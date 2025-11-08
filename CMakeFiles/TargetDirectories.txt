@@ -1,0 +1,3 @@
+C:/Users/LordN.NASHOU/Desktop/code/ASHB2/CMakeFiles/app.dir
+C:/Users/LordN.NASHOU/Desktop/code/ASHB2/CMakeFiles/edit_cache.dir
+C:/Users/LordN.NASHOU/Desktop/code/ASHB2/CMakeFiles/rebuild_cache.dir
