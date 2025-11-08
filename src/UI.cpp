@@ -3,29 +3,35 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <string>
+#include <vector>
 #include "./header/Entity.h"
 #include "./header/UI.h"
+#include <iostream>
 
-#define BUFFER_SIZE
+// ShowEntityWindow implementation
 
-void ShowEntityWindow(Entity* entity, bool* p_open) {
+UI::GridPoint UI::getGridPoint() {
+    return gridPoint;
+}
+
+void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
     if (!ImGui::Begin("=== Entity Statistics ===", p_open, ImGuiWindowFlags_NoCollapse)) {
         ImGui::End();
         return;
     }
 
-    ImGui::Text("%d", entity->entityId);
-    ImGui::Text("name: %s", entity->name);
+    ImGui::Text("ID: %d", entity->entityId);
+    ImGui::Text("Name: %s", entity->name.c_str());
 
     ImGui::Separator();
-    ImGui::Text("Health: %d", entity->entityHealth);
-    ImGui::Text("Age: %d", entity->entityAge);
-    ImGui::Text("Sex: %d", entity->entitySex);
-    ImGui::Text("Hapiness: %d", entity->entityHapiness);
-    ImGui::Text("Stress: %d", entity->entityStress);
-    ImGui::Text("Mental Health: %d", entity->entityMentalHealth);
-    ImGui::Text("Loneliness: %d", entity->entityLoneliness);
-    ImGui::Text("Anger: %d", entity->entityGeneralAnger);
+    ImGui::Text("Health: %.2f", entity->entityHealth);
+    ImGui::Text("Age: %.2f", entity->entityAge);
+    ImGui::Text("Sex: %c", entity->entitySex);
+    ImGui::Text("Happiness: %.2f", entity->entityHapiness);
+    ImGui::Text("Stress: %.2f", entity->entityStress);
+    ImGui::Text("Mental Health: %.2f", entity->entityMentalHealth);
+    ImGui::Text("Loneliness: %.2f", entity->entityLoneliness);
+    ImGui::Text("Anger: %.2f", entity->entityGeneralAnger);
     ImGui::Text("Birthday: %dth day", entity->entityBDay);
     ImGui::Text("Hygiene: %d", entity->entityHygiene);
     ImGui::Separator();
@@ -33,9 +39,49 @@ void ShowEntityWindow(Entity* entity, bool* p_open) {
     ImGui::End();
 }
 
+// DrawGrid implementation
+void UI::DrawGrid(std::vector<GridPoint>& points, float pointSize) {
+    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+    for (auto& p : points) {
+        ImU32 color = p.selected ? IM_COL32(255, 100, 100, 255) : IM_COL32(200, 200, 200, 255);
+        draw_list->AddCircleFilled(p.pos, pointSize, color);
+    }
+}
+
+// HandlePointMovement implementation
+// Returns the index of the selected/moved point, -1 if none
+int UI::HandlePointMovement(std::vector<GridPoint>& points) {
+    ImVec2 mousePos = ImGui::GetIO().MousePos;
+    bool mouseClicked = ImGui::IsMouseClicked(0);
+    bool mouseHeld = ImGui::IsMouseDown(0);
+
+    static int selectedIndex = -1;
+
+    if (mouseClicked) {
+        selectedIndex = -1;
+        for (int i = 0; i < points.size(); i++) {
+            float dx = mousePos.x - points[i].pos.x;
+            float dy = mousePos.y - points[i].pos.y;
+            if (dx * dx + dy * dy < 64.0f) { // radius²
+                selectedIndex = i;
+                points[i].selected = true;
+                break;
+            } else {
+                points[i].selected = false;
+            }
+        }
+    }
+
+    if (mouseHeld && selectedIndex >= 0) {
+        points[selectedIndex].pos = mousePos;
+    }
+
+    return selectedIndex; // returns -1 if no point is selected
+}
 
 
-void createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText) {
+// createPlayer implementation
+void UI::createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText) {
     ImGui::Begin("Player Statistics");
 
     ImGui::Text("Health: %d", health);
