@@ -36,6 +36,32 @@ void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
     ImGui::Text("Hygiene: %d", entity->entityHygiene);
     ImGui::Separator();
 
+       if(entity->list_entityPointedDesire.size() > 0){
+        ImGui::Text("Desire List");
+        for(int i=0; i < entity->list_entityPointedDesire.size(); i++){
+            Entity* pointed = entity->list_entityPointedDesire.at(i).pointedEntity;
+            ImGui::Text("%d -> %d : %s", entity->list_entityPointedDesire.at(i).desire,
+                       pointed->entityId, pointed->name.c_str());
+        }
+    }
+
+    if(entity->list_entityPointedAnger.size() > 0){
+        ImGui::Text("Anger List");
+        for(int i=0; i < entity->list_entityPointedAnger.size(); i++){
+            Entity* pointed = entity->list_entityPointedAnger.at(i).pointedEntity;
+            ImGui::Text("%d -> %d : %s", entity->list_entityPointedAnger.at(i).anger,
+                       pointed->entityId, pointed->name.c_str());
+        }
+    }
+
+    if(entity->list_entityPointedCouple.size() > 0){
+        ImGui::Text("Couple List");
+        for(int i=0; i < entity->list_entityPointedCouple.size(); i++){
+            Entity* pointed = entity->list_entityPointedCouple.at(i).pointedEntity;
+            ImGui::Text("=> %d : %s", pointed->entityId, pointed->name.c_str());
+        }
+    }
+
     ImGui::End();
 }
 

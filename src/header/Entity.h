@@ -4,22 +4,56 @@
 #include <string>
 #include <optional>
 #include <vector>
+//#include "../../libs/BetterRand/BetterRand.h"
+
+
+class Entity;
+
+static std::vector<std::string> male_name = {
+"Sammy",
+"Pierre",
+"Alexander",
+"Griffin",
+"Rayan",
+"Yahir",
+"Marques",
+"Julien",
+"Casey",
+"Fletcher",
+"Isiah",
+"Keegan"};
+
+static std::vector<std::string> female_name = {
+"Amari",
+"Campbell",
+"Iris",
+"Selah",
+"Kamila",
+"Makaila",
+"Bethany",
+"Jazlynn",
+"Hadley",
+"Stella",
+"Mckinley",
+"Eliza"
+};
+
 
 struct entityPointedDesire {
     int Id;
-    int IdPointer;
+    Entity* pointedEntity;  // Changed to pointer
     float desire;
 };
 
 struct entityPointedAnger {
     int Id;
-    int IdPointer;
+    Entity* pointedEntity;  // Changed to pointer
     float anger;
 };
 
 struct entityPointedCouple {
     int id;
-    int IdPointer;
+    Entity* pointedEntity;  // Changed to pointer
 };
 
 class Entity {
@@ -38,6 +72,9 @@ public:
     int entityHygiene;
     char entitySex;
     int entityBDay;
+    std::vector<entityPointedDesire> list_entityPointedDesire;
+    std::vector<entityPointedAnger> list_entityPointedAnger;
+    std::vector<entityPointedCouple> list_entityPointedCouple;
 
     // Optional attributes
     entityPointedDesire pointedDesire;
@@ -46,7 +83,6 @@ public:
 
     // Constructors
     Entity(int id);
-
     Entity(int id,
            float age,
            float health,
@@ -60,13 +96,18 @@ public:
            int hygiene,
            char sex,
            int bDay,
-           entityPointedDesire desire,
-           entityPointedAnger anger,
-           entityPointedCouple couple);
+           entityPointedDesire*,
+           entityPointedAnger*,
+           entityPointedCouple*);
 
     // Methods
     std::string getName();
     float getHealth();
 };
+
+// Move these outside the header to avoid multiple definition errors
+extern std::vector<entityPointedDesire> list_entityPointedDesire;
+extern std::vector<entityPointedAnger> list_entityPointedAnger;
+extern std::vector<entityPointedCouple> list_entityPointedCouple;
 
 #endif // ENTITY_H

@@ -7,10 +7,9 @@
 #include <imgui_impl_opengl3.h>
 #include <string>
 #include <vector>
-#include "Entity.h"
-#include <imgui.h>
 
-
+// Forward declaration of Entity
+class Entity;
 
 class UI {
 public:

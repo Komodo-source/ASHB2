@@ -10,9 +10,11 @@
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include <vector>
-
+#include <time.h>
+#include <random>
 
 int main() {
+     srand(time(NULL));
     if (!glfwInit()) return -1;
 
     GLFWwindow* window = glfwCreateWindow(800, 600, "ASHB2 BUILD", nullptr, nullptr);
@@ -47,7 +49,7 @@ int main() {
     //vector of Entity
     std::vector<Entity> entities;
     for(int i=0;i<nb_entity;i++){
-        Entity entity = Entity(i);
+        Entity entity = Entity(i, 0, 100, 50, 0, 100, "", 0, 0, 0, 100, 'A', 0, nullptr, nullptr, nullptr);
         entities.push_back(entity);
     }
 

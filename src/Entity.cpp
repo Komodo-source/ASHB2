@@ -1,4 +1,9 @@
 #include "./header/Entity.h"
+#include "./header/random.hpp"
+#include <string>
+//#include "../libs/BetterRand/BetterRand.h"
+#include <time.h>
+#include <random>
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -13,15 +18,15 @@ Entity::Entity(int id)
       entityBoredom(0.0f),
       entityGeneralAnger(0.0f),
       entityHygiene(100),
-      entitySex('U'),
+      entitySex('A'),
       entityBDay(0),
       pointedDesire({}),
       pointedAnger({}),
       pointedCouple({})
 {
+
 }
 
-// Constructor with all attributes
 Entity::Entity(int id,
                float age,
                float health,
@@ -35,9 +40,9 @@ Entity::Entity(int id,
                int hygiene,
                char sex,
                int bDay,
-               entityPointedDesire desire,
-               entityPointedAnger anger,
-               entityPointedCouple couple)
+               entityPointedDesire* desire = nullptr,
+               entityPointedAnger* anger = nullptr,
+               entityPointedCouple* couple = nullptr)
     : entityId(id),
       entityAge(age),
       entityHealth(health),
@@ -50,11 +55,35 @@ Entity::Entity(int id,
       entityGeneralAnger(generalAnger),
       entityHygiene(hygiene),
       entitySex(sex),
-      entityBDay(bDay),
-      pointedDesire(desire),
-      pointedAnger(anger),
-      pointedCouple(couple)
+      entityBDay(bDay)
 {
+    if(desire != nullptr){
+        list_entityPointedDesire.push_back(*desire);
+    }else if(anger != nullptr){
+        list_entityPointedAnger.push_back(*anger);
+    }else if(couple != nullptr){
+        list_entityPointedCouple.push_back(*couple);
+    }
+
+
+    if(entitySex == 'A'){
+        if(rand() % 1){
+            entitySex = 'M';
+        }else{
+            entitySex = 'F';
+        }
+    }
+
+    if(name.empty()){
+        int taille = male_name.size() - 1;
+        if (entitySex == 'M') {
+            int index = (rand() % taille);
+                name = male_name.at(index);
+            } else {
+                int index = (rand() % taille);
+                name = female_name.at(index);
+            }
+    }
 }
 
 // Getter for name
@@ -66,3 +95,4 @@ std::string Entity::getName() {
 float Entity::getHealth() {
     return this->entityHealth;
 }
+
