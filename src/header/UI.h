@@ -7,6 +7,7 @@
 #include <imgui_impl_opengl3.h>
 #include <string>
 #include <vector>
+#include <map>
 
 // Forward declaration of Entity
 class Entity;
@@ -23,7 +24,7 @@ public:
     void DrawGrid(std::vector<GridPoint>& points, float pointSize = 8.0f);
     int HandlePointMovement(std::vector<GridPoint>& points);
     void createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText);
-
+    void showSimulationInformation(int day, int num_entity, int tick, std::map<std::string, int> complementary_information);
     GridPoint getGridPoint();
 private:
     GridPoint gridPoint;

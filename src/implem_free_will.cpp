@@ -6,96 +6,26 @@
 #include <algorithm>
 #include <memory>
 #include <deque>
-#include "../header/Entity.h"
+#include "./header/Entity.h"
+#include "./header/FreeWillSystem.h"
+#include <iostream>
 
-// Forward declaration
-class Entity;
+//class Entity;
 
-
-struct StatRequirement {
-    std::string statName;
-    float requiredValue;
-    float weight; // How important this requirement is (0-1)
-};
-
-// Stat changes that result from an action
-struct StatChange {
-    std::string statName;
-    float changeValue;
-};
-
-// Action definition
-struct Action {
-    std::string name;
-    int actionId;
-    std::vector<StatRequirement> requirements;
-    std::vector<StatChange> statChanges;
-    float baseSatisfaction; // How much this action satisfies base needs
-    std::string needCategory; // "social", "health", "entertainment", "hygiene", etc.
-    float duration; // Time this action takes
-
-    Action(std::string n, int id, std::string category = "general")
-        : name(n), actionId(id), needCategory(category), baseSatisfaction(10.0f), duration(1.0f) {}
-};
-
-// Memory of past actions
-struct ActionMemory {
-    int actionId;
-    std::string actionName;
-    int timestamp;
-    float outcomeSuccess; // How successful was the action (0-1)
-    std::map<std::string, float> statsBefore;
-    std::map<std::string, float> statsAfter;
-};
-
-// Need system
-struct Need {
-    std::string name;
-    float urgency; // 0-100, how urgent is this need
-    float decayRate; // How fast this need grows over time
-    std::vector<std::string> satisfyingCategories; // Which action categories satisfy this
-
-    Need(std::string n, float decay = 0.1f)
-        : name(n), urgency(50.0f), decayRate(decay) {}
-
-    void update(float deltaTime) {
-        urgency = std::min(100.0f, urgency + decayRate * deltaTime);
-    }
-
-    void satisfy(float amount) {
-        urgency = std::max(0.0f, urgency - amount);
-    }
-};
-
-// Free Will System
-class FreeWillSystem {
-private:
-    std::deque<ActionMemory> actionHistory; // Last 50 actions
-    static const int MAX_MEMORY = 50;
-    std::map<std::string, Need> needs;
-    std::vector<Action> availableActions;
-    int currentTime;
-    std::mt19937 rng;
-
-    // Get stat value from entity
-    float getEntityStat(Entity* entity, const std::string& statName);
-
-    // Set stat value on entity
-    void setEntityStat(Entity* entity, const std::string& statName, float value);
 
     // Calculate memory weight (more recent = more weight)
-    float getMemoryWeight(int memoryAge) {
+    float FreeWillSystem::getMemoryWeight(int memoryAge) {
         float decay = std::exp(-memoryAge / 20.0f); // Exponential decay
         return decay;
     }
 
     // Calculate how well entity meets action requirements
-    float calculateRequirementFitness(Entity* entity, const Action& action) {
+    float FreeWillSystem::calculateRequirementFitness(Entity* entity, const Action& action) {
         float totalFitness = 0.0f;
         float totalWeight = 0.0f;
 
         for (const auto& req : action.requirements) {
-            float currentValue = getEntityStat(entity, req.statName);
+             float currentValue = getEntityStat(entity, req.statName);
             float difference = currentValue - req.requiredValue;
 
             float fitness;
@@ -114,7 +44,7 @@ private:
     }
 
     // Calculate how much this action addresses current needs
-    float calculateNeedSatisfaction(const Action& action) {
+    float FreeWillSystem::calculateNeedSatisfaction(const Action& action) {
         float satisfaction = 0.0f;
 
         auto needIt = needs.find(action.needCategory);
@@ -127,7 +57,7 @@ private:
     }
 
     // Calculate bias from memory (learn from past experiences)
-    float calculateMemoryBias(int actionId) {
+    float FreeWillSystem::calculateMemoryBias(int actionId) {
         float bias = 0.0f;
         float totalWeight = 0.0f;
         int memoryIndex = 0;
@@ -145,7 +75,7 @@ private:
     }
 
     // Calculate variety bonus (avoid repetition)
-    float calculateVarietyBonus(int actionId) {
+    float FreeWillSystem::calculateVarietyBonus(int actionId) {
         int recentCount = 0;
         int checkDepth = std::min(10, (int)actionHistory.size());
 
@@ -159,13 +89,13 @@ private:
         return std::max(0.0f, 1.0f - (recentCount * 0.2f));
     }
 
-public:
-    FreeWillSystem() : currentTime(0), rng(std::random_device{}()) {
+
+    FreeWillSystem::FreeWillSystem() : currentTime(0), rng(std::random_device{}()) {
         initializeNeeds();
         initializeActions();
     }
 
-    void initializeNeeds() {
+    void FreeWillSystem::initializeNeeds() {
         needs["social"] = Need("social", 0.15f);
         needs["social"].satisfyingCategories = {"social", "entertainment"};
 
@@ -185,7 +115,11 @@ public:
         needs["happiness"].satisfyingCategories = {"entertainment", "social", "achievement"};
     }
 
-    void initializeActions() {
+    //implementation of a list of action
+    void FreeWillSystem::initializeActions() {
+        //murder action
+
+
         // Social actions
         Action socialize("Socialize", 1, "social");
         socialize.requirements = {
@@ -275,79 +209,98 @@ public:
         availableActions.push_back(work);
     }
 
-    // Main decision-making function
-    Action* chooseAction(Entity* entity) {
-        std::vector<std::pair<Action*, float>> actionWeights;
+        // Main decision-making function
+    Action* FreeWillSystem::chooseAction(Entity* entity) {
+            std::cout << "\n=== Choosing Action ===\n";
+            std::vector<std::pair<Action*, float>> actionWeights;
 
-        for (auto& action : availableActions) {
-            // Calculate multiple factors
-            float requirementFitness = calculateRequirementFitness(entity, action);
-            float needSatisfaction = calculateNeedSatisfaction(action);
-            float memoryBias = calculateMemoryBias(action.actionId);
-            float varietyBonus = calculateVarietyBonus(action.actionId);
+            for (auto& action : availableActions) {
+                float requirementFitness = calculateRequirementFitness(entity, action);
+                float needSatisfaction = calculateNeedSatisfaction(action);
+                float memoryBias = calculateMemoryBias(action.actionId);
+                float varietyBonus = calculateVarietyBonus(action.actionId);
 
-            // Combined weight with different factor importance
-            float weight =
-                requirementFitness * 0.3f +  // Can we do it?
-                needSatisfaction * 0.4f +     // Does it satisfy our needs?
-                memoryBias * 0.2f +            // Did it work well before?
-                varietyBonus * 0.1f;           // Avoid repetition
+                std::cout << "\nAction: " << action.name << "\n";
+                std::cout << "  RequirementFitness: " << requirementFitness << "\n";
+                std::cout << "  NeedSatisfaction:   " << needSatisfaction << "\n";
+                std::cout << "  MemoryBias:         " << memoryBias << "\n";
+                std::cout << "  VarietyBonus:       " << varietyBonus << "\n";
 
-            // Add randomness factor (simulate unpredictability)
-            std::uniform_real_distribution<float> dist(0.8f, 1.2f);
-            weight *= dist(rng);
+                float weight =
+                    requirementFitness * 0.3f +
+                    needSatisfaction * 0.4f +
+                    memoryBias * 0.2f +
+                    varietyBonus * 0.1f;
 
-            actionWeights.push_back({&action, weight});
-        }
+                std::uniform_real_distribution<float> dist(0.8f, 1.2f);
+                float randomFactor = dist(rng);
+                weight *= randomFactor;
 
-        // Sort by weight
-        std::sort(actionWeights.begin(), actionWeights.end(),
-                  [](const auto& a, const auto& b) { return a.second > b.second; });
+                std::cout << "  Combined Weight (pre-sort): " << weight
+                        << " (RandomFactor: " << randomFactor << ")\n";
 
-        // Weighted random selection (top actions more likely)
-        float totalWeight = 0.0f;
-        for (const auto& aw : actionWeights) {
-            totalWeight += aw.second;
-        }
-
-        std::uniform_real_distribution<float> selectDist(0.0f, totalWeight);
-        float selection = selectDist(rng);
-
-        float cumulative = 0.0f;
-        for (const auto& aw : actionWeights) {
-            cumulative += aw.second;
-            if (selection <= cumulative) {
-                return aw.first;
+                actionWeights.push_back({&action, weight});
             }
+
+            std::sort(actionWeights.begin(), actionWeights.end(),
+                    [](const auto& a, const auto& b) { return a.second > b.second; });
+
+            std::cout << "\n-- Sorted Action Weights --\n";
+            for (auto& aw : actionWeights) {
+                std::cout << "  " << aw.first->name << ": " << aw.second << "\n";
+            }
+
+            float totalWeight = 0.0f;
+            for (const auto& aw : actionWeights) totalWeight += aw.second;
+
+            std::uniform_real_distribution<float> selectDist(0.0f, totalWeight);
+            float selection = selectDist(rng);
+            std::cout << "\nTotalWeight: " << totalWeight
+                    << " | SelectionPoint: " << selection << "\n";
+
+            float cumulative = 0.0f;
+            for (const auto& aw : actionWeights) {
+                cumulative += aw.second;
+                if (selection <= cumulative) {
+                    std::cout << ">>> Chosen Action: " << aw.first->name << " <<<\n";
+                    return aw.first;
+                }
+            }
+
+            std::cout << ">>> Default fallback to: " << availableActions[0].name << " <<<\n";
+            return &availableActions[0];
         }
 
-        return &availableActions[0]; // Fallback
-    }
 
-    // Execute chosen action
-    void executeAction(Entity* entity, Action* action) {
-        // Store state before action
+        // Execute chosen action
+    void FreeWillSystem::executeAction(Entity* entity, Action* action) {
+        std::cout << "\n=== Executing Action: " << action->name << " ===\n";
+
         std::map<std::string, float> statsBefore = captureEntityStats(entity);
+        std::cout << "Stats Before:\n";
+        for (auto& [k, v] : statsBefore) std::cout << "  " << k << ": " << v << "\n";
 
-        // Apply stat changes
         for (const auto& change : action->statChanges) {
             float currentValue = getEntityStat(entity, change.statName);
-            setEntityStat(entity, change.statName, currentValue + change.changeValue);
+            float newValue = currentValue + change.changeValue;
+            setEntityStat(entity, change.statName, newValue);
+            std::cout << "  Changed " << change.statName << ": " << currentValue
+                    << " -> " << newValue << "\n";
         }
 
-        // Satisfy related needs
         auto needIt = needs.find(action->needCategory);
         if (needIt != needs.end()) {
+            std::cout << "Satisfying need category: " << action->needCategory << "\n";
             needIt->second.satisfy(action->baseSatisfaction);
         }
 
-        // Store state after action
         std::map<std::string, float> statsAfter = captureEntityStats(entity);
+        std::cout << "Stats After:\n";
+        for (auto& [k, v] : statsAfter) std::cout << "  " << k << ": " << v << "\n";
 
-        // Calculate outcome success
         float outcomeSuccess = calculateOutcomeSuccess(statsBefore, statsAfter);
+        std::cout << "Outcome Success: " << outcomeSuccess << "\n";
 
-        // Record in memory
         ActionMemory memory;
         memory.actionId = action->actionId;
         memory.actionName = action->name;
@@ -357,39 +310,36 @@ public:
         memory.statsAfter = statsAfter;
 
         actionHistory.push_front(memory);
-
-        // Keep only last 50 actions
-        if (actionHistory.size() > MAX_MEMORY) {
-            actionHistory.pop_back();
-        }
+        if (actionHistory.size() > MAX_MEMORY) actionHistory.pop_back();
 
         currentTime++;
+        std::cout << "Action completed. Memory recorded. Time now: " << currentTime << "\n";
     }
 
     // Update needs over time
-    void updateNeeds(float deltaTime) {
+    void FreeWillSystem::updateNeeds(float deltaTime) {
         for (auto& needPair : needs) {
             needPair.second.update(deltaTime);
         }
     }
 
     // Add custom action
-    void addAction(const Action& action) {
+    void FreeWillSystem::addAction(const Action& action) {
         availableActions.push_back(action);
     }
 
     // Get action history
-    const std::deque<ActionMemory>& getActionHistory() const {
+    const std::deque<ActionMemory>& FreeWillSystem::getActionHistory() const {
         return actionHistory;
     }
 
     // Get current needs
-    const std::map<std::string, Need>& getNeeds() const {
+    const std::map<std::string, Need>& FreeWillSystem::getNeeds() const {
         return needs;
     }
 
-private:
-    std::map<std::string, float> captureEntityStats(Entity* entity) {
+
+    std::map<std::string, float> FreeWillSystem::captureEntityStats(Entity* entity) {
         return {
             {"health", entity->entityHealth},
             {"happiness", entity->entityHapiness},
@@ -402,7 +352,7 @@ private:
         };
     }
 
-    float calculateOutcomeSuccess(const std::map<std::string, float>& before,
+    float FreeWillSystem::calculateOutcomeSuccess(const std::map<std::string, float>& before,
                                    const std::map<std::string, float>& after) {
         // Compare positive stats (higher is better)
         float success = 0.0f;
@@ -422,7 +372,6 @@ private:
 
         return count > 0 ? success / count : 0.5f;
     }
-};
 
 // Implementation of stat getter/setter
 float FreeWillSystem::getEntityStat(Entity* entity, const std::string& statName) {

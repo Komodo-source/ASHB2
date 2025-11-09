@@ -7,12 +7,40 @@
 #include "./header/Entity.h"
 #include "./header/UI.h"
 #include <iostream>
+#include <map>
+
 
 // ShowEntityWindow implementation
 
 UI::GridPoint UI::getGridPoint() {
     return gridPoint;
 }
+
+//complementary_info = nombre de couple, nombre de mort etc etc
+void UI::showSimulationInformation(int day, int num_entity, int tick, std::map<std::string, int> complementary_information){
+    ImGui::Begin("=== Simulation Statistics ===");
+    ImGui::Text("Number Entities: %d", num_entity);
+    ImGui::Text("day: %d", day);
+    ImGui::Text("actual tick: %d", tick);
+    ImGui::Separator();
+    for(auto& p : complementary_information){
+        ImGui::Text("%s: %d", p.first,p.second);
+    }
+    ImGui::End();
+}
+
+/*
+void UI::showSystemInformation(){
+    ImGui::Begin("=== System Statistics ===");
+    ImGui::Text("Number Entities: %d", num_entity);
+    ImGui::Text("day: %d", day);
+    ImGui::Text("actual tick: %d", tick);
+    ImGui::Separator();
+    for(auto& p : complementary_information){
+        ImGui::Text("%s: %d", p.first,p.second);
+    }
+    ImGui::End();
+}*/
 
 void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
     if (!ImGui::Begin("=== Entity Statistics ===", p_open, ImGuiWindowFlags_NoCollapse)) {

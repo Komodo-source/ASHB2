@@ -1,10 +1,9 @@
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 cmake_minimum_required(VERSION 3.10)
-project(ImGuiApp)
+project(ASHB2)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Chemins vers les bibliothèques
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/libs/glfw")
@@ -33,7 +32,12 @@ link_directories(${GLFW_DIR}/lib-mingw-w64)  # Ajustez selon votre compilateur
 find_package(OpenGL REQUIRED)
 
 # Créer l'exécutable
-add_executable(app src/main.cpp src/UI.cpp src/Entity.cpp ${IMGUI_SOURCES})
+add_executable(app
+src/main.cpp
+src/UI.cpp
+src/Entity.cpp
+${IMGUI_SOURCES}
+src/implem_free_will.cpp)
 
 # Lier les bibliothèques
 target_link_libraries(app

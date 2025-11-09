@@ -12,7 +12,22 @@
 #include <vector>
 #include <time.h>
 #include <random>
+#include <thread>
+#include "./header/FreeWillSystem.h"
 
+int main(){
+    Entity entity = Entity(1, 0, 100, 50, 0, 100, "", 0, 0, 0, 100, 'A', 0, nullptr, nullptr, nullptr);
+    FreeWillSystem sys;
+    while(true){
+        sys.updateNeeds(1.0f);
+        Action* chosen =sys.chooseAction(&entity);
+        sys.executeAction(&entity, chosen);
+    }
+
+    sys.addAction()
+}
+
+/*
 int main() {
      srand(time(NULL));
     if (!glfwInit()) return -1;
@@ -61,6 +76,9 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+
+        instanceUI.showSimulationInformation(0, entities.size(), 1, {});
+
         int moved_entity = instanceUI.HandlePointMovement(points);
         if (moved_entity != -1) {
             if (showEntityWindow) {
@@ -87,3 +105,4 @@ int main() {
     glfwTerminate();
     return 0;
 }
+*/
