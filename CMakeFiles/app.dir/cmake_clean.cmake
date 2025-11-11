@@ -13,6 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj.d"
   "CMakeFiles/app.dir/src/Entity.cpp.obj"
   "CMakeFiles/app.dir/src/Entity.cpp.obj.d"
+  "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj"
+  "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj.d"
   "CMakeFiles/app.dir/src/UI.cpp.obj"
   "CMakeFiles/app.dir/src/UI.cpp.obj.d"
   "CMakeFiles/app.dir/src/implem_free_will.cpp.obj"

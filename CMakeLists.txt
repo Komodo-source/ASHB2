@@ -37,7 +37,9 @@ src/main.cpp
 src/UI.cpp
 src/Entity.cpp
 ${IMGUI_SOURCES}
-src/implem_free_will.cpp)
+src/implem_free_will.cpp
+src/SpatialMesh.cpp
+)
 
 # Lier les bibliothèques
 target_link_libraries(app

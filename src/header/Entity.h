@@ -103,6 +103,7 @@ public:
     // Methods
     std::string getName();
     float getHealth();
+    int getId();
 };
 
 // Move these outside the header to avoid multiple definition errors

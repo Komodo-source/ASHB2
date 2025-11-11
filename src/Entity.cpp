@@ -91,6 +91,10 @@ std::string Entity::getName() {
     return this->name;
 }
 
+int Entity::getId() {
+    return this->entityId;
+}
+
 // Getter for health
 float Entity::getHealth() {
     return this->entityHealth;

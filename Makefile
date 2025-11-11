@@ -296,6 +296,30 @@ src/Entity.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Entity.cpp.s
 .PHONY : src/Entity.cpp.s
 
+src/SpatialMesh.obj: src/SpatialMesh.cpp.obj
+.PHONY : src/SpatialMesh.obj
+
+# target to build an object file
+src/SpatialMesh.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SpatialMesh.cpp.obj
+.PHONY : src/SpatialMesh.cpp.obj
+
+src/SpatialMesh.i: src/SpatialMesh.cpp.i
+.PHONY : src/SpatialMesh.i
+
+# target to preprocess a source file
+src/SpatialMesh.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SpatialMesh.cpp.i
+.PHONY : src/SpatialMesh.cpp.i
+
+src/SpatialMesh.s: src/SpatialMesh.cpp.s
+.PHONY : src/SpatialMesh.s
+
+# target to generate assembly for a file
+src/SpatialMesh.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SpatialMesh.cpp.s
+.PHONY : src/SpatialMesh.cpp.s
+
 src/UI.obj: src/UI.cpp.obj
 .PHONY : src/UI.obj
 
@@ -398,6 +422,9 @@ help:
 	@echo ... src/Entity.obj
 	@echo ... src/Entity.i
 	@echo ... src/Entity.s
+	@echo ... src/SpatialMesh.obj
+	@echo ... src/SpatialMesh.i
+	@echo ... src/SpatialMesh.s
 	@echo ... src/UI.obj
 	@echo ... src/UI.i
 	@echo ... src/UI.s

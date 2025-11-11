@@ -14,7 +14,12 @@
 #include <random>
 #include <thread>
 #include "./header/FreeWillSystem.h"
+#include "./header/SpatialMesh.h"
+#include "./header/BetterRand.h"
+#include <iostream>
 
+
+    /*
 int main(){
     Entity entity = Entity(1, 0, 100, 50, 0, 100, "", 0, 0, 0, 100, 'A', 0, nullptr, nullptr, nullptr);
     FreeWillSystem sys;
@@ -23,16 +28,35 @@ int main(){
         Action* chosen =sys.chooseAction(&entity);
         sys.executeAction(&entity, chosen);
     }
-
-    sys.addAction()
+    //sys.addAction()
 }
 
-/*
+*/
+
+std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, std::vector<UI::GridPoint> position, float width, float height, float radius=100){
+    std::cout << "== Patial Mesh Separation ==\n";
+    auto groups = getCloseEntityGroups(position, entities, width, height, radius);
+    std::cout << "Found " << groups.size() << " groups of close entities:\n\n";
+
+    for (size_t i = 0; i < groups.size(); ++i) {
+        std::cout << "Group " << i + 1 << " (" << groups[i].size() << " entities):\n";
+        for (Entity* entity : groups[i]) {
+            std::cout << "  Entity " << entity->getId() << "\n";  // Assuming getId() method
+        }
+        std::cout << "\n";
+    }
+    std::cout << "== end of separation ==\n";
+    return groups;
+}
+
 int main() {
-     srand(time(NULL));
+    srand(time(NULL));
     if (!glfwInit()) return -1;
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "ASHB2 BUILD", nullptr, nullptr);
+    const float height = 600;
+    const float width = 800;
+
+    GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 BUILD", nullptr, nullptr);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -63,12 +87,18 @@ int main() {
 
     //vector of Entity
     std::vector<Entity> entities;
-    for(int i=0;i<nb_entity;i++){
+    for(int i=0; i<nb_entity; i++){
         Entity entity = Entity(i, 0, 100, 50, 0, 100, "", 0, 0, 0, 100, 'A', 0, nullptr, nullptr, nullptr);
         entities.push_back(entity);
     }
 
     static bool showEntityWindow = true;
+    std::vector<Entity*> ent_quad;
+    for(int i=0; i<entities.size(); i++){
+        ent_quad.push_back(&entities[i]);
+    }
+
+    std::vector<std::vector<Entity*>> close = separationQuad(ent_quad, points, width, height);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -85,7 +115,6 @@ int main() {
                 instanceUI.ShowEntityWindow(&entities.at(moved_entity), &showEntityWindow);
             }
         }
-
 
         instanceUI.DrawGrid(points);
 
@@ -105,4 +134,3 @@ int main() {
     glfwTerminate();
     return 0;
 }
-*/

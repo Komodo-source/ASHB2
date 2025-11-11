@@ -9,6 +9,7 @@
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
 #include <iostream>
+#include "./header/BetterRand.h"
 
 //class Entity;
 
@@ -117,7 +118,8 @@
 
     //implementation of a list of action
     void FreeWillSystem::initializeActions() {
-        //murder action
+        //a implem action pointé
+        //hurt someone action
 
 
         // Social actions
@@ -143,7 +145,7 @@
         };
         exercise.statChanges = {
             {"health", 10.0f},
-            {"stress", -15.0f},
+            {"stress", -10.0f},
             {"happiness", 10.0f},
             {"boredom", -10.0f}
         };
@@ -282,7 +284,8 @@
 
         for (const auto& change : action->statChanges) {
             float currentValue = getEntityStat(entity, change.statName);
-            float newValue = currentValue + change.changeValue;
+            float newValue = currentValue + BetterRand::genNrInInterval(change.changeValue -4, change.changeValue+4); // nouvelle valeur appliqué
+            //on fait une variation de 4
             setEntityStat(entity, change.statName, newValue);
             std::cout << "  Changed " << change.statName << ": " << currentValue
                     << " -> " << newValue << "\n";
