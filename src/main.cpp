@@ -17,6 +17,7 @@
 #include "./header/SpatialMesh.h"
 #include "./header/BetterRand.h"
 #include <iostream>
+#include <thread>
 
 
     /*
@@ -32,6 +33,15 @@ int main(){
 }
 
 */
+
+void applyFreeWill(std::vector<Entity>& entities, std::vector<Entity> neighboor){
+    for(Entity en : entities){
+        FreeWillSystem sys;
+        sys.updateNeeds(1.0f);
+        Action* chosen = sys.chooseAction(&en);
+        sys.executeAction(&en, chosen);
+    }
+}
 
 std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, std::vector<UI::GridPoint> position, float width, float height, float radius=100){
     std::cout << "== Patial Mesh Separation ==\n";

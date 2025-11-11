@@ -102,7 +102,8 @@ public:
     void initializeActions();
 
     Action* chooseAction(Entity* entity);
-    void executeAction(Entity* entity, Action* action);
+    void executeAction(Entity* entity, Action* action, Entity* pointed=nullptr);
+    void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
 
     void updateNeeds(float deltaTime);
     void addAction(const Action& action);

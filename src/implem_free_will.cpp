@@ -106,9 +106,6 @@
         needs["hygiene"] = Need("hygiene", 0.12f);
         needs["hygiene"].satisfyingCategories = {"hygiene"};
 
-        needs["entertainment"] = Need("entertainment", 0.2f);
-        needs["entertainment"].satisfyingCategories = {"entertainment", "social"};
-
         needs["safety"] = Need("safety", 0.05f);
         needs["safety"].satisfyingCategories = {"safety", "health"};
 
@@ -120,7 +117,6 @@
     void FreeWillSystem::initializeActions() {
         //a implem action pointé
         //hurt someone action
-
 
         // Social actions
         Action socialize("Socialize", 1, "social");
@@ -164,21 +160,6 @@
         };
         shower.baseSatisfaction = 15.0f;
         availableActions.push_back(shower);
-
-        // Entertainment actions
-        Action play("Play Game", 4, "entertainment");
-        play.requirements = {
-            {"boredom", 40.0f, 0.8f},
-            {"stress", 70.0f, 0.3f}
-        };
-        play.statChanges = {
-            {"boredom", -30.0f},
-            {"happiness", 20.0f},
-            {"stress", -10.0f},
-            {"loneliness", 5.0f}
-        };
-        play.baseSatisfaction = 30.0f;
-        availableActions.push_back(play);
 
         // Rest action
         Action rest("Rest", 5, "health");
@@ -273,9 +254,33 @@
             return &availableActions[0];
         }
 
+    //ici on assimile l'action pointé vers sur celui qui est pointé
+    //par le pointeur
+    void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action){
+        if(action->name == "Desire"){
+            auto list_desire = pointer->getListDesire();
+            int index = pointer->contains(list_desire, pointed, 1);
+            if(index == -1){ // n'as pas de desire, créer un nouveau
+            //pour l'instant on met a voir pour un auto incrément
+            //ou val aléatoire
+                float desire = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
+                pointer->addSocial( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
+            }else{ //le désire existe déjà
+                auto list_social = pointer->getListSocial();
+                int index_social = pointer->contains(list_social, pointed, 1);
+                int borne_haut = 5;
+                if(index_social != 1){ //si a des liens social augmenté le désir
+                    borne_haut += (list_social[index_social].social / 10);
+                }
+
+                list_desire[index].desire += static_cast<float>(BetterRand::genNrInInterval(1,borne_haut));
+            }
+        }
+    }
 
         // Execute chosen action
-    void FreeWillSystem::executeAction(Entity* entity, Action* action) {
+    void FreeWillSystem::executeAction(Entity* entity, Action* action, Entity* pointed=nullptr) {
         std::cout << "\n=== Executing Action: " << action->name << " ===\n";
 
         std::map<std::string, float> statsBefore = captureEntityStats(entity);

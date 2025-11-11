@@ -4,6 +4,7 @@
 //#include "../libs/BetterRand/BetterRand.h"
 #include <time.h>
 #include <random>
+#include <algorithm>
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -42,7 +43,8 @@ Entity::Entity(int id,
                int bDay,
                entityPointedDesire* desire = nullptr,
                entityPointedAnger* anger = nullptr,
-               entityPointedCouple* couple = nullptr)
+               entityPointedCouple* couple = nullptr,
+               entityPointedSocial* social = nullptr)
     : entityId(id),
       entityAge(age),
       entityHealth(health),
@@ -63,6 +65,8 @@ Entity::Entity(int id,
         list_entityPointedAnger.push_back(*anger);
     }else if(couple != nullptr){
         list_entityPointedCouple.push_back(*couple);
+    }else if(social != nullptr){
+        list_entityPointedSocial.push_back(*social);
     }
 
 
@@ -100,3 +104,74 @@ float Entity::getHealth() {
     return this->entityHealth;
 }
 
+void Entity::addDesire(entityPointedDesire pointed) {
+    list_entityPointedDesire.push_back(pointed);
+}
+
+
+void Entity::addAnger(entityPointedAnger pointed) {
+    list_entityPointedAnger.push_back(pointed);
+}
+
+void Entity::addCouple(entityPointedCouple pointed) {
+    list_entityPointedCouple.push_back(pointed);
+}
+
+void Entity::addSocial(entityPointedSocial pointed) {
+    list_entityPointedSocial.push_back(pointed);
+}
+
+
+std::vector<entityPointedDesire> Entity::getListDesire(){ return list_entityPointedDesire;}
+std::vector<entityPointedAnger> Entity::getListAnger(){ return list_entityPointedAnger;}
+std::vector<entityPointedCouple> Entity::getListCouple(){ return list_entityPointedCouple;}
+std::vector<entityPointedSocial> Entity::getListSocial(){ return list_entityPointedSocial;}
+
+//retourne 1 si trouve la struct dans la liste passé, num_list= 1: Desire, 2: Anger, 3: Couple, 4: Social
+int Entity::contains(const auto vec, Entity* ptr, int num_list) {
+    switch (num_liste)
+    {
+    case 1:
+        auto it =  std::find_if(vec.begin(), vec.end(),
+        [ptr](const entityPointedDesire& e) {
+            return e.pointedEntity == ptr;
+        }) != vec.end();
+        return std::distance(vec.begin(), it);
+        if(it != vec.end())
+            return static_cast<int>(std::distance(vec.begin(), it));
+        return -1;
+        break;
+    case 2:
+        auto it =  std::find_if(vec.begin(), vec.end(),
+        [ptr](const entityPointedAnger& e) {
+            return e.pointedEntity == ptr;
+        }) != vec.end();
+        break;
+        if(it != vec.end())
+            return static_cast<int>(std::distance(vec.begin(), it));
+        return -1;
+    case 3:
+        auto it =  std::find_if(vec.begin(), vec.end(),
+        [ptr](const entityPointedCouple& e) {
+            return e.pointedEntity == ptr;
+        }) != vec.end();
+        break;
+        if(it != vec.end())
+            return static_cast<int>(std::distance(vec.begin(), it));
+        return -1;
+    case 4:
+        auto it =  std::find_if(vec.begin(), vec.end(),
+        [ptr](const entityPointedSocial& e) {
+            return e.pointedEntity == ptr;
+        }) != vec.end();
+        break;
+        if(it != vec.end())
+            return static_cast<int>(std::distance(vec.begin(), it));
+        return -1;
+
+    default:
+        return false;
+        break;
+    }
+
+}
