@@ -108,6 +108,7 @@ int main() {
     srand(time(NULL));
     if (!glfwInit()) return -1;
 
+
     const float height = 600;
     const float width = 800;
 
@@ -163,6 +164,7 @@ int main() {
     // std::thread statistics(applyFreeWill, std::ref(close_entity_together));
 
     int frameCounter = 0;
+    int day = 0;
     const int UPDATE_FREQUENCY = 60; // Update free will every 60 frames
 
     while (!glfwWindowShouldClose(window)) {
@@ -170,6 +172,39 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        // Check for dead entities and remove them
+        for(int i = entities.size() - 1; i >= 0; i--){
+            if(entities[i].entityHealth <= 0.0f){
+                std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
+
+                // Remove from points vector
+                if(i < points.size()){
+                    points.erase(points.begin() + i);
+                    // Update IDs for remaining points
+                    for(int j = i; j < points.size(); j++){
+                        points[j].id = j;
+                    }
+                }
+
+                // Remove from entities vector
+                entities.erase(entities.begin() + i);
+
+                // Rebuild ent_quad pointer vector
+                ent_quad.clear();
+                for(int j = 0; j < entities.size(); j++){
+                    ent_quad.push_back(&entities[j]);
+                }
+
+                // Reset selected entity if it was removed
+                if(selectedEntityIndex == i){
+                    showEntityWindow = false;
+                    selectedEntityIndex = -1;
+                } else if(selectedEntityIndex > i){
+                    selectedEntityIndex--;
+                }
+            }
+        }
 
         // Update free will system periodically
         frameCounter++;
@@ -180,10 +215,12 @@ int main() {
             close_entity_together = separationQuad(ent_quad, points, width, height);
 
             // Apply free will to all entity groups
+            std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
             applyFreeWill(close_entity_together);
         }
 
-        instanceUI.showSimulationInformation(0, entities.size(), 1, {});
+        // 60 tick
+        instanceUI.showSimulationInformation(day / 60 , entities.size(), UPDATE_FREQUENCY, {});
 
         int moved_entity = instanceUI.HandlePointMovement(points);
         if (moved_entity != -1) {
@@ -191,7 +228,7 @@ int main() {
             showEntityWindow = true;
         }
 
-        if (showEntityWindow && selectedEntityIndex >= 0) {
+        if (showEntityWindow && selectedEntityIndex >= 0 && selectedEntityIndex < entities.size()) {
             instanceUI.ShowEntityWindow(&entities.at(selectedEntityIndex), &showEntityWindow);
         }
 
@@ -205,6 +242,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
+        day ++;
     }
 
     ImGui_ImplOpenGL3_Shutdown();

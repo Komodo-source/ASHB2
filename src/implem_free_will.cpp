@@ -121,10 +121,10 @@
             {"stress", 30.0f, 0.3f}
         };
         socialize.statChanges = {
-            {"loneliness", -10.0f},
-            {"happiness", 10.0f},
-            {"stress", -7.0f},
-            {"boredom", -11.0f}
+            {"loneliness", -7.0f},
+            {"happiness", 6.0f},
+            {"stress", -4.0f},
+            {"boredom", -9.0f}
         };
         socialize.baseSatisfaction = 20.0f;
         availableActions.push_back(socialize);
@@ -135,9 +135,9 @@
             {"happiness", 40.0f, 0.6f}
         };
         desire.statChanges = {
-            {"loneliness", -15.0f},
-            {"happiness", 20.0f},
-            {"stress", -5.0f}
+            {"loneliness", -12.0f},
+            {"happiness", 13.0f},
+            {"stress", -6.0f}
         };
         desire.baseSatisfaction = 30.0f;
         availableActions.push_back(desire);
@@ -148,10 +148,10 @@
             {"loneliness", 30.0f, 0.8f}
         };
         goodconn.statChanges = {
-            {"happiness", 15.0f},
-            {"loneliness", -20.0f},
-            {"mentalHealth", 10.0f},
-            {"stress", -10.0f}
+            {"happiness", 13.0f},
+            {"loneliness", -14.0f},
+            {"mentalHealth", 9.0f},
+            {"stress", -4.0f}
         };
         goodconn.baseSatisfaction = 35.0f;
         availableActions.push_back(goodconn);
@@ -162,10 +162,10 @@
             {"stress", 50.0f, 0.7f}
         };
         angconn.statChanges = {
-            {"anger", 10.0f},
-            {"stress", 15.0f},
-            {"happiness", -10.0f},
-            {"mentalHealth", -5.0f}
+            {"anger", 13.0f},
+            {"stress", 17.0f},
+            {"happiness", -12.0f},
+            {"mentalHealth", -7.0f}
         };
         angconn.baseSatisfaction = 15.0f;
         availableActions.push_back(angconn);
@@ -178,25 +178,25 @@
             {"stress", 70.0f, 0.8f}
         };
         murder.statChanges = {
-            {"anger", -30.0f},
-            {"mentalHealth", -40.0f},
-            {"stress", 50.0f},
-            {"happiness", -50.0f}
+            {"anger", -33.0f},
+            {"mentalHealth", -23.0f},
+            {"stress", 17.0f},
+            {"happiness", 3.0f}
         };
         murder.baseSatisfaction = 10.0f;
         availableActions.push_back(murder);
 
         Action discrimination("Discrimination", 6, "social");
         discrimination.requirements = {
-            {"anger", 50.0f, 0.8f},
-            {"mentalHealth", 40.0f, 0.6f},
-            {"stress", 50.0f, 0.5f}
+            {"anger", 30.0f, 0.8f},
+            {"mentalHealth", 20.0f, 0.6f},
+            {"stress", 35.0f, 0.5f}
         };
         discrimination.statChanges = {
-            {"anger", -10.0f},
-            {"mentalHealth", -10.0f},
+            {"anger", -14.0f},
+            {"mentalHealth", -12.0f},
             {"stress", 5.0f},
-            {"happiness", -5.0f}
+            {"happiness", -1.0f}
         };
         discrimination.baseSatisfaction = 5.0f;
         availableActions.push_back(discrimination);
@@ -206,7 +206,7 @@
         suicide.requirements = {
             {"mentalHealth", 10.0f, 1.0f},
             {"stress", 90.0f, 1.0f},
-            {"happiness", 10.0f, 0.9f}
+            {"happiness", 5.0f, 0.9f}
         };
         suicide.statChanges = {
             {"health", -100.0f},
@@ -221,9 +221,9 @@
             {"mentalHealth", 40.0f, 0.7f}
         };
         anxiety.statChanges = {
-            {"stress", 10.0f},
+            {"stress", 17.0f},
             {"mentalHealth", -10.0f},
-            {"health", -5.0f},
+            {"health", -7.0f},
             {"happiness", -10.0f}
         };
         anxiety.baseSatisfaction = 5.0f;
@@ -237,7 +237,7 @@
             {"stress", 40.0f, 0.5f}
         };
         breeding.statChanges = {
-            {"happiness", 25.0f},
+            {"happiness", 35.0f},
             {"stress", -15.0f},
             {"loneliness", -20.0f},
             {"health", -10.0f}
@@ -266,7 +266,7 @@
             {"hygiene", 50.0f, 0.9f}
         };
         shower.statChanges = {
-            {"hygiene", 40.0f},
+            {"hygiene", 30.0f},
             {"happiness", 5.0f},
             {"stress", -5.0f}
         };
@@ -280,7 +280,7 @@
             {"health", 40.0f, 0.5f}
         };
         rest.statChanges = {
-            {"stress", -25.0f},
+            {"stress", -20.0f},
             {"health", 15.0f},
             {"mentalHealth", 10.0f},
             {"boredom", 10.0f}
@@ -295,7 +295,7 @@
             {"health", 50.0f, 0.4f}
         };
         work.statChanges = {
-            {"stress", 15.0f},
+            {"stress", 17.0f},
             {"happiness", 15.0f},
             {"boredom", -20.0f},
             {"loneliness", 10.0f}
@@ -335,7 +335,7 @@
             // Negative relationships increase weight for negative actions
             for (const auto& anger : angerList) {
                 if (anger.pointedEntity == neighbor) {
-                    relationshipWeight -= anger.anger * 0.1f;
+                    relationshipWeight -= anger.anger * 0.17f;
                 }
             }
 
@@ -389,10 +389,25 @@
                     varietyBonus * 0.1f +
                     socialInfluence * 0.15f;
 
+                // Apply rarity multipliers for extreme actions
+                float rarityMultiplier = 1.0f;
+                if (action.name == "Murder") {
+                    rarityMultiplier = 0.05f; // 5% probability weight
+                } else if (action.name == "Suicide") {
+                    rarityMultiplier = 0.02f; // 2% probability weight
+                } else if (action.name == "Discrimination") {
+                    rarityMultiplier = 0.3f; // 30% probability weight
+                } else if (action.name == "Anxiety") {
+                    rarityMultiplier = 0.4f; // 40% probability weight
+                }
+
+                weight *= rarityMultiplier;
+
                 std::uniform_real_distribution<float> dist(0.8f, 1.2f);
                 float randomFactor = dist(rng);
                 weight *= randomFactor;
 
+                std::cout << "  RarityMultiplier:   " << rarityMultiplier << "\n";
                 std::cout << "  Combined Weight (pre-sort): " << weight
                         << " (RandomFactor: " << randomFactor << ")\n";
 
@@ -432,56 +447,56 @@
     //par le pointeur
     void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action){
         if(action->name == "Desire"){
-            auto list_desire = pointer->getListDesire();
-            int index = pointer->contains(list_desire, pointed, 1);
+            int index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
             if(index == -1){ // n'as pas de desire, créer un nouveau
-            //pour l'instant on met a voir pour un auto incrément
-            //ou val aléatoire
                 float desire = static_cast<float>(BetterRand::genNrInInterval(1,5));
                 std::cout << "Nouveau lien de desire ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
-                pointer->addDesire( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
+                pointer->addDesire({1, pointed, desire});
             }else{ //le désire existe déjà
-                auto list_social = pointer->getListSocial();
-                int index_social = pointer->contains(list_social, pointed, 1);
+                int index_social = pointer->contains(pointer->list_entityPointedSocial, pointed, 1);
                 int borne_haut = 5;
                 if(index_social != -1){ //si a des liens social augmenté le désir
-                    borne_haut += (list_social[index_social].social / 10);
+                    borne_haut += (pointer->list_entityPointedSocial[index_social].social / 10);
                 }
-                list_desire[index].desire += static_cast<float>(BetterRand::genNrInInterval(1,borne_haut));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(1, borne_haut));
+                pointer->list_entityPointedDesire[index].desire += increment;
+                std::cout << "Desire renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "AngerConnection"){
-            auto list_anger = pointer->getListAnger();
-            int index = pointer->contains(list_anger, pointed, 2);
+            int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
             if(index == -1){
                 float anger = static_cast<float>(BetterRand::genNrInInterval(1,5));
                 std::cout << "Nouveau lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
-                pointer->addAnger( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
-            }else{ // TODO: implem si fils d'une personne anciennement anger mettre plus anger
-                list_anger[index].anger += static_cast<float>(BetterRand::genNrInInterval(1,5));
+                pointer->addAnger({1, pointed, anger});
+            }else{
+                float increment = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                pointer->list_entityPointedAnger[index].anger += increment;
+                std::cout << "Anger renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "Socialize"){
-            auto list_social = pointer->getListSocial();
-            int index = pointer->contains(list_social, pointed, 4);
+            int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(index == -1){
                 float social = static_cast<float>(BetterRand::genNrInInterval(1,5));
                 std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
-                pointer->addSocial( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
+                pointer->addSocial({1, pointed, social});
             }else{
-                list_social[index].social += static_cast<float>(BetterRand::genNrInInterval(1,5));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                pointer->list_entityPointedSocial[index].social += increment;
+                std::cout << "Social renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "GoodConnection"){
-            auto list_social = pointer->getListSocial();
-            int index = pointer->contains(list_social, pointed, 4);
+            int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(index == -1){
                 float social = static_cast<float>(BetterRand::genNrInInterval(5,10));
                 std::cout << "Nouveau lien social (good) ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
-                pointer->addSocial( {1, pointed,  social});
+                pointer->addSocial({1, pointed, social});
             }else{
-                list_social[index].social += static_cast<float>(BetterRand::genNrInInterval(5,10));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(5,10));
+                pointer->list_entityPointedSocial[index].social += increment;
+                std::cout << "Social (good) renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "Breeding"){
-            auto list_couple = pointer->getListCouple();
-            int index = pointer->contains(list_couple, pointed, 3);
+            int index = pointer->contains(pointer->list_entityPointedCouple, pointed, 3);
             if(index == -1){
                 std::cout << "Nouveau couple ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
                 pointer->addCouple({1, pointed});
@@ -493,14 +508,15 @@
             // Mark pointed entity as dead (health = 0)
             pointed->entityHealth = 0.0f;
         }else if(action->name == "Discrimination"){
-            auto list_anger = pointer->getListAnger();
-            int index = pointer->contains(list_anger, pointed, 2);
+            int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
             if(index == -1){
                 float anger = static_cast<float>(BetterRand::genNrInInterval(3,8));
                 std::cout << "Discrimination: lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
-                pointer->addAnger( {1, pointed,  anger});
+                pointer->addAnger({1, pointed, anger});
             }else{
-                list_anger[index].anger += static_cast<float>(BetterRand::genNrInInterval(2,6));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(2,6));
+                pointer->list_entityPointedAnger[index].anger += increment;
+                std::cout << "Discrimination renforcée entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }
     }

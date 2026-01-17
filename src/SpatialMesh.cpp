@@ -122,6 +122,7 @@ void QuadTree::clear() {
 }
 
 // Fonction principale
+
 std::vector<std::vector<Entity*>> getCloseEntityGroups(
     const std::vector<UI::GridPoint>& gridPoints,
     const std::vector<Entity*>& entities,
@@ -129,18 +130,18 @@ std::vector<std::vector<Entity*>> getCloseEntityGroups(
     float worldHeight,
     float interactionRadius)
 {
+    // 1. Prepare data
     std::vector<EntityPosition> entityPositions;
     entityPositions.reserve(gridPoints.size());
 
     for (const auto& point : gridPoints) {
-        if (point.id >= 0 && point.id < entities.size() && entities[point.id] != nullptr) {
+        if (point.id >= 0 && (size_t)point.id < entities.size() && entities[point.id] != nullptr) {
             entityPositions.emplace_back(entities[point.id], point.pos.x, point.pos.y);
         }
     }
 
-    QuadTree tree(AABB(worldWidth / 2, worldHeight / 2,
-                       worldWidth / 2, worldHeight / 2));
-
+    // 2. Build QuadTree
+    QuadTree tree(AABB(worldWidth / 2, worldHeight / 2, worldWidth / 2, worldHeight / 2));
     for (auto& entityPos : entityPositions) {
         tree.insert(&entityPos);
     }
@@ -148,27 +149,40 @@ std::vector<std::vector<Entity*>> getCloseEntityGroups(
     std::vector<std::vector<Entity*>> groups;
     std::vector<bool> processed(entityPositions.size(), false);
 
+    // 3. Grouping using BFS (Flood Fill)
     for (size_t i = 0; i < entityPositions.size(); ++i) {
         if (processed[i]) continue;
 
-        EntityPosition& entityPos = entityPositions[i];
-        std::vector<EntityPosition*> closeEntityPositions;
+        // Start a new group
+        std::vector<Entity*> currentGroup;
+        std::vector<size_t> queue;
 
-        tree.queryRadius(entityPos.x, entityPos.y, interactionRadius, closeEntityPositions);
+        queue.push_back(i);
+        processed[i] = true;
 
-        if (closeEntityPositions.size() > 1) {
-            std::vector<Entity*> group;
-            for (EntityPosition* nearbyPos : closeEntityPositions) {
-                size_t idx = nearbyPos - &entityPositions[0];
-                if (idx < entityPositions.size() && !processed[idx]) {
-                    group.push_back(nearbyPos->entity);
-                    processed[idx] = true;
+        size_t head = 0;
+        while(head < queue.size()){
+            size_t currentIdx = queue[head++];
+            EntityPosition& currentEnt = entityPositions[currentIdx];
+            currentGroup.push_back(currentEnt.entity);
+
+            // Find all neighbors
+            std::vector<EntityPosition*> neighbors;
+            tree.queryRadius(currentEnt.x, currentEnt.y, interactionRadius, neighbors);
+
+            for (EntityPosition* neighborPtr : neighbors) {
+                // Calculate index safely
+                size_t neighborIdx = neighborPtr - &entityPositions[0];
+
+                if (!processed[neighborIdx]) {
+                    processed[neighborIdx] = true;
+                    queue.push_back(neighborIdx);
                 }
             }
+        }
 
-            if (!group.empty()) {
-                groups.push_back(group);
-            }
+        if (!currentGroup.empty()) {
+            groups.push_back(currentGroup);
         }
     }
 
