@@ -4,6 +4,7 @@
 #include <string>
 #include <optional>
 #include <vector>
+#include <algorithm>
 //#include "../../libs/BetterRand/BetterRand.h"
 
 
@@ -76,7 +77,7 @@ public:
     float entityLoneliness;
     float entityBoredom;
     float entityGeneralAnger;
-    int entityHygiene;
+    float entityHygiene;
     char entitySex;
     int entityBDay;
     std::vector<entityPointedDesire> list_entityPointedDesire;
@@ -102,9 +103,9 @@ public:
            float loneliness,
            float boredom,
            float generalAnger,
-           int hygiene,
+           float hygiene,
            char sex,
-           int bDay,
+           int bDay, //bday = jour de l'annee / 365
            entityPointedDesire*,
            entityPointedAnger*,
            entityPointedCouple*,
@@ -114,11 +115,15 @@ public:
     std::string getName();
     float getHealth();
     int getId();
-    void Entity::addDesire(entityPointedDesire pointed);
-    void Entity::addAnger(entityPointedAnger pointed);
-    void Entity::addCouple(entityPointedCouple pointed);
-    void Entity::addSocial(entityPointedSocial pointed);
-    int contains(const auto vec, Entity* ptr, int num_list);
+    void addDesire(entityPointedDesire pointed);
+    void addAnger(entityPointedAnger pointed);
+    void addCouple(entityPointedCouple pointed);
+    void addSocial(entityPointedSocial pointed);
+
+    // Template method - must be in header for template instantiation
+    template<typename T>
+    int contains(const T& vec, Entity* ptr, int num_list);
+
     std::vector<entityPointedDesire> getListDesire();
     std::vector<entityPointedAnger> getListAnger();
     std::vector<entityPointedCouple> getListCouple();
@@ -130,5 +135,18 @@ extern std::vector<entityPointedDesire> list_entityPointedDesire;
 extern std::vector<entityPointedAnger> list_entityPointedAnger;
 extern std::vector<entityPointedCouple> list_entityPointedCouple;
 extern std::vector<entityPointedSocial> list_entityPointedSocial;
+
+// Template implementation must be in header
+template<typename T>
+int Entity::contains(const T& vec, Entity* ptr, int num_list) {
+    auto it = std::find_if(vec.begin(), vec.end(),
+        [ptr](const auto& e) {
+            return e.pointedEntity == ptr;
+        });
+
+    if(it != vec.end())
+        return static_cast<int>(std::distance(vec.begin(), it));
+    return -1;
+}
 
 #endif // ENTITY_H

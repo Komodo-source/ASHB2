@@ -113,6 +113,12 @@ CMakeFiles/app.dir/src/UI.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
  C:/mingw64/include/c++/14.2.0/optional \
+ C:/mingw64/include/c++/14.2.0/algorithm \
+ C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+ C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+ C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+ C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+ C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h \
  C:/mingw64/include/c++/14.2.0/map \
  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \

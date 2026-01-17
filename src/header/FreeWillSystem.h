@@ -101,7 +101,7 @@ public:
     void initializeNeeds();
     void initializeActions();
 
-    Action* chooseAction(Entity* entity);
+    Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {});
     void executeAction(Entity* entity, Action* action, Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
 
@@ -110,6 +110,9 @@ public:
 
     const std::deque<ActionMemory>& getActionHistory() const;
     const std::map<std::string, Need>& getNeeds() const;
+
+    // Helper for social environment influence
+    float calculateSocialInfluence(Entity* entity, const std::vector<Entity*>& neighbors, const Action& action);
 };
 
 #endif

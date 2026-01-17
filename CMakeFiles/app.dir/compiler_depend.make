@@ -1380,9 +1380,11 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   libs/imgui/backends/imgui_impl_opengl3.h \
   libs/imgui/imconfig.h \
   libs/imgui/imgui.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/align.h \
   C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
   C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
@@ -1421,10 +1423,12 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
@@ -1437,6 +1441,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -1545,8 +1550,10 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   libs/imgui/imgui.h \
   src/header/Entity.h \
   src/header/UI.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
   C:/mingw64/include/c++/14.2.0/bits/allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
@@ -1587,22 +1594,26 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
   C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
   C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
   C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
   C:/mingw64/include/c++/14.2.0/bits/vector.tcc \

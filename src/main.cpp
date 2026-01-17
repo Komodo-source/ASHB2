@@ -12,7 +12,6 @@
 #include <vector>
 #include <time.h>
 #include <random>
-#include <thread>
 #include "./header/FreeWillSystem.h"
 #include "./header/SpatialMesh.h"
 #include "./header/BetterRand.h"
@@ -34,12 +33,52 @@ int main(){
 
 */
 
-void applyFreeWill(std::vector<Entity>& entities, std::vector<Entity> neighboor){
-    for(Entity en : entities){
-        FreeWillSystem sys;
-        sys.updateNeeds(1.0f);
-        Action* chosen = sys.chooseAction(&en);
-        sys.executeAction(&en, chosen);
+void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
+    // Process each group of close entities
+    for(auto& group : entityGroups){
+        // For each entity in the group
+        for(Entity* entity : group){
+            if(entity->entityHealth <= 0.0f) continue; // Skip dead entities
+
+            FreeWillSystem sys;
+            sys.updateNeeds(1.0f);
+
+            // Get neighbors (all entities in the same group except self)
+            std::vector<Entity*> neighbors;
+            for(Entity* potential_neighbor : group){
+                if(potential_neighbor != entity && potential_neighbor->entityHealth > 0.0f){
+                    neighbors.push_back(potential_neighbor);
+                }
+            }
+
+            // Choose action based on needs and social environment
+            Action* chosen = sys.chooseAction(entity, neighbors);
+
+            // Determine if this is a pointed action (requires a target)
+            bool isPointedAction = (chosen->name == "Socialize" ||
+                                   chosen->name == "Desire" ||
+                                   chosen->name == "GoodConnection" ||
+                                   chosen->name == "AngerConnection" ||
+                                   chosen->name == "Murder" ||
+                                   chosen->name == "Discrimination" ||
+                                   chosen->name == "Breeding");
+
+            Entity* target = nullptr;
+            if(isPointedAction && !neighbors.empty()){
+                // Select a random neighbor as target
+                int targetIndex = BetterRand::genNrInInterval(0, (int) neighbors.size() - 1);
+                target = neighbors[targetIndex];
+
+                // Execute the action with the target
+                sys.executeAction(entity, chosen, target);
+
+                // Update relationship based on action
+                sys.pointedAssimilation(entity, target, chosen);
+            } else {
+                // Execute self-directed action
+                sys.executeAction(entity, chosen);
+            }
+        }
     }
 }
 
@@ -57,6 +96,12 @@ std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, 
     }
     std::cout << "== end of separation ==\n";
     return groups;
+}
+
+
+void sync_clock_stats(Entity* ent, int neighboors){
+    FreeWillSystem fs;
+    fs.chooseAction(ent);
 }
 
 int main() {
@@ -98,17 +143,27 @@ int main() {
     //vector of Entity
     std::vector<Entity> entities;
     for(int i=0; i<nb_entity; i++){
-        Entity entity = Entity(i, 0, 100, 50, 0, 100, "", 0, 0, 0, 100, 'A', 0, nullptr, nullptr, nullptr);
+        Entity entity = Entity(
+            i, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, nullptr, nullptr, nullptr, nullptr);
         entities.push_back(entity);
     }
 
-    static bool showEntityWindow = true;
+    static bool showEntityWindow = false;
+    static int selectedEntityIndex = -1;
     std::vector<Entity*> ent_quad;
     for(int i=0; i<entities.size(); i++){
         ent_quad.push_back(&entities[i]);
     }
 
-    std::vector<std::vector<Entity*>> close = separationQuad(ent_quad, points, width, height);
+    std::vector<std::vector<Entity*>> close_entity_together = separationQuad(ent_quad, points, width, height);
+
+    // ici on applique l'algorithme pour modification stats
+    // Note: For now, we'll run this in the main loop instead of a separate thread
+    // to avoid threading complexity with the UI
+    // std::thread statistics(applyFreeWill, std::ref(close_entity_together));
+
+    int frameCounter = 0;
+    const int UPDATE_FREQUENCY = 60; // Update free will every 60 frames
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -116,14 +171,28 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        // Update free will system periodically
+        frameCounter++;
+        if(frameCounter >= UPDATE_FREQUENCY){
+            frameCounter = 0;
+
+            // Recalculate entity groups based on current positions
+            close_entity_together = separationQuad(ent_quad, points, width, height);
+
+            // Apply free will to all entity groups
+            applyFreeWill(close_entity_together);
+        }
 
         instanceUI.showSimulationInformation(0, entities.size(), 1, {});
 
         int moved_entity = instanceUI.HandlePointMovement(points);
         if (moved_entity != -1) {
-            if (showEntityWindow) {
-                instanceUI.ShowEntityWindow(&entities.at(moved_entity), &showEntityWindow);
-            }
+            selectedEntityIndex = moved_entity;
+            showEntityWindow = true;
+        }
+
+        if (showEntityWindow && selectedEntityIndex >= 0) {
+            instanceUI.ShowEntityWindow(&entities.at(selectedEntityIndex), &showEntityWindow);
         }
 
         instanceUI.DrawGrid(points);

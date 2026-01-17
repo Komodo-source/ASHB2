@@ -13,7 +13,6 @@
 
 //class Entity;
 
-
     // Calculate memory weight (more recent = more weight)
     float FreeWillSystem::getMemoryWeight(int memoryAge) {
         float decay = std::exp(-memoryAge / 20.0f); // Exponential decay
@@ -40,7 +39,6 @@
             totalFitness += fitness * req.weight;
             totalWeight += req.weight;
         }
-
         return totalWeight > 0 ? totalFitness / totalWeight : 1.0f;
     }
 
@@ -115,26 +113,140 @@
 
     //implementation of a list of action
     void FreeWillSystem::initializeActions() {
-        //a implem action pointé
-        //hurt someone action
-
-        // Social actions
+        //
+        //POINTED actions (require a target entity)
         Action socialize("Socialize", 1, "social");
         socialize.requirements = {
             {"loneliness", 30.0f, 0.8f},
-            {"stress", 50.0f, 0.3f}
+            {"stress", 30.0f, 0.3f}
         };
         socialize.statChanges = {
-            {"loneliness", -20.0f},
-            {"happiness", 15.0f},
-            {"stress", -10.0f},
-            {"boredom", -15.0f}
+            {"loneliness", -10.0f},
+            {"happiness", 10.0f},
+            {"stress", -7.0f},
+            {"boredom", -11.0f}
         };
-        socialize.baseSatisfaction = 25.0f;
+        socialize.baseSatisfaction = 20.0f;
         availableActions.push_back(socialize);
 
+        Action desire("Desire", 2, "social");
+        desire.requirements = {
+            {"loneliness", 40.0f, 0.9f},
+            {"happiness", 40.0f, 0.6f}
+        };
+        desire.statChanges = {
+            {"loneliness", -15.0f},
+            {"happiness", 20.0f},
+            {"stress", -5.0f}
+        };
+        desire.baseSatisfaction = 30.0f;
+        availableActions.push_back(desire);
+
+        Action goodconn("GoodConnection", 3, "social");
+        goodconn.requirements = {
+            {"happiness", 50.0f, 0.7f},
+            {"loneliness", 30.0f, 0.8f}
+        };
+        goodconn.statChanges = {
+            {"happiness", 15.0f},
+            {"loneliness", -20.0f},
+            {"mentalHealth", 10.0f},
+            {"stress", -10.0f}
+        };
+        goodconn.baseSatisfaction = 35.0f;
+        availableActions.push_back(goodconn);
+
+        Action angconn("AngerConnection", 4, "social");
+        angconn.requirements = {
+            {"anger", 60.0f, 0.9f},
+            {"stress", 50.0f, 0.7f}
+        };
+        angconn.statChanges = {
+            {"anger", 10.0f},
+            {"stress", 15.0f},
+            {"happiness", -10.0f},
+            {"mentalHealth", -5.0f}
+        };
+        angconn.baseSatisfaction = 15.0f;
+        availableActions.push_back(angconn);
+
+        // Extreme actions requiring high negative stats
+        Action murder("Murder", 5, "safety");
+        murder.requirements = {
+            {"anger", 80.0f, 1.0f},
+            {"mentalHealth", 20.0f, 0.9f},
+            {"stress", 70.0f, 0.8f}
+        };
+        murder.statChanges = {
+            {"anger", -30.0f},
+            {"mentalHealth", -40.0f},
+            {"stress", 50.0f},
+            {"happiness", -50.0f}
+        };
+        murder.baseSatisfaction = 10.0f;
+        availableActions.push_back(murder);
+
+        Action discrimination("Discrimination", 6, "social");
+        discrimination.requirements = {
+            {"anger", 50.0f, 0.8f},
+            {"mentalHealth", 40.0f, 0.6f},
+            {"stress", 50.0f, 0.5f}
+        };
+        discrimination.statChanges = {
+            {"anger", -10.0f},
+            {"mentalHealth", -10.0f},
+            {"stress", 5.0f},
+            {"happiness", -5.0f}
+        };
+        discrimination.baseSatisfaction = 5.0f;
+        availableActions.push_back(discrimination);
+
+        // Self-harm actions
+        Action suicide("Suicide", 7, "safety");
+        suicide.requirements = {
+            {"mentalHealth", 10.0f, 1.0f},
+            {"stress", 90.0f, 1.0f},
+            {"happiness", 10.0f, 0.9f}
+        };
+        suicide.statChanges = {
+            {"health", -100.0f},
+            {"mentalHealth", -100.0f}
+        };
+        suicide.baseSatisfaction = 0.0f;
+        availableActions.push_back(suicide);
+
+        Action anxiety("Anxiety", 8, "health");
+        anxiety.requirements = {
+            {"stress", 60.0f, 0.9f},
+            {"mentalHealth", 40.0f, 0.7f}
+        };
+        anxiety.statChanges = {
+            {"stress", 10.0f},
+            {"mentalHealth", -10.0f},
+            {"health", -5.0f},
+            {"happiness", -10.0f}
+        };
+        anxiety.baseSatisfaction = 5.0f;
+        availableActions.push_back(anxiety);
+
+        // Positive social action
+        Action breeding("Breeding", 9, "social");
+        breeding.requirements = {
+            {"happiness", 60.0f, 0.8f},
+            {"health", 60.0f, 0.7f},
+            {"stress", 40.0f, 0.5f}
+        };
+        breeding.statChanges = {
+            {"happiness", 25.0f},
+            {"stress", -15.0f},
+            {"loneliness", -20.0f},
+            {"health", -10.0f}
+        };
+        breeding.baseSatisfaction = 40.0f;
+        availableActions.push_back(breeding);
+
         // Health actions
-        Action exercise("Exercise", 2, "health");
+        Action exercise("Exercise", 10, "health");
         exercise.requirements = {
             {"health", 30.0f, 0.7f},
             {"stress", 60.0f, 0.4f}
@@ -149,7 +261,7 @@
         availableActions.push_back(exercise);
 
         // Hygiene actions
-        Action shower("Take Shower", 3, "hygiene");
+        Action shower("Take Shower", 11, "hygiene");
         shower.requirements = {
             {"hygiene", 50.0f, 0.9f}
         };
@@ -162,7 +274,7 @@
         availableActions.push_back(shower);
 
         // Rest action
-        Action rest("Rest", 5, "health");
+        Action rest("Rest", 12, "health");
         rest.requirements = {
             {"stress", 60.0f, 0.7f},
             {"health", 40.0f, 0.5f}
@@ -177,7 +289,7 @@
         availableActions.push_back(rest);
 
         // Work/Achievement action
-        Action work("Work on Project", 6, "achievement");
+        Action work("Work on Project", 13, "achievement");
         work.requirements = {
             {"stress", 40.0f, 0.5f},
             {"health", 50.0f, 0.4f}
@@ -192,9 +304,67 @@
         availableActions.push_back(work);
     }
 
+    // Calculate social influence from neighbors
+    float FreeWillSystem::calculateSocialInfluence(Entity* entity, const std::vector<Entity*>& neighbors, const Action& action) {
+        if (neighbors.empty()) return 0.5f; // Neutral if no neighbors
+
+        float influence = 0.0f;
+        float totalWeight = 0.0f;
+
+        for (Entity* neighbor : neighbors) {
+            // Check existing relationships
+            auto desireList = entity->getListDesire();
+            auto angerList = entity->getListAnger();
+            auto socialList = entity->getListSocial();
+
+            float relationshipWeight = 0.0f;
+
+            // Positive relationships increase weight for positive actions
+            for (const auto& social : socialList) {
+                if (social.pointedEntity == neighbor) {
+                    relationshipWeight += social.social * 0.1f;
+                }
+            }
+
+            for (const auto& desire : desireList) {
+                if (desire.pointedEntity == neighbor) {
+                    relationshipWeight += desire.desire * 0.15f;
+                }
+            }
+
+            // Negative relationships increase weight for negative actions
+            for (const auto& anger : angerList) {
+                if (anger.pointedEntity == neighbor) {
+                    relationshipWeight -= anger.anger * 0.1f;
+                }
+            }
+
+            // Neighbors with similar stats influence action choices
+            float neighborMentalHealth = neighbor->entityMentalHealth;
+            float neighborAnger = neighbor->entityGeneralAnger;
+            float neighborHappiness = neighbor->entityHapiness;
+
+            // If neighbors are angry/stressed, negative actions become more likely
+            if (action.name == "Murder" || action.name == "Discrimination" || action.name == "AngerConnection") {
+                influence += (neighborAnger / 100.0f) * 0.3f;
+            }
+            // If neighbors are happy/healthy, positive actions become more likely
+            else if (action.name == "Socialize" || action.name == "GoodConnection" || action.name == "Breeding") {
+                influence += (neighborHappiness / 100.0f) * 0.3f;
+            }
+
+            totalWeight += 1.0f + relationshipWeight;
+        }
+
+        return totalWeight > 0 ? (influence / neighbors.size()) : 0.5f;
+    }
+
         // Main decision-making function
-    Action* FreeWillSystem::chooseAction(Entity* entity) {
-            std::cout << "\n=== Choosing Action ===\n";
+        // main entry = entree principale de fichier
+    Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors) {
+            std::cout << "\n=== Choosing Action for Entity " << entity->getId() << " ===\n";
+            std::cout << "Number of neighbors: " << neighbors.size() << "\n";
+
             std::vector<std::pair<Action*, float>> actionWeights;
 
             for (auto& action : availableActions) {
@@ -202,18 +372,22 @@
                 float needSatisfaction = calculateNeedSatisfaction(action);
                 float memoryBias = calculateMemoryBias(action.actionId);
                 float varietyBonus = calculateVarietyBonus(action.actionId);
+                float socialInfluence = calculateSocialInfluence(entity, neighbors, action);
 
                 std::cout << "\nAction: " << action.name << "\n";
                 std::cout << "  RequirementFitness: " << requirementFitness << "\n";
                 std::cout << "  NeedSatisfaction:   " << needSatisfaction << "\n";
                 std::cout << "  MemoryBias:         " << memoryBias << "\n";
                 std::cout << "  VarietyBonus:       " << varietyBonus << "\n";
+                std::cout << "  SocialInfluence:    " << socialInfluence << "\n";
 
+                // Updated weights to include social influence
                 float weight =
-                    requirementFitness * 0.3f +
-                    needSatisfaction * 0.4f +
-                    memoryBias * 0.2f +
-                    varietyBonus * 0.1f;
+                    requirementFitness * 0.25f +
+                    needSatisfaction * 0.35f +
+                    memoryBias * 0.15f +
+                    varietyBonus * 0.1f +
+                    socialInfluence * 0.15f;
 
                 std::uniform_real_distribution<float> dist(0.8f, 1.2f);
                 float randomFactor = dist(rng);
@@ -264,23 +438,75 @@
             //pour l'instant on met a voir pour un auto incrément
             //ou val aléatoire
                 float desire = static_cast<float>(BetterRand::genNrInInterval(1,5));
-                std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
-                pointer->addSocial( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
+                std::cout << "Nouveau lien de desire ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
+                pointer->addDesire( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
             }else{ //le désire existe déjà
                 auto list_social = pointer->getListSocial();
                 int index_social = pointer->contains(list_social, pointed, 1);
                 int borne_haut = 5;
-                if(index_social != 1){ //si a des liens social augmenté le désir
+                if(index_social != -1){ //si a des liens social augmenté le désir
                     borne_haut += (list_social[index_social].social / 10);
                 }
-
                 list_desire[index].desire += static_cast<float>(BetterRand::genNrInInterval(1,borne_haut));
+            }
+        }else if(action->name == "AngerConnection"){
+            auto list_anger = pointer->getListAnger();
+            int index = pointer->contains(list_anger, pointed, 2);
+            if(index == -1){
+                float anger = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                std::cout << "Nouveau lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
+                pointer->addAnger( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
+            }else{ // TODO: implem si fils d'une personne anciennement anger mettre plus anger
+                list_anger[index].anger += static_cast<float>(BetterRand::genNrInInterval(1,5));
+            }
+        }else if(action->name == "Socialize"){
+            auto list_social = pointer->getListSocial();
+            int index = pointer->contains(list_social, pointed, 4);
+            if(index == -1){
+                float social = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
+                pointer->addSocial( {1, pointed,  static_cast<float>(BetterRand::genNrInInterval(1,5))});
+            }else{
+                list_social[index].social += static_cast<float>(BetterRand::genNrInInterval(1,5));
+            }
+        }else if(action->name == "GoodConnection"){
+            auto list_social = pointer->getListSocial();
+            int index = pointer->contains(list_social, pointed, 4);
+            if(index == -1){
+                float social = static_cast<float>(BetterRand::genNrInInterval(5,10));
+                std::cout << "Nouveau lien social (good) ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
+                pointer->addSocial( {1, pointed,  social});
+            }else{
+                list_social[index].social += static_cast<float>(BetterRand::genNrInInterval(5,10));
+            }
+        }else if(action->name == "Breeding"){
+            auto list_couple = pointer->getListCouple();
+            int index = pointer->contains(list_couple, pointed, 3);
+            if(index == -1){
+                std::cout << "Nouveau couple ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
+                pointer->addCouple({1, pointed});
+            }else{
+                std::cout << "INFO: Couple existe déjà, renforcement du lien\n" ;
+            }
+        }else if(action->name == "Murder"){
+            std::cout << "MURDER: (" << pointer->getId() << ")" << pointer->getName()<< " a tué (" << pointed->getId() << ")" << pointed->getName() << std::endl;
+            // Mark pointed entity as dead (health = 0)
+            pointed->entityHealth = 0.0f;
+        }else if(action->name == "Discrimination"){
+            auto list_anger = pointer->getListAnger();
+            int index = pointer->contains(list_anger, pointed, 2);
+            if(index == -1){
+                float anger = static_cast<float>(BetterRand::genNrInInterval(3,8));
+                std::cout << "Discrimination: lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
+                pointer->addAnger( {1, pointed,  anger});
+            }else{
+                list_anger[index].anger += static_cast<float>(BetterRand::genNrInInterval(2,6));
             }
         }
     }
 
         // Execute chosen action
-    void FreeWillSystem::executeAction(Entity* entity, Action* action, Entity* pointed=nullptr) {
+    void FreeWillSystem::executeAction(Entity* entity, Action* action, Entity* pointed) {
         std::cout << "\n=== Executing Action: " << action->name << " ===\n";
 
         std::map<std::string, float> statsBefore = captureEntityStats(entity);
@@ -346,7 +572,6 @@
         return needs;
     }
 
-
     std::map<std::string, float> FreeWillSystem::captureEntityStats(Entity* entity) {
         return {
             {"health", entity->entityHealth},
@@ -381,7 +606,7 @@
         return count > 0 ? success / count : 0.5f;
     }
 
-// Implementation of stat getter/setter
+// Implementation of stat getAter/setter
 float FreeWillSystem::getEntityStat(Entity* entity, const std::string& statName) {
     if (statName == "health") return entity->entityHealth;
     if (statName == "happiness") return entity->entityHapiness;

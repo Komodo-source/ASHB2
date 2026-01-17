@@ -18,7 +18,7 @@ Entity::Entity(int id)
       entityLoneliness(0.0f),
       entityBoredom(0.0f),
       entityGeneralAnger(0.0f),
-      entityHygiene(100),
+      entityHygiene(100.0f),
       entitySex('A'),
       entityBDay(0),
       pointedDesire({}),
@@ -38,7 +38,7 @@ Entity::Entity(int id,
                float loneliness,
                float boredom,
                float generalAnger,
-               int hygiene,
+               float hygiene,
                char sex,
                int bDay,
                entityPointedDesire* desire = nullptr,
@@ -127,51 +127,4 @@ std::vector<entityPointedAnger> Entity::getListAnger(){ return list_entityPointe
 std::vector<entityPointedCouple> Entity::getListCouple(){ return list_entityPointedCouple;}
 std::vector<entityPointedSocial> Entity::getListSocial(){ return list_entityPointedSocial;}
 
-//retourne 1 si trouve la struct dans la liste passé, num_list= 1: Desire, 2: Anger, 3: Couple, 4: Social
-int Entity::contains(const auto vec, Entity* ptr, int num_list) {
-    switch (num_liste)
-    {
-    case 1:
-        auto it =  std::find_if(vec.begin(), vec.end(),
-        [ptr](const entityPointedDesire& e) {
-            return e.pointedEntity == ptr;
-        }) != vec.end();
-        return std::distance(vec.begin(), it);
-        if(it != vec.end())
-            return static_cast<int>(std::distance(vec.begin(), it));
-        return -1;
-        break;
-    case 2:
-        auto it =  std::find_if(vec.begin(), vec.end(),
-        [ptr](const entityPointedAnger& e) {
-            return e.pointedEntity == ptr;
-        }) != vec.end();
-        break;
-        if(it != vec.end())
-            return static_cast<int>(std::distance(vec.begin(), it));
-        return -1;
-    case 3:
-        auto it =  std::find_if(vec.begin(), vec.end(),
-        [ptr](const entityPointedCouple& e) {
-            return e.pointedEntity == ptr;
-        }) != vec.end();
-        break;
-        if(it != vec.end())
-            return static_cast<int>(std::distance(vec.begin(), it));
-        return -1;
-    case 4:
-        auto it =  std::find_if(vec.begin(), vec.end(),
-        [ptr](const entityPointedSocial& e) {
-            return e.pointedEntity == ptr;
-        }) != vec.end();
-        break;
-        if(it != vec.end())
-            return static_cast<int>(std::distance(vec.begin(), it));
-        return -1;
-
-    default:
-        return false;
-        break;
-    }
-
-}
+// Note: contains() template implementation moved to Entity.h
