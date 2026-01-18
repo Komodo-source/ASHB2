@@ -21,6 +21,8 @@ Entity::Entity(int id)
       entityHygiene(100.0f),
       entitySex('A'),
       entityBDay(0),
+      entityAntiBody(15),
+      entityDiseaseType(-1),
       pointedDesire({}),
       pointedAnger({}),
       pointedCouple({})
@@ -41,6 +43,8 @@ Entity::Entity(int id,
                float hygiene,
                char sex,
                int bDay,
+               int antiBody = 15,
+               int diseaseType = -1,
                entityPointedDesire* desire = nullptr,
                entityPointedAnger* anger = nullptr,
                entityPointedCouple* couple = nullptr,
@@ -57,7 +61,9 @@ Entity::Entity(int id,
       entityGeneralAnger(generalAnger),
       entityHygiene(hygiene),
       entitySex(sex),
-      entityBDay(bDay)
+      entityBDay(bDay),
+      entityAntiBody(antiBody),
+      entityDiseaseType(diseaseType)
 {
     if(desire != nullptr){
         list_entityPointedDesire.push_back(*desire);

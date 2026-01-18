@@ -80,6 +80,8 @@ public:
     float entityHygiene;
     char entitySex;
     int entityBDay;
+    int entityAntiBody; // pourcentage
+    int entityDiseaseType; //-1 if no disease
     std::vector<entityPointedDesire> list_entityPointedDesire;
     std::vector<entityPointedAnger> list_entityPointedAnger;
     std::vector<entityPointedCouple> list_entityPointedCouple;
@@ -106,6 +108,8 @@ public:
            float hygiene,
            char sex,
            int bDay, //bday = jour de l'annee / 365
+           int antiBody,
+           int diseaseType,
            entityPointedDesire*,
            entityPointedAnger*,
            entityPointedCouple*,

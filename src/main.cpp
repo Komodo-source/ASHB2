@@ -2,7 +2,6 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <string>
 #include "./header/UI.h"
 #include "./header/Entity.h"
 #include "imgui.h"
@@ -17,9 +16,11 @@
 #include "./header/BetterRand.h"
 #include <iostream>
 #include <thread>
+#include "./header/Disease.h"
+#include "util/Debbug.h"
 
 
-    /*
+/*
 int main(){
     Entity entity = Entity(1, 0, 100, 50, 0, 100, "", 0, 0, 0, 100, 'A', 0, nullptr, nullptr, nullptr);
     FreeWillSystem sys;
@@ -33,11 +34,28 @@ int main(){
 
 */
 
+void applyDisease(Entity* ent, int neighSize){
+    //si est seul la proba de tombé malade est null
+    if(neighSize >= 2){
+        Disease d;
+        d.reduceAntiBody(ent);
+        int disease = d.calculateDisease(neighSize, ent);
+        if(disease != -1){
+            //Debug::debbug_log("entity id= " + ent->getId(), 34);
+            ent->entityDiseaseType = disease;
+        }
+    }
+}
+
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
     // Process each group of close entities
     for(auto& group : entityGroups){
         // For each entity in the group
         for(Entity* entity : group){
+            //on applique aussi les paramètres de maladies
+            applyDisease(entity, group.size());
+
+
             if(entity->entityHealth <= 0.0f) continue; // Skip dead entities
 
             FreeWillSystem sys;
@@ -145,7 +163,7 @@ int main() {
     std::vector<Entity> entities;
     for(int i=0; i<nb_entity; i++){
         Entity entity = Entity(
-            i, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, nullptr, nullptr, nullptr, nullptr);
+            i, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 15, -1, nullptr, nullptr, nullptr, nullptr);
         entities.push_back(entity);
     }
 
