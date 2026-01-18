@@ -272,6 +272,30 @@ libs/imgui/imgui_widgets.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.s
 .PHONY : libs/imgui/imgui_widgets.cpp.s
 
+src/Disease.obj: src/Disease.cpp.obj
+.PHONY : src/Disease.obj
+
+# target to build an object file
+src/Disease.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Disease.cpp.obj
+.PHONY : src/Disease.cpp.obj
+
+src/Disease.i: src/Disease.cpp.i
+.PHONY : src/Disease.i
+
+# target to preprocess a source file
+src/Disease.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Disease.cpp.i
+.PHONY : src/Disease.cpp.i
+
+src/Disease.s: src/Disease.cpp.s
+.PHONY : src/Disease.s
+
+# target to generate assembly for a file
+src/Disease.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Disease.cpp.s
+.PHONY : src/Disease.cpp.s
+
 src/Entity.obj: src/Entity.cpp.obj
 .PHONY : src/Entity.obj
 
@@ -419,6 +443,9 @@ help:
 	@echo ... libs/imgui/imgui_widgets.obj
 	@echo ... libs/imgui/imgui_widgets.i
 	@echo ... libs/imgui/imgui_widgets.s
+	@echo ... src/Disease.obj
+	@echo ... src/Disease.i
+	@echo ... src/Disease.s
 	@echo ... src/Entity.obj
 	@echo ... src/Entity.i
 	@echo ... src/Entity.s

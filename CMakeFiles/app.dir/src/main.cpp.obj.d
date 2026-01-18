@@ -40,6 +40,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/backends/imgui_impl_glfw.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/backends/imgui_impl_opengl3.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h \
  C:/mingw64/include/c++/14.2.0/string \
  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
@@ -106,7 +107,6 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h \
  C:/mingw64/include/c++/14.2.0/vector \
  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
@@ -207,4 +207,6 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/this_thread_sleep.h \
  C:/mingw64/include/c++/14.2.0/bits/chrono.h \
  C:/mingw64/include/c++/14.2.0/ratio C:/mingw64/include/c++/14.2.0/ctime \
- C:/mingw64/include/c++/14.2.0/bits/parse_numbers.h
+ C:/mingw64/include/c++/14.2.0/bits/parse_numbers.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Disease.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\util/Debbug.h

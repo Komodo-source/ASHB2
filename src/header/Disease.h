@@ -2,8 +2,9 @@
 #define DISEASE_H
 
 #include <vector>
-#include "./header/Entity.h"
-#include "./header/BetterRand.h"
+#include "./Entity.h"
+#include "./BetterRand.h"
+#include "iostream"
 #pragma once
 
 
@@ -17,10 +18,11 @@ class Disease{
     static const char* DISEASE_3_NAME;
     static const int DISEASE_4;
     static const char* DISEASE_4_NAME;
-    
-    const char* getDiseaseName(int pick);
+
+    static const char* getDiseaseName(int pick);
     static int pickDisease();
-    bool calculateDisease(int neighboorsSize, Entity* ent);
+    int calculateDisease(int neighboorsSize, Entity* ent);
     void reduceAntiBody(Entity* ent);
+    void manageSickness(Entity* ent);
 };
 #endif // DISEASE_H

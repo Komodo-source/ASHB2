@@ -11,6 +11,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/libs/imgui/imgui_tables.cpp.obj.d"
   "CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj"
   "CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj.d"
+  "CMakeFiles/app.dir/src/Disease.cpp.obj"
+  "CMakeFiles/app.dir/src/Disease.cpp.obj.d"
   "CMakeFiles/app.dir/src/Entity.cpp.obj"
   "CMakeFiles/app.dir/src/Entity.cpp.obj.d"
   "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj"

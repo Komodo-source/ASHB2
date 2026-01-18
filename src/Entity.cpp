@@ -128,6 +128,10 @@ void Entity::addSocial(entityPointedSocial pointed) {
 }
 
 
+void Entity::IncrementBDay(){
+    this->entityAge ++;
+}
+
 std::vector<entityPointedDesire> Entity::getListDesire(){ return list_entityPointedDesire;}
 std::vector<entityPointedAnger> Entity::getListAnger(){ return list_entityPointedAnger;}
 std::vector<entityPointedCouple> Entity::getListCouple(){ return list_entityPointedCouple;}

@@ -171,4 +171,16 @@ CMakeFiles/app.dir/src/UI.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
  C:/mingw64/include/c++/14.2.0/istream \
- C:/mingw64/include/c++/14.2.0/bits/istream.tcc
+ C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Disease.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/BetterRand.h \
+ C:/mingw64/include/c++/14.2.0/random C:/mingw64/include/c++/14.2.0/cmath \
+ C:/mingw64/x86_64-w64-mingw32/include/math.h \
+ C:/mingw64/include/c++/14.2.0/cstdint \
+ C:/mingw64/include/c++/14.2.0/limits \
+ C:/mingw64/include/c++/14.2.0/bits/random.h \
+ C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+ C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+ C:/mingw64/include/c++/14.2.0/numeric \
+ C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h

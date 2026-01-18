@@ -7,6 +7,7 @@
 #include "./header/Entity.h"
 #include "./header/UI.h"
 #include <iostream>
+#include "./header/Disease.h"
 #include <map>
 
 
@@ -63,13 +64,21 @@ void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
     ImGui::Text("Birthday: %dth day", entity->entityBDay);
     ImGui::Text("Hygiene: %d", entity->entityHygiene);
     ImGui::Separator();
+    if(entity->entityDiseaseType == -1){
+        ImGui::Text("No actual disease" );
+    }else{
+        Disease d;
+        ImGui::Text("Contaminated by %s", Disease::getDiseaseName(entity->entityDiseaseType));
+        ImGui::Text("AntiBody Percentage %d", entity->entityAntiBody);
+    }
+    ImGui::Separator();
 
     ImGui::Text("== Pointed Attributes ==");
     if(entity->list_entityPointedDesire.size() > 0){
         ImGui::Text("Desire List");
         for(int i=0; i < entity->list_entityPointedDesire.size(); i++){
             Entity* pointed = entity->list_entityPointedDesire.at(i).pointedEntity;
-            ImGui::Text("%d -> %d : %s", entity->list_entityPointedDesire.at(i).desire,
+            ImGui::Text("%.1f -> %d : %s", entity->list_entityPointedDesire.at(i).desire,
                        pointed->entityId, pointed->name.c_str());
         }
     }
@@ -78,7 +87,7 @@ void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
         ImGui::Text("Anger List");
         for(int i=0; i < entity->list_entityPointedAnger.size(); i++){
             Entity* pointed = entity->list_entityPointedAnger.at(i).pointedEntity;
-            ImGui::Text("%d -> %d : %s", entity->list_entityPointedAnger.at(i).anger,
+            ImGui::Text("%.1f -> %d : %s", entity->list_entityPointedAnger.at(i).anger,
                        pointed->entityId, pointed->name.c_str());
         }
     }
@@ -87,7 +96,7 @@ void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
         ImGui::Text("Couple List");
         for(int i=0; i < entity->list_entityPointedCouple.size(); i++){
             Entity* pointed = entity->list_entityPointedCouple.at(i).pointedEntity;
-            ImGui::Text("=> %d : %s", pointed->entityId, pointed->name.c_str());
+            ImGui::Text("=> %.1f : %s", pointed->entityId, pointed->name.c_str());
         }
     }
 
@@ -95,8 +104,9 @@ void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
         ImGui::Text("Social List");
         for(int i=0; i < entity->list_entityPointedSocial.size(); i++){
             Entity* pointed = entity->list_entityPointedSocial.at(i).pointedEntity;
-            ImGui::Text("%d -> %d : %s", entity->list_entityPointedSocial.at(i).social,
-                       pointed->entityId, pointed->name.c_str());
+            ImGui::Text("%.1f -> %d : %s", entity->list_entityPointedSocial.at(i).social,
+                    pointed->entityId, pointed->name.c_str());
+
         }
     }
 

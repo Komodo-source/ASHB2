@@ -14,6 +14,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/imgui_draw.cpp" "CMakeFiles/app.dir/libs/imgui/imgui_draw.cpp.obj" "gcc" "CMakeFiles/app.dir/libs/imgui/imgui_draw.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/imgui_tables.cpp" "CMakeFiles/app.dir/libs/imgui/imgui_tables.cpp.obj" "gcc" "CMakeFiles/app.dir/libs/imgui/imgui_tables.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/imgui_widgets.cpp" "CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj" "gcc" "CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj.d"
+  "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Disease.cpp" "CMakeFiles/app.dir/src/Disease.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Disease.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Entity.cpp" "CMakeFiles/app.dir/src/Entity.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Entity.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/SpatialMesh.cpp" "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj" "gcc" "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/UI.cpp" "CMakeFiles/app.dir/src/UI.cpp.obj" "gcc" "CMakeFiles/app.dir/src/UI.cpp.obj.d"

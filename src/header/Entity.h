@@ -123,6 +123,7 @@ public:
     void addAnger(entityPointedAnger pointed);
     void addCouple(entityPointedCouple pointed);
     void addSocial(entityPointedSocial pointed);
+    void IncrementBDay();
 
     // Template method - must be in header for template instantiation
     template<typename T>

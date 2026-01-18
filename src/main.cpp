@@ -19,6 +19,7 @@
 #include "./header/Disease.h"
 #include "util/Debbug.h"
 
+using GroupEntity = std::vector<std::vector<Entity*>>;
 
 /*
 int main(){
@@ -36,12 +37,16 @@ int main(){
 
 void applyDisease(Entity* ent, int neighSize){
     //si est seul la proba de tombé malade est null
+    Disease d;
+    if(ent->entityDiseaseType != -1){
+        //already sick we manage it
+        d.manageSickness(ent);
+    }
     if(neighSize >= 2){
-        Disease d;
         d.reduceAntiBody(ent);
         int disease = d.calculateDisease(neighSize, ent);
         if(disease != -1){
-            //Debug::debbug_log("entity id= " + ent->getId(), 34);
+            std::cout << "Entity contaminated: " + ent->getId() + ' ' + ent->getName() + " => " + d.getDiseaseName(disease) << std::endl;
             ent->entityDiseaseType = disease;
         }
     }
@@ -130,7 +135,7 @@ int main() {
     const float height = 600;
     const float width = 800;
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 BUILD", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 TEST", nullptr, nullptr);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -141,9 +146,11 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
 
 
-    int nb_entity = 2;
+    int nb_entity = 4;
 
     // vector of GridPoints
+
+
     UI instanceUI;
     std::vector<UI::GridPoint> points;
     int count = 0;
@@ -163,7 +170,7 @@ int main() {
     std::vector<Entity> entities;
     for(int i=0; i<nb_entity; i++){
         Entity entity = Entity(
-            i, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 15, -1, nullptr, nullptr, nullptr, nullptr);
+            i, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr);
         entities.push_back(entity);
     }
 
@@ -204,6 +211,12 @@ int main() {
                         points[j].id = j;
                     }
                 }
+                //Birthday
+                if((day / 60) % 365 ){
+                    for(Entity ent : entities){
+                        ent.IncrementBDay();
+                    }
+                }
 
                 // Remove from entities vector
                 entities.erase(entities.begin() + i);
@@ -237,7 +250,7 @@ int main() {
             applyFreeWill(close_entity_together);
         }
 
-        // 60 tick
+
         instanceUI.showSimulationInformation(day / 60 , entities.size(), UPDATE_FREQUENCY, {});
 
         int moved_entity = instanceUI.HandlePointMovement(points);

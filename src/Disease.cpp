@@ -3,7 +3,7 @@
 #include "./header/Entity.h"
 #include "./header/BetterRand.h"
 #include "./header/Disease.h"
-
+#include "iostream"
 
 const int Disease::DISEASE_1 = 1;
 const char* Disease::DISEASE_1_NAME = "Plague";
@@ -39,17 +39,26 @@ const char* Disease::DISEASE_4_NAME = "Typhus";
     }
   }
 
-  bool Disease::calculateDisease(int neighboorsSize, Entity* ent){
+  int Disease::calculateDisease(int neighboorsSize, Entity* ent){
     int ranchoice = BetterRand::genNrInInterval(0,15);
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
-    if(ent->entityDiseaseTypeAntiBody == diseasePicked){
-      //a peut etre des anticorps pour cette maladie
+    
       if(hygiene - ranchoice - neighboorsSize + (1.3 * ent->entityAntiBody) < 0){
         return diseasePicked;
       }else{
         return -1;
       }
+
+  }
+
+  void Disease::manageSickness(Entity* ent){
+    // guerison
+    ent->entityHealth -= ent->entityDiseaseType;
+    ent->entityHygiene -= ent->entityDiseaseType;
+    ent->entityAntiBody += BetterRand::genNrInInterval(4, 15);
+    if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 20) > 100){
+      std::cout << ent->getName() + " was cured from " + Disease::getDiseaseName(ent->entityDiseaseType) << std::endl;
+      ent->entityDiseaseType = -1;
     }
-    return hygiene - ranchoice - neighboorsSize < 0 ? diseasePicked : -1;
   }

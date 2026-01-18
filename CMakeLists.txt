@@ -36,6 +36,7 @@ add_executable(app
 src/main.cpp
 src/UI.cpp
 src/Entity.cpp
+src/Disease.cpp
 ${IMGUI_SOURCES}
 src/implem_free_will.cpp
 src/SpatialMesh.cpp

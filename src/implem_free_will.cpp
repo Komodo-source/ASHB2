@@ -190,7 +190,7 @@
         discrimination.requirements = {
             {"anger", 30.0f, 0.8f},
             {"mentalHealth", 20.0f, 0.6f},
-            {"stress", 35.0f, 0.5f}
+            {"stress", 30.0f, 0.5f}
         };
         discrimination.statChanges = {
             {"anger", -14.0f},
@@ -447,18 +447,45 @@
     //par le pointeur
     void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action){
         if(action->name == "Desire"){
+            // Natural attraction checks - cannot be attracted if target has poor hygiene or is unhappy
+            if(pointed->entityHygiene < 40){
+                std::cout << "Desire bloqué: " << pointed->getName() << " a une hygiène trop basse (" << pointed->entityHygiene << ")\n";
+                return;
+            }
+            if(pointed->entityHapiness < 30){
+                std::cout << "Desire bloqué: " << pointed->getName() << " est trop malheureux (" << pointed->entityHapiness << ")\n";
+                return;
+            }
+            if(pointed->entityHealth < 30){
+                std::cout << "Desire bloqué: " << pointed->getName() << " est en mauvaise santé (" << pointed->entityHealth << ")\n";
+                return;
+            }
+            // Check if pointer has anger toward pointed - anger blocks desire
+            int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 15){
+                std::cout << "Desire bloqué: " << pointer->getName() << " a trop de colère envers " << pointed->getName() << "\n";
+                return;
+            }
+
             int index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
             if(index == -1){ // n'as pas de desire, créer un nouveau
-                float desire = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                // Desire starts lower, based on target's attractiveness factors
+                float attractiveness = (pointed->entityHygiene / 100.0f) * 0.3f +
+                                       (pointed->entityHapiness / 100.0f) * 0.4f +
+                                       (pointed->entityHealth / 100.0f) * 0.3f;
+                float desire = static_cast<float>(BetterRand::genNrInInterval(1,3)) * attractiveness;
                 std::cout << "Nouveau lien de desire ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
                 pointer->addDesire({1, pointed, desire});
             }else{ //le désire existe déjà
                 int index_social = pointer->contains(pointer->list_entityPointedSocial, pointed, 1);
-                int borne_haut = 5;
+                int borne_haut = 3;
                 if(index_social != -1){ //si a des liens social augmenté le désir
-                    borne_haut += (pointer->list_entityPointedSocial[index_social].social / 10);
+                    borne_haut += (pointer->list_entityPointedSocial[index_social].social / 15);
                 }
                 float increment = static_cast<float>(BetterRand::genNrInInterval(1, borne_haut));
+                // Reduce increment if target's attractiveness is low
+                float attractiveness = (pointed->entityHygiene / 100.0f + pointed->entityHapiness / 100.0f) / 2.0f;
+                increment *= attractiveness;
                 pointer->list_entityPointedDesire[index].desire += increment;
                 std::cout << "Desire renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
@@ -470,36 +497,83 @@
                 pointer->addAnger({1, pointed, anger});
             }else{
                 float increment = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                if(pointed->entityDiseaseType != -1){
+                    //on ajoute un poids mauvais si une personne est malade
+                    pointer->list_entityPointedAnger[index].anger += increment + BetterRand::genNrInInterval(1,4);
+                }else{
+                    pointer->list_entityPointedAnger[index].anger += increment;
+                }
                 pointer->list_entityPointedAnger[index].anger += increment;
                 std::cout << "Anger renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "Socialize"){
             int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(index == -1){
-                float social = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                float social = static_cast<float>(BetterRand::genNrInInterval(1,2));
                 std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
                 pointer->addSocial({1, pointed, social});
             }else{
-                float increment = static_cast<float>(BetterRand::genNrInInterval(1,5));
-                pointer->list_entityPointedSocial[index].social += increment;
+                //Ici on choisit le lien social mais lorsqu'il sociabilise il se rend compte qu'il est malade donc on le
+                //met de poid plus fort
+                float increment = static_cast<float>(BetterRand::genNrInInterval(1,2));
+                if(pointed->entityDiseaseType != -1){
+                    pointer->list_entityPointedSocial[index].social += increment - BetterRand::genNrInInterval(2,6);
+                }else{
+                    pointer->list_entityPointedSocial[index].social += increment;
+                }
                 std::cout << "Social renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "GoodConnection"){
             int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(index == -1){
-                float social = static_cast<float>(BetterRand::genNrInInterval(5,10));
+                float social = static_cast<float>(BetterRand::genNrInInterval(2,4));
                 std::cout << "Nouveau lien social (good) ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
                 pointer->addSocial({1, pointed, social});
             }else{
-                float increment = static_cast<float>(BetterRand::genNrInInterval(5,10));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(2,4));
                 pointer->list_entityPointedSocial[index].social += increment;
                 std::cout << "Social (good) renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "Breeding"){
+            // Check if pointer has high enough desire for pointed (minimum 25)
+            int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
+            if(desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 25){
+                float current_desire = (desire_index == -1) ? 0 : pointer->list_entityPointedDesire[desire_index].desire;
+                std::cout << "Couple bloqué: " << pointer->getName() << " n'a pas assez de désir pour " << pointed->getName() << " (" << current_desire << " < 25)\n";
+                return;
+            }
+            // Check if pointed also has desire for pointer (mutual attraction - minimum 20)
+            int pointed_desire_index = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
+            if(pointed_desire_index == -1 || pointed->list_entityPointedDesire[pointed_desire_index].desire < 20){
+                float pointed_desire = (pointed_desire_index == -1) ? 0 : pointed->list_entityPointedDesire[pointed_desire_index].desire;
+                std::cout << "Couple bloqué: " << pointed->getName() << " n'a pas assez de désir pour " << pointer->getName() << " (" << pointed_desire << " < 20)\n";
+                return;
+            }
+            // Check that neither has too much anger toward the other
+            int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 10){
+                std::cout << "Couple bloqué: " << pointer->getName() << " a trop de colère envers " << pointed->getName() << "\n";
+                return;
+            }
+            int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+            if(pointed_anger_index != -1 && pointed->list_entityPointedAnger[pointed_anger_index].anger > 10){
+                std::cout << "Couple bloqué: " << pointed->getName() << " a trop de colère envers " << pointer->getName() << "\n";
+                return;
+            }
+            // Check both have good social link (minimum 15)
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index == -1 || pointer->list_entityPointedSocial[social_index].social < 15){
+                float current_social = (social_index == -1) ? 0 : pointer->list_entityPointedSocial[social_index].social;
+                std::cout << "Couple bloqué: lien social insuffisant entre " << pointer->getName() << " et " << pointed->getName() << " (" << current_social << " < 15)\n";
+                return;
+            }
+
             int index = pointer->contains(pointer->list_entityPointedCouple, pointed, 3);
             if(index == -1){
                 std::cout << "Nouveau couple ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
                 pointer->addCouple({1, pointed});
+                // Also add the reverse couple link for the pointed entity
+                pointed->addCouple({1, pointer});
             }else{
                 std::cout << "INFO: Couple existe déjà, renforcement du lien\n" ;
             }
