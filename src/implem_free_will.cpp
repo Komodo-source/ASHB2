@@ -623,6 +623,7 @@
         for (auto& [k, v] : statsAfter) std::cout << "  " << k << ": " << v << "\n";
 
         float outcomeSuccess = calculateOutcomeSuccess(statsBefore, statsAfter);
+        
         std::cout << "Outcome Success: " << outcomeSuccess << "\n";
 
         ActionMemory memory;

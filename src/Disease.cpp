@@ -39,12 +39,12 @@ const char* Disease::DISEASE_4_NAME = "Typhus";
     }
   }
 
-  int Disease::calculateDisease(int neighboorsSize, Entity* ent){
+  int Disease::calculateDisease(int neighboorsSize, Entity* ent, int nbSickClose){
     int ranchoice = BetterRand::genNrInInterval(0,15);
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
-    
-      if(hygiene - ranchoice - neighboorsSize + (1.3 * ent->entityAntiBody) < 0){
+
+      if(hygiene - ranchoice - neighboorsSize - (3*nbSickClose) + (1.3 * ent->entityAntiBody) < 0){
         return diseasePicked;
       }else{
         return -1;

@@ -37,7 +37,7 @@ int main(){
 
 */
 
-void applyDisease(Entity* ent, int neighSize){
+void applyDisease(Entity* ent, int neighSize, int sickClose){
     //si est seul la proba de tombé malade est null
     Disease d;
     if(ent->entityDiseaseType != -1){
@@ -46,12 +46,22 @@ void applyDisease(Entity* ent, int neighSize){
     }
     if(neighSize >= 2){
         d.reduceAntiBody(ent);
-        int disease = d.calculateDisease(neighSize, ent);
+        int disease = d.calculateDisease(neighSize, ent, sickClose);
         if(disease != -1){
             std::cout << "Entity contaminated: " + ent->getId() + ' ' + ent->getName() + " => " + d.getDiseaseName(disease) << std::endl;
             ent->entityDiseaseType = disease;
         }
     }
+}
+
+int getNBSickClose(std::vector<Entity*> grp){
+    int c =0;
+    for(Entity* ent : grp){
+        if(ent->entityDiseaseType != -1){
+            c++;
+        }
+    }
+    return c;
 }
 
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
@@ -60,7 +70,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
         // For each entity in the group
         for(Entity* entity : group){
             //on applique aussi les paramètres de maladies
-            applyDisease(entity, group.size());
+            applyDisease(entity, group.size(), getNBSickClose(group));
 
 
             if(entity->entityHealth <= 0.0f) continue; // Skip dead entities

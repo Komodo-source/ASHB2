@@ -142,6 +142,19 @@ void Entity::saveEntityStats(Action* act) {
         file << this->entityAntiBody << ',' << this->entityBoredom << ',' << this->entityGeneralAnger << ',' << this->entityHapiness << ',' << this->entityHealth << ',' << this->entityHygiene << ',' << this->entityLoneliness << ',' << this->entityMentalHealth << ',' << this->entityStress << ',' << "\n";
         file.close();
     }
+
+
+    std::string changes;
+    for(StatChange s : act->statChanges){
+        changes += s.statName + "->" + std::to_string(s.changeValue);
+    }
+    std::string file_name2 = "./src/data/act_" + std::to_string(this->entityId) + ".csv";
+    std::ofstream file2(file_name2, std::ios::app);
+
+    if (file2.is_open()) {
+        file2 << ',' << act->name << ',' << act->needCategory << ',' << std::to_string(act->baseSatisfaction) << ',' << changes ;
+        file2.close();
+    }
 }
 
 std::vector<entityPointedDesire> Entity::getListDesire(){ return list_entityPointedDesire;}

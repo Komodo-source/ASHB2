@@ -21,7 +21,7 @@ class Disease{
 
     static const char* getDiseaseName(int pick);
     static int pickDisease();
-    int calculateDisease(int neighboorsSize, Entity* ent);
+    int calculateDisease(int neighboorsSize, Entity* ent, int nbSickClose);
     void reduceAntiBody(Entity* ent);
     void manageSickness(Entity* ent);
 };

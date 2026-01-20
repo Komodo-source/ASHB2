@@ -34,6 +34,7 @@ struct Action {
     float baseSatisfaction; // How much this action satisfies base needs
     std::string needCategory; // "social", "health", "entertainment", "hygiene", etc.
     float duration; // Time this action takes
+    float outcomeSuccess;  //needed for statistics
 
     Action(std::string n, int id, std::string category = "general")
         : name(n), actionId(id), needCategory(category), baseSatisfaction(10.0f), duration(1.0f) {}
