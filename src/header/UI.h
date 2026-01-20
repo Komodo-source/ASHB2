@@ -13,6 +13,8 @@
 class Entity;
 
 class UI {
+private:
+    bool showDetailedInfo = false;
 public:
     struct GridPoint {
         int id;

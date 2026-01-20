@@ -5,10 +5,13 @@
 #include <optional>
 #include <vector>
 #include <algorithm>
+#include <fstream>
+#include <string>
 //#include "../../libs/BetterRand/BetterRand.h"
 
 
 class Entity;
+class Action;
 
 static std::vector<std::string> male_name = {
 "Sammy",
@@ -124,6 +127,7 @@ public:
     void addCouple(entityPointedCouple pointed);
     void addSocial(entityPointedSocial pointed);
     void IncrementBDay();
+    void saveEntityStats(Action* act);
 
     // Template method - must be in header for template instantiation
     template<typename T>

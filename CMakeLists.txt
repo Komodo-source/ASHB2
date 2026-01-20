@@ -17,6 +17,8 @@ set(IMGUI_SOURCES
     ${IMGUI_DIR}/imgui_widgets.cpp
     ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    src/header/implot.cpp
+    src/header/implot_items.cpp
 )
 
 # Include directories
@@ -40,6 +42,7 @@ src/Disease.cpp
 ${IMGUI_SOURCES}
 src/implem_free_will.cpp
 src/SpatialMesh.cpp
+
 )
 
 # Lier les bibliothèques

@@ -18,6 +18,8 @@
 #include <thread>
 #include "./header/Disease.h"
 #include "util/Debbug.h"
+#include "./header/implot.h"
+#include "./header/implot_internal.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -77,6 +79,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
             // Choose action based on needs and social environment
             Action* chosen = sys.chooseAction(entity, neighbors);
 
+            //saving data
+            entity->saveEntityStats(chosen);
+
             // Determine if this is a pointed action (requires a target)
             bool isPointedAction = (chosen->name == "Socialize" ||
                                    chosen->name == "Desire" ||
@@ -132,8 +137,8 @@ int main() {
     if (!glfwInit()) return -1;
 
 
-    const float height = 600;
-    const float width = 800;
+    const float height = 768;
+    const float width = 1024;
 
     GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 TEST", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -141,6 +146,7 @@ int main() {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");

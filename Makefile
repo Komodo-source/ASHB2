@@ -368,6 +368,54 @@ src/UI.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/UI.cpp.s
 .PHONY : src/UI.cpp.s
 
+src/header/implot.obj: src/header/implot.cpp.obj
+.PHONY : src/header/implot.obj
+
+# target to build an object file
+src/header/implot.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/header/implot.cpp.obj
+.PHONY : src/header/implot.cpp.obj
+
+src/header/implot.i: src/header/implot.cpp.i
+.PHONY : src/header/implot.i
+
+# target to preprocess a source file
+src/header/implot.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/header/implot.cpp.i
+.PHONY : src/header/implot.cpp.i
+
+src/header/implot.s: src/header/implot.cpp.s
+.PHONY : src/header/implot.s
+
+# target to generate assembly for a file
+src/header/implot.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/header/implot.cpp.s
+.PHONY : src/header/implot.cpp.s
+
+src/header/implot_items.obj: src/header/implot_items.cpp.obj
+.PHONY : src/header/implot_items.obj
+
+# target to build an object file
+src/header/implot_items.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/header/implot_items.cpp.obj
+.PHONY : src/header/implot_items.cpp.obj
+
+src/header/implot_items.i: src/header/implot_items.cpp.i
+.PHONY : src/header/implot_items.i
+
+# target to preprocess a source file
+src/header/implot_items.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/header/implot_items.cpp.i
+.PHONY : src/header/implot_items.cpp.i
+
+src/header/implot_items.s: src/header/implot_items.cpp.s
+.PHONY : src/header/implot_items.s
+
+# target to generate assembly for a file
+src/header/implot_items.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/header/implot_items.cpp.s
+.PHONY : src/header/implot_items.cpp.s
+
 src/implem_free_will.obj: src/implem_free_will.cpp.obj
 .PHONY : src/implem_free_will.obj
 
@@ -455,6 +503,12 @@ help:
 	@echo ... src/UI.obj
 	@echo ... src/UI.i
 	@echo ... src/UI.s
+	@echo ... src/header/implot.obj
+	@echo ... src/header/implot.i
+	@echo ... src/header/implot.s
+	@echo ... src/header/implot_items.obj
+	@echo ... src/header/implot_items.i
+	@echo ... src/header/implot_items.s
 	@echo ... src/implem_free_will.obj
 	@echo ... src/implem_free_will.i
 	@echo ... src/implem_free_will.s

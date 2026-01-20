@@ -5,6 +5,8 @@
 #include <time.h>
 #include <random>
 #include <algorithm>
+#include "./header/FreeWillSystem.h"
+
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -130,6 +132,16 @@ void Entity::addSocial(entityPointedSocial pointed) {
 
 void Entity::IncrementBDay(){
     this->entityAge ++;
+}
+
+void Entity::saveEntityStats(Action* act) {
+    std::string file_name = "./src/data/" + std::to_string(this->entityId) + ".csv";
+    std::ofstream file(file_name, std::ios::app);
+
+    if (file.is_open()) {
+        file << this->entityAntiBody << ',' << this->entityBoredom << ',' << this->entityGeneralAnger << ',' << this->entityHapiness << ',' << this->entityHealth << ',' << this->entityHygiene << ',' << this->entityLoneliness << ',' << this->entityMentalHealth << ',' << this->entityStress << ',' << "\n";
+        file.close();
+    }
 }
 
 std::vector<entityPointedDesire> Entity::getListDesire(){ return list_entityPointedDesire;}

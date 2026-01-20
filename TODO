@@ -1,3 +1,5 @@
 * Entities
   - faire les mouvements
-  - faire heal
+  * faire heal
+  - faire la creation de joueur par le gui
+  - faire un 2e graphes pour les actions

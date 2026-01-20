@@ -218,11 +218,41 @@ CMakeFiles/app.dir/libs/imgui/backends/imgui_impl_opengl3.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/app.dir/libs/imgui/backends/imgui_impl_opengl3.cpp.s"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\LordN.NASHOU\Desktop\code\ASHB2\libs\imgui\backends\imgui_impl_opengl3.cpp -o CMakeFiles\app.dir\libs\imgui\backends\imgui_impl_opengl3.cpp.s
 
+CMakeFiles/app.dir/src/header/implot.cpp.obj: CMakeFiles/app.dir/flags.make
+CMakeFiles/app.dir/src/header/implot.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
+CMakeFiles/app.dir/src/header/implot.cpp.obj: src/header/implot.cpp
+CMakeFiles/app.dir/src/header/implot.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/app.dir/src/header/implot.cpp.obj"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/header/implot.cpp.obj -MF CMakeFiles\app.dir\src\header\implot.cpp.obj.d -o CMakeFiles\app.dir\src\header\implot.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header\implot.cpp
+
+CMakeFiles/app.dir/src/header/implot.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/app.dir/src/header/implot.cpp.i"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header\implot.cpp > CMakeFiles\app.dir\src\header\implot.cpp.i
+
+CMakeFiles/app.dir/src/header/implot.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/header/implot.cpp.s"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header\implot.cpp -o CMakeFiles\app.dir\src\header\implot.cpp.s
+
+CMakeFiles/app.dir/src/header/implot_items.cpp.obj: CMakeFiles/app.dir/flags.make
+CMakeFiles/app.dir/src/header/implot_items.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
+CMakeFiles/app.dir/src/header/implot_items.cpp.obj: src/header/implot_items.cpp
+CMakeFiles/app.dir/src/header/implot_items.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/app.dir/src/header/implot_items.cpp.obj"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/header/implot_items.cpp.obj -MF CMakeFiles\app.dir\src\header\implot_items.cpp.obj.d -o CMakeFiles\app.dir\src\header\implot_items.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header\implot_items.cpp
+
+CMakeFiles/app.dir/src/header/implot_items.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/app.dir/src/header/implot_items.cpp.i"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header\implot_items.cpp > CMakeFiles\app.dir\src\header\implot_items.cpp.i
+
+CMakeFiles/app.dir/src/header/implot_items.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/header/implot_items.cpp.s"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header\implot_items.cpp -o CMakeFiles\app.dir\src\header\implot_items.cpp.s
+
 CMakeFiles/app.dir/src/implem_free_will.cpp.obj: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/implem_free_will.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp
 CMakeFiles/app.dir/src/implem_free_will.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/app.dir/src/implem_free_will.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/app.dir/src/implem_free_will.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/implem_free_will.cpp.obj -MF CMakeFiles\app.dir\src\implem_free_will.cpp.obj.d -o CMakeFiles\app.dir\src\implem_free_will.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\implem_free_will.cpp
 
 CMakeFiles/app.dir/src/implem_free_will.cpp.i: cmake_force
@@ -237,7 +267,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp
 CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/app.dir/src/SpatialMesh.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/app.dir/src/SpatialMesh.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/SpatialMesh.cpp.obj -MF CMakeFiles\app.dir\src\SpatialMesh.cpp.obj.d -o CMakeFiles\app.dir\src\SpatialMesh.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\SpatialMesh.cpp
 
 CMakeFiles/app.dir/src/SpatialMesh.cpp.i: cmake_force
@@ -260,6 +290,8 @@ app_OBJECTS = \
 "CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj" \
 "CMakeFiles/app.dir/libs/imgui/backends/imgui_impl_glfw.cpp.obj" \
 "CMakeFiles/app.dir/libs/imgui/backends/imgui_impl_opengl3.cpp.obj" \
+"CMakeFiles/app.dir/src/header/implot.cpp.obj" \
+"CMakeFiles/app.dir/src/header/implot_items.cpp.obj" \
 "CMakeFiles/app.dir/src/implem_free_will.cpp.obj" \
 "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj"
 
@@ -276,6 +308,8 @@ app.exe: CMakeFiles/app.dir/libs/imgui/imgui_tables.cpp.obj
 app.exe: CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj
 app.exe: CMakeFiles/app.dir/libs/imgui/backends/imgui_impl_glfw.cpp.obj
 app.exe: CMakeFiles/app.dir/libs/imgui/backends/imgui_impl_opengl3.cpp.obj
+app.exe: CMakeFiles/app.dir/src/header/implot.cpp.obj
+app.exe: CMakeFiles/app.dir/src/header/implot_items.cpp.obj
 app.exe: CMakeFiles/app.dir/src/implem_free_will.cpp.obj
 app.exe: CMakeFiles/app.dir/src/SpatialMesh.cpp.obj
 app.exe: CMakeFiles/app.dir/build.make
@@ -283,7 +317,7 @@ app.exe: libs/glfw/lib-mingw-w64/libglfw3.a
 app.exe: CMakeFiles/app.dir/linkLibs.rsp
 app.exe: CMakeFiles/app.dir/objects1.rsp
 app.exe: CMakeFiles/app.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable app.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable app.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\app.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
