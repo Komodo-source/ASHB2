@@ -596,7 +596,7 @@
     }
 
         // Execute chosen action
-    void FreeWillSystem::executeAction(Entity* entity, Action* action, Entity* pointed) {
+    void FreeWillSystem::executeAction(Entity* entity, Action* &action, Entity* pointed) {
         std::cout << "\n=== Executing Action: " << action->name << " ===\n";
 
         std::map<std::string, float> statsBefore = captureEntityStats(entity);
@@ -623,7 +623,7 @@
         for (auto& [k, v] : statsAfter) std::cout << "  " << k << ": " << v << "\n";
 
         float outcomeSuccess = calculateOutcomeSuccess(statsBefore, statsAfter);
-        
+        action->outcomeSuccess = outcomeSuccess;
         std::cout << "Outcome Success: " << outcomeSuccess << "\n";
 
         ActionMemory memory;

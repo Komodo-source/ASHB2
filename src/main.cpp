@@ -89,8 +89,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
             // Choose action based on needs and social environment
             Action* chosen = sys.chooseAction(entity, neighbors);
 
-            //saving data
-            entity->saveEntityStats(chosen);
+
+
 
             // Determine if this is a pointed action (requires a target)
             bool isPointedAction = (chosen->name == "Socialize" ||
@@ -109,12 +109,16 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
 
                 // Execute the action with the target
                 sys.executeAction(entity, chosen, target);
+                //saving data
+                entity->saveEntityStats(chosen);
 
                 // Update relationship based on action
                 sys.pointedAssimilation(entity, target, chosen);
             } else {
                 // Execute self-directed action
                 sys.executeAction(entity, chosen);
+                //saving data
+                entity->saveEntityStats(chosen);
             }
         }
     }

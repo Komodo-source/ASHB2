@@ -103,7 +103,7 @@ public:
     void initializeActions();
 
     Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {});
-    void executeAction(Entity* entity, Action* action, Entity* pointed=nullptr);
+    void executeAction(Entity* entity, Action* &action, Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
 
     void updateNeeds(float deltaTime);

@@ -146,13 +146,13 @@ void Entity::saveEntityStats(Action* act) {
 
     std::string changes;
     for(StatChange s : act->statChanges){
-        changes += s.statName + "->" + std::to_string(s.changeValue);
+        changes += s.statName + " => " + std::to_string(s.changeValue) + " ";
     }
     std::string file_name2 = "./src/data/act_" + std::to_string(this->entityId) + ".csv";
     std::ofstream file2(file_name2, std::ios::app);
 
     if (file2.is_open()) {
-        file2 << ',' << act->name << ',' << act->needCategory << ',' << std::to_string(act->baseSatisfaction) << ',' << changes ;
+        file2 << ',' << act->name << ", category: " << act->needCategory << ", satisfaction: " << std::to_string(act->baseSatisfaction) << ", outcome: " << std::to_string(act->outcomeSuccess) << ',' << changes ;
         file2.close();
     }
 }

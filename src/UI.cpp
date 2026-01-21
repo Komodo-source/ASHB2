@@ -60,7 +60,7 @@ void UI::showSystemInformation(){
         ImGui::Text("ID: %d", entity->entityId);
         ImGui::Text("Name: %s", entity->name.c_str());
 
-        ImGui::Separator();
+        ImGui::Spacing();
         ImGui::Text("Health: %.2f", entity->entityHealth);
         ImGui::Text("Age: %.2f", entity->entityAge);
         ImGui::Text("Sex: %c", entity->entitySex);
@@ -71,11 +71,39 @@ void UI::showSystemInformation(){
         ImGui::Text("Anger: %.2f", entity->entityGeneralAnger);
         ImGui::Text("Birthday: %dth day", entity->entityBDay);
         ImGui::Text("Hygiene: %d", entity->entityHygiene);
-        ImGui::Separator();
+        ImGui::Spacing();
         ImGui::Text("AI Entity Information");
 
-        if(ImGui::Button("Show detailed information")){
+        if(ImGui::Button("Show statistics")){
             showDetailedInfo = !showDetailedInfo;
+        }
+        if(ImGui::Button("Show detailed Action Informatino")){
+            showActionInfo = !showActionInfo;
+        }
+
+
+
+        if(showActionInfo){
+            ImGui::Begin("Action statistics", p_open, ImGuiWindowFlags_NoCollapse);
+            std::ifstream statsFile("./src/data/act_" + std::to_string(entity->entityId) + ".csv");
+            std::string line;
+            int c = 1;
+            while (std::getline(statsFile, line)) {
+
+                std::stringstream ss(line);
+                std::string cell;
+
+                while (std::getline(ss, cell, ',')) {
+                    ImGui::Text(cell.c_str());
+                    c++;
+                    if( c == 5){
+                        c = 0;
+                        ImGui::Separator();
+                    }
+                }
+
+            }
+            ImGui::End();
         }
 
         if (showDetailedInfo) {
