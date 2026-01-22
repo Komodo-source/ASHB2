@@ -58,7 +58,6 @@ public:
 
 // Fonction principale pour obtenir les groupes d'entités proches
 std::vector<std::vector<Entity*>> getCloseEntityGroups(
-    const std::vector<UI::GridPoint>& gridPoints,
     const std::vector<Entity*>& entities,
     float worldWidth,
     float worldHeight,

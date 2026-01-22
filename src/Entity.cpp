@@ -25,6 +25,9 @@ Entity::Entity(int id)
       entityBDay(0),
       entityAntiBody(15),
       entityDiseaseType(-1),
+      posX(0.0f),
+      posY(0.0f),
+      selected(false),
       pointedDesire({}),
       pointedAnger({}),
       pointedCouple({})
@@ -65,7 +68,10 @@ Entity::Entity(int id,
       entitySex(sex),
       entityBDay(bDay),
       entityAntiBody(antiBody),
-      entityDiseaseType(diseaseType)
+      entityDiseaseType(diseaseType),
+      posX(0.0f),
+      posY(0.0f),
+      selected(false)
 {
     if(desire != nullptr){
         list_entityPointedDesire.push_back(*desire);
@@ -78,8 +84,9 @@ Entity::Entity(int id,
     }
 
 
+
     if(entitySex == 'A'){
-        if(rand() % 1){
+        if((rand() / (RAND_MAX)) + 1){
             entitySex = 'M';
         }else{
             entitySex = 'F';
@@ -134,6 +141,41 @@ void Entity::IncrementBDay(){
     this->entityAge ++;
 }
 
+Entity* Entity::mostAngryConn(){
+    Entity* ent = nullptr;
+    float max = 0;
+    for(entityPointedAnger pointed: this->list_entityPointedAnger){
+        if(pointed.anger >= max){
+            max = pointed.anger;
+            ent = pointed.pointedEntity;
+        }
+    }
+    return ent;
+}
+Entity* Entity::mostDesireConn(){
+    Entity* ent = nullptr;
+    float max = 0;
+    for(entityPointedDesire pointed: this->list_entityPointedDesire){
+        if(pointed.desire >= max){
+            max = pointed.desire;
+            ent = pointed.pointedEntity;
+        }
+    }
+    return ent;
+}
+
+Entity* Entity::mostSocialConn(){
+    Entity* ent = nullptr;
+    float max = 0;
+    for(entityPointedSocial pointed: this->list_entityPointedSocial){
+        if(pointed.social >= max){
+            max = pointed.social;
+            ent = pointed.pointedEntity;
+        }
+    }
+    return ent;
+}
+
 void Entity::saveEntityStats(Action* act) {
     std::string file_name = "./src/data/" + std::to_string(this->entityId) + ".csv";
     std::ofstream file(file_name, std::ios::app);
@@ -152,7 +194,7 @@ void Entity::saveEntityStats(Action* act) {
     std::ofstream file2(file_name2, std::ios::app);
 
     if (file2.is_open()) {
-        file2 << ',' << act->name << ", category: " << act->needCategory << ", satisfaction: " << std::to_string(act->baseSatisfaction) << ", outcome: " << std::to_string(act->outcomeSuccess) << ',' << changes ;
+        file2 << ',' << act->name << ",category: " << act->needCategory << ",satisfaction: " << std::to_string(act->baseSatisfaction) << ", outcome: " << std::to_string(act->outcomeSuccess) << ',' << changes ;
         file2.close();
     }
 }

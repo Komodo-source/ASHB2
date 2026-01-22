@@ -124,7 +124,6 @@ void QuadTree::clear() {
 // Fonction principale
 
 std::vector<std::vector<Entity*>> getCloseEntityGroups(
-    const std::vector<UI::GridPoint>& gridPoints,
     const std::vector<Entity*>& entities,
     float worldWidth,
     float worldHeight,
@@ -132,11 +131,11 @@ std::vector<std::vector<Entity*>> getCloseEntityGroups(
 {
     // 1. Prepare data
     std::vector<EntityPosition> entityPositions;
-    entityPositions.reserve(gridPoints.size());
+    entityPositions.reserve(entities.size());
 
-    for (const auto& point : gridPoints) {
-        if (point.id >= 0 && (size_t)point.id < entities.size() && entities[point.id] != nullptr) {
-            entityPositions.emplace_back(entities[point.id], point.pos.x, point.pos.y);
+    for (Entity* entity : entities) {
+        if (entity != nullptr) {
+            entityPositions.emplace_back(entity, entity->posX, entity->posY);
         }
     }
 

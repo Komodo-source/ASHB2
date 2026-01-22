@@ -1,8 +1,20 @@
 * Entities
-  - faire les mouvements
+  * faire les mouvements
+    * faire répulsion si malade
+    - faire un bloc dans la map pou pas que les entités dépassent
+
   * faire heal
   - faire la creation de joueur par le gui
-  - faire un 2e graphes pour les actions
+  * faire un 2e graphes pour les actions
+
+
+  IDEE
+
+  - Si une entité a déjà un couple avec une autre entité mais qu'elle éprouve un nouveau désire pour quelqu'un et comment a se rapprocher (physiquement et psychologiquement)
+  créer de la jalousie pour la personne sur qui l'entité est attiré (peut mener à de la
+  discrimination)
+    -> de plus quand quelqu'un est dans un couple la création et l'augmentation de désire
+    est encore plus rare
 
 
   //note de la dernière fois - ajout du debut de l'action dans le grphique

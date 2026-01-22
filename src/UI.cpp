@@ -202,17 +202,17 @@ void UI::showSystemInformation(){
     }
 
 // DrawGrid implementation
-void UI::DrawGrid(std::vector<GridPoint>& points, float pointSize) {
+void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
-    for (auto& p : points) {
-        ImU32 color = p.selected ? IM_COL32(255, 100, 100, 255) : IM_COL32(200, 200, 200, 255);
-        draw_list->AddCircleFilled(p.pos, pointSize, color);
+    for (auto& entity : entities) {
+        ImU32 color = entity->selected ? IM_COL32(255, 100, 100, 255) : IM_COL32(200, 200, 200, 255);
+        draw_list->AddCircleFilled(ImVec2(entity->posX, entity->posY), pointSize, color);
     }
 }
 
 // HandlePointMovement implementation
-// Returns the index of the selected/moved point, -1 if none
-int UI::HandlePointMovement(std::vector<GridPoint>& points) {
+// Returns the index of the selected/moved entity, -1 if none
+int UI::HandlePointMovement(std::vector<Entity*>& entities) {
     ImVec2 mousePos = ImGui::GetIO().MousePos;
     bool mouseClicked = ImGui::IsMouseClicked(0);
     bool mouseHeld = ImGui::IsMouseDown(0);
@@ -221,24 +221,25 @@ int UI::HandlePointMovement(std::vector<GridPoint>& points) {
 
     if (mouseClicked) {
         selectedIndex = -1;
-        for (int i = 0; i < points.size(); i++) {
-            float dx = mousePos.x - points[i].pos.x;
-            float dy = mousePos.y - points[i].pos.y;
+        for (int i = 0; i < entities.size(); i++) {
+            float dx = mousePos.x - entities[i]->posX;
+            float dy = mousePos.y - entities[i]->posY;
             if (dx * dx + dy * dy < 64.0f) { // radius²
                 selectedIndex = i;
-                points[i].selected = true;
+                entities[i]->selected = true;
                 break;
             } else {
-                points[i].selected = false;
+                entities[i]->selected = false;
             }
         }
     }
 
     if (mouseHeld && selectedIndex >= 0) {
-        points[selectedIndex].pos = mousePos;
+        entities[selectedIndex]->posX = mousePos.x;
+        entities[selectedIndex]->posY = mousePos.y;
     }
 
-    return selectedIndex; // returns -1 if no point is selected
+    return selectedIndex; // returns -1 if no entity is selected
 }
 
 

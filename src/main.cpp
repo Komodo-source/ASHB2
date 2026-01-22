@@ -20,6 +20,7 @@
 #include "util/Debbug.h"
 #include "./header/implot.h"
 #include "./header/implot_internal.h"
+#include "./header/Movement.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -64,6 +65,11 @@ int getNBSickClose(std::vector<Entity*> grp){
     return c;
 }
 
+void applyMovement(Entity* ent, std::vector<Entity*> grp){
+    Movement m;
+    m.applyMovement(ent, getNBSickClose(grp));
+}
+
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
     // Process each group of close entities
     for(auto& group : entityGroups){
@@ -72,6 +78,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
             //on applique aussi les paramètres de maladies
             applyDisease(entity, group.size(), getNBSickClose(group));
 
+
+            //apply movement
+            applyMovement(entity, group);
 
             if(entity->entityHealth <= 0.0f) continue; // Skip dead entities
 
@@ -124,9 +133,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
     }
 }
 
-std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, std::vector<UI::GridPoint> position, float width, float height, float radius=100){
+std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, float width, float height, float radius=100){
     std::cout << "== Patial Mesh Separation ==\n";
-    auto groups = getCloseEntityGroups(position, entities, width, height, radius);
+    auto groups = getCloseEntityGroups(entities, width, height, radius);
     std::cout << "Found " << groups.size() << " groups of close entities:\n\n";
 
     for (size_t i = 0; i < groups.size(); ++i) {
@@ -168,30 +177,21 @@ int main() {
 
     int nb_entity = 4;
 
-    // vector of GridPoints
-
-
     UI instanceUI;
-    std::vector<UI::GridPoint> points;
-    int count = 0;
 
+    //vector of Entity with positions
+    std::vector<Entity> entities;
+    int count = 0;
     for (int y = 0; y < 1; ++y){
         for (int x = 0; x < nb_entity; ++x){
-            UI::GridPoint gp;
-            gp.pos = ImVec2(100 + x * 60, 100 + y * 60);
-            gp.selected = false;
-            gp.id = count;
-            points.push_back(gp);
-            count ++;
+            Entity entity = Entity(
+                count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr);
+            entity.posX = 100 + x * 60;
+            entity.posY = 100 + y * 60;
+            entity.selected = false;
+            entities.push_back(entity);
+            count++;
         }
-    }
-
-    //vector of Entity
-    std::vector<Entity> entities;
-    for(int i=0; i<nb_entity; i++){
-        Entity entity = Entity(
-            i, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr);
-        entities.push_back(entity);
     }
 
     static bool showEntityWindow = false;
@@ -201,7 +201,7 @@ int main() {
         ent_quad.push_back(&entities[i]);
     }
 
-    std::vector<std::vector<Entity*>> close_entity_together = separationQuad(ent_quad, points, width, height);
+    std::vector<std::vector<Entity*>> close_entity_together = separationQuad(ent_quad, width, height);
 
     // ici on applique l'algorithme pour modification stats
     // Note: For now, we'll run this in the main loop instead of a separate thread
@@ -223,17 +223,9 @@ int main() {
             if(entities[i].entityHealth <= 0.0f){
                 std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
 
-                // Remove from points vector
-                if(i < points.size()){
-                    points.erase(points.begin() + i);
-                    // Update IDs for remaining points
-                    for(int j = i; j < points.size(); j++){
-                        points[j].id = j;
-                    }
-                }
                 //Birthday
                 if((day / 60) % 365 ){
-                    for(Entity ent : entities){
+                    for(Entity& ent : entities){
                         ent.IncrementBDay();
                     }
                 }
@@ -263,7 +255,7 @@ int main() {
             frameCounter = 0;
 
             // Recalculate entity groups based on current positions
-            close_entity_together = separationQuad(ent_quad, points, width, height);
+            close_entity_together = separationQuad(ent_quad, width, height);
 
             // Apply free will to all entity groups
             std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
@@ -273,7 +265,7 @@ int main() {
 
         instanceUI.showSimulationInformation(day / 60 , entities.size(), UPDATE_FREQUENCY, {});
 
-        int moved_entity = instanceUI.HandlePointMovement(points);
+        int moved_entity = instanceUI.HandlePointMovement(ent_quad);
         if (moved_entity != -1) {
             selectedEntityIndex = moved_entity;
             showEntityWindow = true;
@@ -283,7 +275,7 @@ int main() {
             instanceUI.ShowEntityWindow(&entities.at(selectedEntityIndex), &showEntityWindow);
         }
 
-        instanceUI.DrawGrid(points);
+        instanceUI.DrawGrid(ent_quad);
 
         ImGui::Render();
         int display_w, display_h;

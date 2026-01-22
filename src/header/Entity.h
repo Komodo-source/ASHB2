@@ -30,7 +30,7 @@ static std::vector<std::string> male_name = {
 static std::vector<std::string> female_name = {
 "Amari",
 "Campbell",
-"Iris",
+"Irys",
 "Selah",
 "Kamila",
 "Makaila",
@@ -85,6 +85,9 @@ public:
     int entityBDay;
     int entityAntiBody; // pourcentage
     int entityDiseaseType; //-1 if no disease
+    float posX;
+    float posY;
+    bool selected = false;
     std::vector<entityPointedDesire> list_entityPointedDesire;
     std::vector<entityPointedAnger> list_entityPointedAnger;
     std::vector<entityPointedCouple> list_entityPointedCouple;
@@ -128,6 +131,9 @@ public:
     void addSocial(entityPointedSocial pointed);
     void IncrementBDay();
     void saveEntityStats(Action* act);
+    Entity* mostAngryConn();
+    Entity* mostDesireConn();
+    Entity* mostSocialConn();
 
     // Template method - must be in header for template instantiation
     template<typename T>

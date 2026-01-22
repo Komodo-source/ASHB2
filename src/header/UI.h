@@ -24,8 +24,8 @@ public:
     };
 
     void ShowEntityWindow(Entity* entity, bool* p_open = nullptr);
-    void DrawGrid(std::vector<GridPoint>& points, float pointSize = 8.0f);
-    int HandlePointMovement(std::vector<GridPoint>& points);
+    void DrawGrid(std::vector<Entity*>& entities, float pointSize = 8.0f);
+    int HandlePointMovement(std::vector<Entity*>& entities);
     void createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText);
     void showSimulationInformation(int day, int num_entity, int tick, std::map<std::string, int> complementary_information);
     GridPoint getGridPoint();
