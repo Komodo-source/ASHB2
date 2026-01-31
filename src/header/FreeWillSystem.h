@@ -25,6 +25,8 @@ struct StatChange {
     float changeValue;
 };
 
+
+
 // Action definition
 struct Action {
     std::string name;
@@ -96,6 +98,7 @@ private:
     float calculateOutcomeSuccess(const std::map<std::string, float>& before,
                                   const std::map<std::string, float>& after);
 
+
 public:
     FreeWillSystem();
 
@@ -114,6 +117,8 @@ public:
 
     // Helper for social environment influence
     float calculateSocialInfluence(Entity* entity, const std::vector<Entity*>& neighbors, const Action& action);
+
+    void applyEmotionalContagion(Entity* entity, const std::vector<Entity*>& neighbors);
 };
 
 #endif

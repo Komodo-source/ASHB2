@@ -55,23 +55,52 @@
         return satisfaction;
     }
 
+    void FreeWillSystem::applyEmotionalContagion(Entity* entity, const std::vector<Entity*>& neighbors) {
+        if (neighbors.empty()) return;
+
+        float avgNeighborHappiness = 0.0f;
+        float avgNeighborStress = 0.0f;
+
+        for (Entity* n : neighbors) {
+            avgNeighborHappiness += n->entityHapiness;
+            avgNeighborStress += n->entityStress;
+        }
+        avgNeighborHappiness /= neighbors.size();
+        avgNeighborStress /= neighbors.size();
+
+        // Gradual convergence toward neighbor average
+        entity->entityHapiness += (avgNeighborHappiness - entity->entityHapiness) * 0.05f;
+        entity->entityStress += (avgNeighborStress - entity->entityStress) * 0.08f;
+    }
+
     // Calculate bias from memory (learn from past experiences)
     float FreeWillSystem::calculateMemoryBias(int actionId) {
         float bias = 0.0f;
         float totalWeight = 0.0f;
         int memoryIndex = 0;
+        float recentBias = 0.0f;
+        float oldBias = 0.0f;
+        int recentCount = 0, oldCount = 0;
 
-        for (auto it = actionHistory.rbegin(); it != actionHistory.rend(); ++it) {
-            if (it->actionId == actionId) {
-                float weight = getMemoryWeight(memoryIndex);
-                bias += it->outcomeSuccess * weight;
-                totalWeight += weight;
+        for (int i = 0; i < actionHistory.size(); i++) {
+        if (actionHistory[i].actionId == actionId) {
+            float weight = getMemoryWeight(i);
+
+            if (i < 5) { // Recent memories
+                recentBias += actionHistory[i].outcomeSuccess * weight;
+                recentCount++;
+            } else {
+                oldBias += actionHistory[i].outcomeSuccess * weight;
+                oldCount++;
             }
-            memoryIndex++;
         }
-
-        return totalWeight > 0 ? bias / totalWeight : 0.5f; // Default neutral bias
     }
+
+    float finalBias = (recentBias * 3.0f + oldBias) /
+                      (recentCount * 3.0f + oldCount);
+
+    return finalBias;
+}
 
     // Calculate variety bonus (avoid repetition)
     float FreeWillSystem::calculateVarietyBonus(int actionId) {
@@ -113,7 +142,7 @@
 
     //implementation of a list of action
     void FreeWillSystem::initializeActions() {
-        //
+
         //POINTED actions (require a target entity)
         Action socialize("Socialize", 1, "social");
         socialize.requirements = {
@@ -229,7 +258,408 @@
         anxiety.baseSatisfaction = 5.0f;
         availableActions.push_back(anxiety);
 
-        // Positive social action
+        //self care action - Meditation/Prayer (health)
+        Action Prayer("Prayer", 14, "health");
+        Prayer.requirements = {
+            {"stress", 40.0f, 0.7f},
+            {"mentalHealth", 70.0f, 0.6f}  // mentalHealth <70
+        };
+        Prayer.statChanges = {
+            {"stress", -15.0f},
+            {"mentalHealth", 15.0f},
+            {"loneliness", 5.0f},
+            {"happiness", 8.0f}
+        };
+        Prayer.baseSatisfaction = 13.0f;
+        availableActions.push_back(Prayer);
+
+        // Read/Study (achievement)
+        Action read("Read", 16, "achievement");
+        read.requirements = {
+            {"boredom", 30.0f, 0.7f},
+            {"mentalHealth", 40.0f, 0.5f}
+        };
+        read.statChanges = {
+            {"boredom", -15.0f},
+            {"happiness", 10.0f},
+            {"mentalHealth", 8.0f},
+            {"loneliness", 3.0f}
+        };
+        read.baseSatisfaction = 15.0f;
+        availableActions.push_back(read);
+
+        // Procrastinate (entertainment)
+        Action procrastinate("Procrastinate", 17, "entertainment");
+        procrastinate.requirements = {
+            {"stress", 40.0f, 0.6f},
+            {"boredom", 30.0f, 0.5f}
+        };
+        procrastinate.statChanges = {
+            {"boredom", -10.0f},
+            {"happiness", 3.0f},
+            {"stress", 12.0f},
+            {"mentalHealth", -5.0f}
+        };
+        procrastinate.baseSatisfaction = 8.0f;
+        availableActions.push_back(procrastinate);
+
+        // ==================== SOCIAL ACTIONS ====================
+
+        // Gossip (social)
+        Action gossip("Gossip", 18, "social");
+        gossip.requirements = {
+            {"loneliness", 40.0f, 0.7f},
+            {"boredom", 50.0f, 0.6f}
+        };
+        gossip.statChanges = {
+            {"loneliness", -8.0f},
+            {"boredom", -12.0f},
+            {"happiness", 5.0f}
+        };
+        gossip.baseSatisfaction = 12.0f;
+        availableActions.push_back(gossip);
+
+        // Apologize (social)
+        Action apologize("Apologize", 19, "social");
+        apologize.requirements = {
+            {"anger", 30.0f, 0.8f},  // anger toward target <30
+            {"mentalHealth", 40.0f, 0.6f}
+        };
+        apologize.statChanges = {
+            {"happiness", 8.0f},
+            {"stress", -10.0f},
+            {"mentalHealth", 5.0f}
+        };
+        apologize.baseSatisfaction = 18.0f;
+        availableActions.push_back(apologize);
+
+        // Help/Support (social)
+        Action helpSupport("HelpSupport", 20, "social");
+        helpSupport.requirements = {
+            {"happiness", 50.0f, 0.7f},
+            {"stress", 60.0f, 0.6f}  // stress <60
+        };
+        helpSupport.statChanges = {
+            {"happiness", 10.0f},
+            {"mentalHealth", 8.0f},
+            {"stress", 5.0f}
+        };
+        helpSupport.baseSatisfaction = 20.0f;
+        availableActions.push_back(helpSupport);
+
+        // Ignore/Avoid (social)
+        Action ignoreAvoid("IgnoreAvoid", 21, "social");
+        ignoreAvoid.requirements = {
+            {"stress", 60.0f, 0.7f},
+            {"anger", 40.0f, 0.6f}  // anger toward target 40+
+        };
+        ignoreAvoid.statChanges = {
+            {"stress", -5.0f},
+            {"loneliness", 8.0f}
+        };
+        ignoreAvoid.baseSatisfaction = 8.0f;
+        availableActions.push_back(ignoreAvoid);
+
+        // ==================== SELF-CARE ACTIONS ====================
+
+        // Eat Meal (health)
+        Action eatMeal("EatMeal", 22, "health");
+        eatMeal.requirements = {
+            {"health", 70.0f, 0.8f}  // health <70
+        };
+        eatMeal.statChanges = {
+            {"health", 15.0f},
+            {"happiness", 8.0f},
+            {"hygiene", -2.0f},
+            {"boredom", 3.0f}
+        };
+        eatMeal.baseSatisfaction = 15.0f;
+        availableActions.push_back(eatMeal);
+
+        // Sleep (health)
+        Action sleep("Sleep", 23, "health");
+        sleep.requirements = {
+            {"stress", 50.0f, 0.7f},
+            {"health", 60.0f, 0.6f}  // health <60
+        };
+        sleep.statChanges = {
+            {"stress", -25.0f},
+            {"health", 20.0f},
+            {"mentalHealth", 12.0f},
+            {"hygiene", -5.0f},
+            {"boredom", 5.0f}
+        };
+        sleep.baseSatisfaction = 25.0f;
+        availableActions.push_back(sleep);
+
+        // Self-Harm (health) - concerning but realistic
+        Action selfHarm("SelfHarm", 15, "health");
+        selfHarm.requirements = {
+            {"mentalHealth", 25.0f, 1.0f},  // mentalHealth <25
+            {"stress", 80.0f, 0.9f},
+            {"loneliness", 70.0f, 0.8f}
+        };
+        selfHarm.statChanges = {
+            {"mentalHealth", -15.0f},
+            {"stress", -20.0f},
+            {"health", -10.0f}
+        };
+        selfHarm.baseSatisfaction = 5.0f;
+        availableActions.push_back(selfHarm);
+
+        // ==================== ENTERTAINMENT/HOBBY ACTIONS ====================
+
+        // Watch Entertainment (entertainment)
+        Action watchEntertainment("WatchEntertainment", 24, "entertainment");
+        watchEntertainment.requirements = {
+            {"boredom", 60.0f, 0.8f}
+        };
+        watchEntertainment.statChanges = {
+            {"boredom", -20.0f},
+            {"happiness", 8.0f},
+            {"loneliness", 5.0f},
+            {"stress", -8.0f}
+        };
+        watchEntertainment.baseSatisfaction = 18.0f;
+        availableActions.push_back(watchEntertainment);
+
+        // Creative Activity (achievement)
+        Action creativeActivity("CreativeActivity", 25, "achievement");
+        creativeActivity.requirements = {
+            {"boredom", 40.0f, 0.7f},
+            {"stress", 70.0f, 0.5f}  // stress <70
+        };
+        creativeActivity.statChanges = {
+            {"happiness", 15.0f},
+            {"boredom", -25.0f},
+            {"mentalHealth", 10.0f},
+            {"stress", 5.0f}
+        };
+        creativeActivity.baseSatisfaction = 22.0f;
+        availableActions.push_back(creativeActivity);
+
+        // Gaming/Play (entertainment)
+        Action gaming("Gaming", 26, "entertainment");
+        gaming.requirements = {
+            {"boredom", 50.0f, 0.7f},
+            {"stress", 80.0f, 0.5f}  // stress <80
+        };
+        gaming.statChanges = {
+            {"boredom", -20.0f},
+            {"happiness", 12.0f},
+            {"loneliness", 8.0f},
+            {"stress", -10.0f}
+        };
+        gaming.baseSatisfaction = 16.0f;
+        availableActions.push_back(gaming);
+
+        // ==================== NEGATIVE SOCIAL ACTIONS ====================
+
+        // Insult/Verbal Attack (social)
+        Action insult("Insult", 27, "social");
+        insult.requirements = {
+            {"anger", 50.0f, 0.9f},
+            {"stress", 60.0f, 0.7f}
+        };
+        insult.statChanges = {
+            {"anger", -10.0f},
+            {"stress", 10.0f},
+            {"happiness", -5.0f}
+        };
+        insult.baseSatisfaction = 8.0f;
+        availableActions.push_back(insult);
+
+        // Manipulate (social)
+        Action manipulate("Manipulate", 28, "social");
+        manipulate.requirements = {
+            {"mentalHealth", 50.0f, 0.8f}  // mentalHealth <50
+        };
+        manipulate.statChanges = {
+            {"happiness", 5.0f},
+            {"mentalHealth", -8.0f},
+            {"stress", 5.0f}
+        };
+        manipulate.baseSatisfaction = 10.0f;
+        availableActions.push_back(manipulate);
+
+        // Jealousy/Envy Display (social)
+        Action jealousy("Jealousy", 29, "social");
+        jealousy.requirements = {
+            {"happiness", 40.0f, 0.8f}  // happiness <40
+        };
+        jealousy.statChanges = {
+            {"anger", 15.0f},
+            {"happiness", -10.0f},
+            {"mentalHealth", -5.0f}
+        };
+        jealousy.baseSatisfaction = 5.0f;
+        availableActions.push_back(jealousy);
+
+        // Betray (social)
+        Action betray("Betray", 30, "social");
+        betray.requirements = {
+            {"anger", 60.0f, 0.9f}
+        };
+        betray.statChanges = {
+            {"mentalHealth", -12.0f},
+            {"stress", 20.0f}
+        };
+        betray.baseSatisfaction = 5.0f;
+        availableActions.push_back(betray);
+
+        // ==================== PROFESSIONAL/ACHIEVEMENT ACTIONS ====================
+
+        // Learn New Skill (achievement)
+        Action learnSkill("LearnSkill", 31, "achievement");
+        learnSkill.requirements = {
+            {"boredom", 40.0f, 0.6f},
+            {"mentalHealth", 50.0f, 0.5f},
+            {"stress", 70.0f, 0.5f}  // stress <70
+        };
+        learnSkill.statChanges = {
+            {"happiness", 18.0f},
+            {"boredom", -25.0f},
+            {"mentalHealth", 10.0f},
+            {"stress", 8.0f}
+        };
+        learnSkill.baseSatisfaction = 25.0f;
+        availableActions.push_back(learnSkill);
+
+        // Quit/Give Up (achievement)
+        Action quitGiveUp("QuitGiveUp", 32, "achievement");
+        quitGiveUp.requirements = {
+            {"stress", 80.0f, 0.9f},
+            {"mentalHealth", 40.0f, 0.8f},  // mentalHealth <40
+            {"anger", 50.0f, 0.7f}
+        };
+        quitGiveUp.statChanges = {
+            {"stress", -15.0f},
+            {"happiness", -12.0f},
+            {"mentalHealth", -8.0f},
+            {"boredom", 20.0f}
+        };
+        quitGiveUp.baseSatisfaction = 8.0f;
+        availableActions.push_back(quitGiveUp);
+
+        // ==================== SUBSTANCE/COPING ACTIONS ====================
+
+        // Drink Alcohol (entertainment/health)
+        Action drinkAlcohol("DrinkAlcohol", 33, "entertainment");
+        drinkAlcohol.requirements = {
+            {"stress", 60.0f, 0.7f}  // stress 60+ OR happiness <40
+        };
+        drinkAlcohol.statChanges = {
+            {"stress", -20.0f},
+            {"happiness", 10.0f},
+            {"health", -8.0f},
+            {"mentalHealth", -5.0f},
+            {"hygiene", -3.0f}
+        };
+        drinkAlcohol.baseSatisfaction = 15.0f;
+        availableActions.push_back(drinkAlcohol);
+
+        // Smoke/Vape (health)
+        Action smoke("Smoke", 34, "health");
+        smoke.requirements = {
+            {"stress", 50.0f, 0.8f}
+        };
+        smoke.statChanges = {
+            {"stress", -12.0f},
+            {"health", -5.0f},
+            {"hygiene", -2.0f}
+        };
+        smoke.baseSatisfaction = 10.0f;
+        availableActions.push_back(smoke);
+
+        // ==================== INTIMATE/ROMANTIC ACTIONS ====================
+
+        // Flirt (social)
+        Action flirt("Flirt", 35, "social");
+        flirt.requirements = {
+            {"happiness", 40.0f, 0.6f},
+            {"loneliness", 40.0f, 0.7f},
+            {"hygiene", 50.0f, 0.5f}
+        };
+        flirt.statChanges = {
+            {"loneliness", -5.0f},
+            {"happiness", 8.0f}
+        };
+        flirt.baseSatisfaction = 12.0f;
+        availableActions.push_back(flirt);
+
+        // Date (social)
+        Action date("Date", 36, "social");
+        date.requirements = {
+            {"hygiene", 60.0f, 0.7f}
+        };
+        date.statChanges = {
+            {"loneliness", -15.0f},
+            {"happiness", 15.0f},
+            {"stress", -8.0f}
+        };
+        date.baseSatisfaction = 25.0f;
+        availableActions.push_back(date);
+
+        // Break Up (social)
+        Action breakUp("BreakUp", 37, "social");
+        breakUp.requirements = {
+            {"anger", 40.0f, 0.8f}  // anger toward partner 40+ OR desire <10
+        };
+        breakUp.statChanges = {
+            {"happiness", -20.0f},
+            {"stress", 15.0f},
+            {"loneliness", 25.0f},
+            {"mentalHealth", -10.0f}
+        };
+        breakUp.baseSatisfaction = 5.0f;
+        availableActions.push_back(breakUp);
+
+        // Reconcile (social)
+        Action reconcile("Reconcile", 38, "social");
+        reconcile.requirements = {
+            {"anger", 30.0f, 0.8f}  // anger <30
+        };
+        reconcile.statChanges = {
+            {"happiness", 20.0f},
+            {"stress", -10.0f}
+        };
+        reconcile.baseSatisfaction = 22.0f;
+        availableActions.push_back(reconcile);
+
+        // ==================== DEFENSIVE/BOUNDARY ACTIONS ====================
+
+        // Set Boundaries (social)
+        Action setBoundaries("SetBoundaries", 39, "social");
+        setBoundaries.requirements = {
+            {"stress", 70.0f, 0.7f},
+            {"anger", 30.0f, 0.6f},
+            {"mentalHealth", 50.0f, 0.5f}
+        };
+        setBoundaries.statChanges = {
+            {"stress", -12.0f},
+            {"mentalHealth", 8.0f},
+            {"anger", -5.0f}
+        };
+        setBoundaries.baseSatisfaction = 15.0f;
+        availableActions.push_back(setBoundaries);
+
+        // Seek Therapy/Help (health)
+        Action seekTherapy("SeekTherapy", 40, "health");
+        seekTherapy.requirements = {
+            {"mentalHealth", 30.0f, 0.9f},  // mentalHealth <30
+            {"stress", 70.0f, 0.7f}
+        };
+        seekTherapy.statChanges = {
+            {"mentalHealth", 20.0f},
+            {"stress", -15.0f},
+            {"happiness", 8.0f},
+            {"anger", -10.0f}
+        };
+        seekTherapy.baseSatisfaction = 25.0f;
+        availableActions.push_back(seekTherapy);
+
+        // ==================== EXISTING ACTIONS ====================
+
         Action breeding("Breeding", 9, "social");
         breeding.requirements = {
             {"happiness", 60.0f, 0.8f},
@@ -259,6 +689,19 @@
         };
         exercise.baseSatisfaction = 20.0f;
         availableActions.push_back(exercise);
+
+
+        Action selfHarm("Self Harm", 15, "health");
+        selfHarm.statChanges = {
+            {"mentalHealth", 25.0f},
+            {"stress", 80.0f},
+        };
+
+        selfHarm.statChanges = {
+            {"mentalHealth", -15.0f},
+            {"stress", -20.0f},
+            {"health", -10.0f}
+        };
 
         // Hygiene actions
         Action shower("Take Shower", 11, "hygiene");
@@ -345,12 +788,23 @@
             float neighborHappiness = neighbor->entityHapiness;
 
             // If neighbors are angry/stressed, negative actions become more likely
-            if (action.name == "Murder" || action.name == "Discrimination" || action.name == "AngerConnection") {
+            if (action.name == "Murder" || action.name == "Discrimination" || action.name == "AngerConnection" ||
+                action.name == "Insult" || action.name == "Betray" || action.name == "Jealousy" ||
+                action.name == "Manipulate" || action.name == "IgnoreAvoid") {
                 influence += (neighborAnger / 100.0f) * 0.3f;
             }
             // If neighbors are happy/healthy, positive actions become more likely
-            else if (action.name == "Socialize" || action.name == "GoodConnection" || action.name == "Breeding") {
+            else if (action.name == "Socialize" || action.name == "GoodConnection" || action.name == "Breeding" ||
+                     action.name == "HelpSupport" || action.name == "Apologize" || action.name == "Flirt" ||
+                     action.name == "Date" || action.name == "Reconcile" || action.name == "CreativeActivity" ||
+                     action.name == "LearnSkill") {
                 influence += (neighborHappiness / 100.0f) * 0.3f;
+            }
+            // Coping actions influenced by neighbor stress
+            else if (action.name == "DrinkAlcohol" || action.name == "Smoke" || action.name == "SelfHarm" ||
+                     action.name == "Procrastinate" || action.name == "QuitGiveUp") {
+                float neighborStress = neighbor->entityStress;
+                influence += (neighborStress / 100.0f) * 0.2f;
             }
 
             totalWeight += 1.0f + relationshipWeight;
@@ -395,14 +849,67 @@
                 } else if (action.name == "Suicide") {
                     rarityMultiplier = 0.02f; // 2% probability weight
                 } else if (action.name == "Discrimination") {
-                    rarityMultiplier = 0.3f; // 30% probability weight
+                    rarityMultiplier = 0.25f; // 25% probability weight
+                    if(entity->getTypeGoal() == "self"){
+                        rarityMultiplier *= 1.25;
+                    }
                 } else if (action.name == "Anxiety") {
+                    rarityMultiplier = 0.3f; // 30% probability weight
+                } else if (action.name == "SelfHarm") {
+                    rarityMultiplier = 0.1f; // 10% probability weight
+                } else if (action.name == "Betray") {
+                    rarityMultiplier = 0.15f; // 15% probability weight - serious action
+                    if(entity->getTypeGoal() == "self"){
+                        rarityMultiplier *= 1.25;
+                    }
+                } else if (action.name == "Manipulate") {
+                    rarityMultiplier = 0.3f; // 30% probability weight
+                } else if (action.name == "Insult") {
                     rarityMultiplier = 0.4f; // 40% probability weight
+                } else if (action.name == "BreakUp") {
+                    rarityMultiplier = 0.25f; // 25% probability weight
+                } else if (action.name == "QuitGiveUp") {
+                    rarityMultiplier = 0.2f; // 20% probability weight
+                } else if (action.name == "DrinkAlcohol") {
+                    rarityMultiplier = 0.5f; // 50% probability weight - common coping
+                } else if (action.name == "Smoke") {
+                    rarityMultiplier = 0.5f; // 50% probability weight - common coping
+                } else if (action.name == "Gossip") {
+                    rarityMultiplier = 0.6f; // 60% probability weight - common social behavior
+                } else if (action.name == "Jealousy") {
+                    rarityMultiplier = 0.35f; // 35% probability weight
+                }else if(action.name == "gossip" && entity->getTypeGoal() == "make_friends"){
+                   rarityMultiplier = 0.15f;
+                }else if(entity->getTypeGoal() == "find_partner" || entity->getTypeGoal() == "make_friends"){
+                   rarityMultiplier = 0.3f;
+                }else if( entity->getTypeGoal() == "make_friends"){
+                   rarityMultiplier = 0.2f;
+                }else if( entity->getTypeGoal() == "happiness" && action.name == "WatchEntertainment"){
+                   rarityMultiplier = 0.25f;
+                }else if( entity->getTypeGoal() == "happiness" && action.name == "creativeActivity"){
+                   rarityMultiplier = 0.25f;
+                }else if( entity->getTypeGoal() == "happiness" && action.name == "gaming"){
+                   rarityMultiplier = 0.27f;
+                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Jealousy"){
+                   rarityMultiplier = 0.25f;
+                }else if( entity->getTypeGoal() == "build_career" && action.name == "LearnSkill"){
+                   rarityMultiplier = 0.25f;
+                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Flirt"){
+                   rarityMultiplier = 0.40f;
+                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Date"){
+                   rarityMultiplier = 0.40f;
+                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Reconcile"){
+                   rarityMultiplier = 0.40f;
+                }
+                else if( entity->getTypeGoal() == "find_partner" && action.name == "Breeding"){
+                   rarityMultiplier = 0.40f;
+                }else if( entity->getTypeGoal() == "build_career" && action.name == "Work on Project"){
+                   rarityMultiplier = 0.25f;
                 }
 
                 weight *= rarityMultiplier;
 
-                std::uniform_real_distribution<float> dist(0.8f, 1.2f);
+                std::uniform_real_distribution<float> dist(0.95f, 1.05f);
                 float randomFactor = dist(rng);
                 weight *= randomFactor;
 
@@ -488,6 +995,7 @@
                 pointer->list_entityPointedDesire[index].desire += increment;
                 std::cout << "Desire renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
+
         }else if(action->name == "AngerConnection"){
             int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
             if(index == -1){
@@ -511,6 +1019,13 @@
                 float social = static_cast<float>(BetterRand::genNrInInterval(1,2));
                 std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
                 pointer->addSocial({1, pointed, social});
+                pointed->addSocial({1, pointer, social * 0.8f}); // Slightly less impact
+
+                //applyStatChanges(pointer, action->statChanges);
+                //applyStatChanges(pointed, {
+                //    {"loneliness", -5.0f},  // They also feel less lonely
+                //    {"happiness", 4.0f}     // They also get happier
+                //});
             }else{
                 //Ici on choisit le lien social mais lorsqu'il sociabilise il se rend compte qu'il est malade donc on le
                 //met de poid plus fort
@@ -592,6 +1107,270 @@
                 std::cout << "Discrimination renforcée entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }
+        // ==================== NEW SOCIAL ACTIONS ====================
+        else if(action->name == "Gossip"){
+            // Gossip can damage relationships - 30% chance pointed finds out and gets angry
+            if(BetterRand::genNrInInterval(1, 100) <= 30){
+                int index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+                if(index == -1){
+                    float anger = static_cast<float>(BetterRand::genNrInInterval(2,5));
+                    std::cout << "Gossip découvert! " << pointed->getName() << " ajoute anger envers " << pointer->getName() << " +" << anger << std::endl;
+                    pointed->addAnger({1, pointer, anger});
+                }else{
+                    float increment = static_cast<float>(BetterRand::genNrInInterval(2,4));
+                    pointed->list_entityPointedAnger[index].anger += increment;
+                    std::cout << "Gossip découvert! " << pointed->getName() << " augmente anger envers " << pointer->getName() << " +" << increment << std::endl;
+                }
+            }else{
+                std::cout << "Gossip: " << pointer->getName() << " parle de " << pointed->getName() << " (non découvert)\n";
+            }
+        }
+        else if(action->name == "Apologize"){
+            // Reduces anger between entities
+            int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(index != -1){
+                float reduction = static_cast<float>(BetterRand::genNrInInterval(5,12));
+                pointer->list_entityPointedAnger[index].anger = std::max(0.0f, pointer->list_entityPointedAnger[index].anger - reduction);
+                std::cout << "Apologize: " << pointer->getName() << " réduit anger envers " << pointed->getName() << " -" << reduction << std::endl;
+            }
+            // Also reduce pointed's anger toward pointer
+            int pointed_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+            if(pointed_index != -1){
+                float reduction = static_cast<float>(BetterRand::genNrInInterval(3,8));
+                pointed->list_entityPointedAnger[pointed_index].anger = std::max(0.0f, pointed->list_entityPointedAnger[pointed_index].anger - reduction);
+                std::cout << "Apologize: " << pointed->getName() << " accepte excuses, anger réduit -" << reduction << std::endl;
+            }
+        }
+        else if(action->name == "HelpSupport"){
+            // Strengthens social bonds significantly
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index == -1){
+                float social = static_cast<float>(BetterRand::genNrInInterval(3,6));
+                std::cout << "HelpSupport: nouveau lien social entre " << pointer->getName() << " et " << pointed->getName() << " +" << social << std::endl;
+                pointer->addSocial({1, pointed, social});
+            }else{
+                float increment = static_cast<float>(BetterRand::genNrInInterval(3,6));
+                pointer->list_entityPointedSocial[social_index].social += increment;
+                std::cout << "HelpSupport: lien social renforcé entre " << pointer->getName() << " et " << pointed->getName() << " +" << increment << std::endl;
+            }
+            // Pointed also gains social bond
+            int pointed_social_index = pointed->contains(pointed->list_entityPointedSocial, pointer, 4);
+            if(pointed_social_index == -1){
+                float social = static_cast<float>(BetterRand::genNrInInterval(2,5));
+                pointed->addSocial({1, pointer, social});
+            }else{
+                float increment = static_cast<float>(BetterRand::genNrInInterval(2,4));
+                pointed->list_entityPointedSocial[pointed_social_index].social += increment;
+            }
+        }
+        else if(action->name == "IgnoreAvoid"){
+            // Weakens social bonds
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index != -1){
+                float reduction = static_cast<float>(BetterRand::genNrInInterval(2,5));
+                pointer->list_entityPointedSocial[social_index].social = std::max(0.0f, pointer->list_entityPointedSocial[social_index].social - reduction);
+                std::cout << "IgnoreAvoid: " << pointer->getName() << " évite " << pointed->getName() << ", lien social -" << reduction << std::endl;
+            }
+        }
+        else if(action->name == "Insult"){
+            // Creates/strengthens anger link with target
+            int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(index == -1){
+                float anger = static_cast<float>(BetterRand::genNrInInterval(2,5));
+                pointer->addAnger({1, pointed, anger});
+            }
+            // Target gets angry at pointer
+            int pointed_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+            if(pointed_index == -1){
+                float anger = static_cast<float>(BetterRand::genNrInInterval(5,10));
+                std::cout << "Insult: " << pointed->getName() << " devient angry envers " << pointer->getName() << " +" << anger << std::endl;
+                pointed->addAnger({1, pointer, anger});
+            }else{
+                float increment = static_cast<float>(BetterRand::genNrInInterval(4,8));
+                pointed->list_entityPointedAnger[pointed_index].anger += increment;
+                std::cout << "Insult: " << pointed->getName() << " augmente anger envers " << pointer->getName() << " +" << increment << std::endl;
+            }
+            // Damages social bond
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index != -1){
+                pointer->list_entityPointedSocial[social_index].social = std::max(0.0f, pointer->list_entityPointedSocial[social_index].social - 3.0f);
+            }
+        }
+        else if(action->name == "Manipulate"){
+            // Complex relationship effects - pointer gains slight social control
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index == -1){
+                float social = static_cast<float>(BetterRand::genNrInInterval(1,3));
+                pointer->addSocial({1, pointed, social});
+            }
+            // But pointed may feel used (small anger increase)
+            if(BetterRand::genNrInInterval(1, 100) <= 40){
+                int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+                if(pointed_anger_index == -1){
+                    float anger = static_cast<float>(BetterRand::genNrInInterval(1,3));
+                    pointed->addAnger({1, pointer, anger});
+                    std::cout << "Manipulate: " << pointed->getName() << " ressent manipulation, anger +" << anger << std::endl;
+                }else{
+                    float increment = static_cast<float>(BetterRand::genNrInInterval(1,3));
+                    pointed->list_entityPointedAnger[pointed_anger_index].anger += increment;
+                }
+            }
+        }
+        else if(action->name == "Jealousy"){
+            // Creates anger link toward target
+            int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(index == -1){
+                float anger = static_cast<float>(BetterRand::genNrInInterval(5,10));
+                std::cout << "Jealousy: " << pointer->getName() << " envieux de " << pointed->getName() << ", anger +" << anger << std::endl;
+                pointer->addAnger({1, pointed, anger});
+            }else{
+                float increment = static_cast<float>(BetterRand::genNrInInterval(4,8));
+                pointer->list_entityPointedAnger[index].anger += increment;
+                std::cout << "Jealousy: " << pointer->getName() << " renforce jalousie envers " << pointed->getName() << " +" << increment << std::endl;
+            }
+        }
+        else if(action->name == "Betray"){
+            // Destroys social link, creates strong anger
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index != -1){
+                std::cout << "Betray: Lien social détruit entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
+                pointer->list_entityPointedSocial.erase(pointer->list_entityPointedSocial.begin() + social_index);
+            }
+            // Target gets very angry
+            int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+            if(pointed_anger_index == -1){
+                float anger = static_cast<float>(BetterRand::genNrInInterval(15,25));
+                std::cout << "Betray: " << pointed->getName() << " trahi par " << pointer->getName() << ", anger +" << anger << std::endl;
+                pointed->addAnger({1, pointer, anger});
+            }else{
+                float increment = static_cast<float>(BetterRand::genNrInInterval(12,20));
+                pointed->list_entityPointedAnger[pointed_anger_index].anger += increment;
+            }
+            // Also destroy pointed's social link to pointer
+            int pointed_social_index = pointed->contains(pointed->list_entityPointedSocial, pointer, 4);
+            if(pointed_social_index != -1){
+                pointed->list_entityPointedSocial.erase(pointed->list_entityPointedSocial.begin() + pointed_social_index);
+            }
+        }
+        // ==================== INTIMATE/ROMANTIC ACTIONS ====================
+        else if(action->name == "Flirt"){
+            // Check hygiene requirement
+            if(pointer->entityHygiene < 50){
+                std::cout << "Flirt bloqué: " << pointer->getName() << " a une hygiène trop basse\n";
+                return;
+            }
+            // Can create weak desire link
+            int index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
+            if(index == -1){
+                float desire = static_cast<float>(BetterRand::genNrInInterval(1,3));
+                std::cout << "Flirt: nouveau désir faible entre " << pointer->getName() << " et " << pointed->getName() << " +" << desire << std::endl;
+                pointer->addDesire({1, pointed, desire});
+            }else{
+                float increment = static_cast<float>(BetterRand::genNrInInterval(1,2));
+                pointer->list_entityPointedDesire[index].desire += increment;
+            }
+            // Small social bond increase
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index == -1){
+                pointer->addSocial({1, pointed, 1.0f});
+            }
+        }
+        else if(action->name == "Date"){
+            // Check if there's a desire link (minimum 15)
+            int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
+            if(desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 15){
+                std::cout << "Date bloqué: pas assez de désir entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
+                return;
+            }
+            // Check hygiene
+            if(pointer->entityHygiene < 60){
+                std::cout << "Date bloqué: " << pointer->getName() << " a une hygiène trop basse\n";
+                return;
+            }
+            // Strengthen desire
+            float desire_increment = static_cast<float>(BetterRand::genNrInInterval(3,6));
+            pointer->list_entityPointedDesire[desire_index].desire += desire_increment;
+            std::cout << "Date: désir renforcé entre " << pointer->getName() << " et " << pointed->getName() << " +" << desire_increment << std::endl;
+            // Strengthen social
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index == -1){
+                pointer->addSocial({1, pointed, static_cast<float>(BetterRand::genNrInInterval(3,5))});
+            }else{
+                pointer->list_entityPointedSocial[social_index].social += static_cast<float>(BetterRand::genNrInInterval(2,4));
+            }
+            // Pointed also benefits
+            int pointed_desire_index = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
+            if(pointed_desire_index == -1){
+                pointed->addDesire({1, pointer, static_cast<float>(BetterRand::genNrInInterval(2,4))});
+            }else{
+                pointed->list_entityPointedDesire[pointed_desire_index].desire += static_cast<float>(BetterRand::genNrInInterval(2,4));
+            }
+        }
+        else if(action->name == "BreakUp"){
+            // Check if couple link exists
+            int couple_index = pointer->contains(pointer->list_entityPointedCouple, pointed, 3);
+            if(couple_index == -1){
+                std::cout << "BreakUp bloqué: pas de couple entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
+                return;
+            }
+            // Remove couple links
+            std::cout << "BreakUp: Couple détruit entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
+            pointer->list_entityPointedCouple.erase(pointer->list_entityPointedCouple.begin() + couple_index);
+            int pointed_couple_index = pointed->contains(pointed->list_entityPointedCouple, pointer, 3);
+            if(pointed_couple_index != -1){
+                pointed->list_entityPointedCouple.erase(pointed->list_entityPointedCouple.begin() + pointed_couple_index);
+            }
+            // Reduce desire significantly
+            int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
+            if(desire_index != -1){
+                pointer->list_entityPointedDesire[desire_index].desire *= 0.3f;
+            }
+            // Pointed gets sad and possibly angry
+            int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+            if(pointed_anger_index == -1){
+                float anger = static_cast<float>(BetterRand::genNrInInterval(5,15));
+                pointed->addAnger({1, pointer, anger});
+            }else{
+                pointed->list_entityPointedAnger[pointed_anger_index].anger += static_cast<float>(BetterRand::genNrInInterval(5,12));
+            }
+        }
+        else if(action->name == "Reconcile"){
+            // Check if anger is low enough
+            int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 30){
+                std::cout << "Reconcile bloqué: trop de colère entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
+                return;
+            }
+            // Restore/strengthen social bond
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index == -1){
+                pointer->addSocial({1, pointed, static_cast<float>(BetterRand::genNrInInterval(3,6))});
+            }else{
+                pointer->list_entityPointedSocial[social_index].social += static_cast<float>(BetterRand::genNrInInterval(3,5));
+            }
+            // Reduce anger
+            if(anger_index != -1){
+                pointer->list_entityPointedAnger[anger_index].anger = std::max(0.0f, pointer->list_entityPointedAnger[anger_index].anger - 10.0f);
+            }
+            int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+            if(pointed_anger_index != -1){
+                pointed->list_entityPointedAnger[pointed_anger_index].anger = std::max(0.0f, pointed->list_entityPointedAnger[pointed_anger_index].anger - 8.0f);
+            }
+            std::cout << "Reconcile: " << pointer->getName() << " et " << pointed->getName() << " se réconcilient\n";
+        }
+        else if(action->name == "SetBoundaries"){
+            // Reduces social interaction frequency (lower social bond slightly but reduce stress)
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index != -1){
+                pointer->list_entityPointedSocial[social_index].social = std::max(0.0f, pointer->list_entityPointedSocial[social_index].social - 2.0f);
+            }
+            // Reduce anger toward target
+            int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(anger_index != -1){
+                pointer->list_entityPointedAnger[anger_index].anger = std::max(0.0f, pointer->list_entityPointedAnger[anger_index].anger - 5.0f);
+            }
+            std::cout << "SetBoundaries: " << pointer->getName() << " établit des limites avec " << pointed->getName() << std::endl;
+        }
     }
 
         // Execute chosen action
@@ -642,10 +1421,15 @@
 
     // Update needs over time
     void FreeWillSystem::updateNeeds(float deltaTime) {
-        for (auto& needPair : needs) {
-            needPair.second.update(deltaTime);
+        needs["social"].urgency += 0.15f * deltaTime;
+        needs["health"].urgency += 0.08f * deltaTime;
+        needs["hygiene"].urgency += 0.12f * deltaTime;
+
+        // Cap at 100
+        for (auto& [name, need] : needs) {
+            need.urgency = std::min(100.0f, need.urgency);
         }
-    }
+   }
 
     // Add custom action
     void FreeWillSystem::addAction(const Action& action) {

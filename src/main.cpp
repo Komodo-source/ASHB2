@@ -130,6 +130,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
                 //saving data
                 entity->saveEntityStats(chosen);
             }
+
+            //call emotion contagion
+            sys.applyEmotionalContagion(entity, group);
         }
     }
 }
@@ -190,7 +193,7 @@ int main() {
     for (int y = 0; y < 1; ++y){
         for (int x = 0; x < nb_entity; ++x){
             Entity entity = Entity(
-                count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr);
+                count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
             entity.posX = 100 + x * 60;
             entity.posY = 100 + y * 60;
             entity.selected = false;
@@ -265,6 +268,7 @@ int main() {
             // Apply free will to all entity groups
             std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
             applyFreeWill(close_entity_together);
+
         }
 
 

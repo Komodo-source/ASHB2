@@ -53,7 +53,8 @@ Entity::Entity(int id,
                entityPointedDesire* desire = nullptr,
                entityPointedAnger* anger = nullptr,
                entityPointedCouple* couple = nullptr,
-               entityPointedSocial* social = nullptr)
+               entityPointedSocial* social = nullptr,
+               std::string goalType = "happiness")
     : entityId(id),
       entityAge(age),
       entityHealth(health),
@@ -164,6 +165,8 @@ Entity* Entity::mostDesireConn(){
     return ent;
 }
 
+
+
 Entity* Entity::mostSocialConn(){
     Entity* ent = nullptr;
     float max = 0;
@@ -175,6 +178,16 @@ Entity* Entity::mostSocialConn(){
     }
     return ent;
 }
+
+std::string Entity::getTypeGoal(){
+    return m_goal.type;
+}
+
+int Entity::progressGoal(){
+    return m_goal.progressToward;
+}
+
+
 
 void Entity::saveEntityStats(Action* act) {
     std::string file_name = "./src/data/" + std::to_string(this->entityId) + ".csv";

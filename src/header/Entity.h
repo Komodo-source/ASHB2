@@ -42,6 +42,13 @@ static std::vector<std::string> female_name = {
 "Eliza"
 };
 
+struct Goal {
+    std::string type;
+    // "find_partner", "build_career", "make_friends", "happiness", "self"
+    float priority;
+    int progressToward; // 0-100
+};
+
 
 struct entityPointedDesire {
     int Id;
@@ -92,12 +99,14 @@ public:
     std::vector<entityPointedAnger> list_entityPointedAnger;
     std::vector<entityPointedCouple> list_entityPointedCouple;
     std::vector<entityPointedSocial> list_entityPointedSocial;
+    Goal m_goal;
 
     // Optional attributes
     entityPointedDesire pointedDesire;
     entityPointedAnger pointedAnger;
     entityPointedCouple pointedCouple;
     entityPointedSocial social;
+
 
     // Constructors
     Entity(int id);
@@ -119,7 +128,8 @@ public:
            entityPointedDesire*,
            entityPointedAnger*,
            entityPointedCouple*,
-           entityPointedSocial*);
+           entityPointedSocial*,
+           std::string goalType);
 
     // Methods
     std::string getName();
@@ -143,6 +153,8 @@ public:
     std::vector<entityPointedAnger> getListAnger();
     std::vector<entityPointedCouple> getListCouple();
     std::vector<entityPointedSocial> getListSocial();
+    std::string getTypeGoal();
+    int progressGoal();
 };
 
 // Move these outside the header to avoid multiple definition errors
