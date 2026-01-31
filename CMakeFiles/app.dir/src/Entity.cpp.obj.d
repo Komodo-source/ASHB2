@@ -197,4 +197,5 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/deque \
  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/BetterRand.h

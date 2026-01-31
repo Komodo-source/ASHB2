@@ -6,7 +6,7 @@
 #include <random>
 #include <algorithm>
 #include "./header/FreeWillSystem.h"
-
+#include "header/BetterRand.h"
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -86,7 +86,7 @@ Entity::Entity(int id,
 
 
     if(entitySex == 'A'){
-        if((rand() / (RAND_MAX)) + 1){
+        if(BetterRand::genNrInInterval(0,1)){
             entitySex = 'M';
         }else{
             entitySex = 'F';

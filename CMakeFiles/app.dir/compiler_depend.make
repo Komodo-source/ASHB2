@@ -1571,7 +1571,8 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/x86_64-w64-mingw32/include/time.h \
   C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
   C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
-  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
+  src/header/BetterRand.h
 
 CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   libs/glfw/include/GLFW/glfw3.h \
