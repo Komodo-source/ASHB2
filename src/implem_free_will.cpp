@@ -381,7 +381,6 @@
                 std::cout << "  VarietyBonus:       " << varietyBonus << "\n";
                 std::cout << "  SocialInfluence:    " << socialInfluence << "\n";
 
-                // Updated weights to include social influence
                 float weight =
                     requirementFitness * 0.25f +
                     needSatisfaction * 0.35f +

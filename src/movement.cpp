@@ -5,7 +5,7 @@
 #include <iostream>
 
 void Movement::MoveTowardsRandom(Entity* ent, int force){
-  int x = BetterRand::genNrInInterval(0, 4);
+  int x = BetterRand::genNrInInterval(0, 6);
   if(x == 1){
     ent->posX += force;
     ent->posY += force;
@@ -32,7 +32,8 @@ void Movement::MovementTowardsPoint(Entity* ent, Entity* target, int force){
     pos[0] = x - force;
   }
 
-  if(std::max(y, y_target) == x_target){
+  if(std::max(y, x_target) == x_target){
+
     pos[1] = y + force;
   }else{
     pos[1] = y - force;
@@ -51,7 +52,7 @@ void Movement::MovementTowardsPoint(Entity* ent, Entity* target, int force){
     pos[0] = x + force;
   }
 
-  if(std::max(y, y_target) == x_target){
+  if(std::max(y, x_target) == x_target){
     pos[1] = y - force;
   }else{
     pos[1] = y + force;
@@ -63,7 +64,7 @@ void Movement::MovementTowardsPoint(Entity* ent, Entity* target, int force){
 
 void Movement::applyMovement(Entity* ent, int closeSickEnt=0){
   // on ne peut (et veut) pas envoyer l'entite vers son couple
-  int pointMovement = BetterRand::genNrInInterval(0, 7) + (ent->entityHealth / 40);
+  int pointMovement = BetterRand::genNrInInterval(0, 9) + (ent->entityHealth / 40);
   if(closeSickEnt < 2){
 
     Entity* mostHated = ent->mostAngryConn(); //2e 2/6 = 1/3 = 0.3
@@ -78,7 +79,7 @@ void Movement::applyMovement(Entity* ent, int closeSickEnt=0){
       MovementTowardsPoint(ent, mostSocial, floor(pointMovement * 0.16));
     }
   }else{
-    pointMovement += BetterRand::genNrInInterval(1,5); //on donne un 'boost' pour qu'il puisse s'échapper
+    pointMovement += BetterRand::genNrInInterval(3,7); //on donne un 'boost' pour qu'il puisse s'échapper
     MoveTowardsRandom(ent, pointMovement);
   }
     std::cout << "== Movement Applied == \n " << ent->name << "new pos->(" << ent->posX << ";" << ent->posY << ")\n";

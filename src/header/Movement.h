@@ -1,5 +1,10 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
+#include "./Entity.h"
+#include "./BetterRand.h"
+#include "./UI.h"
+#include <iostream>
+
 
 class Movement{
   public:

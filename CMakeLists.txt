@@ -42,6 +42,7 @@ src/Disease.cpp
 ${IMGUI_SOURCES}
 src/implem_free_will.cpp
 src/SpatialMesh.cpp
+src/Movement.cpp
 
 )
 

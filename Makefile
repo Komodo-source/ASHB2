@@ -464,6 +464,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/movement.obj: src/movement.cpp.obj
+.PHONY : src/movement.obj
+
+# target to build an object file
+src/movement.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/movement.cpp.obj
+.PHONY : src/movement.cpp.obj
+
+src/movement.i: src/movement.cpp.i
+.PHONY : src/movement.i
+
+# target to preprocess a source file
+src/movement.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/movement.cpp.i
+.PHONY : src/movement.cpp.i
+
+src/movement.s: src/movement.cpp.s
+.PHONY : src/movement.s
+
+# target to generate assembly for a file
+src/movement.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/movement.cpp.s
+.PHONY : src/movement.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -515,6 +539,9 @@ help:
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
+	@echo ... src/movement.obj
+	@echo ... src/movement.i
+	@echo ... src/movement.s
 .PHONY : help
 
 

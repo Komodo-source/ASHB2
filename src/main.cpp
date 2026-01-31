@@ -21,6 +21,7 @@
 #include "./header/implot.h"
 #include "./header/implot_internal.h"
 #include "./header/Movement.h"
+#include "./util/clear.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -156,6 +157,10 @@ void sync_clock_stats(Entity* ent, int neighboors){
 }
 
 int main() {
+    std::cout << "clearing files... \n" ;
+    rm_data_file();
+    rm_data_act_file();
+    std::cout << "done \n" ;
     srand(time(NULL));
     if (!glfwInit()) return -1;
 
