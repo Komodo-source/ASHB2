@@ -49,6 +49,23 @@ struct Goal {
     int progressToward; // 0-100
 };
 
+// Big Five personality traits - affects behavior and need rates
+struct Personality {
+    float extraversion;      // 0-100: affects social need rates
+    float agreeableness;     // 0-100: reduces anger, increases forgiveness
+    float conscientiousness; // 0-100: affects work/achievement drive
+    float neuroticism;       // 0-100: affects stress/anxiety thresholds
+    float openness;          // 0-100: affects variety seeking
+
+    Personality()
+        : extraversion(50.0f), agreeableness(50.0f), conscientiousness(50.0f),
+          neuroticism(50.0f), openness(50.0f) {}
+
+    Personality(float ext, float agr, float con, float neu, float ope)
+        : extraversion(ext), agreeableness(agr), conscientiousness(con),
+          neuroticism(neu), openness(ope) {}
+};
+
 
 struct entityPointedDesire {
     int Id;
@@ -100,6 +117,7 @@ public:
     std::vector<entityPointedCouple> list_entityPointedCouple;
     std::vector<entityPointedSocial> list_entityPointedSocial;
     Goal m_goal;
+    Personality personality;
 
     // Optional attributes
     entityPointedDesire pointedDesire;

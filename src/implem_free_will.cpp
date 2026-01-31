@@ -117,6 +117,152 @@
         return std::max(0.0f, 1.0f - (recentCount * 0.2f));
     }
 
+    // Calculate contextual weight based on environment
+    float FreeWillSystem::calculateContextualWeight(const Action& action, const ActionContext& context) {
+        float modifier = 1.0f;
+
+        // Sleep is much more likely at night
+        if (action.name == "Sleep" && context.isNightTime)
+            modifier *= 2.5f;
+        if (action.name == "Sleep" && !context.isNightTime)
+            modifier *= 0.3f;
+
+        // Work is less likely on weekends
+        if (action.name == "Work on Project" && context.isWeekend)
+            modifier *= 0.3f;
+        if (action.name == "Work on Project" && context.isAtWork)
+            modifier *= 2.0f;
+
+        // Can't socialize alone
+        if (action.name == "Socialize" && context.numPeopleNearby == 0)
+            modifier *= 0.0f;
+        if (action.name == "Socialize" && context.numPeopleNearby > 3)
+            modifier *= 1.5f;
+
+        // Extreme negative actions drastically reduced in public
+        if (action.name == "Murder" && context.isInPublic)
+            modifier *= 0.01f;
+        if (action.name == "SelfHarm" && context.isInPublic)
+            modifier *= 0.05f;
+        if (action.name == "Suicide" && context.isInPublic)
+            modifier *= 0.02f;
+
+        // Substance use less likely at work
+        if ((action.name == "DrinkAlcohol" || action.name == "Smoke") && context.isAtWork)
+            modifier *= 0.2f;
+
+        // Entertainment more likely on weekends
+        if ((action.name == "Gaming" || action.name == "WatchEntertainment") && context.isWeekend)
+            modifier *= 1.5f;
+
+        // Creative activities and learning more likely when not at work
+        if ((action.name == "CreativeActivity" || action.name == "LearnSkill") && !context.isAtWork && context.isWeekend)
+            modifier *= 1.3f;
+
+        // Flirting and dating more likely in public social settings
+        if ((action.name == "Flirt" || action.name == "Date") && context.isInPublic && context.numPeopleNearby > 0)
+            modifier *= 1.4f;
+
+        // Hygiene actions more likely at home (not in public/at work)
+        if (action.name == "Take Shower" && (context.isInPublic || context.isAtWork))
+            modifier *= 0.1f;
+
+        // Rest more likely at night or when not at work
+        if (action.name == "Rest" && context.isNightTime)
+            modifier *= 1.8f;
+        if (action.name == "Rest" && context.isAtWork)
+            modifier *= 0.3f;
+
+        // Prayer/meditation more likely at night or morning (not during work)
+        if (action.name == "Prayer" && !context.isAtWork)
+            modifier *= 1.3f;
+
+        // Gossip more likely when multiple people around
+        if (action.name == "Gossip" && context.numPeopleNearby >= 2)
+            modifier *= 1.5f;
+
+        // Professional actions more likely at work
+        if (action.name == "LearnSkill" && context.isAtWork)
+            modifier *= 1.4f;
+
+        return modifier;
+    }
+
+    // Calculate personality influence on action choice
+    float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action& action) {
+        float modifier = 1.0f;
+        const Personality& p = entity->personality;
+
+        // Extraversion affects social actions
+        if (action.needCategory == "social") {
+            modifier *= 0.5f + (p.extraversion / 100.0f); // 0.5x to 1.5x
+        }
+
+        // Agreeableness reduces negative social actions
+        if (action.name == "Murder" || action.name == "Discrimination" ||
+            action.name == "Insult" || action.name == "Betray" ||
+            action.name == "AngerConnection" || action.name == "Manipulate") {
+            modifier *= 1.5f - (p.agreeableness / 100.0f); // 1.5x to 0.5x
+        }
+
+        // Agreeableness increases positive social actions
+        if (action.name == "Apologize" || action.name == "HelpSupport" ||
+            action.name == "Reconcile" || action.name == "GoodConnection") {
+            modifier *= 0.5f + (p.agreeableness / 100.0f); // 0.5x to 1.5x
+        }
+
+        // Conscientiousness affects work/achievement actions
+        if (action.needCategory == "achievement") {
+            modifier *= 0.5f + (p.conscientiousness / 100.0f); // 0.5x to 1.5x
+        }
+
+        // Low conscientiousness increases procrastination
+        if (action.name == "Procrastinate" || action.name == "QuitGiveUp") {
+            modifier *= 1.5f - (p.conscientiousness / 100.0f); // 1.5x to 0.5x
+        }
+
+        // Neuroticism affects stress-related and anxiety actions
+        if (action.name == "Anxiety" || action.name == "SelfHarm" ||
+            action.name == "Suicide") {
+            modifier *= 0.5f + (p.neuroticism / 100.0f); // 0.5x to 1.5x
+        }
+
+        // High neuroticism increases coping mechanisms
+        if (action.name == "DrinkAlcohol" || action.name == "Smoke") {
+            modifier *= 0.7f + (p.neuroticism / 150.0f); // 0.7x to ~1.37x
+        }
+
+        // Low neuroticism increases positive mental health actions
+        if (action.name == "Prayer" || action.name == "SeekTherapy" ||
+            action.name == "Exercise") {
+            modifier *= 1.0f + ((100.0f - p.neuroticism) / 200.0f); // 1.0x to 1.5x
+        }
+
+        // Openness affects variety seeking and creative actions
+        if (action.name == "CreativeActivity" || action.name == "LearnSkill" ||
+            action.name == "Read") {
+            modifier *= 0.5f + (p.openness / 100.0f); // 0.5x to 1.5x
+        }
+
+        // Low openness increases routine actions
+        if (action.name == "WatchEntertainment" || action.name == "Gaming") {
+            modifier *= 1.3f - (p.openness / 200.0f); // 1.3x to 0.8x
+        }
+
+        // Extraversion affects jealousy (introverts may be more prone)
+        if (action.name == "Jealousy") {
+            modifier *= 1.3f - (p.extraversion / 200.0f); // 1.3x to 0.8x
+        }
+
+        // High extraversion increases flirting and dating
+        if (action.name == "Flirt" || action.name == "Date" ||
+            action.name == "Breeding") {
+            modifier *= 0.6f + (p.extraversion / 125.0f); // 0.6x to 1.4x
+        }
+
+        return modifier;
+    }
+
 
     FreeWillSystem::FreeWillSystem() : currentTime(0), rng(std::random_device{}()) {
         initializeNeeds();
@@ -815,9 +961,17 @@
 
         // Main decision-making function
         // main entry = entree principale de fichier
-    Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors) {
+    Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context) {
             std::cout << "\n=== Choosing Action for Entity " << entity->getId() << " ===\n";
             std::cout << "Number of neighbors: " << neighbors.size() << "\n";
+            std::cout << "Context: Night=" << context.isNightTime << " Weekend=" << context.isWeekend
+                      << " AtWork=" << context.isAtWork << " InPublic=" << context.isInPublic
+                      << " PeopleNearby=" << context.numPeopleNearby << "\n";
+            std::cout << "Personality: E=" << entity->personality.extraversion
+                      << " A=" << entity->personality.agreeableness
+                      << " C=" << entity->personality.conscientiousness
+                      << " N=" << entity->personality.neuroticism
+                      << " O=" << entity->personality.openness << "\n";
 
             std::vector<std::pair<Action*, float>> actionWeights;
 
@@ -827,20 +981,28 @@
                 float memoryBias = calculateMemoryBias(action.actionId);
                 float varietyBonus = calculateVarietyBonus(action.actionId);
                 float socialInfluence = calculateSocialInfluence(entity, neighbors, action);
+                float contextualWeight = calculateContextualWeight(action, context);
+                float personalityModifier = calculatePersonalityModifier(entity, action);
 
                 std::cout << "\nAction: " << action.name << "\n";
-                std::cout << "  RequirementFitness: " << requirementFitness << "\n";
-                std::cout << "  NeedSatisfaction:   " << needSatisfaction << "\n";
-                std::cout << "  MemoryBias:         " << memoryBias << "\n";
-                std::cout << "  VarietyBonus:       " << varietyBonus << "\n";
-                std::cout << "  SocialInfluence:    " << socialInfluence << "\n";
+                std::cout << "  RequirementFitness:   " << requirementFitness << "\n";
+                std::cout << "  NeedSatisfaction:     " << needSatisfaction << "\n";
+                std::cout << "  MemoryBias:           " << memoryBias << "\n";
+                std::cout << "  VarietyBonus:         " << varietyBonus << "\n";
+                std::cout << "  SocialInfluence:      " << socialInfluence << "\n";
+                std::cout << "  ContextualWeight:     " << contextualWeight << "\n";
+                std::cout << "  PersonalityModifier:  " << personalityModifier << "\n";
 
                 float weight =
-                    requirementFitness * 0.25f +
-                    needSatisfaction * 0.35f +
-                    memoryBias * 0.15f +
-                    varietyBonus * 0.1f +
-                    socialInfluence * 0.15f;
+                    requirementFitness * 0.20f +
+                    needSatisfaction * 0.25f +
+                    memoryBias * 0.10f +
+                    varietyBonus * 0.10f +
+                    socialInfluence * 0.10f;
+
+                // Apply contextual and personality modifiers as multipliers
+                weight *= contextualWeight;
+                weight *= personalityModifier;
 
                 // Apply rarity multipliers for extreme actions
                 float rarityMultiplier = 1.0f;
@@ -913,7 +1075,7 @@
                 float randomFactor = dist(rng);
                 weight *= randomFactor;
 
-                std::cout << "  RarityMultiplier:   " << rarityMultiplier << "\n";
+                std::cout << "  RarityMultiplier:     " << rarityMultiplier << "\n";
                 std::cout << "  Combined Weight (pre-sort): " << weight
                         << " (RandomFactor: " << randomFactor << ")\n";
 
@@ -982,6 +1144,9 @@
                 float desire = static_cast<float>(BetterRand::genNrInInterval(1,3)) * attractiveness;
                 std::cout << "Nouveau lien de desire ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
                 pointer->addDesire({1, pointed, desire});
+
+                //Reciprocal link
+                pointed->addSocial({1, pointer, desire * 0.7f});
             }else{ //le désire existe déjà
                 int index_social = pointer->contains(pointer->list_entityPointedSocial, pointed, 1);
                 int borne_haut = 3;
@@ -1002,6 +1167,8 @@
                 float anger = static_cast<float>(BetterRand::genNrInInterval(1,5));
                 std::cout << "Nouveau lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
                 pointer->addAnger({1, pointed, anger});
+                //Reciprocal link
+                pointed->addSocial({1, pointer, anger * 0.7f});
             }else{
                 float increment = static_cast<float>(BetterRand::genNrInInterval(1,5));
                 if(pointed->entityDiseaseType != -1){
@@ -1043,6 +1210,8 @@
                 float social = static_cast<float>(BetterRand::genNrInInterval(2,4));
                 std::cout << "Nouveau lien social (good) ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
                 pointer->addSocial({1, pointed, social});
+                //Reciprocal link
+                pointed->addSocial({1, pointer, social * 0.7f});
             }else{
                 float increment = static_cast<float>(BetterRand::genNrInInterval(2,4));
                 pointer->list_entityPointedSocial[index].social += increment;

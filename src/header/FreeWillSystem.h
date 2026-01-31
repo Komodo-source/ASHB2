@@ -52,6 +52,23 @@ struct ActionMemory {
     std::map<std::string, float> statsAfter;
 };
 
+// Context for action evaluation
+struct ActionContext {
+    bool isNightTime;
+    bool isWeekend;
+    bool isAtWork;
+    bool isInPublic;
+    int numPeopleNearby;
+
+    ActionContext()
+        : isNightTime(false), isWeekend(false), isAtWork(false),
+          isInPublic(false), numPeopleNearby(0) {}
+
+    ActionContext(bool night, bool weekend, bool work, bool pub, int people)
+        : isNightTime(night), isWeekend(weekend), isAtWork(work),
+          isInPublic(pub), numPeopleNearby(people) {}
+};
+
 // Need system
 struct Need {
     std::string name;
@@ -94,6 +111,8 @@ private:
     float calculateNeedSatisfaction(const Action& action);
     float calculateMemoryBias(int actionId);
     float calculateVarietyBonus(int actionId);
+    float calculateContextualWeight(const Action& action, const ActionContext& context);
+    float calculatePersonalityModifier(Entity* entity, const Action& action);
     std::map<std::string, float> captureEntityStats(Entity* entity);
     float calculateOutcomeSuccess(const std::map<std::string, float>& before,
                                   const std::map<std::string, float>& after);
@@ -105,7 +124,7 @@ public:
     void initializeNeeds();
     void initializeActions();
 
-    Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {});
+    Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {}, const ActionContext& context = ActionContext());
     void executeAction(Entity* entity, Action* &action, Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
 

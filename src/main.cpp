@@ -71,7 +71,38 @@ void applyMovement(Entity* ent, std::vector<Entity*> grp){
     m.applyMovement(ent, getNBSickClose(grp));
 }
 
-void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
+// Generate ActionContext based on simulation time
+ActionContext createContextFromTime(int day, int numPeopleNearby) {
+    int hour = (day % 60) * 24 / 60;  // Map frame to hour (0-23)
+    int dayOfWeek = (day / 60) % 7;   // Day of week (0-6)
+
+    bool isNightTime = (hour >= 22 || hour < 6);
+    bool isWeekend = (dayOfWeek >= 5);  // Saturday=5, Sunday=6
+    bool isAtWork = (!isWeekend && hour >= 9 && hour < 17);
+    bool isInPublic = (numPeopleNearby > 2);
+
+    return ActionContext(isNightTime, isWeekend, isAtWork, isInPublic, numPeopleNearby);
+}
+
+// Generate random personality using Big Five distribution
+Personality generateRandomPersonality() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    // Normal distribution centered at 50 with std dev of 20
+    std::normal_distribution<float> dist(50.0f, 20.0f);
+
+    auto clamp = [](float val) { return std::max(0.0f, std::min(100.0f, val)); };
+
+    return Personality(
+        clamp(dist(gen)),  // extraversion
+        clamp(dist(gen)),  // agreeableness
+        clamp(dist(gen)),  // conscientiousness
+        clamp(dist(gen)),  // neuroticism
+        clamp(dist(gen))   // openness
+    );
+}
+
+void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
     // Process each group of close entities
     for(auto& group : entityGroups){
         // For each entity in the group
@@ -96,8 +127,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups){
                 }
             }
 
-            // Choose action based on needs and social environment
-            Action* chosen = sys.chooseAction(entity, neighbors);
+            // Create context based on current simulation time
+            ActionContext context = createContextFromTime(currentDay, neighbors.size());
+
+            // Choose action based on needs, social environment, context, and personality
+            Action* chosen = sys.chooseAction(entity, neighbors, context);
 
 
 
@@ -197,6 +231,13 @@ int main() {
             entity.posX = 100 + x * 60;
             entity.posY = 100 + y * 60;
             entity.selected = false;
+            // Assign random personality to each entity
+            entity.personality = generateRandomPersonality();
+            std::cout << "Entity " << count << " personality: E=" << entity.personality.extraversion
+                      << " A=" << entity.personality.agreeableness
+                      << " C=" << entity.personality.conscientiousness
+                      << " N=" << entity.personality.neuroticism
+                      << " O=" << entity.personality.openness << "\n";
             entities.push_back(entity);
             count++;
         }
@@ -265,9 +306,9 @@ int main() {
             // Recalculate entity groups based on current positions
             close_entity_together = separationQuad(ent_quad, width, height);
 
-            // Apply free will to all entity groups
+            // Apply free will to all entity groups with current day for context
             std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
-            applyFreeWill(close_entity_together);
+            applyFreeWill(close_entity_together, day);
 
         }
 
