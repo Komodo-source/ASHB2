@@ -54,7 +54,8 @@ Entity::Entity(int id,
                entityPointedAnger* anger = nullptr,
                entityPointedCouple* couple = nullptr,
                entityPointedSocial* social = nullptr,
-               std::string goalType = "happiness")
+               std::string goalType = "happiness"
+                )
     : entityId(id),
       entityAge(age),
       entityHealth(health),
@@ -186,6 +187,8 @@ std::string Entity::getTypeGoal(){
 int Entity::progressGoal(){
     return m_goal.progressToward;
 }
+
+
 
 
 

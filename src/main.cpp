@@ -88,7 +88,6 @@ ActionContext createContextFromTime(int day, int numPeopleNearby) {
 Personality generateRandomPersonality() {
     std::random_device rd;
     std::mt19937 gen(rd());
-    // Normal distribution centered at 50 with std dev of 20
     std::normal_distribution<float> dist(50.0f, 20.0f);
 
     auto clamp = [](float val) { return std::max(0.0f, std::min(100.0f, val)); };
@@ -110,16 +109,14 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             //on applique aussi les paramètres de maladies
             applyDisease(entity, group.size(), getNBSickClose(group));
 
-
             //apply movement
             applyMovement(entity, group);
 
             if(entity->entityHealth <= 0.0f) continue; // Skip dead entities
 
-            FreeWillSystem sys;
+            FreeWillSystem& sys = entity->getFreeWill();
             sys.updateNeeds(1.0f);
 
-            // Get neighbors (all entities in the same group except self)
             std::vector<Entity*> neighbors;
             for(Entity* potential_neighbor : group){
                 if(potential_neighbor != entity && potential_neighbor->entityHealth > 0.0f){
@@ -133,7 +130,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             // Choose action based on needs, social environment, context, and personality
             Action* chosen = sys.chooseAction(entity, neighbors, context);
 
-
+            // we ondulate the loneliness wether it has neighboor or not
+            entity->entityLoneliness += 4 * neighbors.size() + entityGroups.size();
 
 
             // Determine if this is a pointed action (requires a target)
@@ -165,7 +163,6 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 entity->saveEntityStats(chosen);
             }
 
-            //call emotion contagion
             sys.applyEmotionalContagion(entity, group);
         }
     }

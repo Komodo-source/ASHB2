@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 //#include "../../libs/BetterRand/BetterRand.h"
-
+#include "FreeWillSystem.h"
 
 class Entity;
 class Action;
@@ -118,6 +118,7 @@ public:
     std::vector<entityPointedSocial> list_entityPointedSocial;
     Goal m_goal;
     Personality personality;
+    FreeWillSystem fws;
 
     // Optional attributes
     entityPointedDesire pointedDesire;
@@ -173,6 +174,7 @@ public:
     std::vector<entityPointedSocial> getListSocial();
     std::string getTypeGoal();
     int progressGoal();
+    FreeWillSystem& getFreeWill(){return fws;};
 };
 
 // Move these outside the header to avoid multiple definition errors

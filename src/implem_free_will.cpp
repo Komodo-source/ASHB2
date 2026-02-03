@@ -11,7 +11,6 @@
 #include <iostream>
 #include "./header/BetterRand.h"
 
-//class Entity;
 
     // Calculate memory weight (more recent = more weight)
     float FreeWillSystem::getMemoryWeight(int memoryAge) {
@@ -30,9 +29,8 @@
 
             float fitness;
             if (difference >= 0) {
-                fitness = 1.0f; // Full fitness if requirement met
+                 fitness = 1.0f + std::min(0.5f, difference / (req.requiredValue * 2.0f));
             } else {
-                // Partial fitness based on how close we are
                 fitness = std::max(0.0f, 1.0f + (difference / req.requiredValue));
             }
 
@@ -48,7 +46,6 @@
 
         auto needIt = needs.find(action.needCategory);
         if (needIt != needs.end()) {
-            // Higher urgency = more satisfaction from doing this action
             satisfaction += needIt->second.urgency * 0.01f * action.baseSatisfaction;
         }
 
@@ -68,9 +65,9 @@
         avgNeighborHappiness /= neighbors.size();
         avgNeighborStress /= neighbors.size();
 
-        // Gradual convergence toward neighbor average
-        entity->entityHapiness += (avgNeighborHappiness - entity->entityHapiness) * 0.05f;
-        entity->entityStress += (avgNeighborStress - entity->entityStress) * 0.08f;
+        // fix
+        float contagionFactor = 0.02f * (entity->personality.extraversion / 100.0f);
+        entity->entityHapiness += (avgNeighborHappiness - entity->entityHapiness) * contagionFactor;
     }
 
     // Calculate bias from memory (learn from past experiences)
@@ -96,9 +93,8 @@
         }
     }
 
-    float finalBias = (recentBias * 3.0f + oldBias) /
-                      (recentCount * 3.0f + oldCount);
-
+    if (recentCount == 0 && oldCount == 0) return 0.5f;
+        float finalBias = (recentBias * 3.0f + oldBias) / (recentCount * 3.0f + oldCount);
     return finalBias;
 }
 
@@ -188,51 +184,42 @@
         return modifier;
     }
 
-    // Calculate personality influence on action choice
     float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action& action) {
         float modifier = 1.0f;
         const Personality& p = entity->personality;
 
-        // Extraversion affects social actions
         if (action.needCategory == "social") {
             modifier *= 0.5f + (p.extraversion / 100.0f); // 0.5x to 1.5x
         }
 
-        // Agreeableness reduces negative social actions
         if (action.name == "Murder" || action.name == "Discrimination" ||
             action.name == "Insult" || action.name == "Betray" ||
             action.name == "AngerConnection" || action.name == "Manipulate") {
             modifier *= 1.5f - (p.agreeableness / 100.0f); // 1.5x to 0.5x
         }
 
-        // Agreeableness increases positive social actions
         if (action.name == "Apologize" || action.name == "HelpSupport" ||
             action.name == "Reconcile" || action.name == "GoodConnection") {
             modifier *= 0.5f + (p.agreeableness / 100.0f); // 0.5x to 1.5x
         }
 
-        // Conscientiousness affects work/achievement actions
         if (action.needCategory == "achievement") {
             modifier *= 0.5f + (p.conscientiousness / 100.0f); // 0.5x to 1.5x
         }
 
-        // Low conscientiousness increases procrastination
         if (action.name == "Procrastinate" || action.name == "QuitGiveUp") {
             modifier *= 1.5f - (p.conscientiousness / 100.0f); // 1.5x to 0.5x
         }
 
-        // Neuroticism affects stress-related and anxiety actions
         if (action.name == "Anxiety" || action.name == "SelfHarm" ||
             action.name == "Suicide") {
             modifier *= 0.5f + (p.neuroticism / 100.0f); // 0.5x to 1.5x
         }
 
-        // High neuroticism increases coping mechanisms
         if (action.name == "DrinkAlcohol" || action.name == "Smoke") {
             modifier *= 0.7f + (p.neuroticism / 150.0f); // 0.7x to ~1.37x
         }
 
-        // Low neuroticism increases positive mental health actions
         if (action.name == "Prayer" || action.name == "SeekTherapy" ||
             action.name == "Exercise") {
             modifier *= 1.0f + ((100.0f - p.neuroticism) / 200.0f); // 1.0x to 1.5x
@@ -249,7 +236,6 @@
             modifier *= 1.3f - (p.openness / 200.0f); // 1.3x to 0.8x
         }
 
-        // Extraversion affects jealousy (introverts may be more prone)
         if (action.name == "Jealousy") {
             modifier *= 1.3f - (p.extraversion / 200.0f); // 1.3x to 0.8x
         }
@@ -836,19 +822,6 @@
         exercise.baseSatisfaction = 20.0f;
         availableActions.push_back(exercise);
 
-
-        Action selfHarm("Self Harm", 15, "health");
-        selfHarm.statChanges = {
-            {"mentalHealth", 25.0f},
-            {"stress", 80.0f},
-        };
-
-        selfHarm.statChanges = {
-            {"mentalHealth", -15.0f},
-            {"stress", -20.0f},
-            {"health", -10.0f}
-        };
-
         // Hygiene actions
         Action shower("Take Shower", 11, "hygiene");
         shower.requirements = {
@@ -993,14 +966,19 @@
                 std::cout << "  ContextualWeight:     " << contextualWeight << "\n";
                 std::cout << "  PersonalityModifier:  " << personalityModifier << "\n";
 
-                float weight =
-                    requirementFitness * 0.20f +
-                    needSatisfaction * 0.25f +
-                    memoryBias * 0.10f +
-                    varietyBonus * 0.10f +
-                    socialInfluence * 0.10f;
+                float reqWeight = 0.15f + (entity->personality.conscientiousness / 500.0f); // 0.15-0.35
 
-                // Apply contextual and personality modifiers as multipliers
+                float needWeight = 0.20f + (entity->personality.neuroticism / 500.0f); // 0.20-0.40
+
+                float varietyWeight = 0.05f + (entity->personality.openness / 500.0f); // 0.05-0.25
+
+
+                float weight = requirementFitness * 0.20f
+                            + needSatisfaction * 0.25f
+                            + memoryBias * 0.10f
+                            + varietyBonus * 0.10f
+                            + socialInfluence * 0.10f;
+
                 weight *= contextualWeight;
                 weight *= personalityModifier;
 
@@ -1552,7 +1530,7 @@
 
         for (const auto& change : action->statChanges) {
             float currentValue = getEntityStat(entity, change.statName);
-            float newValue = currentValue + BetterRand::genNrInInterval(change.changeValue -4, change.changeValue+4); // nouvelle valeur appliqué
+            float newValue = currentValue + BetterRand::genNrInInterval(change.changeValue -2, change.changeValue+2); // nouvelle valeur appliqué
             //on fait une variation de 4
             setEntityStat(entity, change.statName, newValue);
             std::cout << "  Changed " << change.statName << ": " << currentValue

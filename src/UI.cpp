@@ -71,8 +71,18 @@ void UI::showSystemInformation(){
         ImGui::Text("Anger: %.2f", entity->entityGeneralAnger);
         ImGui::Text("Birthday: %dth day", entity->entityBDay);
         ImGui::Text("Hygiene: %d", entity->entityHygiene);
+
+        ImGui::Text("Life Goal: %s", entity->m_goal.type);
+        ImGui::Text("   ->: %s %", entity->m_goal.progressToward);
         ImGui::Spacing();
-        ImGui::Text("AI Entity Information");
+        ImGui::Text(" === Personnality ===");
+        ImGui::Text("extraversion: %.2f", entity->personality.extraversion);
+        ImGui::Text("agreeableness: %.2f", entity->personality.agreeableness);
+        ImGui::Text("conscientiousness: %.2f", entity->personality.conscientiousness);
+        ImGui::Text("neuroticism: %.2f", entity->personality.neuroticism);
+        ImGui::Text("openness: %.2f", entity->personality.openness);
+        ImGui::Spacing();
+        ImGui::Text(" === AI Entity Information ===");
 
         if(ImGui::Button("Show statistics")){
             showDetailedInfo = !showDetailedInfo;
