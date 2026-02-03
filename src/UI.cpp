@@ -72,8 +72,8 @@ void UI::showSystemInformation(){
         ImGui::Text("Birthday: %dth day", entity->entityBDay);
         ImGui::Text("Hygiene: %d", entity->entityHygiene);
 
-        ImGui::Text("Life Goal: %s", entity->m_goal.type);
-        ImGui::Text("   ->: %s %", entity->m_goal.progressToward);
+        ImGui::Text("Life Goal: %s", entity->m_goal.type.c_str());
+        ImGui::Text("   ->: %.2f %", entity->m_goal.progressToward);
         ImGui::Spacing();
         ImGui::Text(" === Personnality ===");
         ImGui::Text("extraversion: %.2f", entity->personality.extraversion);

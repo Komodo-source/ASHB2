@@ -131,7 +131,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             Action* chosen = sys.chooseAction(entity, neighbors, context);
 
             // we ondulate the loneliness wether it has neighboor or not
-            entity->entityLoneliness += 4 * neighbors.size() + entityGroups.size();
+            if(entity->entityLoneliness < 90){
+                entity->entityLoneliness += 6 * neighbors.size() + entityGroups.size();
+            }
 
 
             // Determine if this is a pointed action (requires a target)

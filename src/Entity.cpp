@@ -105,6 +105,10 @@ Entity::Entity(int id,
                 name = female_name.at(index);
             }
     }
+
+    char* type[5] = {"find_partner", "build_career", "make_friends", "happiness", "self"};
+    m_goal.progressToward = 0.0;
+    m_goal.type = type[BetterRand::genNrInInterval(0,4)];
 }
 
 // Getter for name
