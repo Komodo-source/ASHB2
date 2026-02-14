@@ -29,7 +29,11 @@ public:
     void createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText);
     void showSimulationInformation(int day, int num_entity, int tick, std::map<std::string, int> complementary_information);
     GridPoint getGridPoint();
+    // Returns: 0=nothing, 1=save pressed, 2=load pressed
+    // filename is set to the user-entered filename
+    int showSaveLoadButtons(std::string& filename);
 private:
+    char saveLoadFilename[256] = "savegame.txt";
     GridPoint gridPoint;
 };
 

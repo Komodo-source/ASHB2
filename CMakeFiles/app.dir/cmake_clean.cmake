@@ -15,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/Disease.cpp.obj.d"
   "CMakeFiles/app.dir/src/Entity.cpp.obj"
   "CMakeFiles/app.dir/src/Entity.cpp.obj.d"
+  "CMakeFiles/app.dir/src/SaveLoad.cpp.obj"
+  "CMakeFiles/app.dir/src/SaveLoad.cpp.obj.d"
   "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj"
   "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj.d"
   "CMakeFiles/app.dir/src/UI.cpp.obj"

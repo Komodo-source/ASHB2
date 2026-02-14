@@ -175,6 +175,18 @@ public:
     std::string getTypeGoal();
     int progressGoal();
     FreeWillSystem& getFreeWill(){return fws;};
+    bool checkCouple(Entity* ent);
+
+    // Save/Load
+    void saveTo(std::ofstream& file) const;
+    void loadFrom(std::ifstream& file);
+    void resolvePointers(std::vector<Entity>& allEntities);
+
+    // Temporary storage for IDs during loading (before pointer resolution)
+    std::vector<std::pair<int, float>> tempDesireIds;
+    std::vector<std::pair<int, float>> tempAngerIds;
+    std::vector<std::pair<int, float>> tempSocialIds;
+    std::vector<int> tempCoupleIds;
 };
 
 // Move these outside the header to avoid multiple definition errors

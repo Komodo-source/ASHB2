@@ -320,6 +320,30 @@ src/Entity.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Entity.cpp.s
 .PHONY : src/Entity.cpp.s
 
+src/SaveLoad.obj: src/SaveLoad.cpp.obj
+.PHONY : src/SaveLoad.obj
+
+# target to build an object file
+src/SaveLoad.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SaveLoad.cpp.obj
+.PHONY : src/SaveLoad.cpp.obj
+
+src/SaveLoad.i: src/SaveLoad.cpp.i
+.PHONY : src/SaveLoad.i
+
+# target to preprocess a source file
+src/SaveLoad.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SaveLoad.cpp.i
+.PHONY : src/SaveLoad.cpp.i
+
+src/SaveLoad.s: src/SaveLoad.cpp.s
+.PHONY : src/SaveLoad.s
+
+# target to generate assembly for a file
+src/SaveLoad.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SaveLoad.cpp.s
+.PHONY : src/SaveLoad.cpp.s
+
 src/SpatialMesh.obj: src/SpatialMesh.cpp.obj
 .PHONY : src/SpatialMesh.obj
 
@@ -521,6 +545,9 @@ help:
 	@echo ... src/Entity.obj
 	@echo ... src/Entity.i
 	@echo ... src/Entity.s
+	@echo ... src/SaveLoad.obj
+	@echo ... src/SaveLoad.i
+	@echo ... src/SaveLoad.s
 	@echo ... src/SpatialMesh.obj
 	@echo ... src/SpatialMesh.i
 	@echo ... src/SpatialMesh.s

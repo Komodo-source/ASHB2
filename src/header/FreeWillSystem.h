@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <memory>
 #include <deque>
+#include <fstream>
 #include "./Entity.h"
 
 class Entity;
@@ -138,6 +139,9 @@ public:
     float calculateSocialInfluence(Entity* entity, const std::vector<Entity*>& neighbors, const Action& action);
 
     void applyEmotionalContagion(Entity* entity, const std::vector<Entity*>& neighbors);
+
+    void saveTo(std::ofstream& file) const;
+    void loadFrom(std::ifstream& file);
 };
 
 #endif

@@ -37,6 +37,22 @@ void UI::showSimulationInformation(int day, int num_entity, int tick, std::map<s
     ImGui::End();
 }
 
+int UI::showSaveLoadButtons(std::string& filename) {
+    int result = 0;
+    ImGui::Begin("Save / Load");
+    ImGui::InputText("File", saveLoadFilename, sizeof(saveLoadFilename));
+    if (ImGui::Button("Save Game")) {
+        result = 1;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Load Game")) {
+        result = 2;
+    }
+    filename = std::string(saveLoadFilename);
+    ImGui::End();
+    return result;
+}
+
 /*
 void UI::showSystemInformation(){
     ImGui::Begin("=== System Statistics ===");

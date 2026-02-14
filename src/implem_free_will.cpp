@@ -10,7 +10,7 @@
 #include "./header/FreeWillSystem.h"
 #include <iostream>
 #include "./header/BetterRand.h"
-
+#include "./header/heritage.h"
 
     // Calculate memory weight (more recent = more weight)
     float FreeWillSystem::getMemoryWeight(int memoryAge) {
@@ -242,7 +242,7 @@
 
         // High extraversion increases flirting and dating
         if (action.name == "Flirt" || action.name == "Date" ||
-            action.name == "Breeding") {
+            action.name == "couple") {
             modifier *= 0.6f + (p.extraversion / 125.0f); // 0.6x to 1.4x
         }
 
@@ -790,22 +790,37 @@
         seekTherapy.baseSatisfaction = 25.0f;
         availableActions.push_back(seekTherapy);
 
-        // ==================== EXISTING ACTIONS ====================
 
-        Action breeding("Breeding", 9, "social");
-        breeding.requirements = {
-            {"happiness", 60.0f, 0.8f},
+        Action couple("couple", 41, "social");
+        couple.requirements = {
+            {"happiness", 65.0f, 0.8f},
             {"health", 60.0f, 0.7f},
-            {"stress", 40.0f, 0.5f}
+            {"hygiene", 70.0f, 0.68f}
+        };
+        couple.statChanges = {
+            {"happiness", 45.0f},
+            {"loneliness", -25.0f},
+            {"stress", 20.0f},
+        };
+        couple.baseSatisfaction = 50.0f;
+        availableActions.push_back(couple);
+
+
+        Action breeding("Breeding", 41, "social");
+        breeding.requirements = {
+            {"happiness", 75.0f, 0.8f},
+            {"health", 65.0f, 0.7f},
+            {"stress", 25.0f, 0.4f},
+            {"hygiene", 70.0f, 0.68f}
         };
         breeding.statChanges = {
-            {"happiness", 35.0f},
-            {"stress", -15.0f},
-            {"loneliness", -20.0f},
-            {"health", -10.0f}
+            {"happiness", 45.0f},
+            {"loneliness", -25.0f},
+            {"stress", 20.0f},
         };
-        breeding.baseSatisfaction = 40.0f;
+        breeding.baseSatisfaction = 50.0f;
         availableActions.push_back(breeding);
+
 
         // Health actions
         Action exercise("Exercise", 10, "health");
@@ -913,7 +928,7 @@
                 influence += (neighborAnger / 100.0f) * 0.3f;
             }
             // If neighbors are happy/healthy, positive actions become more likely
-            else if (action.name == "Socialize" || action.name == "GoodConnection" || action.name == "Breeding" ||
+            else if (action.name == "Socialize" || action.name == "GoodConnection" || action.name == "breeding" || action.name == "couple" ||
                      action.name == "HelpSupport" || action.name == "Apologize" || action.name == "Flirt" ||
                      action.name == "Date" || action.name == "Reconcile" || action.name == "CreativeActivity" ||
                      action.name == "LearnSkill") {
@@ -1041,7 +1056,9 @@
                 }else if( entity->getTypeGoal() == "find_partner" && action.name == "Reconcile"){
                    rarityMultiplier = 0.40f;
                 }
-                else if( entity->getTypeGoal() == "find_partner" && action.name == "Breeding"){
+                else if( entity->getTypeGoal() == "find_partner" && action.name == "breeding"){
+                   rarityMultiplier = 0.75f;
+                }else if( entity->getTypeGoal() == "find_partner" && action.name == "couple"){
                    rarityMultiplier = 0.40f;
                 }else if( entity->getTypeGoal() == "build_career" && action.name == "Work on Project"){
                    rarityMultiplier = 0.25f;
@@ -1197,6 +1214,58 @@
             }
         }else if(action->name == "Breeding"){
             // Check if pointer has high enough desire for pointed (minimum 25)
+            //and is in couple
+
+            //check social links -> cannot make a baby with someone if
+            // one of the partner has no desire or is angry to the other partner
+            int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
+            if(desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 25){
+                float current_desire = (desire_index == -1) ? 0 : pointer->list_entityPointedDesire[desire_index].desire;
+                std::cout << "Couple bloqué: " << pointer->getName() << " n'a pas assez de désir pour " << pointed->getName() << " (" << current_desire << " < 25)\n";
+                return;
+            }
+            // Check if pointed also has desire for pointer (mutual attraction - minimum 20)
+            int pointed_desire_index = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
+            if(pointed_desire_index == -1 || pointed->list_entityPointedDesire[pointed_desire_index].desire < 20){
+                float pointed_desire = (pointed_desire_index == -1) ? 0 : pointed->list_entityPointedDesire[pointed_desire_index].desire;
+                std::cout << "Couple bloqué: " << pointed->getName() << " n'a pas assez de désir pour " << pointer->getName() << " (" << pointed_desire << " < 20)\n";
+                return;
+            }
+            // Check that neither has too much anger toward the other
+            int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
+            if(anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 10){
+                std::cout << "Reproduction bloqué: " << pointer->getName() << " a trop de colère envers " << pointed->getName() << "\n";
+                return;
+            }
+            int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+            if(pointed_anger_index != -1 && pointed->list_entityPointedAnger[pointed_anger_index].anger > 10){
+                std::cout << "Reproduction bloqué: " << pointed->getName() << " a trop de colère envers " << pointer->getName() << "\n";
+                return;
+            }
+            // Check both have good social link (minimum 15)
+            int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
+            if(social_index == -1 || pointer->list_entityPointedSocial[social_index].social < 15){
+                float current_social = (social_index == -1) ? 0 : pointer->list_entityPointedSocial[social_index].social;
+                std::cout << "Reproduction bloqué: lien social insuffisant entre " << pointer->getName() << " et " << pointed->getName() << " (" << current_social << " < 15)\n";
+                return;
+            }
+
+            if(pointer->checkCouple(pointed)){ //check if they are in couple
+                std::cout << "Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
+                Entity baby = Entity(5, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 5, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
+                baby.posX = pointer->posX + 3;
+                baby.posY = pointer->posY + 3;
+                //on ajoute aux graphe
+                Heritage::add_child(pointed, &baby);
+                Heritage::add_child(pointer, &baby);
+
+            }else{
+                std::cout << "INFO: Couple existe déjà, renforcement du lien\n" ;
+            }
+        }
+
+        else if(action->name == "couple"){
+            // Check if pointer has high enough desire for pointed (minimum 25)
             int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
             if(desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 25){
                 float current_desire = (desire_index == -1) ? 0 : pointer->list_entityPointedDesire[desire_index].desire;
@@ -1254,7 +1323,6 @@
                 std::cout << "Discrimination renforcée entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }
-        // ==================== NEW SOCIAL ACTIONS ====================
         else if(action->name == "Gossip"){
             // Gossip can damage relationships - 30% chance pointed finds out and gets angry
             if(BetterRand::genNrInInterval(1, 100) <= 30){
@@ -1563,7 +1631,7 @@
         if (actionHistory.size() > MAX_MEMORY) actionHistory.pop_back();
 
         currentTime++;
-        std::cout << "Action completed. Memory recorded. Time now: " << currentTime << "\n";
+        std::cout << ">>>> Action completed. Memory recorded. Time now: " << currentTime << "\n";
     }
 
     // Update needs over time
@@ -1649,4 +1717,62 @@ void FreeWillSystem::setEntityStat(Entity* entity, const std::string& statName, 
     else if (statName == "boredom") entity->entityBoredom = std::max(0.0f, std::min(100.0f, value));
     else if (statName == "anger") entity->entityGeneralAnger = std::max(0.0f, std::min(100.0f, value));
     else if (statName == "hygiene") entity->entityHygiene = (int)std::max(0.0f, std::min(100.0f, value));
+}
+
+void FreeWillSystem::saveTo(std::ofstream& file) const {
+    file << "FWS_TIME:" << currentTime << "\n";
+    file << "NEED_COUNT:" << needs.size() << "\n";
+    for (const auto& pair : needs) {
+        file << "NEED:" << pair.first << "," << pair.second.urgency << "\n";
+    }
+    file << "MEMORY_COUNT:" << actionHistory.size() << "\n";
+    for (const auto& mem : actionHistory) {
+        file << "MEMORY:" << mem.actionId << "," << mem.actionName << "," << mem.timestamp << "," << mem.outcomeSuccess << "\n";
+        file << "STATSBEFORE:";
+        bool first = true;
+        for (const auto& s : mem.statsBefore) { if (!first) file << ";"; file << s.first << "=" << s.second; first = false; }
+        file << "\n";
+        file << "STATSAFTER:";
+        first = true;
+        for (const auto& s : mem.statsAfter) { if (!first) file << ";"; file << s.first << "=" << s.second; first = false; }
+        file << "\n";
+    }
+}
+
+void FreeWillSystem::loadFrom(std::ifstream& file) {
+    std::string line;
+    std::getline(file, line); currentTime = std::stoi(line.substr(9));
+    initializeNeeds(); initializeActions();
+    std::getline(file, line); int needCount = std::stoi(line.substr(11));
+    for (int i = 0; i < needCount; i++) {
+        std::getline(file, line); std::string data = line.substr(5);
+        size_t comma = data.find(','); std::string needName = data.substr(0, comma);
+        float urgency = std::stof(data.substr(comma + 1));
+        auto it = needs.find(needName); if (it != needs.end()) it->second.urgency = urgency;
+    }
+    std::getline(file, line); int memoryCount = std::stoi(line.substr(13));
+    actionHistory.clear();
+    for (int i = 0; i < memoryCount; i++) {
+        ActionMemory mem;
+        std::getline(file, line); std::string data = line.substr(7);
+        size_t p1 = data.find(','); mem.actionId = std::stoi(data.substr(0, p1));
+        size_t p2 = data.find(',', p1 + 1); mem.actionName = data.substr(p1 + 1, p2 - p1 - 1);
+        size_t p3 = data.find(',', p2 + 1); mem.timestamp = std::stoi(data.substr(p2 + 1, p3 - p2 - 1));
+        mem.outcomeSuccess = std::stof(data.substr(p3 + 1));
+        std::getline(file, line); std::string beforeData = line.substr(12);
+        if (!beforeData.empty()) { size_t pos = 0; while (pos < beforeData.size()) {
+            size_t eq = beforeData.find('=', pos); if (eq == std::string::npos) break;
+            size_t semi = beforeData.find(';', pos); std::string key = beforeData.substr(pos, eq - pos);
+            std::string val = (semi == std::string::npos) ? beforeData.substr(eq + 1) : beforeData.substr(eq + 1, semi - eq - 1);
+            mem.statsBefore[key] = std::stof(val); pos = (semi == std::string::npos) ? beforeData.size() : semi + 1;
+        }}
+        std::getline(file, line); std::string afterData = line.substr(11);
+        if (!afterData.empty()) { size_t pos = 0; while (pos < afterData.size()) {
+            size_t eq = afterData.find('=', pos); if (eq == std::string::npos) break;
+            size_t semi = afterData.find(';', pos); std::string key = afterData.substr(pos, eq - pos);
+            std::string val = (semi == std::string::npos) ? afterData.substr(eq + 1) : afterData.substr(eq + 1, semi - eq - 1);
+            mem.statsAfter[key] = std::stof(val); pos = (semi == std::string::npos) ? afterData.size() : semi + 1;
+        }}
+        actionHistory.push_back(mem);
+    }
 }

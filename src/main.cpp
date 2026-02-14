@@ -22,6 +22,8 @@
 #include "./header/implot_internal.h"
 #include "./header/Movement.h"
 #include "./util/clear.h"
+#include "./header/SaveLoad.h"
+#include "./header/heritage.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -230,6 +232,7 @@ int main() {
             entity.posX = 100 + x * 60;
             entity.posY = 100 + y * 60;
             entity.selected = false;
+            Heritage::UnlinkedNode(&entity);
             // Assign random personality to each entity
             entity.personality = generateRandomPersonality();
             std::cout << "Entity " << count << " personality: E=" << entity.personality.extraversion
@@ -313,6 +316,24 @@ int main() {
 
 
         instanceUI.showSimulationInformation(day / 60 , entities.size(), UPDATE_FREQUENCY, {});
+
+        // Save/Load buttons
+        std::string saveFilename;
+        int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename);
+        if (saveLoadAction == 1) {
+            saveGame(saveFilename, entities, day, frameCounter);
+        } else if (saveLoadAction == 2) {
+            if (loadGame(saveFilename, entities, day, frameCounter)) {
+                // Rebuild pointer vectors after loading
+                ent_quad.clear();
+                for (int j = 0; j < (int)entities.size(); j++) {
+                    ent_quad.push_back(&entities[j]);
+                }
+                close_entity_together = separationQuad(ent_quad, width, height);
+                showEntityWindow = false;
+                selectedEntityIndex = -1;
+            }
+        }
 
         int moved_entity = instanceUI.HandlePointMovement(ent_quad);
         if (moved_entity != -1) {
