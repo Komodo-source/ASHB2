@@ -10,7 +10,7 @@
 
 class Heritage{
   public:
-    static std::vector<Graph> heritage_graph;
+    static inline std::vector<Graph> heritage_graph;
     void static add_child(Entity* pointer, Entity* pointed);
     int getSizeGraph();
     static void UnlinkedNode(Entity* node);

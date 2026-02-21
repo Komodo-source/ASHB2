@@ -70,6 +70,38 @@
         entity->entityHapiness += (avgNeighborHappiness - entity->entityHapiness) * contagionFactor;
     }
 
+    // Apply direct stat changes from environmental conditions each tick
+    void FreeWillSystem::applyEnvironmentalEffects(Entity* entity, const EnvironmentalFactors& env) {
+        // Weather: sun boosts happiness, rain lowers it
+        float weatherDelta = (env.weatherQuality - 50.0f) / 50.0f; // -1 to +1
+        entity->entityHapiness += weatherDelta * 0.8f;
+
+        // Noise: raises stress proportional to noise level above a baseline
+        if (env.noiseLevel > 30.0f) {
+            entity->entityStress += (env.noiseLevel - 30.0f) / 70.0f * 1.5f;
+        }
+
+        // Low safety: raises anxiety (stress + mentalHealth damage)
+        if (env.safetyLevel < 50.0f) {
+            float dangerFactor = (50.0f - env.safetyLevel) / 50.0f;
+            entity->entityStress += dangerFactor * 2.0f;
+            entity->entityMentalHealth -= dangerFactor * 0.5f;
+        }
+
+        // Crowd discomfort for introverts
+        if (env.crowdDensity > 60.0f) {
+            float introversion = 1.0f - (entity->personality.extraversion / 100.0f);
+            float crowdDiscomfort = ((env.crowdDensity - 60.0f) / 40.0f) * introversion;
+            entity->entityStress += crowdDiscomfort * 1.5f;
+            entity->entityHapiness -= crowdDiscomfort * 1.0f;
+        }
+
+        // Clamp all stats
+        entity->entityHapiness     = std::max(0.0f, std::min(100.0f, entity->entityHapiness));
+        entity->entityStress       = std::max(0.0f, std::min(100.0f, entity->entityStress));
+        entity->entityMentalHealth = std::max(0.0f, std::min(100.0f, entity->entityMentalHealth));
+    }
+
     // Calculate bias from memory (learn from past experiences)
     float FreeWillSystem::calculateMemoryBias(int actionId) {
         float bias = 0.0f;
@@ -180,6 +212,98 @@
         // Professional actions more likely at work
         if (action.name == "LearnSkill" && context.isAtWork)
             modifier *= 1.4f;
+
+        return modifier;
+    }
+
+    // Grief reduces social drive and raises substance use / coping action likelihood
+    float FreeWillSystem::calculateGriefModifier(Entity* entity, const Action& action) {
+        float grief = entity->getGriefIntensity();
+        if (grief <= 0.0f) return 1.0f;
+
+        float modifier = 1.0f;
+
+        // Grieving significantly reduces desire to socialise
+        if (action.needCategory == "social") {
+            modifier *= 1.0f - (grief * 0.55f); // up to -55% at full grief
+        }
+
+        // Grieving raises substance use risk (coping mechanism)
+        if (action.name == "DrinkAlcohol" || action.name == "Smoke") {
+            modifier *= 1.0f + (grief * 1.8f); // up to +180% at full grief
+        }
+
+        // Grieving raises self-harm / anxiety risk
+        if (action.name == "SelfHarm" || action.name == "Anxiety") {
+            modifier *= 1.0f + (grief * 0.9f);
+        }
+
+        // Grieving raises therapy / prayer seeking
+        if (action.name == "SeekTherapy" || action.name == "Prayer") {
+            modifier *= 1.0f + (grief * 0.6f);
+        }
+
+        // Grieving slightly raises rest/sleep (withdrawal)
+        if (action.name == "Sleep" || action.name == "Rest") {
+            modifier *= 1.0f + (grief * 0.3f);
+        }
+
+        return modifier;
+    }
+
+    // Environmental modifier — crowd avoidance for introverts, noise stress, safety flee
+    float FreeWillSystem::calculateEnvironmentalModifier(Entity* entity, const Action& action,
+                                                         const EnvironmentalFactors& env) {
+        float modifier = 1.0f;
+        const Personality& p = entity->personality;
+
+        // --- Crowd avoidance: introverts avoid social actions in crowded areas ---
+        float crowdPenalty = (env.crowdDensity / 100.0f) * (1.0f - p.extraversion / 100.0f);
+        if (action.needCategory == "social") {
+            // introverts (extraversion 0) get full crowd penalty; extraverts (100) get none
+            modifier *= 1.0f - (crowdPenalty * 0.6f);
+        }
+        // Extraverts enjoy crowded social scenes
+        if ((action.name == "Socialize" || action.name == "GoodConnection") && env.crowdDensity > 50.0f) {
+            modifier *= 1.0f + ((p.extraversion / 100.0f) * 0.4f);
+        }
+
+        // --- Noise level raises stress-related actions ---
+        if (env.noiseLevel > 60.0f) {
+            float noiseFactor = (env.noiseLevel - 60.0f) / 40.0f; // 0-1 above threshold
+            if (action.name == "Anxiety") modifier *= 1.0f + noiseFactor * 0.8f;
+            if (action.name == "IgnoreAvoid") modifier *= 1.0f + noiseFactor * 0.5f;
+            if (action.name == "Socialize") modifier *= 1.0f - noiseFactor * 0.3f;
+        }
+
+        // --- Low safety: raises anxiety and flee-like actions, reduces stay-put behaviours ---
+        if (env.safetyLevel < 40.0f) {
+            float dangerFactor = 1.0f - (env.safetyLevel / 40.0f); // 0-1 below threshold
+            if (action.name == "Anxiety") modifier *= 1.0f + dangerFactor * 1.2f;
+            if (action.name == "SelfHarm" || action.name == "Suicide")
+                modifier *= 1.0f + dangerFactor * 0.5f;
+            // Suppresses leisure in dangerous areas
+            if (action.name == "Gaming" || action.name == "WatchEntertainment" ||
+                action.name == "CreativeActivity")
+                modifier *= 1.0f - dangerFactor * 0.5f;
+        }
+
+        // --- Good weather boosts positive/outdoor behaviours ---
+        if (env.weatherQuality > 65.0f) {
+            float sunBonus = (env.weatherQuality - 65.0f) / 35.0f;
+            if (action.name == "Exercise" || action.name == "Socialize" ||
+                action.name == "GoodConnection")
+                modifier *= 1.0f + sunBonus * 0.4f;
+        }
+        // Bad weather boosts indoor coping behaviours
+        if (env.weatherQuality < 35.0f) {
+            float rainPenalty = (35.0f - env.weatherQuality) / 35.0f;
+            if (action.name == "WatchEntertainment" || action.name == "Gaming" ||
+                action.name == "DrinkAlcohol")
+                modifier *= 1.0f + rainPenalty * 0.4f;
+            if (action.name == "Anxiety" || action.name == "Procrastinate")
+                modifier *= 1.0f + rainPenalty * 0.3f;
+        }
 
         return modifier;
     }
@@ -881,6 +1005,25 @@
         availableActions.push_back(work);
     }
 
+    void FreeWillSystem::updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess){
+        if(act.name == "Murder" || act.name == "SelfHarm"){
+            ent->personality.neuroticism += 1.2f;
+            ent->personality.agreeableness -= 1.5f;
+        }else if((act.name == "Socialize" || act.name == "Gossip") && outcomeSuccess > 0.7){
+            ent->personality.agreeableness += 1.0f;
+            ent->personality.openness += 0.9f;
+        }else if(act.name == "Paryer" && outcomeSuccess > 0.55){
+            ent->personality.conscientiousness += 1.3f;
+        }else if(act.name == "DrinkAlcohol" || act.name == "Smoke"){
+            ent->personality.neuroticism += 0.9f;
+        }else if(act.name == "Take Shower" || act.name == "Rest" || act.name == "Sleep"){
+            ent->personality.neuroticism -= 0.2f;
+        }else if((act.name == "Flirt" || act.name == "Date") && outcomeSuccess > 0.6){
+            ent->personality.neuroticism -= 0.3f;
+            ent->personality.agreeableness += 1.6f;
+            ent->personality.openness += 1.6f;
+        }
+    }
     // Calculate social influence from neighbors
     float FreeWillSystem::calculateSocialInfluence(Entity* entity, const std::vector<Entity*>& neighbors, const Action& action) {
         if (neighbors.empty()) return 0.5f; // Neutral if no neighbors
@@ -980,6 +1123,8 @@
                 std::cout << "  SocialInfluence:      " << socialInfluence << "\n";
                 std::cout << "  ContextualWeight:     " << contextualWeight << "\n";
                 std::cout << "  PersonalityModifier:  " << personalityModifier << "\n";
+                std::cout << "  GriefModifier:        " << calculateGriefModifier(entity, action) << "\n";
+                std::cout << "  EnvModifier:          " << calculateEnvironmentalModifier(entity, action, context.env) << "\n";
 
                 float reqWeight = 0.15f + (entity->personality.conscientiousness / 500.0f); // 0.15-0.35
 
@@ -987,6 +1132,9 @@
 
                 float varietyWeight = 0.05f + (entity->personality.openness / 500.0f); // 0.05-0.25
 
+
+                float griefModifier = calculateGriefModifier(entity, action);
+                float envModifier = calculateEnvironmentalModifier(entity, action, context.env);
 
                 float weight = requirementFitness * 0.20f
                             + needSatisfaction * 0.25f
@@ -996,6 +1144,8 @@
 
                 weight *= contextualWeight;
                 weight *= personalityModifier;
+                weight *= griefModifier;
+                weight *= envModifier;
 
                 // Apply rarity multipliers for extreme actions
                 float rarityMultiplier = 1.0f;
@@ -1548,6 +1698,11 @@
             }else{
                 pointed->list_entityPointedAnger[pointed_anger_index].anger += static_cast<float>(BetterRand::genNrInInterval(5,12));
             }
+            // Both partners enter grief — the one broken up with grieves more
+            float breakerIntensity = 0.4f + BetterRand::genNrInInterval(0, 20) / 100.0f;
+            float brokenpIntensity = 0.6f + BetterRand::genNrInInterval(0, 20) / 100.0f;
+            pointer->addGrief(pointed->entityId, breakerIntensity, false);
+            pointed->addGrief(pointer->entityId, brokenpIntensity, false);
         }
         else if(action->name == "Reconcile"){
             // Check if anger is low enough
@@ -1626,6 +1781,9 @@
         memory.outcomeSuccess = outcomeSuccess;
         memory.statsBefore = statsBefore;
         memory.statsAfter = statsAfter;
+
+        std::cout << "Updating Personnality\n";
+        updatePersonalityFromExperience(entity, *action , outcomeSuccess);
 
         actionHistory.push_front(memory);
         if (actionHistory.size() > MAX_MEMORY) actionHistory.pop_back();

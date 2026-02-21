@@ -68,9 +68,23 @@ int getNBSickClose(std::vector<Entity*> grp){
     return c;
 }
 
-void applyMovement(Entity* ent, std::vector<Entity*> grp){
+void applyMovement(Entity* ent, std::vector<Entity*> grp,
+                   const EnvironmentalFactors& env = EnvironmentalFactors()){
     Movement m;
-    m.applyMovement(ent, getNBSickClose(grp));
+    m.applyMovement(ent, getNBSickClose(grp), (int)grp.size(), env);
+}
+
+// Generate simple pseudo-random EnvironmentalFactors that shift slowly over time
+EnvironmentalFactors generateEnvFactors(int day) {
+    // Use a slow sine-based drift so conditions change gradually
+    float weather  = 50.0f + 40.0f * std::sin(day * 0.003f);
+    float noise    = 20.0f + 30.0f * std::abs(std::sin(day * 0.007f + 1.0f));
+    float safety   = 60.0f + 30.0f * std::cos(day * 0.005f + 2.0f);
+    float crowd    = 20.0f + 40.0f * std::abs(std::sin(day * 0.004f + 0.5f));
+
+    // Clamp to [0, 100]
+    auto clamp = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
+    return EnvironmentalFactors(clamp(weather), clamp(crowd), clamp(noise), clamp(safety));
 }
 
 // Generate ActionContext based on simulation time
@@ -83,7 +97,8 @@ ActionContext createContextFromTime(int day, int numPeopleNearby) {
     bool isAtWork = (!isWeekend && hour >= 9 && hour < 17);
     bool isInPublic = (numPeopleNearby > 2);
 
-    return ActionContext(isNightTime, isWeekend, isAtWork, isInPublic, numPeopleNearby);
+    EnvironmentalFactors env = generateEnvFactors(day);
+    return ActionContext(isNightTime, isWeekend, isAtWork, isInPublic, numPeopleNearby, env);
 }
 
 // Generate random personality using Big Five distribution
@@ -104,6 +119,8 @@ Personality generateRandomPersonality() {
 }
 
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
+    EnvironmentalFactors env = generateEnvFactors(currentDay);
+
     // Process each group of close entities
     for(auto& group : entityGroups){
         // For each entity in the group
@@ -111,13 +128,19 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             //on applique aussi les paramètres de maladies
             applyDisease(entity, group.size(), getNBSickClose(group));
 
-            //apply movement
-            applyMovement(entity, group);
+            // Tick grief recovery
+            entity->tickGrief(1.0f);
+
+            //apply movement (now env-aware)
+            applyMovement(entity, group, env);
 
             if(entity->entityHealth <= 0.0f) continue; // Skip dead entities
 
             FreeWillSystem& sys = entity->getFreeWill();
             sys.updateNeeds(1.0f);
+
+            // Apply direct environmental stat effects
+            sys.applyEnvironmentalEffects(entity, env);
 
             std::vector<Entity*> neighbors;
             for(Entity* potential_neighbor : group){
@@ -126,17 +149,16 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
             }
 
-            // Create context based on current simulation time
+            // Create context based on current simulation time (includes env)
             ActionContext context = createContextFromTime(currentDay, neighbors.size());
 
-            // Choose action based on needs, social environment, context, and personality
+            // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosen = sys.chooseAction(entity, neighbors, context);
 
             // we ondulate the loneliness wether it has neighboor or not
             if(entity->entityLoneliness < 90){
                 entity->entityLoneliness += 6 * neighbors.size() + entityGroups.size();
             }
-
 
             // Determine if this is a pointed action (requires a target)
             bool isPointedAction = (chosen->name == "Socialize" ||
@@ -153,6 +175,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 int targetIndex = BetterRand::genNrInInterval(0, (int) neighbors.size() - 1);
                 target = neighbors[targetIndex];
 
+                bool targetWasAlive = (target->entityHealth > 0.0f);
+
                 // Execute the action with the target
                 sys.executeAction(entity, chosen, target);
                 //saving data
@@ -160,6 +184,25 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
                 // Update relationship based on action
                 sys.pointedAssimilation(entity, target, chosen);
+
+                // Detect murder: if target just died, trigger grief in all connected entities
+                if(targetWasAlive && target->entityHealth <= 0.0f){
+                    std::cout << "DEATH EVENT: " << target->name << " was killed. Propagating grief.\n";
+                    for(Entity* other : group){
+                        if(other == target || other->entityHealth <= 0.0f) continue;
+                        bool hadBond = false;
+                        for(const auto& s : other->list_entityPointedSocial)
+                            if(s.pointedEntity == target && s.social > 8.0f){ hadBond = true; break; }
+                        if(!hadBond) for(const auto& d : other->list_entityPointedDesire)
+                            if(d.pointedEntity == target && d.desire > 8.0f){ hadBond = true; break; }
+                        if(!hadBond) for(const auto& c : other->list_entityPointedCouple)
+                            if(c.pointedEntity == target){ hadBond = true; break; }
+                        if(hadBond){
+                            float intensity = 0.65f + BetterRand::genNrInInterval(0, 25) / 100.0f;
+                            other->addGrief(target->entityId, intensity, true);
+                        }
+                    }
+                }
             } else {
                 // Execute self-directed action
                 sys.executeAction(entity, chosen);
@@ -203,8 +246,8 @@ int main() {
     if (!glfwInit()) return -1;
 
 
-    const float height = 768;
-    const float width = 1024;
+    const float height = 1050;
+    const float width = 1600;
 
     GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 TEST", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -300,18 +343,20 @@ int main() {
             }
         }
 
-        // Update free will system periodically
-        frameCounter++;
-        if(frameCounter >= UPDATE_FREQUENCY){
-            frameCounter = 0;
+        // Update free will system periodically (only when not paused)
+        if (!instanceUI.isSimulationPaused()) {
+            frameCounter++;
+            if(frameCounter >= UPDATE_FREQUENCY){
+                frameCounter = 0;
 
-            // Recalculate entity groups based on current positions
-            close_entity_together = separationQuad(ent_quad, width, height);
+                // Recalculate entity groups based on current positions
+                close_entity_together = separationQuad(ent_quad, width, height);
 
-            // Apply free will to all entity groups with current day for context
-            std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
-            applyFreeWill(close_entity_together, day);
+                // Apply free will to all entity groups with current day for context
+                std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
+                applyFreeWill(close_entity_together, day);
 
+            }
         }
 
 
@@ -355,7 +400,9 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
-        day ++;
+        if (!instanceUI.isSimulationPaused()) {
+            day++;
+        }
     }
 
     ImGui_ImplOpenGL3_Shutdown();

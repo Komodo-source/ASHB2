@@ -62,14 +62,54 @@ void Movement::MovementTowardsPoint(Entity* ent, Entity* target, int force){
 }
 
 
-void Movement::applyMovement(Entity* ent, int closeSickEnt=0){
-  // on ne peut (et veut) pas envoyer l'entite vers son couple
-  int pointMovement = BetterRand::genNrInInterval(1, 6) + (ent->entityHealth / 40);
-  if(closeSickEnt < 2){
+void Movement::clampToWindow(Entity* ent, float windowWidth, float windowHeight){
+  const float margin = 10.0f;
+  if(ent->posX < margin) ent->posX = margin;
+  if(ent->posY < margin) ent->posY = margin;
+  if(ent->posX > windowWidth - margin) ent->posX = windowWidth - margin;
+  if(ent->posY > windowHeight - margin) ent->posY = windowHeight - margin;
+}
 
-    Entity* mostHated = ent->mostAngryConn(); //2e 2/6 = 1/3 = 0.3
-    Entity* mostDesire = ent->mostDesireConn(); //lien le plus fort 3/6 = 1/2
-    Entity* mostSocial = ent->mostSocialConn(); //4e 1/6 = 0.16
+void Movement::applyMovement(Entity* ent, int closeSickEnt,
+                              int crowdSize,
+                              const EnvironmentalFactors& env,
+                              float windowWidth, float windowHeight){
+  int pointMovement = BetterRand::genNrInInterval(1, 6) + (ent->entityHealth / 40);
+
+  // --- Low-safety flee behaviour ---
+  // Entities in dangerous areas move away randomly with an urgency boost
+  if (env.safetyLevel < 40.0f) {
+    float dangerFactor = (40.0f - env.safetyLevel) / 40.0f; // 0-1
+    int fleeBoost = static_cast<int>(dangerFactor * 6.0f);
+    pointMovement += fleeBoost + BetterRand::genNrInInterval(1, 4);
+    MoveTowardsRandom(ent, pointMovement);
+    clampToWindow(ent, windowWidth, windowHeight);
+    std::cout << "== Movement (Safety-Flee) == \n " << ent->name
+              << " flees danger. safetyLevel=" << env.safetyLevel
+              << " pos->(" << ent->posX << ";" << ent->posY << ")\n";
+    return;
+  }
+
+  // --- Introvert crowd-avoidance ---
+  // Introverts (low extraversion) flee when crowdSize is high
+  bool isCrowded = (crowdSize > 3 || env.crowdDensity > 60.0f);
+  bool isIntrovert = (ent->personality.extraversion < 40.0f);
+  if (isCrowded && isIntrovert) {
+    int avoidBoost = BetterRand::genNrInInterval(1, 4);
+    pointMovement += avoidBoost;
+    MoveTowardsRandom(ent, pointMovement);
+    clampToWindow(ent, windowWidth, windowHeight);
+    std::cout << "== Movement (Introvert Crowd-Avoid) == \n " << ent->name
+              << " avoids crowd (extraversion=" << ent->personality.extraversion
+              << ", crowd=" << crowdSize << ")"
+              << " pos->(" << ent->posX << ";" << ent->posY << ")\n";
+    return;
+  }
+
+  if(closeSickEnt < 2){
+    Entity* mostHated = ent->mostAngryConn();
+    Entity* mostDesire = ent->mostDesireConn();
+    Entity* mostSocial = ent->mostSocialConn();
 
     if(mostHated != nullptr){
       MovementInversePoint(ent, mostHated, floor(pointMovement * 1.3));
@@ -79,8 +119,9 @@ void Movement::applyMovement(Entity* ent, int closeSickEnt=0){
       MovementTowardsPoint(ent, mostSocial, floor(pointMovement * 1.16));
     }
   }else{
-    pointMovement += BetterRand::genNrInInterval(1,6); //on donne un 'boost' pour qu'il puisse s'échapper
+    pointMovement += BetterRand::genNrInInterval(1,6);
     MoveTowardsRandom(ent, pointMovement);
   }
-    std::cout << "== Movement Applied == \n " << ent->name << "new pos->(" << ent->posX << ";" << ent->posY << ")\n";
+  clampToWindow(ent, windowWidth, windowHeight);
+  std::cout << "== Movement Applied == \n " << ent->name << " new pos->(" << ent->posX << ";" << ent->posY << ")\n";
 }

@@ -42,6 +42,22 @@ static std::vector<std::string> female_name = {
 "Eliza"
 };
 
+
+struct GriefState {
+    int lostPersonId;      // ID of the lost person
+    int stagesRemaining;   // Kübler-Ross: 5 stages remaining
+    float intensity;       // 0-1, decreases over time as entity recovers
+    bool isDeath;          // true = death, false = breakup
+};
+
+struct PersonalityChange {
+    float extraversionDrift = 0.0f;
+    float agreeablenessDrift = 0.0f;
+    float conscientiousnessDrift = 0.0f;
+    float neuroticismDrift = 0.0f; //névrosité
+    float opennessDrift = 0.0f;
+};
+
 struct Goal {
     std::string type;
     // "find_partner", "build_career", "make_friends", "happiness", "self"
@@ -119,6 +135,7 @@ public:
     Goal m_goal;
     Personality personality;
     FreeWillSystem fws;
+    std::vector<GriefState> griefStates;
 
     // Optional attributes
     entityPointedDesire pointedDesire;
@@ -176,6 +193,11 @@ public:
     int progressGoal();
     FreeWillSystem& getFreeWill(){return fws;};
     bool checkCouple(Entity* ent);
+
+    // Grief system
+    void addGrief(int lostId, float intensity, bool isDeath);
+    void tickGrief(float deltaTime);
+    float getGriefIntensity() const;
 
     // Save/Load
     void saveTo(std::ofstream& file) const;

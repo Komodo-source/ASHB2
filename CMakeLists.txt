@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(ASHB2)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -29,7 +29,7 @@ include_directories(
 )
 
 # Link directories
-link_directories(${GLFW_DIR}/lib-mingw-w64)  # Ajustez selon votre compilateur
+link_directories(${GLFW_DIR}/lib-mingw-w64)  
 
 find_package(OpenGL REQUIRED)
 
@@ -44,6 +44,8 @@ src/implem_free_will.cpp
 src/SpatialMesh.cpp
 src/Movement.cpp
 src/SaveLoad.cpp
+src/Heritage.cpp
+src/Graph.cpp
 
 )
 

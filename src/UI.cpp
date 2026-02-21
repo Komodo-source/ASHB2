@@ -12,6 +12,7 @@
 #include "./header/implot.h"
 #include "./header/implot_internal.h"
 #include <sstream>
+#include <filesystem>
 
 // ShowEntityWindow implementation
 
@@ -29,6 +30,13 @@ void UI::showSimulationInformation(int day, int num_entity, int tick, std::map<s
     if (ImGui::Button("Create Entity")) {
         //createPlayer()
         ;
+    }
+    if (ImGui::Button(simulationPaused ? "Resume Simulation" : "Stop Simulation")) {
+        simulationPaused = !simulationPaused;
+    }
+    if (simulationPaused) {
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "PAUSED");
     }
     ImGui::Separator();
     for(auto& p : complementary_information){
@@ -48,6 +56,24 @@ int UI::showSaveLoadButtons(std::string& filename) {
     if (ImGui::Button("Load Game")) {
         result = 2;
     }
+
+    ImGui::Separator();
+    ImGui::Text("Files in directory:");
+    ImGui::BeginChild("FileBrowser", ImVec2(0, 150), true);
+    try {
+        std::filesystem::path exeDir = std::filesystem::current_path();
+        for (const auto& entry : std::filesystem::directory_iterator(exeDir)) {
+            if (entry.is_regular_file()) {
+                std::string name = entry.path().filename().string();
+                if (ImGui::Selectable(name.c_str())) {
+                    strncpy(saveLoadFilename, name.c_str(), sizeof(saveLoadFilename) - 1);
+                    saveLoadFilename[sizeof(saveLoadFilename) - 1] = '\0';
+                }
+            }
+        }
+    } catch (...) {}
+    ImGui::EndChild();
+
     filename = std::string(saveLoadFilename);
     ImGui::End();
     return result;

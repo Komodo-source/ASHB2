@@ -1,6 +1,7 @@
 #include "./header/Entity.h"
 #include "./header/random.hpp"
 #include <string>
+#include <iostream>
 //#include "../libs/BetterRand/BetterRand.h"
 #include <time.h>
 #include <random>
@@ -229,6 +230,59 @@ std::vector<entityPointedDesire> Entity::getListDesire(){ return list_entityPoin
 std::vector<entityPointedAnger> Entity::getListAnger(){ return list_entityPointedAnger;}
 std::vector<entityPointedCouple> Entity::getListCouple(){ return list_entityPointedCouple;}
 std::vector<entityPointedSocial> Entity::getListSocial(){ return list_entityPointedSocial;}
+
+// ==================== GRIEF SYSTEM ====================
+
+void Entity::addGrief(int lostId, float intensity, bool isDeath) {
+    // If already grieving this person, refresh and intensify
+    for (auto& g : griefStates) {
+        if (g.lostPersonId == lostId) {
+            g.stagesRemaining = 5;
+            g.intensity = std::min(1.0f, g.intensity + intensity * 0.5f);
+            std::cout << "Grief refreshed for entity " << entityId
+                      << " (lost person " << lostId << ", intensity: " << g.intensity << ")\n";
+            return;
+        }
+    }
+    GriefState gs;
+    gs.lostPersonId = lostId;
+    gs.stagesRemaining = 5;
+    gs.intensity = std::min(1.0f, intensity);
+    gs.isDeath = isDeath;
+    griefStates.push_back(gs);
+    std::cout << "Grief added for entity " << entityId
+              << " (lost person " << lostId
+              << (isDeath ? ", cause: death" : ", cause: breakup")
+              << ", intensity: " << gs.intensity << ")\n";
+}
+
+void Entity::tickGrief(float deltaTime) {
+    // Gradual recovery: intensity decreases each tick
+    float recoveryRate = 0.0008f * deltaTime; // very slow recovery
+    for (auto& g : griefStates) {
+        g.intensity -= recoveryRate;
+        // Advance stage every time intensity crosses a threshold
+        float stageThreshold = (float)g.stagesRemaining / 5.0f;
+        if (g.intensity < stageThreshold - 0.1f && g.stagesRemaining > 0) {
+            g.stagesRemaining--;
+            std::cout << "Entity " << entityId << " grief stage -> " << g.stagesRemaining << "\n";
+        }
+        if (g.intensity < 0.0f) g.intensity = 0.0f;
+    }
+    griefStates.erase(
+        std::remove_if(griefStates.begin(), griefStates.end(),
+            [](const GriefState& g) { return g.intensity <= 0.0f; }),
+        griefStates.end()
+    );
+}
+
+float Entity::getGriefIntensity() const {
+    float total = 0.0f;
+    for (const auto& g : griefStates) {
+        total += g.intensity;
+    }
+    return std::min(1.0f, total);
+}
 
 // Note: contains() template implementation moved to Entity.h
 

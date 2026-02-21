@@ -53,6 +53,22 @@ struct ActionMemory {
     std::map<std::string, float> statsAfter;
 };
 
+// Environmental factors affecting entity behavior
+struct EnvironmentalFactors {
+    float weatherQuality; // 0-100: 0=stormy/depressing, 100=sunny/uplifting
+    float crowdDensity;   // 0-100: 0=isolated, 100=very crowded (introverts flee)
+    float noiseLevel;     // 0-100: 0=silent, 100=very loud (increases stress)
+    float safetyLevel;    // 0-100: 0=very dangerous, 100=fully safe
+
+    EnvironmentalFactors()
+        : weatherQuality(60.0f), crowdDensity(20.0f),
+          noiseLevel(20.0f), safetyLevel(80.0f) {}
+
+    EnvironmentalFactors(float weather, float crowd, float noise, float safety)
+        : weatherQuality(weather), crowdDensity(crowd),
+          noiseLevel(noise), safetyLevel(safety) {}
+};
+
 // Context for action evaluation
 struct ActionContext {
     bool isNightTime;
@@ -60,14 +76,16 @@ struct ActionContext {
     bool isAtWork;
     bool isInPublic;
     int numPeopleNearby;
+    EnvironmentalFactors env;
 
     ActionContext()
         : isNightTime(false), isWeekend(false), isAtWork(false),
           isInPublic(false), numPeopleNearby(0) {}
 
-    ActionContext(bool night, bool weekend, bool work, bool pub, int people)
+    ActionContext(bool night, bool weekend, bool work, bool pub, int people,
+                  EnvironmentalFactors environment = EnvironmentalFactors())
         : isNightTime(night), isWeekend(weekend), isAtWork(work),
-          isInPublic(pub), numPeopleNearby(people) {}
+          isInPublic(pub), numPeopleNearby(people), env(environment) {}
 };
 
 // Need system
@@ -114,6 +132,8 @@ private:
     float calculateVarietyBonus(int actionId);
     float calculateContextualWeight(const Action& action, const ActionContext& context);
     float calculatePersonalityModifier(Entity* entity, const Action& action);
+    float calculateGriefModifier(Entity* entity, const Action& action);
+    float calculateEnvironmentalModifier(Entity* entity, const Action& action, const EnvironmentalFactors& env);
     std::map<std::string, float> captureEntityStats(Entity* entity);
     float calculateOutcomeSuccess(const std::map<std::string, float>& before,
                                   const std::map<std::string, float>& after);
@@ -139,9 +159,11 @@ public:
     float calculateSocialInfluence(Entity* entity, const std::vector<Entity*>& neighbors, const Action& action);
 
     void applyEmotionalContagion(Entity* entity, const std::vector<Entity*>& neighbors);
+    void applyEnvironmentalEffects(Entity* entity, const EnvironmentalFactors& env);
 
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
+    void updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess);
 };
 
 #endif

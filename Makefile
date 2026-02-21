@@ -320,6 +320,54 @@ src/Entity.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Entity.cpp.s
 .PHONY : src/Entity.cpp.s
 
+src/Graph.obj: src/Graph.cpp.obj
+.PHONY : src/Graph.obj
+
+# target to build an object file
+src/Graph.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Graph.cpp.obj
+.PHONY : src/Graph.cpp.obj
+
+src/Graph.i: src/Graph.cpp.i
+.PHONY : src/Graph.i
+
+# target to preprocess a source file
+src/Graph.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Graph.cpp.i
+.PHONY : src/Graph.cpp.i
+
+src/Graph.s: src/Graph.cpp.s
+.PHONY : src/Graph.s
+
+# target to generate assembly for a file
+src/Graph.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Graph.cpp.s
+.PHONY : src/Graph.cpp.s
+
+src/Heritage.obj: src/Heritage.cpp.obj
+.PHONY : src/Heritage.obj
+
+# target to build an object file
+src/Heritage.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Heritage.cpp.obj
+.PHONY : src/Heritage.cpp.obj
+
+src/Heritage.i: src/Heritage.cpp.i
+.PHONY : src/Heritage.i
+
+# target to preprocess a source file
+src/Heritage.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Heritage.cpp.i
+.PHONY : src/Heritage.cpp.i
+
+src/Heritage.s: src/Heritage.cpp.s
+.PHONY : src/Heritage.s
+
+# target to generate assembly for a file
+src/Heritage.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Heritage.cpp.s
+.PHONY : src/Heritage.cpp.s
+
 src/SaveLoad.obj: src/SaveLoad.cpp.obj
 .PHONY : src/SaveLoad.obj
 
@@ -545,6 +593,12 @@ help:
 	@echo ... src/Entity.obj
 	@echo ... src/Entity.i
 	@echo ... src/Entity.s
+	@echo ... src/Graph.obj
+	@echo ... src/Graph.i
+	@echo ... src/Graph.s
+	@echo ... src/Heritage.obj
+	@echo ... src/Heritage.i
+	@echo ... src/Heritage.s
 	@echo ... src/SaveLoad.obj
 	@echo ... src/SaveLoad.i
 	@echo ... src/SaveLoad.s
