@@ -89,11 +89,11 @@ EnvironmentalFactors generateEnvFactors(int day) {
 
 // Generate ActionContext based on simulation time
 ActionContext createContextFromTime(int day, int numPeopleNearby) {
-    int hour = (day % 60) * 24 / 60;  // Map frame to hour (0-23)
-    int dayOfWeek = (day / 60) % 7;   // Day of week (0-6)
+    int hour = (day % 60) * 24 / 60;
+    int dayOfWeek = (day / 60) % 7;
 
     bool isNightTime = (hour >= 22 || hour < 6);
-    bool isWeekend = (dayOfWeek >= 5);  // Saturday=5, Sunday=6
+    bool isWeekend = (dayOfWeek >= 5);
     bool isAtWork = (!isWeekend && hour >= 9 && hour < 17);
     bool isInPublic = (numPeopleNearby > 2);
 
@@ -242,12 +242,21 @@ int main() {
     rm_data_file();
     rm_data_act_file();
     std::cout << "done \n" ;
+    int entity_num;
+    std::cout << "Welcome to Arificial Simulation of Human Behavior \n";
+    std::cout << "complete simulation can be found at /data/complete_logs.txt\n";
+    std::cout << "you can save and load simulation at any moment\n";
+    std::cout << "@author: Komodo \n";
+    std::cout << "enter enity number (int): ";
+    std::cin >> entity_num;
+
+
     srand(time(NULL));
     if (!glfwInit()) return -1;
 
 
     const float height = 1050;
-    const float width = 1600;
+    const float width = 1400;
 
     GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 TEST", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -261,7 +270,7 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
 
 
-    int nb_entity = 4;
+
 
     UI instanceUI;
 
@@ -269,7 +278,7 @@ int main() {
     std::vector<Entity> entities;
     int count = 0;
     for (int y = 0; y < 1; ++y){
-        for (int x = 0; x < nb_entity; ++x){
+        for (int x = 0; x < entity_num; ++x){
             Entity entity = Entity(
                 count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
             entity.posX = 100 + x * 60;
@@ -324,7 +333,6 @@ int main() {
                     }
                 }
 
-                // Remove from entities vector
                 entities.erase(entities.begin() + i);
 
                 // Rebuild ent_quad pointer vector
@@ -362,7 +370,6 @@ int main() {
 
         instanceUI.showSimulationInformation(day / 60 , entities.size(), UPDATE_FREQUENCY, {});
 
-        // Save/Load buttons
         std::string saveFilename;
         int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename);
         if (saveLoadAction == 1) {

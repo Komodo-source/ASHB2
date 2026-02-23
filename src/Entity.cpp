@@ -471,3 +471,38 @@ void Entity::resolvePointers(std::vector<Entity>& allEntities) {
     }
     tempCoupleIds.clear();
 }
+
+
+void Entity::setGoal(std::string type){
+    this->m_goal.type = type;
+    this->m_goal.progressToward = 0.0;
+}
+
+
+ float Entity::searchConnAng(Entity* ent){ // return just the value
+    for(entityPointedAnger pointed: this->list_entityPointedAnger){
+        if(ent == pointed.pointedEntity){
+            return pointed.anger;
+        }
+    }
+    return -1;
+}
+
+float Entity::searchConnDesire(Entity* ent){
+    for(entityPointedDesire pointed: this->list_entityPointedDesire){
+        if(ent == pointed.pointedEntity){
+            return pointed.desire;
+        }
+    }
+    return -1;
+}
+
+
+float Entity::searchConnSocial(Entity* ent){
+    for(entityPointedSocial pointed: this->list_entityPointedSocial){
+        if(ent == pointed.pointedEntity){
+            return pointed.social;
+        }
+    }
+    return -1;
+}

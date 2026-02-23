@@ -148,7 +148,6 @@ std::vector<std::vector<Entity*>> getCloseEntityGroups(
     std::vector<std::vector<Entity*>> groups;
     std::vector<bool> processed(entityPositions.size(), false);
 
-    // 3. Grouping using BFS (Flood Fill)
     for (size_t i = 0; i < entityPositions.size(); ++i) {
         if (processed[i]) continue;
 

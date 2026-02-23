@@ -181,6 +181,10 @@ public:
     Entity* mostDesireConn();
     Entity* mostSocialConn();
 
+    float searchConnAng(Entity* ent);
+    float searchConnDesire(Entity* ent);
+    float searchConnSocial(Entity* ent);
+
     // Template method - must be in header for template instantiation
     template<typename T>
     int contains(const T& vec, Entity* ptr, int num_list);
@@ -193,6 +197,8 @@ public:
     int progressGoal();
     FreeWillSystem& getFreeWill(){return fws;};
     bool checkCouple(Entity* ent);
+
+    void setGoal(std::string type);
 
     // Grief system
     void addGrief(int lostId, float intensity, bool isDeath);
@@ -209,6 +215,7 @@ public:
     std::vector<std::pair<int, float>> tempAngerIds;
     std::vector<std::pair<int, float>> tempSocialIds;
     std::vector<int> tempCoupleIds;
+
 };
 
 // Move these outside the header to avoid multiple definition errors

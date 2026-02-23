@@ -7,6 +7,8 @@
   - faire la creation de joueur par le gui
   * faire un 2e graphes pour les actions
   - faire lien arbre généalogique
+  - faire les logs
+  - remplacer les string par des ID et avoir un fichier dictionnaire qui référence tout
 
   IDEE
 
@@ -21,3 +23,5 @@
   //il faut que tu reprennes l'outcome success de l'action et que tu le mette dans le csv
   //et que tu l'affiches en tableau
 https://www.geeks3d.com/hacklab/20210129/dear-imgui-new-table-api/
+
+

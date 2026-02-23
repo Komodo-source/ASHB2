@@ -14,7 +14,7 @@
 
     // Calculate memory weight (more recent = more weight)
     float FreeWillSystem::getMemoryWeight(int memoryAge) {
-        float decay = std::exp(-memoryAge / 20.0f); // Exponential decay
+        float decay = std::exp(-memoryAge / 20.0f);
         return decay;
     }
 
@@ -65,7 +65,6 @@
         avgNeighborHappiness /= neighbors.size();
         avgNeighborStress /= neighbors.size();
 
-        // fix
         float contagionFactor = 0.02f * (entity->personality.extraversion / 100.0f);
         entity->entityHapiness += (avgNeighborHappiness - entity->entityHapiness) * contagionFactor;
     }
@@ -278,7 +277,7 @@
 
         // --- Low safety: raises anxiety and flee-like actions, reduces stay-put behaviours ---
         if (env.safetyLevel < 40.0f) {
-            float dangerFactor = 1.0f - (env.safetyLevel / 40.0f); // 0-1 below threshold
+            float dangerFactor = 1.0f - (env.safetyLevel / 40.0f);
             if (action.name == "Anxiety") modifier *= 1.0f + dangerFactor * 1.2f;
             if (action.name == "SelfHarm" || action.name == "Suicide")
                 modifier *= 1.0f + dangerFactor * 0.5f;
@@ -346,7 +345,7 @@
 
         if (action.name == "Prayer" || action.name == "SeekTherapy" ||
             action.name == "Exercise") {
-            modifier *= 1.0f + ((100.0f - p.neuroticism) / 200.0f); // 1.0x to 1.5x
+            modifier *= 1.0f + ((100.0f - p.neuroticism) / 200.0f);
         }
 
         // Openness affects variety seeking and creative actions
@@ -518,7 +517,7 @@
         Action Prayer("Prayer", 14, "health");
         Prayer.requirements = {
             {"stress", 40.0f, 0.7f},
-            {"mentalHealth", 70.0f, 0.6f}  // mentalHealth <70
+            {"mentalHealth", 70.0f, 0.6f}
         };
         Prayer.statChanges = {
             {"stress", -15.0f},
@@ -1147,10 +1146,10 @@
                 weight *= griefModifier;
                 weight *= envModifier;
 
-                // Apply rarity multipliers for extreme actions
+                // rarete + condition de stats
                 float rarityMultiplier = 1.0f;
                 if (action.name == "Murder") {
-                    rarityMultiplier = 0.05f; // 5% probability weight
+                    rarityMultiplier = 0.02f; // 5% probability weight
                 } else if (action.name == "Suicide") {
                     rarityMultiplier = 0.02f; // 2% probability weight
                 } else if (action.name == "Discrimination") {
@@ -1161,7 +1160,7 @@
                 } else if (action.name == "Anxiety") {
                     rarityMultiplier = 0.3f; // 30% probability weight
                 } else if (action.name == "SelfHarm") {
-                    rarityMultiplier = 0.1f; // 10% probability weight
+                    rarityMultiplier = 0.02f; // 10% probability weight
                 } else if (action.name == "Betray") {
                     rarityMultiplier = 0.15f; // 15% probability weight - serious action
                     if(entity->getTypeGoal() == "self"){
@@ -1362,7 +1361,7 @@
                 pointer->list_entityPointedSocial[index].social += increment;
                 std::cout << "Social (good) renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
-        }else if(action->name == "Breeding"){
+        }else if(action->name == "Breeding"){ // REPRODUCTION
             // Check if pointer has high enough desire for pointed (minimum 25)
             //and is in couple
 
@@ -1405,12 +1404,23 @@
                 Entity baby = Entity(5, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 5, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
                 baby.posX = pointer->posX + 3;
                 baby.posY = pointer->posY + 3;
+                baby.setGoal("self");
+
+
+                //heritage
+                float avg_openness_parent = (pointed->personality.openness + pointer->personality.openness) / 2;
+                float avg_extraversion_parent = (pointed->personality.extraversion + pointer->personality.extraversion) / 2;
+                baby.personality.openness = avg_openness_parent;
+                baby.personality.extraversion = avg_extraversion_parent;
+
                 //on ajoute aux graphe
                 Heritage::add_child(pointed, &baby);
                 Heritage::add_child(pointer, &baby);
 
             }else{
-                std::cout << "INFO: Couple existe déjà, renforcement du lien\n" ;
+                std::cout << "INFO: couple doesnt exist, creating a new one\n";
+                pointer->addCouple({1, pointed});
+                pointed->addCouple({1, pointer});
             }
         }
 
@@ -1459,9 +1469,12 @@
             }
         }else if(action->name == "Murder"){
             std::cout << "MURDER: (" << pointer->getId() << ")" << pointer->getName()<< " a tué (" << pointed->getId() << ")" << pointed->getName() << std::endl;
-            // Mark pointed entity as dead (health = 0)
-            pointed->entityHealth = 0.0f;
-        }else if(action->name == "Discrimination"){
+            //action grave doit etre exec que si certaines conditions sont remplis
+            if(pointed->searchConnAng(pointer) > 40.0 || pointed->personality.neuroticism > 50.0 || pointed->entityMentalHealth < 30){
+                pointed->entityHealth = 0.0f;
+            }
+        }
+        else if(action->name == "Discrimination"){
             int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
             if(index == -1){
                 float anger = static_cast<float>(BetterRand::genNrInInterval(3,8));
