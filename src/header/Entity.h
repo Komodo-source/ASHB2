@@ -42,6 +42,13 @@ static std::vector<std::string> female_name = {
 "Eliza"
 };
 
+enum AttachmentStyle {
+    SECURE,      // Comfortable with intimacy and independence
+    ANXIOUS,     // Craves closeness, fears abandonment
+    AVOIDANT,    // Values independence, suppresses need for closeness
+    DISORGANIZED // Simultaneous desire and fear of intimacy
+};
+
 
 struct GriefState {
     int lostPersonId;      // ID of the lost person
@@ -80,6 +87,37 @@ struct Personality {
     Personality(float ext, float agr, float con, float neu, float ope)
         : extraversion(ext), agreeableness(agr), conscientiousness(con),
           neuroticism(neu), openness(ope) {}
+};
+
+
+struct ValueSystem {
+    float familyOrientation;     // How much family matters
+    float achievementDrive;      // Career/status
+    float spiritualNeed;         // Prayer/meaning-making
+    float hedonism;              // Pleasure-seeking
+    float collectivism;          // Group vs individual priority
+};
+
+enum LifeStage { INFANT, CHILD, ADOLESCENT, ADULT, ELDER };
+
+struct DevelopmentalHistory {
+    bool hadSecureAttachment;      // relation des parents était comment bien ou mauvaise ??
+    float childhoodTraumaScore;    // négligé, violenté, etc...
+    float childhoodNurturingScore; // Inverse de ce qui est au dessus
+    int developmentTicksRemaining = 80; //avant que l'enfance se termine
+    AttachmentStyle attachmentStyle = SECURE;
+
+    DevelopmentalHistory(){
+        hadSecureAttachment = false;
+        childhoodTraumaScore = 0.0f;
+        childhoodNurturingScore = 0.0f;
+    }
+
+    DevelopmentalHistory(bool sec, float trauma, float nuturing){
+        hadSecureAttachment = sec;
+        childhoodTraumaScore = trauma;
+        childhoodNurturingScore = nuturing;
+    }
 };
 
 
@@ -125,6 +163,7 @@ public:
     int entityBDay;
     int entityAntiBody; // pourcentage
     int entityDiseaseType; //-1 if no disease
+    LifeStage entityLifeStage;
     float posX;
     float posY;
     bool selected = false;
@@ -134,8 +173,15 @@ public:
     std::vector<entityPointedSocial> list_entityPointedSocial;
     Goal m_goal;
     Personality personality;
+    DevelopmentalHistory dv;
     FreeWillSystem fws;
     std::vector<GriefState> griefStates;
+    ValueSystem ValueSystem;
+
+    LifeStage lifeStage = INFANT;
+    Entity* parent1 = nullptr;
+    Entity* parent2 = nullptr;
+
 
     // Optional attributes
     entityPointedDesire pointedDesire;
@@ -161,6 +207,7 @@ public:
            int bDay, //bday = jour de l'annee / 365
            int antiBody,
            int diseaseType,
+
            entityPointedDesire*,
            entityPointedAnger*,
            entityPointedCouple*,
@@ -216,6 +263,9 @@ public:
     std::vector<std::pair<int, float>> tempSocialIds;
     std::vector<int> tempCoupleIds;
 
+
+
+
 };
 
 // Move these outside the header to avoid multiple definition errors
@@ -238,3 +288,4 @@ int Entity::contains(const T& vec, Entity* ptr, int num_list) {
 }
 
 #endif // ENTITY_H
+

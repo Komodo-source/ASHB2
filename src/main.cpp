@@ -88,7 +88,7 @@ EnvironmentalFactors generateEnvFactors(int day) {
 }
 
 // Generate ActionContext based on simulation time
-ActionContext createContextFromTime(int day, int numPeopleNearby) {
+ActionContext createContextFromTime(int day, int numPeopleNearby, const std::map<std::string, SocialNorm>& norms = {}) {
     int hour = (day % 60) * 24 / 60;
     int dayOfWeek = (day / 60) % 7;
 
@@ -98,7 +98,7 @@ ActionContext createContextFromTime(int day, int numPeopleNearby) {
     bool isInPublic = (numPeopleNearby > 2);
 
     EnvironmentalFactors env = generateEnvFactors(day);
-    return ActionContext(isNightTime, isWeekend, isAtWork, isInPublic, numPeopleNearby, env);
+    return ActionContext(isNightTime, isWeekend, isAtWork, isInPublic, numPeopleNearby, env, norms);
 }
 
 // Generate random personality using Big Five distribution
@@ -123,7 +123,38 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
     // Process each group of close entities
     for(auto& group : entityGroups){
-        // For each entity in the group
+
+        // --- Calculate Social Norms for this group ---
+        std::map<std::string, SocialNorm> currentNorms;
+        std::map<std::string, int> actionCounts;
+        int totalRecentActions = 0;
+
+        // Gather recent actions across all group members
+        for(Entity* groupMember : group) {
+            if(groupMember->entityHealth <= 0.0f) continue;
+
+            const auto& history = groupMember->getFreeWill().getActionHistory();
+            // Look at the last 10 actions per entity to determine the "current" vibe
+            int actionsToCheck = std::min(10, (int)history.size());
+            for(int i = 0; i < actionsToCheck; ++i) {
+                actionCounts[history[i].actionName]++;
+                totalRecentActions++;
+            }
+        }
+
+        // Calculate prevalence and define norms
+        if(totalRecentActions > 0) {
+            for(const auto& pair : actionCounts) {
+                float prevalence = (float)pair.second / totalRecentActions;
+                // Only consider it a norm if it's somewhat common (> 10%)
+                if(prevalence > 0.10f) {
+                    // Norm pressure scales with prevalence.
+                    // e.g., if 60% of recent actions are 'Gossip', normPressure is 0.6.
+                    currentNorms[pair.first] = SocialNorm(pair.first, prevalence, prevalence);
+                }
+            }
+        }
+
         for(Entity* entity : group){
             //on applique aussi les paramètres de maladies
             applyDisease(entity, group.size(), getNBSickClose(group));
@@ -149,8 +180,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
             }
 
-            // Create context based on current simulation time (includes env)
-            ActionContext context = createContextFromTime(currentDay, neighbors.size());
+            // Create context based on current simulation time (includes env and norms)
+            ActionContext context = createContextFromTime(currentDay, neighbors.size(), currentNorms);
 
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosen = sys.chooseAction(entity, neighbors, context);
@@ -158,6 +189,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             // we ondulate the loneliness wether it has neighboor or not
             if(entity->entityLoneliness < 90){
                 entity->entityLoneliness += 6 * neighbors.size() + entityGroups.size();
+            }
+
+            //chaque 10 ticks on applique le développement
+            if(currentDay % 10 == 0){
+                sys.tickChildDevelopment(entity, 1.0f);
             }
 
             // Determine if this is a pointed action (requires a target)
@@ -241,6 +277,11 @@ int main() {
     std::cout << "clearing files... \n" ;
     rm_data_file();
     rm_data_act_file();
+
+    // Clear tick history file
+    std::ofstream tick_history("./src/data/tick_history.jsonl", std::ios::trunc);
+    tick_history.close();
+
     std::cout << "done \n" ;
     int entity_num;
     std::cout << "Welcome to Arificial Simulation of Human Behavior \n";
@@ -326,8 +367,9 @@ int main() {
             if(entities[i].entityHealth <= 0.0f){
                 std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
 
-                //Birthday
-                if((day / 60) % 365 ){
+                //Birthday,
+                // une année = 100 jours
+                if((day / 60) % 100 ){
                     for(Entity& ent : entities){
                         ent.IncrementBDay();
                     }
@@ -363,6 +405,9 @@ int main() {
                 // Apply free will to all entity groups with current day for context
                 std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
                 applyFreeWill(close_entity_together, day);
+
+                // Export current state to JSON lines for HTML viewer
+                exportTickHistory("./src/data/tick_history.jsonl", entities, day);
 
             }
         }

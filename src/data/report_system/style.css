@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.top > h1{
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+  color: #111;
+}
+.top > p{
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+  color: rgb(76, 76, 76);
+}
+body{
+  background-color: #faf9f9;
+}
+
+
+.data{
+  display: flex;
+  margin-top: 5rem;
+}
+
+.log > h3, .ai_summary > h3{
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+}
+.logs{
+  overflow: hidden;
+  height: 50rem;
+  overflow-y: scroll;
+}
+.logs > p {
+  font-family: "ui-monospace", sans-serif;
+}
+
+.log > h3{
+  border-bottom: #232222 solid 1px;
+}
+
+.log{
+  width: 40%;
+  margin-left: 2rem;
+  padding-bottom: 2rem;
+  border: 1px #232222 solid;
+}
+
+button{
+      width: 30%;
+    height: 2rem;
+    border: transparent;
+    background-color: green;
+    color: #fff;
+    cursor: pointer;
+
+}
+.ai_summary > h3{
+  border-bottom: #232222 solid 1px;
+}
+
+.ai_summary{
+  width: 60%;
+    margin-left: 2rem;
+  padding-bottom: 2rem;
+  border: 1px #232222 solid;
+}
+
+ .ai_summary > p{
+  margin-left: 2rem;
+  font-family: "Roboto", sans-serif;
+  margin-right: 2rem;
+  line-height: 22px;
+}

@@ -146,6 +146,15 @@ void Entity::addSocial(entityPointedSocial pointed) {
 
 void Entity::IncrementBDay(){
     this->entityAge ++;
+    if(this->entityAge < 10){
+        this->entityLifeStage = LifeStage::CHILD;
+    }else if(this->entityAge < 18){
+        this->entityLifeStage = LifeStage::ADOLESCENT;
+    }else if(this->entityAge < 65){
+        this->entityLifeStage = LifeStage::ADULT;
+    }else{
+        this->entityLifeStage = LifeStage::ELDER;
+    }
 }
 
 Entity* Entity::mostAngryConn(){
@@ -230,8 +239,6 @@ std::vector<entityPointedDesire> Entity::getListDesire(){ return list_entityPoin
 std::vector<entityPointedAnger> Entity::getListAnger(){ return list_entityPointedAnger;}
 std::vector<entityPointedCouple> Entity::getListCouple(){ return list_entityPointedCouple;}
 std::vector<entityPointedSocial> Entity::getListSocial(){ return list_entityPointedSocial;}
-
-// ==================== GRIEF SYSTEM ====================
 
 void Entity::addGrief(int lostId, float intensity, bool isDeath) {
     // If already grieving this person, refresh and intensify

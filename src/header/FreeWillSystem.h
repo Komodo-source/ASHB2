@@ -26,6 +26,17 @@ struct StatChange {
     float changeValue;
 };
 
+// Represents a social norm in the entity's current group
+struct SocialNorm {
+    std::string actionName;
+    float prevalence;       // 0-1: how common this action is in the group
+    float normPressure;     // How much deviation from it costs socially
+
+    SocialNorm() : actionName(""), prevalence(0.0f), normPressure(0.0f) {}
+    SocialNorm(std::string name, float prev, float pressure)
+        : actionName(name), prevalence(prev), normPressure(pressure) {}
+};
+
 
 
 // Action definition
@@ -77,15 +88,17 @@ struct ActionContext {
     bool isInPublic;
     int numPeopleNearby;
     EnvironmentalFactors env;
+    std::map<std::string, SocialNorm> activeNorms; // Extracted societal norms
 
     ActionContext()
         : isNightTime(false), isWeekend(false), isAtWork(false),
           isInPublic(false), numPeopleNearby(0) {}
 
     ActionContext(bool night, bool weekend, bool work, bool pub, int people,
-                  EnvironmentalFactors environment = EnvironmentalFactors())
+                  EnvironmentalFactors environment = EnvironmentalFactors(),
+                  std::map<std::string, SocialNorm> norms = {})
         : isNightTime(night), isWeekend(weekend), isAtWork(work),
-          isInPublic(pub), numPeopleNearby(people), env(environment) {}
+          isInPublic(pub), numPeopleNearby(people), env(environment), activeNorms(norms) {}
 };
 
 // Need system
@@ -139,6 +152,10 @@ private:
                                   const std::map<std::string, float>& after);
 
 
+
+
+
+
 public:
     FreeWillSystem();
 
@@ -164,6 +181,12 @@ public:
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
     void updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess);
+        void finalizeChildhood(Entity* child);
+    void tickChildDevelopment(Entity* child, float deltaTime);
+
+    void updateValuesFromExperiences(Entity* ent, Action* &action, float outcomeSuccess);
+    void tickValueGoalAlignment(Entity* entity);
+    float applyValueSatisfaction(Entity* entity, Action* &action);
 };
 
 #endif

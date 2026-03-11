@@ -215,6 +215,110 @@
         return modifier;
     }
 
+
+    //modifier l'attachement
+    void FreeWillSystem::tickChildDevelopment(Entity* child, float deltaTime) {
+    if (child->lifeStage == ADULT) return;
+    if (child->parent1 == nullptr || child->parent2 == nullptr) {
+        // Orphan — severe trauma accumulation
+        child->dv.childhoodTraumaScore += 2.5f * deltaTime;
+        return;
+    }
+    //distance entre parents
+    float dist1 = std::sqrt(
+        std::pow(child->posX - child->parent1->posX, 2) +
+        std::pow(child->posY - child->parent1->posY, 2)
+    );
+    float dist2 = std::sqrt(
+        std::pow(child->posX - child->parent2->posX, 2) +
+        std::pow(child->posY - child->parent2->posY, 2)
+    );
+
+    // check si parents ensemble
+    float parentDist = std::sqrt(
+        std::pow(child->parent1->posX - child->parent2->posX, 2) +
+        std::pow(child->parent1->posY - child->parent2->posY, 2)
+    );
+
+    const float NEGLECT_THRESHOLD = 80.0f;
+    const float SEPARATION_THRESHOLD = 120.0f;
+
+    bool parent1Absent = (dist1 > NEGLECT_THRESHOLD);
+    bool parent2Absent = (dist2 > NEGLECT_THRESHOLD);
+    bool parentsApart  = (parentDist > SEPARATION_THRESHOLD);
+
+    //calcul des traumas
+    if (parent1Absent && parent2Absent) {
+        child->dv.childhoodTraumaScore += 3.0f * deltaTime;
+    } else if (parent1Absent || parent2Absent) {
+
+        child->dv.childhoodTraumaScore += 1.5f * deltaTime;
+    } else if (parentsApart) {
+        child->dv.childhoodTraumaScore += 0.8f * deltaTime;
+        child->ValueSystem.familyOrientation -= 0.1;
+    } else {
+        child->dv.childhoodNurturingScore += 2.0f * deltaTime;
+        child->ValueSystem.familyOrientation += 0.1;
+    }
+    if (child->parent1->entityMentalHealth < 30 || child->parent2->entityMentalHealth < 30) {
+        child->dv.childhoodTraumaScore += 1.0f * deltaTime;
+        child->ValueSystem.familyOrientation -= 0.2;
+    }
+    if (child->parent1->entityHapiness < 25 || child->parent2->entityHapiness < 25) {
+        child->dv.childhoodTraumaScore += 0.5f * deltaTime;
+        child->ValueSystem.familyOrientation -= 0.35;
+    }
+
+    child->dv.childhoodTraumaScore =
+        std::min(100.0f, child->dv.childhoodTraumaScore);
+    child->dv.childhoodNurturingScore =
+        std::min(100.0f, child->dv.childhoodNurturingScore);
+
+    child->dv.developmentTicksRemaining--;
+    if (child->dv.developmentTicksRemaining <= 0) {
+        finalizeChildhood(child);
+    }
+}
+
+
+void FreeWillSystem::finalizeChildhood(Entity* child) {
+    float trauma   = child->dv.childhoodTraumaScore;
+    float nurture  = child->dv.childhoodNurturingScore;
+
+    child->personality.neuroticism    += trauma * 0.35f;
+    child->personality.agreeableness  -= trauma * 0.20f;
+    child->personality.extraversion   -= trauma * 0.15f;
+
+    child->personality.openness       += nurture * 0.20f;
+    child->personality.extraversion   += nurture * 0.15f;
+    child->personality.agreeableness  += nurture * 0.18f;
+
+    auto clamp = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
+    child->personality.neuroticism    = clamp(child->personality.neuroticism);
+    child->personality.agreeableness  = clamp(child->personality.agreeableness);
+    child->personality.extraversion   = clamp(child->personality.extraversion);
+    child->personality.openness       = clamp(child->personality.openness);
+
+    if (trauma < 20 && nurture > 60) {
+        child->dv.attachmentStyle = SECURE;
+        child->dv.hadSecureAttachment = true;
+    } else if (trauma > 60) {
+        child->dv.attachmentStyle =
+            (nurture < 30) ? DISORGANIZED : ANXIOUS;
+    } else if (trauma > 30 && nurture < 40) {
+        child->dv.attachmentStyle = AVOIDANT;
+    } else {
+        child->dv.attachmentStyle = ANXIOUS;
+    }
+
+    child->lifeStage = ADULT;
+
+    std::cout << "=== CHILDHOOD COMPLETE: " << child->getName() << " ===\n";
+    std::cout << "  Trauma: " << trauma << " | Nurture: " << nurture << "\n";
+    std::cout << "  Attachment: " << child->dv.attachmentStyle << "\n";
+    std::cout << "  Final Neuroticism: " << child->personality.neuroticism << "\n";
+}
+
     // Grief reduces social drive and raises substance use / coping action likelihood
     float FreeWillSystem::calculateGriefModifier(Entity* entity, const Action& action) {
         float grief = entity->getGriefIntensity();
@@ -256,26 +360,21 @@
         float modifier = 1.0f;
         const Personality& p = entity->personality;
 
-        // --- Crowd avoidance: introverts avoid social actions in crowded areas ---
         float crowdPenalty = (env.crowdDensity / 100.0f) * (1.0f - p.extraversion / 100.0f);
         if (action.needCategory == "social") {
-            // introverts (extraversion 0) get full crowd penalty; extraverts (100) get none
             modifier *= 1.0f - (crowdPenalty * 0.6f);
         }
-        // Extraverts enjoy crowded social scenes
         if ((action.name == "Socialize" || action.name == "GoodConnection") && env.crowdDensity > 50.0f) {
             modifier *= 1.0f + ((p.extraversion / 100.0f) * 0.4f);
         }
 
-        // --- Noise level raises stress-related actions ---
         if (env.noiseLevel > 60.0f) {
-            float noiseFactor = (env.noiseLevel - 60.0f) / 40.0f; // 0-1 above threshold
+            float noiseFactor = (env.noiseLevel - 60.0f) / 40.0f;
             if (action.name == "Anxiety") modifier *= 1.0f + noiseFactor * 0.8f;
             if (action.name == "IgnoreAvoid") modifier *= 1.0f + noiseFactor * 0.5f;
             if (action.name == "Socialize") modifier *= 1.0f - noiseFactor * 0.3f;
         }
 
-        // --- Low safety: raises anxiety and flee-like actions, reduces stay-put behaviours ---
         if (env.safetyLevel < 40.0f) {
             float dangerFactor = 1.0f - (env.safetyLevel / 40.0f);
             if (action.name == "Anxiety") modifier *= 1.0f + dangerFactor * 1.2f;
@@ -287,14 +386,12 @@
                 modifier *= 1.0f - dangerFactor * 0.5f;
         }
 
-        // --- Good weather boosts positive/outdoor behaviours ---
         if (env.weatherQuality > 65.0f) {
             float sunBonus = (env.weatherQuality - 65.0f) / 35.0f;
             if (action.name == "Exercise" || action.name == "Socialize" ||
                 action.name == "GoodConnection")
                 modifier *= 1.0f + sunBonus * 0.4f;
         }
-        // Bad weather boosts indoor coping behaviours
         if (env.weatherQuality < 35.0f) {
             float rainPenalty = (35.0f - env.weatherQuality) / 35.0f;
             if (action.name == "WatchEntertainment" || action.name == "Gaming" ||
@@ -305,6 +402,43 @@
         }
 
         return modifier;
+    }
+
+    float FreeWillSystem::applyValueSatisfaction(Entity* entity, Action* &action){
+        ValueSystem v = entity->ValueSystem;
+        float modifier = 1.0f;
+        if(action->name == "Work on Project" || action->name == "LeanSkill"){
+            modifier += (v.achievementDrive /100.0f) *0.8f;
+        }
+        if (action->needCategory == "social"){
+            modifier += (v.collectivism /100.0f) *0.8f;
+        }
+        if (action->needCategory == "hedonism"){
+            modifier += (v.hedonism /100.0f) *0.8f;
+        }
+        if (action->needCategory == "spiritualNeed"){
+            modifier += (v.spiritualNeed /100.0f) *0.8f;
+        }
+        if(action->name == "couple" || action->name == "Breeding" ){
+            modifier += (v.familyOrientation /100.0f) *0.8f;
+        }
+        if(action->name == "Gaming" || action->name == "WatchEntertainement" || action->name == "DrinkAlcohol" || action->name == "Smoke" ){
+             modifier = (v.spiritualNeed / 100.0f) * 1.5f;
+            if (v.spiritualNeed < 20.0f) modifier = 0.1f;
+        }
+        if(action->name == "Work on Project" || action->name == "LeanSkill" || action->name == "Work on Project" ){
+             modifier = (v.achievementDrive / 100.0f) * 1.5f;
+            if (v.achievementDrive < 20.0f) modifier = 0.1f;
+        }
+        if (action->name == "Socialize" || action->name == "GoodConnection" || action->name == "HelpSupport" || action->name == "Apologize" || action->name == "Reconcile" ){
+            modifier = (v.collectivism / 100.0f) * 1.5f;
+            if (v.collectivism < 20.0f) modifier = 0.1f;
+        }
+
+        if(action->name == "Prayer"){
+            modifier += (v.spiritualNeed /100.0f) *1.2f;
+        }
+        return std::max(0.1f, modifier);;
     }
 
     float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action& action) {
@@ -346,6 +480,8 @@
         if (action.name == "Prayer" || action.name == "SeekTherapy" ||
             action.name == "Exercise") {
             modifier *= 1.0f + ((100.0f - p.neuroticism) / 200.0f);
+            entity->ValueSystem.spiritualNeed += 0.1f;
+
         }
 
         // Openness affects variety seeking and creative actions
@@ -367,6 +503,24 @@
         if (action.name == "Flirt" || action.name == "Date" ||
             action.name == "couple") {
             modifier *= 0.6f + (p.extraversion / 125.0f); // 0.6x to 1.4x
+        }
+
+        AttachmentStyle att = entity->dv.attachmentStyle;
+
+        if (action.name == "couple" || action.name == "Date" || action.name == "Flirt") {
+            if (att == ANXIOUS)      modifier *= 1.4f;
+            if (att == AVOIDANT)     modifier *= 0.5f;
+            if (att == DISORGANIZED) modifier *= 0.8f;
+        }
+
+        if (action.name == "BreakUp") {
+            if (att == ANXIOUS)      modifier *= 0.3f;
+            if (att == AVOIDANT)     modifier *= 1.6f;
+        }
+
+        if (action.name == "Socialize") {
+            if (att == AVOIDANT)     modifier *= 0.7f;
+            if (att == SECURE)       modifier *= 1.2f;
         }
 
         return modifier;
@@ -395,6 +549,11 @@
         needs["happiness"].satisfyingCategories = {"entertainment", "social", "achievement"};
     }
 
+
+
+
+
+    //les satisfactions doivent venir de ValueSystem
     //implementation of a list of action
     void FreeWillSystem::initializeActions() {
 
@@ -662,9 +821,6 @@
         selfHarm.baseSatisfaction = 5.0f;
         availableActions.push_back(selfHarm);
 
-        // ==================== ENTERTAINMENT/HOBBY ACTIONS ====================
-
-        // Watch Entertainment (entertainment)
         Action watchEntertainment("WatchEntertainment", 24, "entertainment");
         watchEntertainment.requirements = {
             {"boredom", 60.0f, 0.8f}
@@ -929,7 +1085,7 @@
         availableActions.push_back(couple);
 
 
-        Action breeding("Breeding", 41, "social");
+        Action breeding("breeding", 41, "social");
         breeding.requirements = {
             {"happiness", 75.0f, 0.8f},
             {"health", 65.0f, 0.7f},
@@ -1089,6 +1245,91 @@
         return totalWeight > 0 ? (influence / neighbors.size()) : 0.5f;
     }
 
+
+
+    void FreeWillSystem::tickValueGoalAlignment(Entity* entity) {
+        ValueSystem& v = entity->ValueSystem;
+        std::string& currentGoal = entity->m_goal.type;
+
+        if (v.familyOrientation > 75.0f && currentGoal == "build_career") {
+            entity->m_goal.priority -= 0.5f;
+            if (entity->m_goal.priority < 20.0f) {
+                entity->setGoal("find_partner");
+                std::cout << entity->getName() << " shifts life goal: career -> find_partner\n";
+            }
+        }
+
+        if (v.achievementDrive > 80.0f && currentGoal == "happiness") {
+            entity->setGoal("build_career");
+            std::cout << entity->getName() << " realizes happiness goal feels directionless, shifts to career\n";
+        }
+
+        if (v.spiritualNeed > 85.0f && entity->entityMentalHealth < 40.0f) {
+            entity->setGoal("self");
+            std::cout << entity->getName() << " enters spiritual withdrawal (mental health crisis)\n";
+        }
+    }
+
+    //update values from experiences
+    void FreeWillSystem::updateValuesFromExperiences(Entity* ent, Action* &action, float outcomeSuccess){
+         ValueSystem& v = ent->ValueSystem;
+         if((action->name == "couple" || action->name == "breeding") && outcomeSuccess > 0.75){
+             v.familyOrientation = std::min(100.0f, v.familyOrientation + 2.5f);
+         }
+         if (action->name == "Betray" || action->name == "BreakUp") {
+             v.collectivism = std::max(0.0f, v.collectivism - 3.0f);
+            v.familyOrientation = std::max(0.0f, v.familyOrientation - 2.0f);
+         }
+
+         if (action->name == "Smoke" || action->name == "DrinkAlcohol") {
+             v.hedonism = std::max(0.0f, v.hedonism + 3.0f);
+             v.spiritualNeed = std::max(0.0f, v.spiritualNeed - 1.5f);
+         }
+
+         if ((action->name == "Work on Project" || action->name == "LearnSkill") && outcomeSuccess > 0.8f) {
+            v.achievementDrive = std::min(100.0f, v.achievementDrive + 1.5f);
+        }
+        if((action->name == "Work on Project" || action->name == "LearnSkill") && outcomeSuccess < 0.2f){
+            v.achievementDrive = std::max(0.0f, v.achievementDrive - 1.5f);
+        }
+
+        if((action->name == "Socialize" || action->name == "Flirt" || action->name == "Date") && outcomeSuccess > 0.8f){
+            v.hedonism = std::min(100.0f, v.hedonism + 1.5f);
+        }
+        if((action->name == "Socialize" || action->name == "Flirt" || action->name == "Date") && outcomeSuccess < 0.2f){
+            v.hedonism = std::max(0.0f, v.hedonism - 1.5f);
+        }
+
+        if((action->name == "HelpSupport" || action->name == "Apologize" || action->name == "Reconcile") && outcomeSuccess > 0.8f){
+            v.collectivism = std::min(100.0f, v.collectivism + 1.5f);
+        }
+        if((action->name == "HelpSupport" || action->name == "Apologize" || action->name == "Reconcile") && outcomeSuccess < 0.2f){
+            v.collectivism = std::max(0.0f, v.collectivism - 1.5f);
+        }
+        if((action->name == "SelfHarm" || action->name == "QuitGiveUp") && outcomeSuccess > 0.8f){
+            v.spiritualNeed = std::min(100.0f, v.spiritualNeed + 1.5f);
+        }
+        if((action->name == "SelfHarm" || action->name == "QuitGiveUp") && outcomeSuccess < 0.2f){
+            v.spiritualNeed = std::max(0.0f, v.spiritualNeed - 1.5f);
+        }
+
+        if((action->name == "Murder" || action->name == "Discrimination" || action->name == "AngerConnection" ||
+            action->name == "Insult" || action->name == "Betray" || action->name == "Jealousy" ||
+            action->name == "Manipulate" || action->name == "IgnoreAvoid") && outcomeSuccess > 0.8f){
+            v.collectivism = std::min(100.0f, v.collectivism + 1.5f);
+        }
+        if((action->name == "Murder" || action->name == "Discrimination" || action->name == "AngerConnection" ||
+            action->name == "Insult" || action->name == "Betray" || action->name == "Jealousy" ||
+            action->name == "Manipulate" || action->name == "IgnoreAvoid") && outcomeSuccess < 0.2f){
+            v.collectivism = std::max(0.0f, v.collectivism - 1.5f);
+        }
+
+        float grief = ent->getGriefIntensity();
+        if (grief > 0.7f) {
+            v.spiritualNeed = std::min(100.0f, v.spiritualNeed + grief * 5.0f);
+        }
+    }
+
         // Main decision-making function
         // main entry = entree principale de fichier
     Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context) {
@@ -1105,6 +1346,8 @@
 
             std::vector<std::pair<Action*, float>> actionWeights;
 
+
+
             for (auto& action : availableActions) {
                 float requirementFitness = calculateRequirementFitness(entity, action);
                 float needSatisfaction = calculateNeedSatisfaction(action);
@@ -1113,6 +1356,20 @@
                 float socialInfluence = calculateSocialInfluence(entity, neighbors, action);
                 float contextualWeight = calculateContextualWeight(action, context);
                 float personalityModifier = calculatePersonalityModifier(entity, action);
+                float valueSatisfaction = applyValueSatisfaction(entity, action);
+
+
+
+                // ---- Social Norm mechanic ----
+                float normModifier = 1.0f;
+                auto normIt = context.activeNorms.find(action.name);
+                if (normIt != context.activeNorms.end()) {
+                    // Normalize behavior: higher prevalence * pressure creates a strong multiplier
+                    // e.g., 0.6 prevalence * 0.6 pressure = 0.36 -> 1.36x multiplier
+                    normModifier = 1.0f + (normIt->second.prevalence * normIt->second.normPressure);
+                }
+
+
 
                 std::cout << "\nAction: " << action.name << "\n";
                 std::cout << "  RequirementFitness:   " << requirementFitness << "\n";
@@ -1122,8 +1379,10 @@
                 std::cout << "  SocialInfluence:      " << socialInfluence << "\n";
                 std::cout << "  ContextualWeight:     " << contextualWeight << "\n";
                 std::cout << "  PersonalityModifier:  " << personalityModifier << "\n";
+                std::cout << "  ValueSatisfaction:    " << valueSatisfaction << "\n";
                 std::cout << "  GriefModifier:        " << calculateGriefModifier(entity, action) << "\n";
                 std::cout << "  EnvModifier:          " << calculateEnvironmentalModifier(entity, action, context.env) << "\n";
+                std::cout << "  NormModifier:         " << normModifier << "\n";
 
                 float reqWeight = 0.15f + (entity->personality.conscientiousness / 500.0f); // 0.15-0.35
 
@@ -1135,6 +1394,8 @@
                 float griefModifier = calculateGriefModifier(entity, action);
                 float envModifier = calculateEnvironmentalModifier(entity, action, context.env);
 
+                tickValueGoalAlignment(entity);
+
                 float weight = requirementFitness * 0.20f
                             + needSatisfaction * 0.25f
                             + memoryBias * 0.10f
@@ -1143,8 +1404,10 @@
 
                 weight *= contextualWeight;
                 weight *= personalityModifier;
+                weight *= valueSatisfaction;
                 weight *= griefModifier;
                 weight *= envModifier;
+                weight *= normModifier;
 
                 // rarete + condition de stats
                 float rarityMultiplier = 1.0f;
@@ -1361,7 +1624,7 @@
                 pointer->list_entityPointedSocial[index].social += increment;
                 std::cout << "Social (good) renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
-        }else if(action->name == "Breeding"){ // REPRODUCTION
+        }else if(action->name == "breeding"){ // REPRODUCTION
             // Check if pointer has high enough desire for pointed (minimum 25)
             //and is in couple
 
@@ -1382,7 +1645,7 @@
             }
             // Check that neither has too much anger toward the other
             int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
-            if(anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 10){
+            if(anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 20){
                 std::cout << "Reproduction bloqué: " << pointer->getName() << " a trop de colère envers " << pointed->getName() << "\n";
                 return;
             }
@@ -1404,6 +1667,17 @@
                 Entity baby = Entity(5, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 5, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
                 baby.posX = pointer->posX + 3;
                 baby.posY = pointer->posY + 3;
+                baby.parent1 = pointed;
+                baby.parent2 = pointer;
+                if(pointer->list_entityPointedAnger[anger_index].anger > 10){
+                    baby.dv.childhoodTraumaScore = pointer->list_entityPointedAnger[anger_index].anger;
+                    baby.dv.childhoodNurturingScore = 0.0f;
+                    baby.dv.hadSecureAttachment = false;
+                }else{
+                    baby.dv.childhoodNurturingScore = pointer->list_entityPointedDesire[desire_index].desire / 25.0f;
+                    baby.dv.childhoodTraumaScore = 0.0f;
+                    baby.dv.hadSecureAttachment = true;
+                }
                 baby.setGoal("self");
 
 
@@ -1786,6 +2060,8 @@
         float outcomeSuccess = calculateOutcomeSuccess(statsBefore, statsAfter);
         action->outcomeSuccess = outcomeSuccess;
         std::cout << "Outcome Success: " << outcomeSuccess << "\n";
+
+        updateValuesFromExperiences(entity, action, outcomeSuccess);
 
         ActionMemory memory;
         memory.actionId = action->actionId;
