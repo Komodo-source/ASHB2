@@ -11,6 +11,7 @@
 #include <iostream>
 #include "./header/BetterRand.h"
 #include "./header/heritage.h"
+#include "./header/SocialNormSystem.h"
 
     // Calculate memory weight (more recent = more weight)
     float FreeWillSystem::getMemoryWeight(int memoryAge) {
@@ -25,6 +26,9 @@
 
         for (const auto& req : action.requirements) {
              float currentValue = getEntityStat(entity, req.statName);
+             if (entity->dv.attachmentStyle == AVOIDANT && req.statName == "loneliness") {
+                 currentValue = 0.0f; // Suppress loneliness
+             }
             float difference = currentValue - req.requiredValue;
 
             float fitness;
@@ -404,42 +408,43 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         return modifier;
     }
 
-    float FreeWillSystem::applyValueSatisfaction(Entity* entity, Action* &action){
+    float FreeWillSystem::applyValueSatisfaction(Entity* entity, const Action& action){
         ValueSystem v = entity->ValueSystem;
         float modifier = 1.0f;
-        if(action->name == "Work on Project" || action->name == "LeanSkill"){
+        if(action.name == "Work on Project" || action.name == "LeanSkill"){
             modifier += (v.achievementDrive /100.0f) *0.8f;
         }
-        if (action->needCategory == "social"){
+        if (action.needCategory == "social"){
             modifier += (v.collectivism /100.0f) *0.8f;
         }
-        if (action->needCategory == "hedonism"){
+        if (action.needCategory == "hedonism"){
             modifier += (v.hedonism /100.0f) *0.8f;
         }
-        if (action->needCategory == "spiritualNeed"){
+        if (action.needCategory == "spiritualNeed"){
             modifier += (v.spiritualNeed /100.0f) *0.8f;
         }
-        if(action->name == "couple" || action->name == "Breeding" ){
+        if(action.name == "couple" || action.name == "Breeding" ){
             modifier += (v.familyOrientation /100.0f) *0.8f;
         }
-        if(action->name == "Gaming" || action->name == "WatchEntertainement" || action->name == "DrinkAlcohol" || action->name == "Smoke" ){
-             modifier = (v.spiritualNeed / 100.0f) * 1.5f;
+        if(action.name == "Gaming" || action.name == "WatchEntertainement" || action.name == "DrinkAlcohol" || action.name == "Smoke" ){
+             modifier *= (v.spiritualNeed / 100.0f) * 1.5f;
             if (v.spiritualNeed < 20.0f) modifier = 0.1f;
         }
-        if(action->name == "Work on Project" || action->name == "LeanSkill" || action->name == "Work on Project" ){
+        if(action.name == "Work on Project" || action.name == "LeanSkill" || action.name == "Work on Project" ){
              modifier = (v.achievementDrive / 100.0f) * 1.5f;
             if (v.achievementDrive < 20.0f) modifier = 0.1f;
         }
-        if (action->name == "Socialize" || action->name == "GoodConnection" || action->name == "HelpSupport" || action->name == "Apologize" || action->name == "Reconcile" ){
+        if (action.name == "Socialize" || action.name == "GoodConnection" || action.name == "HelpSupport" || action.name == "Apologize" || action.name == "Reconcile" ){
             modifier = (v.collectivism / 100.0f) * 1.5f;
             if (v.collectivism < 20.0f) modifier = 0.1f;
         }
 
-        if(action->name == "Prayer"){
+        if(action.name == "Prayer"){
             modifier += (v.spiritualNeed /100.0f) *1.2f;
         }
         return std::max(0.1f, modifier);;
     }
+
 
     float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action& action) {
         float modifier = 1.0f;
@@ -1245,7 +1250,30 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         return totalWeight > 0 ? (influence / neighbors.size()) : 0.5f;
     }
 
+    void FreeWillSystem::tickEmotionalSuppression(Entity* entity) {
+    float& raw      = entity->emotionalState.rawAnger;
+    float& expressed = entity->emotionalState.expressedAnger;
+    float& debt     = entity->emotionalState.suppressionDebt;
 
+    float suppressionTendency = entity->personality.agreeableness / 100.0f;
+
+    raw = entity->entityGeneralAnger;
+
+    expressed = raw * (1.0f - suppressionTendency * 0.6f);
+
+    debt += (raw - expressed) * 0.1f;
+
+    if (debt > 20.0f) {
+        entity->entityMentalHealth -= debt * 0.05f;
+        entity->entityStress       += debt * 0.03f;
+    }
+
+    if (debt > 60.0f) {
+        entity->entityGeneralAnger = std::min(100.0f, raw + debt * 0.5f);
+        debt = 0.0f;
+        std::cout << entity->getName() << " EXPLOSION ÉMOTIONNELLE après suppression prolongée!\n";
+    }
+}
 
     void FreeWillSystem::tickValueGoalAlignment(Entity* entity) {
         ValueSystem& v = entity->ValueSystem;
@@ -1330,6 +1358,8 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         }
     }
 
+    // Dans ton main loop, quand tu détectes health <= 0:
+
         // Main decision-making function
         // main entry = entree principale de fichier
     Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context) {
@@ -1347,7 +1377,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             std::vector<std::pair<Action*, float>> actionWeights;
 
 
-
+            tickValueGoalAlignment(entity);
             for (auto& action : availableActions) {
                 float requirementFitness = calculateRequirementFitness(entity, action);
                 float needSatisfaction = calculateNeedSatisfaction(action);
@@ -1358,18 +1388,9 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 float personalityModifier = calculatePersonalityModifier(entity, action);
                 float valueSatisfaction = applyValueSatisfaction(entity, action);
 
-
-
-                // ---- Social Norm mechanic ----
-                float normModifier = 1.0f;
-                auto normIt = context.activeNorms.find(action.name);
-                if (normIt != context.activeNorms.end()) {
-                    // Normalize behavior: higher prevalence * pressure creates a strong multiplier
-                    // e.g., 0.6 prevalence * 0.6 pressure = 0.36 -> 1.36x multiplier
-                    normModifier = 1.0f + (normIt->second.prevalence * normIt->second.normPressure);
-                }
-
-
+                SocialNorm sc;
+                sc.actionName = 1.0f;
+                //a impélementer
 
                 std::cout << "\nAction: " << action.name << "\n";
                 std::cout << "  RequirementFitness:   " << requirementFitness << "\n";
@@ -1382,7 +1403,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 std::cout << "  ValueSatisfaction:    " << valueSatisfaction << "\n";
                 std::cout << "  GriefModifier:        " << calculateGriefModifier(entity, action) << "\n";
                 std::cout << "  EnvModifier:          " << calculateEnvironmentalModifier(entity, action, context.env) << "\n";
-                std::cout << "  NormModifier:         " << normModifier << "\n";
+                //std::cout << "  NormModifier:         " << normModifier << "\n";
 
                 float reqWeight = 0.15f + (entity->personality.conscientiousness / 500.0f); // 0.15-0.35
 
@@ -1394,7 +1415,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 float griefModifier = calculateGriefModifier(entity, action);
                 float envModifier = calculateEnvironmentalModifier(entity, action, context.env);
 
-                tickValueGoalAlignment(entity);
+
 
                 float weight = requirementFitness * 0.20f
                             + needSatisfaction * 0.25f
@@ -1407,7 +1428,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 weight *= valueSatisfaction;
                 weight *= griefModifier;
                 weight *= envModifier;
-                weight *= normModifier;
+                //weight *= normModifier;
 
                 // rarete + condition de stats
                 float rarityMultiplier = 1.0f;
@@ -1521,6 +1542,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
     //ici on assimile l'action pointé vers sur celui qui est pointé
     //par le pointeur
     void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action){
+
         if(action->name == "Desire"){
             // Natural attraction checks - cannot be attracted if target has poor hygiene or is unhappy
             if(pointed->entityHygiene < 40){
@@ -1584,7 +1606,6 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 }else{
                     pointer->list_entityPointedAnger[index].anger += increment;
                 }
-                pointer->list_entityPointedAnger[index].anger += increment;
                 std::cout << "Anger renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "Socialize"){
@@ -1628,6 +1649,8 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             // Check if pointer has high enough desire for pointed (minimum 25)
             //and is in couple
 
+
+
             //check social links -> cannot make a baby with someone if
             // one of the partner has no desire or is angry to the other partner
             int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
@@ -1663,13 +1686,43 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             }
 
             if(pointer->checkCouple(pointed)){ //check if they are in couple
+                //change life memory
+                LifeMemory mem;
+                mem.eventType = "breeding";
+                mem.entityInvolvedId = pointed->entityId;
+                mem.emotionalIntensity = 2.2f;
+                mem.isFormative = (pointer->lifeMemories.size() < 3); // les premières trahisons marquent plus
+                mem.internalNarrative = "trusted someone and got betrayed";
+                pointer->lifeMemories.push_back(mem);
+                //parent2
+                pointer->personality.agreeableness += 9.0f;
+                pointer->ValueSystem.collectivism += 4.0f;
+                pointer->personality.neuroticism -= 2.0f;
+                pointer->ValueSystem.collectivism += 4.0f;
+                //parent1
+                pointed->personality.agreeableness += 9.0f;
+                pointed->ValueSystem.collectivism += 4.0f;
+                pointed->personality.neuroticism -= 2.0f;
+                pointed->ValueSystem.collectivism += 4.0f;
+
+                if (pointed->m_goal.type == "build_family"){
+                    pointed->m_goal.progressToward += 20.0f;
+                    pointer->ValueSystem.achievementDrive += 8.0f;
+                }
+
+                if (pointer->m_goal.type == "build_family"){
+                    pointer->m_goal.progressToward += 20.0f;
+                    pointer->ValueSystem.achievementDrive += 8.0f;
+                }
+
+
                 std::cout << "Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
                 Entity baby = Entity(5, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 5, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
                 baby.posX = pointer->posX + 3;
                 baby.posY = pointer->posY + 3;
                 baby.parent1 = pointed;
                 baby.parent2 = pointer;
-                if(pointer->list_entityPointedAnger[anger_index].anger > 10){
+                if(anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 10){
                     baby.dv.childhoodTraumaScore = pointer->list_entityPointedAnger[anger_index].anger;
                     baby.dv.childhoodNurturingScore = 0.0f;
                     baby.dv.hadSecureAttachment = false;
@@ -1699,18 +1752,31 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         }
 
         else if(action->name == "couple"){
+            //update LifeMemory
+
+
+
+
+            float required_desire = 25.0f;
+            if (pointer->dv.attachmentStyle == AVOIDANT) required_desire = 40.0f;
+            else if (pointer->dv.attachmentStyle == ANXIOUS) required_desire = 15.0f;
+
             // Check if pointer has high enough desire for pointed (minimum 25)
             int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
-            if(desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 25){
+            if(desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < required_desire){
                 float current_desire = (desire_index == -1) ? 0 : pointer->list_entityPointedDesire[desire_index].desire;
-                std::cout << "Couple bloqué: " << pointer->getName() << " n'a pas assez de désir pour " << pointed->getName() << " (" << current_desire << " < 25)\n";
+                std::cout << "Couple bloqué: " << pointer->getName() << " n'a pas assez de désir pour " << pointed->getName() << " (" << current_desire << " < " << required_desire << ")\n";
                 return;
             }
             // Check if pointed also has desire for pointer (mutual attraction - minimum 20)
+            float required_pointed_desire = 20.0f;
+            if (pointed->dv.attachmentStyle == AVOIDANT) required_pointed_desire = 35.0f;
+            else if (pointed->dv.attachmentStyle == ANXIOUS) required_pointed_desire = 10.0f;
+
             int pointed_desire_index = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
-            if(pointed_desire_index == -1 || pointed->list_entityPointedDesire[pointed_desire_index].desire < 20){
+            if(pointed_desire_index == -1 || pointed->list_entityPointedDesire[pointed_desire_index].desire < required_pointed_desire){
                 float pointed_desire = (pointed_desire_index == -1) ? 0 : pointed->list_entityPointedDesire[pointed_desire_index].desire;
-                std::cout << "Couple bloqué: " << pointed->getName() << " n'a pas assez de désir pour " << pointer->getName() << " (" << pointed_desire << " < 20)\n";
+                std::cout << "Couple bloqué: " << pointed->getName() << " n'a pas assez de désir pour " << pointer->getName() << " (" << pointed_desire << " < " << required_pointed_desire << ")\n";
                 return;
             }
             // Check that neither has too much anger toward the other
@@ -1734,6 +1800,23 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
 
             int index = pointer->contains(pointer->list_entityPointedCouple, pointed, 3);
             if(index == -1){
+                LifeMemory mem;
+                mem.eventType = "couple";
+                mem.entityInvolvedId = pointed->entityId;
+                mem.emotionalIntensity = 1.0f;
+                mem.isFormative = true;
+                mem.internalNarrative = "Entered in a couple";
+                pointer->lifeMemories.push_back(mem);
+
+                if(pointer->m_goal.type == "find_partner"){
+                    pointer->ValueSystem.achievementDrive += 8.0f;
+                    pointer->m_goal.progressToward += 8.0f;
+                }
+                pointer->ValueSystem.collectivism += 1.5f;
+                    pointer->ValueSystem.familyOrientation += 0.7f;
+                    pointer->ValueSystem.hedonism += 0.4f;
+
+
                 std::cout << "Nouveau couple ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
                 pointer->addCouple({1, pointed});
                 // Also add the reverse couple link for the pointed entity
@@ -1742,6 +1825,17 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 std::cout << "INFO: Couple existe déjà, renforcement du lien\n" ;
             }
         }else if(action->name == "Murder"){
+            LifeMemory mem;
+            mem.eventType = "Murder";
+            mem.entityInvolvedId = pointed->entityId;
+            mem.emotionalIntensity = 2.1f;
+            mem.isFormative = true;
+            mem.internalNarrative = "I murdered someone";
+            pointer->lifeMemories.push_back(mem);
+            pointer->personality.neuroticism += 3.2f;
+            pointer->ValueSystem.collectivism -=1.2f;
+
+
             std::cout << "MURDER: (" << pointer->getId() << ")" << pointer->getName()<< " a tué (" << pointed->getId() << ")" << pointed->getName() << std::endl;
             //action grave doit etre exec que si certaines conditions sont remplis
             if(pointed->searchConnAng(pointer) > 40.0 || pointed->personality.neuroticism > 50.0 || pointed->entityMentalHealth < 30){
@@ -1882,6 +1976,20 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             }
         }
         else if(action->name == "Betray"){
+            //life memory
+            LifeMemory mem;
+            mem.eventType = "betrayal";
+            mem.entityInvolvedId = pointed->entityId;
+            mem.emotionalIntensity = 0.8f;
+            mem.isFormative = (pointer->lifeMemories.size() < 3); // les premières trahisons marquent plus
+            mem.internalNarrative = "trusted someone and got betrayed";
+            pointer->lifeMemories.push_back(mem);
+
+            // Si formative: impact permanent sur personnalité
+            if (mem.isFormative) {
+                pointer->personality.agreeableness -= 5.0f;
+                pointer->ValueSystem.collectivism -= 8.0f;
+            }
             // Destroys social link, creates strong anger
             int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(social_index != -1){
@@ -1904,9 +2012,10 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 pointed->list_entityPointedSocial.erase(pointed->list_entityPointedSocial.begin() + pointed_social_index);
             }
         }
-        // ==================== INTIMATE/ROMANTIC ACTIONS ====================
+
         else if(action->name == "Flirt"){
             // Check hygiene requirement
+
             if(pointer->entityHygiene < 50){
                 std::cout << "Flirt bloqué: " << pointer->getName() << " a une hygiène trop basse\n";
                 return;
@@ -1934,6 +2043,14 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 std::cout << "Date bloqué: pas assez de désir entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
                 return;
             }
+            // Avoidant fleeing intimacy if desire/bond too deep
+            if (pointer->dv.attachmentStyle == AVOIDANT && pointer->list_entityPointedDesire[desire_index].desire > 40.0f) {
+                float flee_reduction = static_cast<float>(BetterRand::genNrInInterval(5, 15));
+                pointer->list_entityPointedDesire[desire_index].desire = std::max(0.0f, pointer->list_entityPointedDesire[desire_index].desire - flee_reduction);
+                pointer->entityStress = std::min(100.0f, pointer->entityStress + 10.0f);
+                std::cout << "Date annulé: " << pointer->getName() << " (Avoidant) fuit l'intimité! Désir réduit -" << flee_reduction << std::endl;
+                return;
+            }
             // Check hygiene
             if(pointer->entityHygiene < 60){
                 std::cout << "Date bloqué: " << pointer->getName() << " a une hygiène trop basse\n";
@@ -1959,6 +2076,21 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             }
         }
         else if(action->name == "BreakUp"){
+            //life Memory
+            LifeMemory mem;
+            mem.eventType = "BreakUp";
+            mem.entityInvolvedId = pointer->entityId;
+            mem.emotionalIntensity = 0.8f;
+            mem.isFormative = (pointed->lifeMemories.size() < 3); // les premières BreakUp marquent plus
+            mem.internalNarrative = "I breaked up with someone that I loved";
+            pointed->lifeMemories.push_back(mem);
+
+            if (mem.isFormative) {
+                pointed->personality.agreeableness -= 2.0f;
+                pointed->ValueSystem.collectivism -= 4.0f;
+
+            }
+
             // Check if couple link exists
             int couple_index = pointer->contains(pointer->list_entityPointedCouple, pointed, 3);
             if(couple_index == -1){
@@ -1988,6 +2120,13 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             // Both partners enter grief — the one broken up with grieves more
             float breakerIntensity = 0.4f + BetterRand::genNrInInterval(0, 20) / 100.0f;
             float brokenpIntensity = 0.6f + BetterRand::genNrInInterval(0, 20) / 100.0f;
+
+            if (pointer->dv.attachmentStyle == ANXIOUS) breakerIntensity = std::min(1.0f, breakerIntensity + 0.4f);
+            if (pointer->dv.attachmentStyle == AVOIDANT) breakerIntensity = std::max(0.0f, breakerIntensity - 0.2f);
+
+            if (pointed->dv.attachmentStyle == ANXIOUS) brokenpIntensity = std::min(1.0f, brokenpIntensity + 0.4f);
+            if (pointed->dv.attachmentStyle == AVOIDANT) brokenpIntensity = std::max(0.0f, brokenpIntensity - 0.2f);
+
             pointer->addGrief(pointed->entityId, breakerIntensity, false);
             pointed->addGrief(pointer->entityId, brokenpIntensity, false);
         }

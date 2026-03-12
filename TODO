@@ -11,5 +11,6 @@
   - remplacer les string par des ID et avoir un fichier dictionnaire qui référence tout
 
 AMÉLIORATION DE L'IA
-  - implémenter toute les nouvelles features,
-      - implémenter les 2 nouvelles fonctions pour attachmentStyle
+  * implémenter toute les nouvelles features,
+      * implémenter les 2 nouvelles fonctions pour attachmentStyle
+  - implémenter la norme social

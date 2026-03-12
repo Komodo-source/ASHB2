@@ -50,6 +50,17 @@ enum AttachmentStyle {
 };
 
 
+struct LifeMemory {
+    std::string eventType;
+    int entityInvolvedId;         // qui était impliqué (-1 si personne)
+    float emotionalIntensity;
+    int simulationDay;
+    bool isFormative;             // change la personnalité de façon permanente
+    std::string internalNarrative;
+};
+
+
+
 struct GriefState {
     int lostPersonId;      // ID of the lost person
     int stagesRemaining;   // Kübler-Ross: 5 stages remaining
@@ -65,9 +76,15 @@ struct PersonalityChange {
     float opennessDrift = 0.0f;
 };
 
+struct EmotionalState {
+    float rawAnger      = 0.0f;   // colère réelle interne
+    float expressedAnger = 0.0f;  // ce qu'on montre
+    float suppressionDebt = 0.0f; // accumulation du coût de la suppression
+};
+
 struct Goal {
     std::string type;
-    // "find_partner", "build_career", "make_friends", "happiness", "self"
+    // "find_partner", "build_career", "make_friends", "happiness", "self", "build_family"
     float priority;
     int progressToward; // 0-100
 };
@@ -182,6 +199,8 @@ public:
     Entity* parent1 = nullptr;
     Entity* parent2 = nullptr;
 
+    std::vector<LifeMemory> lifeMemories;
+    EmotionalState emotionalState;
 
     // Optional attributes
     entityPointedDesire pointedDesire;

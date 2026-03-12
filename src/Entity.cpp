@@ -266,6 +266,11 @@ void Entity::addGrief(int lostId, float intensity, bool isDeath) {
 void Entity::tickGrief(float deltaTime) {
     // Gradual recovery: intensity decreases each tick
     float recoveryRate = 0.0008f * deltaTime; // very slow recovery
+    if (this->dv.attachmentStyle == ANXIOUS) {
+        recoveryRate = 0.0004f * deltaTime; // Recover slowly
+    } else if (this->dv.attachmentStyle == AVOIDANT) {
+        recoveryRate = 0.0016f * deltaTime; // Recover quickly
+    }
     for (auto& g : griefStates) {
         g.intensity -= recoveryRate;
         // Advance stage every time intensity crosses a threshold

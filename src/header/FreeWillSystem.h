@@ -25,7 +25,7 @@ struct StatChange {
     std::string statName;
     float changeValue;
 };
-
+/*
 // Represents a social norm in the entity's current group
 struct SocialNorm {
     std::string actionName;
@@ -36,7 +36,7 @@ struct SocialNorm {
     SocialNorm(std::string name, float prev, float pressure)
         : actionName(name), prevalence(prev), normPressure(pressure) {}
 };
-
+*/
 
 
 // Action definition
@@ -88,17 +88,16 @@ struct ActionContext {
     bool isInPublic;
     int numPeopleNearby;
     EnvironmentalFactors env;
-    std::map<std::string, SocialNorm> activeNorms; // Extracted societal norms
+    //std::map<std::string, SocialNorm> activeNorms; // Extracted societal norms
 
     ActionContext()
         : isNightTime(false), isWeekend(false), isAtWork(false),
           isInPublic(false), numPeopleNearby(0) {}
 
     ActionContext(bool night, bool weekend, bool work, bool pub, int people,
-                  EnvironmentalFactors environment = EnvironmentalFactors(),
-                  std::map<std::string, SocialNorm> norms = {})
+                  EnvironmentalFactors environment = EnvironmentalFactors())
         : isNightTime(night), isWeekend(weekend), isAtWork(work),
-          isInPublic(pub), numPeopleNearby(people), env(environment), activeNorms(norms) {}
+          isInPublic(pub), numPeopleNearby(people), env(environment) {}
 };
 
 // Need system
@@ -186,7 +185,8 @@ public:
 
     void updateValuesFromExperiences(Entity* ent, Action* &action, float outcomeSuccess);
     void tickValueGoalAlignment(Entity* entity);
-    float applyValueSatisfaction(Entity* entity, Action* &action);
+    float applyValueSatisfaction(Entity* entity,  const Action& action);
+    void tickEmotionalSuppression(Entity* entity);
 };
 
 #endif

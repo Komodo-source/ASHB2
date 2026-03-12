@@ -88,7 +88,7 @@ EnvironmentalFactors generateEnvFactors(int day) {
 }
 
 // Generate ActionContext based on simulation time
-ActionContext createContextFromTime(int day, int numPeopleNearby, const std::map<std::string, SocialNorm>& norms = {}) {
+ActionContext createContextFromTime(int day, int numPeopleNearby) {
     int hour = (day % 60) * 24 / 60;
     int dayOfWeek = (day / 60) % 7;
 
@@ -98,7 +98,7 @@ ActionContext createContextFromTime(int day, int numPeopleNearby, const std::map
     bool isInPublic = (numPeopleNearby > 2);
 
     EnvironmentalFactors env = generateEnvFactors(day);
-    return ActionContext(isNightTime, isWeekend, isAtWork, isInPublic, numPeopleNearby, env, norms);
+    return ActionContext(isNightTime, isWeekend, isAtWork, isInPublic, numPeopleNearby, env);
 }
 
 // Generate random personality using Big Five distribution
@@ -118,14 +118,63 @@ Personality generateRandomPersonality() {
     );
 }
 
+
+    void handleDeath(Entity* dead, std::vector<Entity*>& allEntities) {
+        for (Entity* ent : allEntities) {
+            if (ent == dead || ent->entityHealth <= 0) continue;
+
+            bool isPartner  = ent->checkCouple(dead);
+            bool isParent   = (ent == dead->parent1 || ent == dead->parent2);
+            bool isChild    = (dead == ent->parent1  || dead == ent->parent2);
+            bool hasSocial  = ent->searchConnSocial(dead) > 10.0f;
+            bool hasDesire  = ent->searchConnDesire(dead) > 15.0f;
+
+            float griefIntensity = 0.0f;
+            std::string narrative = "";
+
+            if (isPartner) {
+                griefIntensity = 0.85f + BetterRand::genNrInInterval(0,15)/100.0f;
+                narrative = "lost life partner";
+                ent->ValueSystem.familyOrientation += 10.0f; // réalisation tardive
+            } else if (isChild) {
+                griefIntensity = 1.0f; // perte d'un enfant = grief maximal
+                narrative = "lost a child";
+                ent->personality.neuroticism += 8.0f;
+            } else if (isParent) {
+                griefIntensity = 0.7f;
+                narrative = "lost a parent";
+                ent->ValueSystem.spiritualNeed += 5.0f;
+            } else if (hasDesire) {
+                griefIntensity = 0.5f;
+                narrative = "lost someone desired";
+            } else if (hasSocial) {
+                griefIntensity = 0.3f;
+                narrative = "lost a social connection";
+            }
+
+            if (griefIntensity > 0.0f) {
+                ent->addGrief(dead->entityId, griefIntensity, true);
+
+                // Mémoire formative
+                LifeMemory mem;
+                mem.eventType = "loss_death";
+                mem.entityInvolvedId = dead->entityId;
+                mem.emotionalIntensity = griefIntensity;
+                mem.isFormative = (griefIntensity > 0.6f);
+                mem.internalNarrative = narrative;
+                ent->lifeMemories.push_back(mem);
+            }
+        }
+    }
+
+
+
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
     EnvironmentalFactors env = generateEnvFactors(currentDay);
 
     // Process each group of close entities
     for(auto& group : entityGroups){
 
-        // --- Calculate Social Norms for this group ---
-        std::map<std::string, SocialNorm> currentNorms;
         std::map<std::string, int> actionCounts;
         int totalRecentActions = 0;
 
@@ -149,8 +198,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 // Only consider it a norm if it's somewhat common (> 10%)
                 if(prevalence > 0.10f) {
                     // Norm pressure scales with prevalence.
-                    // e.g., if 60% of recent actions are 'Gossip', normPressure is 0.6.
-                    currentNorms[pair.first] = SocialNorm(pair.first, prevalence, prevalence);
+                    //currentNorms[pair.first] = SocialNorm(pair.first, prevalence, prevalence);
+                    ;
                 }
             }
         }
@@ -165,7 +214,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             //apply movement (now env-aware)
             applyMovement(entity, group, env);
 
-            if(entity->entityHealth <= 0.0f) continue; // Skip dead entities
+            if(entity->entityHealth <= 0.0f){
+                handleDeath(entity, group);
+            }
 
             FreeWillSystem& sys = entity->getFreeWill();
             sys.updateNeeds(1.0f);
@@ -181,7 +232,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             }
 
             // Create context based on current simulation time (includes env and norms)
-            ActionContext context = createContextFromTime(currentDay, neighbors.size(), currentNorms);
+            ActionContext context = createContextFromTime(currentDay, neighbors.size());
 
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosen = sys.chooseAction(entity, neighbors, context);

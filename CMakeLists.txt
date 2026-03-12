@@ -29,7 +29,7 @@ include_directories(
 )
 
 # Link directories
-link_directories(${GLFW_DIR}/lib-mingw-w64)  
+link_directories(${GLFW_DIR}/lib-mingw-w64)
 
 find_package(OpenGL REQUIRED)
 
@@ -46,6 +46,7 @@ src/Movement.cpp
 src/SaveLoad.cpp
 src/Heritage.cpp
 src/Graph.cpp
+
 
 )
 
