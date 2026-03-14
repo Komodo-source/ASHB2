@@ -130,26 +130,31 @@ Personality generateRandomPersonality() {
             bool hasDesire  = ent->searchConnDesire(dead) > 15.0f;
 
             float griefIntensity = 0.0f;
-            std::string narrative = "";
+            std::string narrative;
 
             if (isPartner) {
                 griefIntensity = 0.85f + BetterRand::genNrInInterval(0,15)/100.0f;
                 narrative = "lost life partner";
                 ent->ValueSystem.familyOrientation += 10.0f; // réalisation tardive
+                ent->onMajorEventAddOrBoostGoal("loss_death");
             } else if (isChild) {
                 griefIntensity = 1.0f; // perte d'un enfant = grief maximal
                 narrative = "lost a child";
                 ent->personality.neuroticism += 8.0f;
+                ent->onMajorEventAddOrBoostGoal("loss_death");
             } else if (isParent) {
                 griefIntensity = 0.7f;
                 narrative = "lost a parent";
                 ent->ValueSystem.spiritualNeed += 5.0f;
+                ent->onMajorEventAddOrBoostGoal("loss_death");
             } else if (hasDesire) {
                 griefIntensity = 0.5f;
                 narrative = "lost someone desired";
+                ent->onMajorEventAddOrBoostGoal("loss_death");
             } else if (hasSocial) {
                 griefIntensity = 0.3f;
                 narrative = "lost a social connection";
+                ent->onMajorEventAddOrBoostGoal("loss_death");
             }
 
             if (griefIntensity > 0.0f) {
@@ -168,6 +173,57 @@ Personality generateRandomPersonality() {
     }
 
 
+    Entity* selectSocialTarget(Entity* self, const std::vector<Entity*>& neighbors,
+                           Action* action) {
+    std::vector<std::pair<Entity*, float>> scores;
+
+    for (Entity* neighbor : neighbors) {
+        float score = 0.0f;
+        MentalModelOfOther* model = self->getModelOf(neighbor);
+
+        if (action->name == "Socialize" || action->name == "GoodConnection") {
+            score += self->searchConnSocial(neighbor) * 2.0f;  // prefer friends
+            score += (model ? model->trustLevel : 0) * 1.5f;
+            score -= self->searchConnAng(neighbor) * 3.0f;     // avoid enemies
+        } else if (action->name == "Desire" || action->name == "Flirt") {
+            score += self->searchConnDesire(neighbor) * 3.0f;
+            score -= self->searchConnAng(neighbor) * 2.0f;
+            // Attachment style affects target preference
+            if (self->dv.attachmentStyle == ANXIOUS)
+                score += (model ? (1.0f - model->predictability) : 0) * 2.0f; // anxious drawn to unpredictable
+        } else if (action->name == "AngerConnection" || action->name == "Murder") {
+            score += self->searchConnAng(neighbor) * 3.0f;     // target enemies
+        } else if (action->name == "HelpSupport") {
+            score += (model ? (100.0f - model->estimatedHappiness) : 50) * 0.02f; // help those suffering
+            score += self->searchConnSocial(neighbor) * 1.0f;
+        } else if (action->name == "Apologize") {
+            score += self->searchConnAng(neighbor) * 2.0f;  // apologize to those angry at us
+        }
+
+        // Proximity bonus — closer entities more likely targets
+        float dist = std::sqrt(std::pow(self->posX - neighbor->posX, 2) +
+                              std::pow(self->posY - neighbor->posY, 2));
+        score *= (1.0f / (1.0f + dist * 0.01f));
+
+        scores.push_back({neighbor, std::max(0.01f, score)});
+    }
+
+    return weightedRandomSelect(scores);
+}
+
+Entity* weightedRandomSelect(std::vector<std::pair<Entity*, float>> scores){
+    float max = 0.0;
+    Entity* choosen = nullptr;
+    for(auto ScoreEntity: scores){
+        if(ScoreEntity.second > max){
+            choosen = ScoreEntity.first;
+            max = ScoreEntity.second;
+        }
+    }
+    return choosen;
+}
+
+
 
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
     EnvironmentalFactors env = generateEnvFactors(currentDay);
@@ -178,12 +234,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
         std::map<std::string, int> actionCounts;
         int totalRecentActions = 0;
 
-        // Gather recent actions across all group members
         for(Entity* groupMember : group) {
             if(groupMember->entityHealth <= 0.0f) continue;
 
             const auto& history = groupMember->getFreeWill().getActionHistory();
-            // Look at the last 10 actions per entity to determine the "current" vibe
             int actionsToCheck = std::min(10, (int)history.size());
             for(int i = 0; i < actionsToCheck; ++i) {
                 actionCounts[history[i].actionName]++;
@@ -223,6 +277,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Apply direct environmental stat effects
             sys.applyEnvironmentalEffects(entity, env);
+            
+            
 
             std::vector<Entity*> neighbors;
             for(Entity* potential_neighbor : group){
@@ -243,8 +299,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             }
 
             //chaque 10 ticks on applique le développement
+            // et on update les goals
             if(currentDay % 10 == 0){
                 sys.tickChildDevelopment(entity, 1.0f);
+                entity->recalculatePriority();
             }
 
             // Determine if this is a pointed action (requires a target)
@@ -258,14 +316,16 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             Entity* target = nullptr;
             if(isPointedAction && !neighbors.empty()){
-                // Select a random neighbor as target
-                int targetIndex = BetterRand::genNrInInterval(0, (int) neighbors.size() - 1);
-                target = neighbors[targetIndex];
+
+                //better neightboor selection
+                //int targetIndex = BetterRand::genNrInInterval(0, (int) neighbors.size() - 1);
+                //target = neighbors[targetIndex];
+                target = selectSocialTarget(entity, group, chosen);
 
                 bool targetWasAlive = (target->entityHealth > 0.0f);
 
                 // Execute the action with the target
-                sys.executeAction(entity, chosen, target);
+                sys.executeAction(entity, chosen, context, target);
                 //saving data
                 entity->saveEntityStats(chosen);
 
@@ -292,7 +352,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
             } else {
                 // Execute self-directed action
-                sys.executeAction(entity, chosen);
+                sys.executeAction(entity, chosen, context);
                 //saving data
                 entity->saveEntityStats(chosen);
             }

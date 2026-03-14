@@ -1277,23 +1277,27 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
 
     void FreeWillSystem::tickValueGoalAlignment(Entity* entity) {
         ValueSystem& v = entity->ValueSystem;
-        std::string& currentGoal = entity->m_goal.type;
+        std::string currentGoal = entity->getTypeGoal();
 
         if (v.familyOrientation > 75.0f && currentGoal == "build_career") {
-            entity->m_goal.priority -= 0.5f;
-            if (entity->m_goal.priority < 20.0f) {
-                entity->setGoal("find_partner");
-                std::cout << entity->getName() << " shifts life goal: career -> find_partner\n";
+            for(LifeGoal& goal : entity->m_goals){
+                if(goal.type == "build_career"){
+                    goal.priority -= 0.5f;
+                    if (goal.priority < 20.0f) {
+                        entity->addOrBoostGoal("find_partner", 1.0f);
+                        std::cout << entity->getName() << " shifts life goal: career -> find_partner\n";
+                    }
+                }
             }
         }
 
         if (v.achievementDrive > 80.0f && currentGoal == "happiness") {
-            entity->setGoal("build_career");
+            entity->addOrBoostGoal("build_career", 1.0f);
             std::cout << entity->getName() << " realizes happiness goal feels directionless, shifts to career\n";
         }
 
         if (v.spiritualNeed > 85.0f && entity->entityMentalHealth < 40.0f) {
-            entity->setGoal("self");
+            entity->addOrBoostGoal("self", 1.0f);
             std::cout << entity->getName() << " enters spiritual withdrawal (mental health crisis)\n";
         }
     }
@@ -1358,6 +1362,30 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         }
     }
 
+    float calculateNormModifier(Entity* entity, const Action& action,
+                            const SocialNorm& norm) {
+
+    if (norm.actionName != action.name) return 1.0f;
+
+    float prevalence = norm.prevalence;
+    float pressure = norm.normPressure;
+
+    float conformityDrive = entity->personality.agreeableness / 100.0f;
+    conformityDrive += entity->ValueSystem.collectivism / 100.0f;
+    conformityDrive *= 0.5f;
+
+    if (prevalence > 0.3f) {
+        return 1.0f + (prevalence * pressure * conformityDrive);
+    } else if (prevalence < 0.1f) {
+        float rebellion = entity->personality.openness / 100.0f;
+        return 1.0f - (pressure * conformityDrive) + (rebellion * 0.3f);
+    }
+
+    return 1.0f;
+}
+
+
+
     // Dans ton main loop, quand tu détectes health <= 0:
 
         // Main decision-making function
@@ -1366,13 +1394,19 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             std::cout << "\n=== Choosing Action for Entity " << entity->getId() << " ===\n";
             std::cout << "Number of neighbors: " << neighbors.size() << "\n";
             std::cout << "Context: Night=" << context.isNightTime << " Weekend=" << context.isWeekend
-                      << " AtWork=" << context.isAtWork << " InPublic=" << context.isInPublic
-                      << " PeopleNearby=" << context.numPeopleNearby << "\n";
+                      << "AtWork=" << context.isAtWork << " InPublic=" << context.isInPublic
+                      << "PeopleNearby=" << context.numPeopleNearby << "\n";
             std::cout << "Personality: E=" << entity->personality.extraversion
-                      << " A=" << entity->personality.agreeableness
-                      << " C=" << entity->personality.conscientiousness
-                      << " N=" << entity->personality.neuroticism
-                      << " O=" << entity->personality.openness << "\n";
+                      << " Agreeableness=" << entity->personality.agreeableness
+                      << " conscientiousness=" << entity->personality.conscientiousness
+                      << " neuroticism=" << entity->personality.neuroticism
+                      << " openness=" << entity->personality.openness << "\n";
+
+            Action* habitualAction = checkHabitTrigger(context);
+            if (habitualAction != nullptr) {
+                std::cout << ">>> Habit Triggered: " << habitualAction->name << " <<<\n";
+                return habitualAction;
+            }
 
             std::vector<std::pair<Action*, float>> actionWeights;
 
@@ -1387,9 +1421,10 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 float contextualWeight = calculateContextualWeight(action, context);
                 float personalityModifier = calculatePersonalityModifier(entity, action);
                 float valueSatisfaction = applyValueSatisfaction(entity, action);
+                float normModifier = calculateNormModifier(entity, action, entity->socialNorm);
 
-                SocialNorm sc;
-                sc.actionName = 1.0f;
+
+
                 //a impélementer
 
                 std::cout << "\nAction: " << action.name << "\n";
@@ -1403,7 +1438,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 std::cout << "  ValueSatisfaction:    " << valueSatisfaction << "\n";
                 std::cout << "  GriefModifier:        " << calculateGriefModifier(entity, action) << "\n";
                 std::cout << "  EnvModifier:          " << calculateEnvironmentalModifier(entity, action, context.env) << "\n";
-                //std::cout << "  NormModifier:         " << normModifier << "\n";
+                std::cout << "  NormModifier:         " << normModifier << "\n";
 
                 float reqWeight = 0.15f + (entity->personality.conscientiousness / 500.0f); // 0.15-0.35
 
@@ -1438,7 +1473,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                     rarityMultiplier = 0.02f; // 2% probability weight
                 } else if (action.name == "Discrimination") {
                     rarityMultiplier = 0.25f; // 25% probability weight
-                    if(entity->getTypeGoal() == "self"){
+                    if(entity->SearchGoal("self").type.empty()){
                         rarityMultiplier *= 1.25;
                     }
                 } else if (action.name == "Anxiety") {
@@ -1447,7 +1482,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                     rarityMultiplier = 0.02f; // 10% probability weight
                 } else if (action.name == "Betray") {
                     rarityMultiplier = 0.15f; // 15% probability weight - serious action
-                    if(entity->getTypeGoal() == "self"){
+                    if(entity->SearchGoal("self").type.empty()){
                         rarityMultiplier *= 1.25;
                     }
                 } else if (action.name == "Manipulate") {
@@ -1466,34 +1501,34 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                     rarityMultiplier = 0.6f; // 60% probability weight - common social behavior
                 } else if (action.name == "Jealousy") {
                     rarityMultiplier = 0.35f; // 35% probability weight
-                }else if(action.name == "gossip" && entity->getTypeGoal() == "make_friends"){
+                }else if(action.name == "gossip" && entity->SearchGoal("make_friends").type.empty()  ){
                    rarityMultiplier = 0.15f;
-                }else if(entity->getTypeGoal() == "find_partner" || entity->getTypeGoal() == "make_friends"){
+                }else if(entity->SearchGoal("find_partner").type.empty()   || entity->SearchGoal("make_friends").type.empty()){
                    rarityMultiplier = 0.3f;
-                }else if( entity->getTypeGoal() == "make_friends"){
+                }else if( entity->SearchGoal("make_friends").type.empty()  ){
                    rarityMultiplier = 0.2f;
-                }else if( entity->getTypeGoal() == "happiness" && action.name == "WatchEntertainment"){
+                }else if( entity->SearchGoal("happiness").type.empty()   && action.name == "WatchEntertainment"){
                    rarityMultiplier = 0.25f;
-                }else if( entity->getTypeGoal() == "happiness" && action.name == "creativeActivity"){
+                }else if( entity->SearchGoal("happiness").type.empty()   && action.name == "creativeActivity"){
                    rarityMultiplier = 0.25f;
-                }else if( entity->getTypeGoal() == "happiness" && action.name == "gaming"){
+                }else if( entity->SearchGoal("happiness").type.empty()   && action.name == "gaming"){
                    rarityMultiplier = 0.27f;
-                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Jealousy"){
+                }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Jealousy"){
                    rarityMultiplier = 0.25f;
-                }else if( entity->getTypeGoal() == "build_career" && action.name == "LearnSkill"){
+                }else if( entity->SearchGoal("build_career").type.empty()   && action.name == "LearnSkill"){
                    rarityMultiplier = 0.25f;
-                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Flirt"){
+                }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Flirt"){
                    rarityMultiplier = 0.40f;
-                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Date"){
+                }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Date"){
                    rarityMultiplier = 0.40f;
-                }else if( entity->getTypeGoal() == "find_partner" && action.name == "Reconcile"){
+                }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Reconcile"){
                    rarityMultiplier = 0.40f;
                 }
-                else if( entity->getTypeGoal() == "find_partner" && action.name == "breeding"){
+                else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "breeding"){
                    rarityMultiplier = 0.75f;
-                }else if( entity->getTypeGoal() == "find_partner" && action.name == "couple"){
+                }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "couple"){
                    rarityMultiplier = 0.40f;
-                }else if( entity->getTypeGoal() == "build_career" && action.name == "Work on Project"){
+                }else if( entity->SearchGoal("build_career").type.empty()   && action.name == "Work on Project"){
                    rarityMultiplier = 0.25f;
                 }
 
@@ -1645,6 +1680,8 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 pointer->list_entityPointedSocial[index].social += increment;
                 std::cout << "Social (good) renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
+            pointed->onMajorEventAddOrBoostGoal("good_connection");
+            pointer->onMajorEventAddOrBoostGoal("good_connection");
         }else if(action->name == "breeding"){ // REPRODUCTION
             // Check if pointer has high enough desire for pointed (minimum 25)
             //and is in couple
@@ -1705,16 +1742,23 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 pointed->personality.neuroticism -= 2.0f;
                 pointed->ValueSystem.collectivism += 4.0f;
 
-                if (pointed->m_goal.type == "build_family"){
-                    pointed->m_goal.progressToward += 20.0f;
-                    pointer->ValueSystem.achievementDrive += 8.0f;
-                }
-
-                if (pointer->m_goal.type == "build_family"){
-                    pointer->m_goal.progressToward += 20.0f;
-                    pointer->ValueSystem.achievementDrive += 8.0f;
-                }
-
+                //for(LifeGoal& goal : pointed->m_goals){
+                //    if (goal.type == "build_family"){
+                //        goal.progressToward += 20.0f;
+                //        pointer->ValueSystem.achievementDrive += 8.0f;
+                //    }
+                //}
+                //
+                //for(LifeGoal& goal : pointer->m_goals){
+                //    if (goal.type == "build_family"){
+                //        goal.progressToward += 20.0f;
+                //        pointer->ValueSystem.achievementDrive += 8.0f;
+                //    }
+                //}
+                
+                //Update goal
+                pointer->onMajorEventAddOrBoostGoal("reproduction");
+                pointed->onMajorEventAddOrBoostGoal("reproduction");
 
                 std::cout << "Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
                 Entity baby = Entity(5, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 5, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
@@ -1753,9 +1797,8 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
 
         else if(action->name == "couple"){
             //update LifeMemory
-
-
-
+            pointer->onMajorEventAddOrBoostGoal("couple");
+            pointed->onMajorEventAddOrBoostGoal("couple");
 
             float required_desire = 25.0f;
             if (pointer->dv.attachmentStyle == AVOIDANT) required_desire = 40.0f;
@@ -1808,9 +1851,11 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 mem.internalNarrative = "Entered in a couple";
                 pointer->lifeMemories.push_back(mem);
 
-                if(pointer->m_goal.type == "find_partner"){
-                    pointer->ValueSystem.achievementDrive += 8.0f;
-                    pointer->m_goal.progressToward += 8.0f;
+                for(LifeGoal& goal : pointer->m_goals){
+                    if(goal.type == "find_partner"){
+                        pointer->ValueSystem.achievementDrive += 8.0f;
+                        goal.progressToward += 8.0f;
+                    }
                 }
                 pointer->ValueSystem.collectivism += 1.5f;
                     pointer->ValueSystem.familyOrientation += 0.7f;
@@ -1976,6 +2021,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             }
         }
         else if(action->name == "Betray"){
+            pointer->onMajorEventAddOrBoostGoal("betrayal");
             //life memory
             LifeMemory mem;
             mem.eventType = "betrayal";
@@ -2170,7 +2216,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
     }
 
         // Execute chosen action
-    void FreeWillSystem::executeAction(Entity* entity, Action* &action, Entity* pointed) {
+    void FreeWillSystem::executeAction(Entity* entity, Action* &action, const ActionContext& context, Entity* pointed) {
         std::cout << "\n=== Executing Action: " << action->name << " ===\n";
 
         std::map<std::string, float> statsBefore = captureEntityStats(entity);
@@ -2209,6 +2255,8 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         memory.outcomeSuccess = outcomeSuccess;
         memory.statsBefore = statsBefore;
         memory.statsAfter = statsAfter;
+
+        updateHabits(action->actionId, context);
 
         std::cout << "Updating Personnality\n";
         updatePersonalityFromExperience(entity, *action , outcomeSuccess);
@@ -2360,5 +2408,64 @@ void FreeWillSystem::loadFrom(std::ifstream& file) {
             mem.statsAfter[key] = std::stof(val); pos = (semi == std::string::npos) ? afterData.size() : semi + 1;
         }}
         actionHistory.push_back(mem);
+    }
+}
+
+        Action* FreeWillSystem::checkHabitTrigger(const ActionContext& context) {
+        for (auto& habit : habits) {
+            if (habit.triggerContext == context && habit.strength > 0.7f) {
+                // Strong habit in matching context -> bypass deliberation
+                float triggerChance = habit.strength * 0.8f;
+                std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+                if (dist(rng) < triggerChance) {
+                    for (auto& action : availableActions) {
+                        if (action.actionId == habit.actionId) {
+                            return &action;
+                        }
+                    }
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    void FreeWillSystem::updateHabits(int actionId, const ActionContext& context) {
+        bool found = false;
+        for (auto& habit : habits) {
+            if (habit.triggerContext == context) {
+                if (habit.actionId == actionId) {
+                    habit.reinforce(0.05f);
+                    habit.consecutiveExecutions++;
+                    found = true;
+                } else {
+                    habit.decay(0.02f);
+                    habit.consecutiveExecutions = 0;
+                }
+            }
+        }
+        if (!found) {
+            habits.push_back(Habit(actionId, context));
+        }
+    }
+
+void SocialNormSystem::update(const std::vector<Entity*>& allEntities) {
+    std::map<std::string, int> actionCounts;
+    int totalActions = 0;
+
+    for (Entity* ent : allEntities) {
+        if (ent->fws.getActionHistory().empty()) continue;
+        const std::string& lastAction = ent->fws.getActionHistory().front().actionName;
+        actionCounts[lastAction]++;
+        totalActions++;
+    }
+
+    if (totalActions == 0) return;
+
+    for (auto& [name, count] : actionCounts) {
+        float prevalence = (float)count / totalActions;
+        auto& norm = norms[name];
+        norm.actionName = name;
+        norm.prevalence = norm.prevalence * 0.95f + prevalence * 0.05f;
+        norm.normPressure = std::abs(norm.prevalence - 0.5f) * 2.0f;
     }
 }

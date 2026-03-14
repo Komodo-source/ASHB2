@@ -1,0 +1,7 @@
+src/implem_free_will.cpp: In member function 'Action* FreeWillSystem::chooseAction(Entity*, const std::vector<Entity*>&, const ActionContext&)':
+src/implem_free_will.cpp:1426:84: error: invalid initialization of reference of type 'const SocialNormSystem&' from expression of type 'SocialNorm'
+ 1426 |                 float normModifier = calculateNormModifier(entity, action, entity->socialNorm);
+      |                                                                            ~~~~~~~~^~~~~~~~~~
+src/implem_free_will.cpp:1366:53: note: in passing argument 3 of 'float calculateNormModifier(Entity*, const Action&, const SocialNormSystem&)'
+ 1366 |                             const SocialNormSystem& norms) {
+      |                             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~

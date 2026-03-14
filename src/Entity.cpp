@@ -1,6 +1,10 @@
 #include "./header/Entity.h"
 #include "./header/random.hpp"
+#include <cstddef>
 #include <string>
+#include "./header/FreeWillSystem.h"
+
+
 #include <iostream>
 //#include "../libs/BetterRand/BetterRand.h"
 #include <time.h>
@@ -8,6 +12,7 @@
 #include <algorithm>
 #include "./header/FreeWillSystem.h"
 #include "header/BetterRand.h"
+#include "./header/SocialNormSystem.h"
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -107,9 +112,14 @@ Entity::Entity(int id,
             }
     }
 
-    char* type[5] = {"find_partner", "build_career", "make_friends", "happiness", "self"};
-    m_goal.progressToward = 0.0;
-    m_goal.type = type[BetterRand::genNrInInterval(0,4)];
+    char* type[5] = {(char*)"find_partner", (char*)"build_career", (char*)"make_friends", (char*)"happiness", (char*)"self"};
+    LifeGoal initialGoal;
+    initialGoal.progressToward = 0.0;
+    initialGoal.type = type[BetterRand::genNrInInterval(0,4)];
+    initialGoal.priority = 100.0f;
+    initialGoal.frustrationLevel = 0.0f;
+    initialGoal.ticksSinceProgress = 0;
+    m_goals.push_back(initialGoal);
 }
 
 // Getter for name
@@ -194,17 +204,17 @@ Entity* Entity::mostSocialConn(){
     return ent;
 }
 
-std::string Entity::getTypeGoal(){
-    return m_goal.type;
-}
-
-int Entity::progressGoal(){
-    return m_goal.progressToward;
-}
+//std::string Entity::getTypeGoal(){
+//    return m_goal.type;
+//}
+//
+//int Entity::progressGoal(){
+//    return m_goal.progressToward;
+//}
 
 bool Entity::checkCouple(Entity* ent){
     for(int i=0;i<list_entityPointedCouple.size();i++){
-        if(list_entityPointedAnger[i].pointedEntity == ent){
+        if(list_entityPointedCouple[i].pointedEntity == ent){
             return true;
         }
     }
@@ -319,7 +329,10 @@ void Entity::saveTo(std::ofstream& file) const {
     file << "POSY:" << posY << "\n";
     file << "PERSONALITY:" << personality.extraversion << "," << personality.agreeableness << ","
          << personality.conscientiousness << "," << personality.neuroticism << "," << personality.openness << "\n";
-    file << "GOAL:" << m_goal.type << "," << m_goal.priority << "," << m_goal.progressToward << "\n";
+    file << m_goals.size() << "\n"; //on inscrit d'abord la taille
+    for(LifeGoal m_goal : m_goals){
+        file << "GOAL:" << m_goal.type << "," << m_goal.priority << "," << m_goal.progressToward << "\n";
+    }
 
     // Save relationship lists (store target entity IDs, not pointers)
     file << "DESIRE_COUNT:" << list_entityPointedDesire.size() << "\n";
@@ -384,12 +397,29 @@ void Entity::loadFrom(std::ifstream& file) {
 
     // Goal
     std::getline(file, line);
-    std::string gdata = line.substr(5);
-    size_t g1 = gdata.find(',');
-    size_t g2 = gdata.find(',', g1 + 1);
-    m_goal.type = gdata.substr(0, g1);
-    m_goal.priority = std::stof(gdata.substr(g1 + 1, g2 - g1 - 1));
-    m_goal.progressToward = std::stoi(gdata.substr(g2 + 1));
+    int nb_goals = stoi(line);
+    for(int i=0; i<nb_goals;i++){
+        std::getline(file, line);
+        LifeGoal goal;
+        std::string gdata = line.substr(5);
+        size_t g1 = gdata.find(',');
+        size_t g2 = gdata.find(',', g1 + 1);
+        size_t g3 = gdata.find(',', g2 + 1);
+        size_t g4 = gdata.find(',', g3 + 1);
+        goal.type = gdata.substr(0, g1);
+        goal.priority = std::stof(gdata.substr(g1 + 1, g2 - g1 - 1));
+        goal.progressToward = std::stoi(gdata.substr(g2 + 1, g3 - g2 - 1));
+        
+        if (g3 != std::string::npos && g4 != std::string::npos) {
+            goal.frustrationLevel = std::stof(gdata.substr(g3 + 1, g4 - g3 - 1));
+            goal.ticksSinceProgress = std::stoi(gdata.substr(g4 + 1));
+        } else {
+            goal.frustrationLevel = 0.0f;
+            goal.ticksSinceProgress = 0;
+        }
+
+        m_goals.push_back(goal);
+    }
 
     // Load relationship IDs (will resolve to pointers later)
     list_entityPointedDesire.clear();
@@ -484,11 +514,76 @@ void Entity::resolvePointers(std::vector<Entity>& allEntities) {
     tempCoupleIds.clear();
 }
 
+//remplacer par AddOrBoostGoal
+//void Entity::setGoal(std::string type){
+//    this->m_goal.type = type;
+//    this->m_goal.progressToward = 0.0;
+//}
 
-void Entity::setGoal(std::string type){
-    this->m_goal.type = type;
-    this->m_goal.progressToward = 0.0;
+LifeGoal Entity::SearchGoal(const std::string& goal_name) {
+    //si on ne trouve pas on renvoie un nouveau
+    for(LifeGoal goal : m_goals){
+        if(goal.type == goal_name){
+            return goal;
+        }
+    }
+    LifeGoal new_life_goal;
+    return new_life_goal;
 }
+
+void Entity::recalculatePriority() {    
+    for (LifeGoal& goal : m_goals) {
+        if (goal.type == "find_partner" && !list_entityPointedCouple.empty()) {
+            goal.priority *= 0.3f;
+        }
+        if (goal.type == "build_family" && list_entityPointedCouple.empty()) {
+            goal.priority *= 0.1f;
+        }
+        if (goal.type == "build_career" && entityAge > 60) {
+            goal.priority *= 0.5f;
+        }
+        if (goal.frustrationLevel > 70.0f) {
+            goal.priority *= 0.6f;
+        }
+    }
+}
+
+void Entity::addOrBoostGoal(const std::string& goal_name, float value){
+    for(LifeGoal& goal : m_goals){
+        if(goal.type == goal_name){
+            goal.priority += value;
+            goal.progressToward += 2.0f;
+            return ;
+        }
+    }
+    LifeGoal new_life_goal;
+    new_life_goal.type = goal_name;
+    new_life_goal.priority = value;
+    new_life_goal.progressToward = 1.0f;
+    new_life_goal.frustrationLevel = 0.0f;
+    new_life_goal.ticksSinceProgress = 0;
+    m_goals.push_back(new_life_goal);
+}
+
+void Entity::onMajorEventAddOrBoostGoal(const std::string& eventType) {
+    if (eventType == "loss_death") {
+        addOrBoostGoal("find_meaning", 2.3f);
+    } 
+    else if (eventType == "couple") {
+        addOrBoostGoal("find_partner", 1.1f);
+        addOrBoostGoal("build_family", 0.6f);
+    }
+    else if (eventType == "reproduction") {
+        addOrBoostGoal("build_family", 2.5f);
+    }
+    else if(eventType == "good_connection"){
+        addOrBoostGoal("make_friends", 0.7f);
+    }
+    else if (eventType == "betrayal") {
+        addOrBoostGoal("self_protection", 0.8f);
+    }
+}
+
 
 
  float Entity::searchConnAng(Entity* ent){ // return just the value
@@ -518,3 +613,12 @@ float Entity::searchConnSocial(Entity* ent){
     }
     return -1;
 }
+
+MentalModelOfOther* Entity::getModelOf(Entity* ent){
+    for(MentalModelOfOther* md : list_MentalModelOfOther){
+        if(md->entityPointed == ent){
+            return md;
+        }
+    }
+}
+

@@ -10,7 +10,6 @@
 #include <memory>
 #include <deque>
 #include <fstream>
-#include "./Entity.h"
 
 class Entity;
 
@@ -98,6 +97,27 @@ struct ActionContext {
                   EnvironmentalFactors environment = EnvironmentalFactors())
         : isNightTime(night), isWeekend(weekend), isAtWork(work),
           isInPublic(pub), numPeopleNearby(people), env(environment) {}
+
+    bool operator==(const ActionContext& other) const {
+        return isNightTime == other.isNightTime &&
+               isWeekend == other.isWeekend &&
+               isAtWork == other.isAtWork &&
+               isInPublic == other.isInPublic;
+        // Not comparing exact numPeopleNearby and env to allow general habits to form
+    }
+};
+
+struct Habit {
+    int actionId;
+    float strength;          // 0-1, grows with repetition
+    ActionContext triggerContext;  // when does this habit fire?
+    int consecutiveExecutions;
+    
+    Habit(int id, ActionContext ctx) 
+        : actionId(id), strength(0.1f), triggerContext(ctx), consecutiveExecutions(1) {}
+    
+    void reinforce(float amount) { strength = std::min(1.0f, strength + amount); }
+    void decay(float amount) { strength = std::max(0.0f, strength - amount); }
 };
 
 // Need system
@@ -128,6 +148,7 @@ private:
     static const int MAX_MEMORY = 50;
     std::map<std::string, Need> needs;
     std::vector<Action> availableActions;
+    std::vector<Habit> habits;
     int currentTime;
     std::mt19937 rng;
 
@@ -161,8 +182,11 @@ public:
     void initializeNeeds();
     void initializeActions();
 
+    Action* checkHabitTrigger(const ActionContext& context);
+    void updateHabits(int actionId, const ActionContext& context);
+
     Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {}, const ActionContext& context = ActionContext());
-    void executeAction(Entity* entity, Action* &action, Entity* pointed=nullptr);
+    void executeAction(Entity* entity, Action* &action, const ActionContext& context = ActionContext(), Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
 
     void updateNeeds(float deltaTime);

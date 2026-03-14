@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
-//#include "../../libs/BetterRand/BetterRand.h"
 #include "FreeWillSystem.h"
+#include "SocialNormSystem.h"
 
 class Entity;
 class Action;
@@ -77,25 +77,31 @@ struct PersonalityChange {
 };
 
 struct EmotionalState {
-    float rawAnger      = 0.0f;   // colère réelle interne
+
+    float rawAnger    = 0.0f;   // colère réelle interne
     float expressedAnger = 0.0f;  // ce qu'on montre
     float suppressionDebt = 0.0f; // accumulation du coût de la suppression
 };
 
-struct Goal {
+struct LifeGoal {
     std::string type;
-    // "find_partner", "build_career", "make_friends", "happiness", "self", "build_family"
-    float priority;
-    int progressToward; // 0-100
+        // "find_partner", "build_career", "make_friends", "happiness", "self", "build_family"
+    float priority;          // dynamic, shifts with context
+    float progressToward;
+    float frustrationLevel;  // increases when blocked
+    int ticksSinceProgress;
 };
 
-// Big Five personality traits - affects behavior and need rates
+
+
+
+// Big Five personality traits
 struct Personality {
-    float extraversion;      // 0-100: affects social need rates
-    float agreeableness;     // 0-100: reduces anger, increases forgiveness
-    float conscientiousness; // 0-100: affects work/achievement drive
-    float neuroticism;       // 0-100: affects stress/anxiety thresholds
-    float openness;          // 0-100: affects variety seeking
+    float extraversion;      // affects social need rates
+    float agreeableness;     // reduces anger, increases forgiveness
+    float conscientiousness; // affects work/achievement drive
+    float neuroticism;       // affects stress/anxiety thresholds
+    float openness;          // affects variety seeking
 
     Personality()
         : extraversion(50.0f), agreeableness(50.0f), conscientiousness(50.0f),
@@ -108,6 +114,7 @@ struct Personality {
 
 
 struct ValueSystem {
+
     float familyOrientation;     // How much family matters
     float achievementDrive;      // Career/status
     float spiritualNeed;         // Prayer/meaning-making
@@ -136,6 +143,28 @@ struct DevelopmentalHistory {
         childhoodNurturingScore = nuturing;
     }
 };
+
+struct MentalModelOfOther {
+    Entity* entityPointed;
+    float perceivedExtraversion;
+    float perceivedAgreeableness;
+    float perceivedNeuroticism;
+
+    float estimatedHappiness;
+    float estimatedAnger;
+    float estimatedStress;
+
+    float trustLevel;          // accumulated from interactions
+    float predictability;      // how well I can predict their behavior
+    float lastInteractionDay;
+    std::string lastInteractionOutcome;
+
+    float perceivedIntentionality; // do I think they act deliberately?
+
+    void updateFromObservation(Entity* observed, float observerAccuracy);
+
+};
+
 
 
 struct entityPointedDesire {
@@ -188,12 +217,14 @@ public:
     std::vector<entityPointedAnger> list_entityPointedAnger;
     std::vector<entityPointedCouple> list_entityPointedCouple;
     std::vector<entityPointedSocial> list_entityPointedSocial;
-    Goal m_goal;
+    //LifeGoal m_goal;
     Personality personality;
     DevelopmentalHistory dv;
     FreeWillSystem fws;
     std::vector<GriefState> griefStates;
     ValueSystem ValueSystem;
+    SocialNorm socialNorm;
+    std::vector<LifeGoal> m_goals; //une entité peut avoir entre 1 - 5 but de vie
 
     LifeStage lifeStage = INFANT;
     Entity* parent1 = nullptr;
@@ -201,6 +232,8 @@ public:
 
     std::vector<LifeMemory> lifeMemories;
     EmotionalState emotionalState;
+    std::vector<MentalModelOfOther*> list_MentalModelOfOther;
+
 
     // Optional attributes
     entityPointedDesire pointedDesire;
@@ -271,6 +304,8 @@ public:
     void tickGrief(float deltaTime);
     float getGriefIntensity() const;
 
+    LifeGoal SearchGoal(const std::string& goal_name);
+
     // Save/Load
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
@@ -282,9 +317,11 @@ public:
     std::vector<std::pair<int, float>> tempSocialIds;
     std::vector<int> tempCoupleIds;
 
-
-
-
+    MentalModelOfOther* getModelOf(Entity* ent);
+    void recalculatePriority();
+    void addOrBoostGoal(const std::string& goal_name, float value);
+    void onMajorEventAddOrBoostGoal(const std::string& eventType);
+    //SocialNorm getSocialNorm();
 };
 
 // Move these outside the header to avoid multiple definition errors
