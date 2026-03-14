@@ -204,13 +204,15 @@ Entity* Entity::mostSocialConn(){
     return ent;
 }
 
-//std::string Entity::getTypeGoal(){
-//    return m_goal.type;
-//}
-//
-//int Entity::progressGoal(){
-//    return m_goal.progressToward;
-//}
+std::string Entity::getTypeGoal(){
+    if (!m_goals.empty()) return m_goals.front().type;
+    return "none";
+}
+
+double Entity::progressGoal(){
+    if (!m_goals.empty()) return m_goals.front().progressToward;
+    return 0.0;
+}
 
 bool Entity::checkCouple(Entity* ent){
     for(int i=0;i<list_entityPointedCouple.size();i++){
@@ -519,6 +521,31 @@ void Entity::resolvePointers(std::vector<Entity>& allEntities) {
 //    this->m_goal.type = type;
 //    this->m_goal.progressToward = 0.0;
 //}
+// 
+
+void FreeWillSystem::initializeNeeds() {
+    // PHYSIOLOGICAL — fast decay, always fighting to stay satisfied
+    needs["hunger"]  = Need("hunger",  PHYSIOLOGICAL, 0.25f);
+    needs["sleep"]   = Need("sleep",   PHYSIOLOGICAL, 0.18f);
+    needs["health"]  = Need("health",  PHYSIOLOGICAL, 0.08f);
+    needs["hygiene"] = Need("hygiene", PHYSIOLOGICAL, 0.12f);
+
+    // SAFETY — medium decay
+    needs["safety"]  = Need("safety",  SAFETY, 0.06f);
+
+    // BELONGING — medium decay
+    needs["social"]  = Need("social",  BELONGING, 0.15f);
+    needs["love"]    = Need("love",    BELONGING, 0.10f);
+
+    // ESTEEM — slow decay
+    needs["achievement"] = Need("achievement", ESTEEM, 0.05f);
+    needs["recognition"] = Need("recognition", ESTEEM, 0.04f);
+
+    // SELF-ACTUALIZATION — slowest decay
+    needs["meaning"]    = Need("meaning",    SELF_ACTUALIZATION, 0.03f);
+    needs["creativity"] = Need("creativity", SELF_ACTUALIZATION, 0.02f);
+}
+
 
 LifeGoal Entity::SearchGoal(const std::string& goal_name) {
     //si on ne trouve pas on renvoie un nouveau
@@ -583,7 +610,6 @@ void Entity::onMajorEventAddOrBoostGoal(const std::string& eventType) {
         addOrBoostGoal("self_protection", 0.8f);
     }
 }
-
 
 
  float Entity::searchConnAng(Entity* ent){ // return just the value

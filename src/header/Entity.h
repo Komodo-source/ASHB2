@@ -114,7 +114,6 @@ struct Personality {
 
 
 struct ValueSystem {
-
     float familyOrientation;     // How much family matters
     float achievementDrive;      // Career/status
     float spiritualNeed;         // Prayer/meaning-making
@@ -165,6 +164,16 @@ struct MentalModelOfOther {
 
 };
 
+enum NeedLevel { PHYSIOLOGICAL, SAFETY, BELONGING, ESTEEM, SELF_ACTUALIZATION };
+
+struct HierarchicalNeed {
+    std::string name;
+    NeedLevel level;
+    float urgency;         // 0-100
+    float decayRate;       // level-dependent
+    float satisfactionThreshold;  // must reach this before higher needs activate  
+};
+
 
 
 struct entityPointedDesire {
@@ -193,6 +202,7 @@ struct entityPointedCouple {
 
 class Entity {
 public:
+    void initHieracgicalNeeds();
     // Attributes
     int entityId;
     float entityAge;
@@ -225,6 +235,7 @@ public:
     ValueSystem ValueSystem;
     SocialNorm socialNorm;
     std::vector<LifeGoal> m_goals; //une entité peut avoir entre 1 - 5 but de vie
+    std::map<NeedLevel, HierarchicalNeed> needs;
 
     LifeStage lifeStage = INFANT;
     Entity* parent1 = nullptr;
@@ -293,9 +304,10 @@ public:
     std::vector<entityPointedCouple> getListCouple();
     std::vector<entityPointedSocial> getListSocial();
     std::string getTypeGoal();
-    int progressGoal();
+    double progressGoal();
     FreeWillSystem& getFreeWill(){return fws;};
     bool checkCouple(Entity* ent);
+    void initializeNeeds();
 
     void setGoal(std::string type);
 
@@ -310,18 +322,21 @@ public:
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
     void resolvePointers(std::vector<Entity>& allEntities);
+    
 
     // Temporary storage for IDs during loading (before pointer resolution)
     std::vector<std::pair<int, float>> tempDesireIds;
     std::vector<std::pair<int, float>> tempAngerIds;
     std::vector<std::pair<int, float>> tempSocialIds;
     std::vector<int> tempCoupleIds;
+    
 
     MentalModelOfOther* getModelOf(Entity* ent);
     void recalculatePriority();
     void addOrBoostGoal(const std::string& goal_name, float value);
     void onMajorEventAddOrBoostGoal(const std::string& eventType);
     //SocialNorm getSocialNorm();
+    //bool isActive(const std::map<NeedLevel, float>& levelSatisfaction) const;
 };
 
 // Move these outside the header to avoid multiple definition errors

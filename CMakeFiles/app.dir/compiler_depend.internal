@@ -1346,6 +1346,7 @@ CMakeFiles/app.dir/src/Disease.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Disease.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h
  C:/mingw64/include/c++/14.2.0/backward/binders.h
@@ -1564,6 +1565,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Entity.cpp
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/random.hpp
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h
@@ -1802,6 +1804,7 @@ CMakeFiles/app.dir/src/Graph.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h
@@ -2052,6 +2055,7 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/heritage.h
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h
@@ -2272,6 +2276,7 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SaveLoad.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h
  C:/mingw64/include/c++/14.2.0/backward/binders.h
@@ -2493,7 +2498,6 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/backends/imgui_impl_opengl3.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/imconfig.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/imgui.h
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h
  C:/mingw64/include/c++/14.2.0/backward/binders.h
@@ -2737,6 +2741,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj
  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SpatialMesh.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h
 
@@ -2752,6 +2757,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Disease.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/implot.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/implot_internal.h
@@ -3482,6 +3488,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/heritage.h
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h
@@ -3712,6 +3719,7 @@ CMakeFiles/app.dir/src/main.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Movement.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SaveLoad.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SpatialMesh.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/heritage.h
@@ -4076,6 +4084,7 @@ CMakeFiles/app.dir/src/movement.cpp.obj
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Movement.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h
  C:/mingw64/include/c++/14.2.0/algorithm
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h

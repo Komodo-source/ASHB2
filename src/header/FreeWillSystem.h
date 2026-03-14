@@ -61,6 +61,9 @@ struct ActionMemory {
     float outcomeSuccess; // How successful was the action (0-1)
     std::map<std::string, float> statsBefore;
     std::map<std::string, float> statsAfter;
+    // Deliberation context (optional, for storytelling/debugging)
+    std::string deliberationReasoning;
+    bool isImpulsive;
 };
 
 // Environmental factors affecting entity behavior
@@ -77,6 +80,52 @@ struct EnvironmentalFactors {
     EnvironmentalFactors(float weather, float crowd, float noise, float safety)
         : weatherQuality(weather), crowdDensity(crowd),
           noiseLevel(noise), safetyLevel(safety) {}
+};
+
+// Cognitive Architecture: lightweight cognitive pipeline components
+// Perception: what the entity notices filtered by personality/state
+struct PerceivedEvent {
+    int eventId{0};
+    std::string eventType; // e.g., "Threat", "Opportunity", etc.
+    float intensity{0.0f};
+    Entity* source{nullptr};
+};
+
+struct PerceivedEntity {
+    Entity* entity{nullptr};
+    float distance{0.0f};
+};
+
+struct Perception {
+    std::vector<PerceivedEvent> events;
+    std::vector<PerceivedEntity> nearbyEntities;
+    EnvironmentalFactors perceivedEnv;
+    float attentionalFocus{0.5f}; // 0..1
+};
+
+// Appraisal: OCC-style evaluation relative to self
+struct Appraisal {
+    float relevance{0.5f};      // does this relate to my goals?
+    float desirability{0.5f};   // is this good for me?
+    float novelty{0.5f};        // is this unexpected?
+    float controllability{0.5f};
+    float normCompliance{0.5f}; // fits social norms?
+    float agentBlame{0.0f};     // attribution
+};
+
+// Deliberation: candidate actions and chosen action with reasoning
+struct ActionCandidate {
+    const Action* action{nullptr};
+    float score{0.0f};
+    ActionCandidate() = default;
+    explicit ActionCandidate(const Action* a) : action(a) {}
+};
+
+struct Deliberation {
+    std::vector<ActionCandidate> candidates;
+    const Action* chosenAction{nullptr};
+    std::string internalReasoning;
+    bool isImpulsive{false}; // System 1 vs System 2
 };
 
 // Context for action evaluation
@@ -112,10 +161,10 @@ struct Habit {
     float strength;          // 0-1, grows with repetition
     ActionContext triggerContext;  // when does this habit fire?
     int consecutiveExecutions;
-    
-    Habit(int id, ActionContext ctx) 
+
+    Habit(int id, ActionContext ctx)
         : actionId(id), strength(0.1f), triggerContext(ctx), consecutiveExecutions(1) {}
-    
+
     void reinforce(float amount) { strength = std::min(1.0f, strength + amount); }
     void decay(float amount) { strength = std::max(0.0f, strength - amount); }
 };
@@ -152,6 +201,9 @@ private:
     int currentTime;
     std::mt19937 rng;
 
+    // Last deliberation result (pipeline state) for reflection/logging
+    Deliberation lastDeliberation;
+
     // Get stat value from entity
     float getEntityStat(Entity* entity, const std::string& statName);
 
@@ -160,7 +212,7 @@ private:
 
     float getMemoryWeight(int memoryAge);
     float calculateRequirementFitness(Entity* entity, const Action& action);
-    float calculateNeedSatisfaction(const Action& action);
+    float calculateNeedSatisfaction(const Action& action, Entity* targetNeed);
     float calculateMemoryBias(int actionId);
     float calculateVarietyBonus(int actionId);
     float calculateContextualWeight(const Action& action, const ActionContext& context);
@@ -182,14 +234,19 @@ public:
     void initializeNeeds();
     void initializeActions();
 
+
+
     Action* checkHabitTrigger(const ActionContext& context);
     void updateHabits(int actionId, const ActionContext& context);
 
     Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {}, const ActionContext& context = ActionContext());
+    // New cognitive pipeline entry point (separate from legacy scoring)
+    Action* cognitiveChooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context);
     void executeAction(Entity* entity, Action* &action, const ActionContext& context = ActionContext(), Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
 
     void updateNeeds(float deltaTime);
+    NeedLevel updateHieratchicalNeed(Entity* ent, const Action& action);
     void addAction(const Action& action);
 
     const std::deque<ActionMemory>& getActionHistory() const;

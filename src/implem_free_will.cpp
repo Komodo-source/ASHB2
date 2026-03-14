@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <string>
 #include <vector>
 #include <map>
@@ -45,16 +46,38 @@
     }
 
     // Calculate how much this action addresses current needs
-    float FreeWillSystem::calculateNeedSatisfaction(const Action& action) {
+    float FreeWillSystem::calculateNeedSatisfaction(const Action& action, Entity* targetNeed) {
         float satisfaction = 0.0f;
+        float hierarchyMultiplier = 0.0f;
 
         auto needIt = needs.find(action.needCategory);
         if (needIt != needs.end()) {
             satisfaction += needIt->second.urgency * 0.01f * action.baseSatisfaction;
         }
 
-        return satisfaction;
+        NeedLevel choosen_need_level  = updateHieratchicalNeed(targetNeed, action);
+
+        switch (choosen_need_level) {
+            case PHYSIOLOGICAL:
+                // Physiological needs get massive boost when urgent
+                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 3.0f; // up to 4x
+                break;
+            case SAFETY:
+                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 2.0f; // up to 3x
+                break;
+            case BELONGING:
+                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 1.0f; // up to 2x
+                break;
+            case ESTEEM:
+                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 0.5f; // up to 1.5x
+                break;
+            case SELF_ACTUALIZATION:
+                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 0.3f; // up to 1.3x
+                break;
+
+        return satisfaction + hierarchyMultiplier;
     }
+}
 
     void FreeWillSystem::applyEmotionalContagion(Entity* entity, const std::vector<Entity*>& neighbors) {
         if (neighbors.empty()) return;
@@ -1391,16 +1414,21 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         // Main decision-making function
         // main entry = entree principale de fichier
     Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context) {
-            std::cout << "\n=== Choosing Action for Entity " << entity->getId() << " ===\n";
-            std::cout << "Number of neighbors: " << neighbors.size() << "\n";
-            std::cout << "Context: Night=" << context.isNightTime << " Weekend=" << context.isWeekend
-                      << "AtWork=" << context.isAtWork << " InPublic=" << context.isInPublic
-                      << "PeopleNearby=" << context.numPeopleNearby << "\n";
-            std::cout << "Personality: E=" << entity->personality.extraversion
-                      << " Agreeableness=" << entity->personality.agreeableness
-                      << " conscientiousness=" << entity->personality.conscientiousness
-                      << " neuroticism=" << entity->personality.neuroticism
-                      << " openness=" << entity->personality.openness << "\n";
+        // Attempt the cognitive pipeline path first
+        Action* cp = cognitiveChooseAction(entity, neighbors, context);
+        if (cp != nullptr) return cp;
+        // Fallback to legacy scoring if pipeline did not produce a result
+        // (legacy path retained for compatibility)
+        //std::cout << "\n=== Choosing Action for Entity " << entity->getId() << " ===\n";
+        //std::cout << "Number of neighbors: " << neighbors.size() << "\n";
+        //std::cout << "Context: Night=" << context.isNightTime << " Weekend=" << context.isWeekend
+        //          << "AtWork=" << context.isAtWork << " InPublic=" << context.isInPublic
+        //          << "PeopleNearby=" << context.numPeopleNearby << "\n";
+        //std::cout << "Personality: E=" << entity->personality.extraversion
+        //          << " Agreeableness=" << entity->personality.agreeableness
+        //          << " conscientiousness=" << entity->personality.conscientiousness
+        //          << " neuroticism=" << entity->personality.neuroticism
+        //          << " openness=" << entity->personality.openness << "\n";
 
             Action* habitualAction = checkHabitTrigger(context);
             if (habitualAction != nullptr) {
@@ -1411,10 +1439,11 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             std::vector<std::pair<Action*, float>> actionWeights;
 
 
+
             tickValueGoalAlignment(entity);
             for (auto& action : availableActions) {
                 float requirementFitness = calculateRequirementFitness(entity, action);
-                float needSatisfaction = calculateNeedSatisfaction(action);
+                float needSatisfaction = calculateNeedSatisfaction(action, entity);
                 float memoryBias = calculateMemoryBias(action.actionId);
                 float varietyBonus = calculateVarietyBonus(action.actionId);
                 float socialInfluence = calculateSocialInfluence(entity, neighbors, action);
@@ -1573,6 +1602,55 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             std::cout << ">>> Default fallback to: " << availableActions[0].name << " <<<\n";
             return &availableActions[0];
         }
+
+    NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& action){
+
+        // Physiological: hunger, sleep, health (fast decay, highest priority)
+        //Safety: physical security, financial stability, predictability (medium decay)
+        //Belonging: social connection, love, friendship, family (medium decay)
+        //Esteem: achievement, recognition, self-respect (slow decay)
+        //Self-Actualization: creativity, meaning, legacy (slowest decay)
+        if(action.name == "Desire" ||
+            action.name == "GoodConnection" ||
+            action.name == "Gossip" ||
+            action.name == "Betray" ||
+            action.name == "Flirt" ||
+            action.name == "couple"){
+            ent->needs[BELONGING].satisfactionThreshold += 5.0f;
+            ent->needs[BELONGING].satisfactionThreshold -= ent->needs[BELONGING].decayRate;
+            return BELONGING;
+        }else if(action.name == "Prayer" ||
+            action.name == "Read" ||
+            action.name == "WatchEntertainment" ||
+            action.name == "Gaming" ||
+            action.name == "WatchEntertainment"){
+            ent->needs[SELF_ACTUALIZATION].satisfactionThreshold += 5.0f;
+            return SELF_ACTUALIZATION;
+        }else if(action.name == "EatMeal" || action.name == "Sleep"
+            || action.name == "Take Shower" ||
+            action.name == "Rest"){
+            ent->needs[PHYSIOLOGICAL].satisfactionThreshold += 5.0f;
+            ent->needs[PHYSIOLOGICAL].satisfactionThreshold -= ent->needs[PHYSIOLOGICAL].decayRate;
+            return PHYSIOLOGICAL;
+
+        }else if(action.name == "LearnSkill" || action.name == "Work on Project" ){
+            ent->needs[ESTEEM].satisfactionThreshold += 5.0f;
+            ent->needs[ESTEEM].satisfactionThreshold -= ent->needs[ESTEEM].decayRate;
+            return ESTEEM;
+
+        }else if(action.name == "Discrimination" || action.name == "Murder"
+            || action.name == "SetBoundaries"){
+            ent->needs[SAFETY].satisfactionThreshold += 5.0f;
+            ent->needs[SAFETY].satisfactionThreshold -= ent->needs[SAFETY].decayRate;
+            return SAFETY;
+
+        }else if(action.name == "QuitGiveUP"){
+            ent->needs[SELF_ACTUALIZATION].satisfactionThreshold -= 2.0f;
+            ent->needs[SELF_ACTUALIZATION].satisfactionThreshold -= ent->needs[SELF_ACTUALIZATION].decayRate;
+            return SELF_ACTUALIZATION;
+        }
+        //decay
+    }
 
     //ici on assimile l'action pointé vers sur celui qui est pointé
     //par le pointeur
@@ -1755,7 +1833,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 //        pointer->ValueSystem.achievementDrive += 8.0f;
                 //    }
                 //}
-                
+
                 //Update goal
                 pointer->onMajorEventAddOrBoostGoal("reproduction");
                 pointed->onMajorEventAddOrBoostGoal("reproduction");
@@ -1775,7 +1853,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                     baby.dv.childhoodTraumaScore = 0.0f;
                     baby.dv.hadSecureAttachment = true;
                 }
-                baby.setGoal("self");
+                baby.addOrBoostGoal("self", 100.0f);
 
 
                 //heritage
@@ -2253,6 +2331,9 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         memory.actionName = action->name;
         memory.timestamp = currentTime;
         memory.outcomeSuccess = outcomeSuccess;
+        // Reflect cognitive pipeline decisions in memory for debugging/history
+        memory.deliberationReasoning = lastDeliberation.internalReasoning;
+        memory.isImpulsive = lastDeliberation.isImpulsive;
         memory.statsBefore = statsBefore;
         memory.statsAfter = statsAfter;
 
@@ -2429,7 +2510,7 @@ void FreeWillSystem::loadFrom(std::ifstream& file) {
         return nullptr;
     }
 
-    void FreeWillSystem::updateHabits(int actionId, const ActionContext& context) {
+void FreeWillSystem::updateHabits(int actionId, const ActionContext& context) {
         bool found = false;
         for (auto& habit : habits) {
             if (habit.triggerContext == context) {
@@ -2447,6 +2528,7 @@ void FreeWillSystem::loadFrom(std::ifstream& file) {
             habits.push_back(Habit(actionId, context));
         }
     }
+
 
 void SocialNormSystem::update(const std::vector<Entity*>& allEntities) {
     std::map<std::string, int> actionCounts;
@@ -2468,4 +2550,81 @@ void SocialNormSystem::update(const std::vector<Entity*>& allEntities) {
         norm.prevalence = norm.prevalence * 0.95f + prevalence * 0.05f;
         norm.normPressure = std::abs(norm.prevalence - 0.5f) * 2.0f;
     }
+}
+
+// Cognitive Pipeline: Perception -> Appraisal -> Deliberation -> Action
+Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context){
+    // Build a lightweight Perception
+    Perception perception;
+    float stressFactor = entity->entityStress / 100.0f;
+    perception.attentionalFocus = std::max(0.0f, 1.0f - stressFactor);
+    perception.perceivedEnv = context.env;
+    perception.events.clear();
+    perception.nearbyEntities.clear();
+    for (Entity* nb : neighbors){
+        PerceivedEntity pe; pe.entity = nb;
+        float dx = entity->posX - nb->posX;
+        float dy = entity->posY - nb->posY;
+        pe.distance = std::sqrt(dx*dx + dy*dy);
+        perception.nearbyEntities.push_back(pe);
+        if (nb->entityHealth < 40.0f){
+            PerceivedEvent ev; ev.eventType = "Threat"; ev.intensity = (40.0f - nb->entityHealth) / 40.0f; ev.source = nb; perception.events.push_back(ev);
+        } else if (nb->entityHapiness > 60.0f){
+            PerceivedEvent ev; ev.eventType = "SocialOpportunity"; ev.intensity = (nb->entityHapiness - 60.0f) / 40.0f; ev.source = nb; perception.events.push_back(ev);
+        }
+    }
+
+    // Appraisal
+    Appraisal appraisal; auto clamp01 = [](float v){ if (v <= 0.0f) return 0.0f; if (v >= 1.0f) return 1.0f; return v; };
+    appraisal.novelty = 0.5f + 0.1f * (float)perception.events.size();
+    appraisal.relevance = clamp01(0.4f + (entity->entityHapiness / 100.0f) * 0.25f - (entity->entityStress / 100.0f) * 0.25f);
+    appraisal.desirability = clamp01(0.5f + (entity->personality.extraversion - 50.0f) / 200.0f);
+    appraisal.controllability = clamp01(0.5f - (entity->entityStress / 100.0f) * 0.2f);
+    appraisal.normCompliance = clamp01(0.5f + (entity->personality.agreeableness - 50.0f) / 200.0f);
+    appraisal.agentBlame = 0.0f;
+    appraisal.novelty = clamp01(appraisal.novelty);
+
+    // Generate 3-7 candidates using existing scoring utilities
+    std::vector<ActionCandidate> candidates;
+    for (const Action& act : availableActions){
+        const Action* aPtr = &act;
+        float requirementFitness = calculateRequirementFitness(entity, act);
+        float needSatisfaction = calculateNeedSatisfaction(act, entity);
+        float memoryBias = calculateMemoryBias(act.actionId);
+        float varietyBonus = calculateVarietyBonus(act.actionId);
+        float socialInfluence = calculateSocialInfluence(entity, neighbors, act);
+        float contextualWeight = calculateContextualWeight(act, context);
+        float personalityModifier = calculatePersonalityModifier(entity, act);
+        float valueSatisfaction = applyValueSatisfaction(entity, act);
+        float griefModifier = calculateGriefModifier(entity, act);
+        float envModifier = calculateEnvironmentalModifier(entity, act, context.env);
+        float normModifier = calculateNormModifier(entity, act, entity->socialNorm);
+        float score = requirementFitness * 0.20f
+                    + needSatisfaction * 0.25f
+                    + memoryBias * 0.10f
+                    + varietyBonus * 0.10f
+                    + socialInfluence * 0.10f;
+        score *= contextualWeight;
+        score *= personalityModifier;
+        score *= valueSatisfaction;
+        score *= griefModifier;
+        score *= envModifier;
+        score *= normModifier;
+        if (score > 0.0f){ candidates.emplace_back(aPtr); candidates.back().score = score; }
+    }
+    // Ensure at least 3 candidates
+    if (candidates.size() < 3){
+        for (const Action& act : availableActions){ ActionCandidate c(&act); c.score = calculateNeedSatisfaction(act, entity) + calculateContextualWeight(act, context); candidates.push_back(c); if (candidates.size() >= 3) break; }
+    }
+    std::sort(candidates.begin(), candidates.end(), [](const ActionCandidate& a, const ActionCandidate& b){ return a.score > b.score; });
+    if (candidates.size() > 7) candidates.resize(7);
+
+    // Deliberation
+    Deliberation delib; delib.candidates = candidates; if (!candidates.empty()){ delib.chosenAction = candidates.front().action; } else { delib.chosenAction = nullptr; }
+    delib.internalReasoning = "Cognitive Pipeline: chosen by top-scoring candidate";
+    delib.isImpulsive = (entity->entityStress > 60.0f) || (appraisal.novelty > 0.6f);
+    lastDeliberation = delib;
+
+    if (delib.chosenAction != nullptr) return const_cast<Action*>(delib.chosenAction);
+    return nullptr;
 }

@@ -244,7 +244,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/deque \
  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SpatialMesh.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h \
@@ -255,6 +255,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/std_thread.h \
  C:/mingw64/include/c++/14.2.0/bits/this_thread_sleep.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Disease.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\util/Debbug.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/implot.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/implot_internal.h \

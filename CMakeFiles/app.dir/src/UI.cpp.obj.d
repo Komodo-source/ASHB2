@@ -224,7 +224,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/deque \
  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h \
  C:/mingw64/include/c++/14.2.0/filesystem \
  C:/mingw64/include/c++/14.2.0/bits/fs_fwd.h \
@@ -247,6 +247,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/fs_ops.h \
  C:/mingw64/include/c++/14.2.0/iostream \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Disease.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/BetterRand.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/implot.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/implot_internal.h \

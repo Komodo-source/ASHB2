@@ -211,7 +211,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/deque \
  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/random.hpp \
  C:/mingw64/include/c++/14.2.0/chrono \
  C:/mingw64/include/c++/14.2.0/bits/chrono.h \
@@ -223,6 +223,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/stl_relops.h \
  C:/mingw64/include/c++/14.2.0/iterator \
  C:/mingw64/include/c++/14.2.0/bits/stream_iterator.h \
- C:/mingw64/include/c++/14.2.0/iostream \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
- C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/BetterRand.h
+ C:/mingw64/include/c++/14.2.0/iostream \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/BetterRand.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h

@@ -52,7 +52,8 @@ void applyDisease(Entity* ent, int neighSize, int sickClose){
         d.reduceAntiBody(ent);
         int disease = d.calculateDisease(neighSize, ent, sickClose);
         if(disease != -1){
-            std::cout << "Entity contaminated: " + ent->getId() + ' ' + ent->getName() + " => " + d.getDiseaseName(disease) << std::endl;
+            std::cout << "Entity contaminated: " << ent->getId() << " " << ent->getName()
+                      << " => " << d.getDiseaseName(disease) << std::endl;
             ent->entityDiseaseType = disease;
         }
     }
@@ -173,6 +174,8 @@ Personality generateRandomPersonality() {
     }
 
 
+    Entity* weightedRandomSelect(std::vector<std::pair<Entity*, float>> scores);
+
     Entity* selectSocialTarget(Entity* self, const std::vector<Entity*>& neighbors,
                            Action* action) {
     std::vector<std::pair<Entity*, float>> scores;
@@ -277,8 +280,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Apply direct environmental stat effects
             sys.applyEnvironmentalEffects(entity, env);
-            
-            
+
+
 
             std::vector<Entity*> neighbors;
             for(Entity* potential_neighbor : group){
@@ -292,6 +295,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosen = sys.chooseAction(entity, neighbors, context);
+            
+            //Update Hierachical need
+            sys.updateHieratchicalNeed(entity, chosen);
+            sys.updateNeeds(currentDay);
 
             // we ondulate the loneliness wether it has neighboor or not
             if(entity->entityLoneliness < 90){
