@@ -1,3 +1,4 @@
+
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -15,6 +16,7 @@
 #include "./header/SpatialMesh.h"
 #include "./header/BetterRand.h"
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include "./header/Disease.h"
 #include "util/Debbug.h"
@@ -53,8 +55,10 @@ void applyDisease(Entity* ent, int neighSize, int sickClose){
         d.reduceAntiBody(ent);
         int disease = d.calculateDisease(neighSize, ent, sickClose);
         if(disease != -1){
-            std::cout << "Entity contaminated: " << ent->getId() << " " << ent->getName()
-                      << " => " << d.getDiseaseName(disease) << std::endl;
+            std::stringstream ss;
+            ss << "Entity contaminated: " << ent->getId() << " " << ent->getName()
+                      << " => " << d.getDiseaseName(disease);
+            globalLogger->logCmd(ss.str());
             globalLogger->logDisease(ent->getId(), ent->getName(), d.getDiseaseName(disease));
             ent->entityDiseaseType = disease;
         }
@@ -216,19 +220,36 @@ Personality generateRandomPersonality() {
     return weightedRandomSelect(scores);
 }
 
-Entity* weightedRandomSelect(std::vector<std::pair<Entity*, float>> scores){
-    float max = 0.0;
-    Entity* choosen = nullptr;
-    for(auto ScoreEntity: scores){
-        if(ScoreEntity.second > max){
-            choosen = ScoreEntity.first;
-            max = ScoreEntity.second;
-        }
+void implementRegion(){
+    std::cout << "Choose a world region (h to help): \n";
+    std::cout << "1 /// Paris, France; 48° 51′ 24″ north, 2° 21′ 07″ east /// Oceanic\n";
+    std::cout << "2 /// Guangzhou, China; 23° 07′ 48″ north, 113° 15′ 36″ east /// monsoon\n";
+    std::cout << "3 /// Addis-Abeba, Ethiopia; 9° 1′ 48″ north, 38° 44′ 24″ east /// arid\n";
+    char choice;
+    std::cin >> choice;
+    if(choice == 'h'){
+        std::cout << "This feature is principally implemented for disease spreading, it barely affects the simulation links or its global functionning\n";
+        implementRegion();
+    }else{
+        Disease::region = (int)choice;
     }
-    return choosen;
 }
 
+Entity* weightedRandomSelect(std::vector<std::pair<Entity*, float>> scores){
+    float total = 0.0f;
+    for (auto& s : scores) total += s.second;
+    float roll = BetterRand::genNrInInterval(0.0f, total);
+    float cum = 0.0f;
+    for (auto& s : scores) {
+        cum += s.second;
+        if (roll <= cum) return s.first;
+    }
+    return scores.back().first;
+}
 
+std::vector<Entity> get_new_borns(){
+    return FreeWillSystem::new_borns;
+}
 
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
     EnvironmentalFactors env = generateEnvFactors(currentDay);
@@ -282,6 +303,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 handleDeath(entity, group);
             }
 
+
+
             FreeWillSystem& sys = entity->getFreeWill();
             sys.updateNeeds(1.0f);
 
@@ -308,8 +331,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             sys.updateNeeds(currentDay);
 
             // we ondulate the loneliness wether it has neighboor or not
-            if(entity->entityLoneliness < 90){
-                entity->entityLoneliness += 6 * neighbors.size() + entityGroups.size();
+            if (neighbors.size() > 0) {
+                entity->entityLoneliness -= 2.0f * neighbors.size(); // decrease when with others
+                entity->entityLoneliness = std::max(0.0f, entity->entityLoneliness);
+            } else {
+                entity->entityLoneliness += 1.5f;
             }
 
             //chaque 10 ticks on applique le développement
@@ -349,7 +375,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
                 // Detect murder: if target just died, trigger grief in all connected entities
                 if(targetWasAlive && target->entityHealth <= 0.0f){
-                    std::cout << "DEATH EVENT: " << target->name << " was killed. Propagating grief.\n";
+                    std::stringstream ss;
+                    ss << "DEATH EVENT: " << target->name << " was killed. Propagating grief.";
+                    globalLogger->logCmd(ss.str());
                     globalLogger->logDeath(target->entityId, target->name, target->entityAge, "murder by " + entity->name);
                     for(Entity* other : group){
                         if(other == target || other->entityHealth <= 0.0f) continue;
@@ -404,26 +432,32 @@ void sync_clock_stats(Entity* ent, int neighboors){
 int main() {
 
 
-    // Initialize logger (this redirects std::cout to cmd_log.txt)
-    Logger logger;
-    globalLogger = &logger;
+   //// Initialize logger (this redirects std::cout to cmd_log.txt)
+   Logger logger;
+   globalLogger = &logger;
 
-    std::cout << "clearing files... \n" ;
-    rm_data_file();
-    rm_data_act_file();
-    rm_log_files();  // Clear all log files
-    globalLogger->clearAllLogs();  // Ensure logs are cleared
+    globalLogger->logCmd("clearing files...");
+    try{
+
+        rm_data_file();
+        rm_data_act_file();
+        rm_log_files();  // Clear all log files
+        globalLogger->clearAllLogs();  // Ensure logs are cleared
+    }catch(...){
+        ;
+    }
 
     // Clear tick history file
     std::ofstream tick_history("./src/data/tick_history.json", std::ios::trunc);
     tick_history.close();
 
-    std::cout << "done \n" ;
+    globalLogger->logCmd("done");
     int entity_num;
-    std::cout << "Welcome to Artificial Simulation of Human Behavior \n";
+    std::cout << "Welcome to Artificial Simulation of Human Behavior (ASHB)\n";
     std::cout << "complete simulation can be found at /data/complete_logs.txt\n";
     std::cout << "you can save and load simulation at any moment\n";
     std::cout << "@author: Komodo \n";
+    implementRegion();
     std::cout << "enter entity number (int): ";
     std::cin >> entity_num;
 
@@ -461,11 +495,13 @@ int main() {
             Heritage::UnlinkedNode(&entity);
             // Assign random personality to each entity
             entity.personality = generateRandomPersonality();
-            std::cout << "Entity " << count << " personality: E=" << entity.personality.extraversion
+            std::stringstream ss;
+            ss << "Entity " << count << " personality: E=" << entity.personality.extraversion
                       << " A=" << entity.personality.agreeableness
                       << " C=" << entity.personality.conscientiousness
                       << " N=" << entity.personality.neuroticism
-                      << " O=" << entity.personality.openness << "\n";
+                      << " O=" << entity.personality.openness;
+            globalLogger->logCmd(ss.str());
             entities.push_back(entity);
             count++;
         }
@@ -495,19 +531,19 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        //Birthday,
+        // une année = 100 jours
+        if((day / 60) % 100 ){
+            for(Entity& ent : entities){
+                ent.IncrementBDay();
+            }
+        }
+
         // Check for dead entities and remove them
         for(int i = entities.size() - 1; i >= 0; i--){
             if(entities[i].entityHealth <= 0.0f){
                 std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
                 globalLogger->logDeath(entities[i].getId(), entities[i].getName(), entities[i].entityAge, "health depletion");
-
-                //Birthday,
-                // une année = 100 jours
-                if((day / 60) % 100 ){
-                    for(Entity& ent : entities){
-                        ent.IncrementBDay();
-                    }
-                }
 
                 entities.erase(entities.begin() + i);
 
@@ -539,6 +575,11 @@ int main() {
                 // Apply free will to all entity groups with current day for context
                 std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
                 applyFreeWill(close_entity_together, day);
+                std::vector<Entity> new_borns = get_new_borns();
+                for(Entity ent: new_borns){
+                    entities.push_back(ent);
+                }
+                FreeWillSystem::clear_new_borns();
 
                 // Export current state to JSON lines for HTML viewer
                 exportTickHistory("./src/data/tick_history.jsonl", entities, day);

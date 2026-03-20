@@ -234,6 +234,8 @@ public:
     EmotionalState emotionalState;
     std::vector<MentalModelOfOther*> list_MentalModelOfOther;
 
+    float Esteem;
+
 
     // Optional attributes
     entityPointedDesire pointedDesire;
@@ -307,6 +309,8 @@ public:
 
     LifeGoal SearchGoal(const std::string& goal_name);
 
+    MentalModelOfOther* getModelOf(Entity* ent);
+
     // Save/Load
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
@@ -320,7 +324,6 @@ public:
     std::vector<int> tempCoupleIds;
 
 
-    MentalModelOfOther* getModelOf(Entity* ent);
     void recalculatePriority();
     void addOrBoostGoal(const std::string& goal_name, float value);
     void onMajorEventAddOrBoostGoal(const std::string& eventType);

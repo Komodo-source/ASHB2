@@ -44,9 +44,9 @@ public:
         eventsLogFile.open("./data/events_log.txt", std::ios::app);
 
         // Redirect std::cout to cmd_log.txt
-        if (cmdLogFile.is_open()) {
-            std::cout.rdbuf(cmdLogFile.rdbuf());
-        }
+        // if (cmdLogFile.is_open()) {
+        //     std::cout.rdbuf(cmdLogFile.rdbuf());
+        // }
     }
 
     ~Logger() {
@@ -112,6 +112,11 @@ public:
         eventsLogFile << "[" << timestamp << "] " << eventType << ": " << details << std::endl;
     }
 
+    void logCmd(const std::string& message) {
+        std::string timestamp = getTimestamp();
+        cmdLogFile << "[" << timestamp << "] " << message << std::endl;
+    }
+
     // Utility function to clear all log files
     void clearAllLogs() {
         cmdLogFile.close();
@@ -134,9 +139,9 @@ public:
         eventsLogFile.open("./data/events_log.txt", std::ios::trunc);
 
         // Re-redirect cout
-        if (cmdLogFile.is_open()) {
-            std::cout.rdbuf(cmdLogFile.rdbuf());
-        }
+        // if (cmdLogFile.is_open()) {
+        //     std::cout.rdbuf(cmdLogFile.rdbuf());
+        // }
     }
 };
 

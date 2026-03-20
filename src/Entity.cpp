@@ -641,12 +641,22 @@ float Entity::searchConnSocial(Entity* ent){
     return -1;
 }
 
-MentalModelOfOther* Entity::getModelOf(Entity* ent){
-    for(MentalModelOfOther* md : list_MentalModelOfOther){
-        if(md->entityPointed == ent){
-            return md;
-        }
+
+
+void MentalModelOfOther::updateFromObservation(Entity* observed, float observerAccuracy) {
+    // Lerp perceived traits toward observed reality, dampened by observer accuracy
+    perceivedExtraversion  += (observed->personality.extraversion  - perceivedExtraversion)  * observerAccuracy * 0.1f;
+    perceivedAgreeableness += (observed->personality.agreeableness - perceivedAgreeableness) * observerAccuracy * 0.1f;
+    perceivedNeuroticism   += (observed->personality.neuroticism   - perceivedNeuroticism)   * observerAccuracy * 0.1f;
+    estimatedHappiness = observed->entityHapiness * observerAccuracy + estimatedHappiness * (1.0f - observerAccuracy);
+    estimatedAnger     = observed->entityGeneralAnger * observerAccuracy + estimatedAnger * (1.0f - observerAccuracy);
+    estimatedStress    = observed->entityStress * observerAccuracy + estimatedStress * (1.0f - observerAccuracy);
+}
+
+MentalModelOfOther* Entity::getModelOf(Entity* ent) {
+    for (MentalModelOfOther* md : list_MentalModelOfOther) {
+        if (md->entityPointed == ent) return md;
     }
-    return nullptr;
+    return nullptr; // ← was missing
 }
 

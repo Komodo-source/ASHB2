@@ -16,6 +16,7 @@ const int Disease::DISEASE_3 = 3;
 const char* Disease::DISEASE_3_NAME = "Malaria";
 const int Disease::DISEASE_4 = 4;
 const char* Disease::DISEASE_4_NAME = "Typhus";
+int Disease::region;
 
   int Disease::pickDisease(){
     return BetterRand::genNrInInterval(1,4);
@@ -47,7 +48,7 @@ const char* Disease::DISEASE_4_NAME = "Typhus";
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
 
-      if(hygiene - ranchoice - neighboorsSize - (3*nbSickClose) + (1.3 * ent->entityAntiBody) < 0){
+      if(hygiene - (ranchoice * region) - neighboorsSize - (3*nbSickClose) + (1.3 * ent->entityAntiBody) < 0){
         return diseasePicked;
       }else{
         return -1;

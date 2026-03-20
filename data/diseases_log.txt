@@ -1,0 +1,17 @@
+[2026-03-20 23:42:06] Entity 0 (Campbell) contracted Plague
+[2026-03-20 23:42:06] Entity 1 (Julien) contracted Fever
+[2026-03-20 23:42:06] Entity 2 (Yahir) contracted Malaria
+[2026-03-20 23:42:06] Entity 3 (Makaila) contracted Malaria
+[2026-03-20 23:42:06] Entity 4 (Alexander) contracted Typhus
+[2026-03-20 23:42:07] Entity 0 (Campbell) contracted Plague
+[2026-03-20 23:42:07] Entity 1 (Julien) contracted Fever
+[2026-03-20 23:42:07] Entity 2 (Yahir) contracted Typhus
+[2026-03-20 23:42:07] Entity 3 (Makaila) contracted Fever
+[2026-03-20 23:42:07] Entity 4 (Alexander) contracted Plague
+[2026-03-20 23:42:08] Entity 0 (Campbell) contracted Malaria
+[2026-03-20 23:42:08] Entity 2 (Yahir) contracted Malaria
+[2026-03-20 23:42:08] Entity 3 (Makaila) contracted Plague
+[2026-03-20 23:42:08] Entity 4 (Alexander) contracted Typhus
+[2026-03-20 23:42:09] Entity 1 (Julien) contracted Plague
+[2026-03-20 23:42:09] Entity 2 (Yahir) contracted Malaria
+[2026-03-20 23:42:09] Entity 4 (Alexander) contracted Plague

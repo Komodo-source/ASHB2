@@ -18,6 +18,8 @@ class Disease{
     static const char* DISEASE_3_NAME;
     static const int DISEASE_4;
     static const char* DISEASE_4_NAME;
+    
+    static int region; // la region indique un pourcentage plus fort ou faible d'obtenir une maladie
 
     static const char* getDiseaseName(int pick);
     static int pickDisease();

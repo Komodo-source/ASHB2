@@ -16,6 +16,7 @@
 #include "./header/Logging.h"
 #include "./header/NeedLevel.h"
 
+std::vector<Entity> FreeWillSystem::new_borns;
 extern Logger* globalLogger;
 
     // Calculate memory weight (more recent = more weight)
@@ -90,11 +91,10 @@ extern Logger* globalLogger;
                 hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 0.5f;
                 break;
             case SELF_ACTUALIZATION:
-                hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 0.3f; 
+                hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 0.3f;
                 break;
         }
-
-        return satisfaction + hierarchyMultiplier;
+        return satisfaction * hierarchyMultiplier;
     }
 
     void FreeWillSystem::applyEmotionalContagion(Entity* entity, const std::vector<Entity*>& neighbors) {
@@ -1612,6 +1612,10 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             for (const auto& aw : actionWeights) {
                 cumulative += aw.second;
                 if (selection <= cumulative) {
+                    // on update les norms social ici
+                    socialNormInstance.update(neighbors);
+                    entity->socialNorm = socialNormInstance.norms[aw.first->name];
+
                     std::cout << ">>> Chosen Action: " << aw.first->name << " <<<\n";
                     return aw.first;
                 }
@@ -1620,6 +1624,9 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             std::cout << ">>> Default fallback to: " << availableActions[0].name << " <<<\n";
             return &availableActions[0];
         }
+
+
+
 NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& action) {
 
     if (!ent) return SELF_ACTUALIZATION;
@@ -1640,6 +1647,9 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         needs["love"].satisfactionThreshold += 5.0f;
         needs["love"].satisfactionThreshold -= needs["love"].decayRate;
 
+        needs["social"].urgency -= 0.5f;
+        needs["love"].urgency -= 0.5f;
+
         return BELONGING;
     }
 
@@ -1651,6 +1661,9 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
 
         needs["meaning"].satisfactionThreshold += 5.0f;
         needs["creativity"].satisfactionThreshold += 5.0f;
+
+        needs["meaning"].urgency -= 0.5f;
+        needs["creativity"].urgency -= 0.5f;
 
         return SELF_ACTUALIZATION;
     }
@@ -1675,6 +1688,8 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         needs["achievement"].satisfactionThreshold += 5.0f;
         needs["recognition"].satisfactionThreshold += 5.0f;
 
+        needs["achievement"].urgency -= 5.0f;
+        needs["recognition"].urgency -= 5.0f;
         return ESTEEM;
     }
 
@@ -1686,6 +1701,8 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         needs["safety"].satisfactionThreshold += 5.0f;
         needs["safety"].satisfactionThreshold -= needs["safety"].decayRate;
 
+        needs["safety"].urgency -= 5.0f;
+
         return SAFETY;
     }
 
@@ -1695,11 +1712,15 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         needs["meaning"].satisfactionThreshold -= 2.0f;
         needs["creativity"].satisfactionThreshold -= 2.0f;
 
+        needs["creativity"].urgency += 2.0f;
+
         return SELF_ACTUALIZATION;
     }
 
-    return SELF_ACTUALIZATION;
+    return BELONGING;
 }
+
+
 
 
     //ici on assimile l'action pointé vers sur celui qui est pointé
@@ -1906,6 +1927,9 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
                 }
                 baby.addOrBoostGoal("self", 100.0f);
 
+                //ajoute au nouveaux né
+                new_borns.push_back(baby);
+
 
                 //heritage
                 float avg_openness_parent = (pointed->personality.openness + pointer->personality.openness) / 2;
@@ -1916,6 +1940,8 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
                 //on ajoute aux graphe
                 Heritage::add_child(pointed, &baby);
                 Heritage::add_child(pointer, &baby);
+
+
 
             }else{
                 std::cout << "INFO: couple doesnt exist, creating a new one\n";
@@ -1984,6 +2010,8 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
                     if(goal.type == "find_partner"){
                         pointer->ValueSystem.achievementDrive += 8.0f;
                         goal.progressToward += 8.0f;
+                        pointed->Esteem += 8.0f;
+                        pointer->Esteem += 8.0f;
                     }
                 }
                 pointer->ValueSystem.collectivism += 1.5f;
@@ -2399,7 +2427,28 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
 
         currentTime++;
         std::cout << ">>>> Action completed. Memory recorded. Time now: " << currentTime << "\n";
+
+
+
+
+        //update du model mental après action social
+        MentalModelOfOther* model = entity->getModelOf(entity);
+        if (model == nullptr) {
+            MentalModelOfOther* newModel = new MentalModelOfOther();
+            newModel->entityPointed = entity;
+            newModel->trustLevel = 50.0f;
+            newModel->predictability = 0.5f;
+            entity->list_MentalModelOfOther.push_back(newModel);
+            model = newModel;
+        }
+        float accuracy = 0.3f + entity->personality.agreeableness / 200.0f;
+        model->updateFromObservation(entity, accuracy);
     }
+
+     void FreeWillSystem::clear_new_borns(){
+         new_borns.clear();
+    }
+
 
     // Update needs over time
     void FreeWillSystem::updateNeeds(float deltaTime) {
@@ -2624,7 +2673,9 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
         } else if (nb->entityHapiness > 60.0f){
             PerceivedEvent ev; ev.eventType = "SocialOpportunity"; ev.intensity = (nb->entityHapiness - 60.0f) / 40.0f; ev.source = nb; perception.events.push_back(ev);
         }
+
     }
+
 
     // Appraisal
     Appraisal appraisal; auto clamp01 = [](float v){ if (v <= 0.0f) return 0.0f; if (v >= 1.0f) return 1.0f; return v; };
@@ -2664,6 +2715,9 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
         score *= normModifier;
         if (score > 0.0f){ candidates.emplace_back(aPtr); candidates.back().score = score; }
     }
+
+
+
     // Ensure at least 3 candidates
     if (candidates.size() < 3){
         for (const Action& act : availableActions){ ActionCandidate c(&act); c.score = calculateNeedSatisfaction(act, entity) + calculateContextualWeight(act, context); candidates.push_back(c); if (candidates.size() >= 3) break; }

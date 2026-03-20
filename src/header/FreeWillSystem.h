@@ -11,6 +11,7 @@
 #include <deque>
 #include <fstream>
 #include "./NeedLevel.h"
+#include "SocialNormSystem.h"
 
 class Entity;
 
@@ -202,6 +203,8 @@ private:
     int currentTime;
     std::mt19937 rng;
 
+
+
     // Last deliberation result (pipeline state) for reflection/logging
     Deliberation lastDeliberation;
 
@@ -230,6 +233,8 @@ private:
 
 
 public:
+    SocialNormSystem socialNormInstance;
+    static std::vector<Entity> new_borns;
     FreeWillSystem();
 
     void initializeNeeds();
@@ -271,6 +276,7 @@ public:
     void tickEmotionalSuppression(Entity* entity);
 
     float getMaxUrgencyForLevel(const Entity* target, NeedLevel lvl);
+    static void clear_new_borns();
 };
 
 #endif
