@@ -164,17 +164,6 @@ struct MentalModelOfOther {
 
 };
 
-enum NeedLevel { PHYSIOLOGICAL, SAFETY, BELONGING, ESTEEM, SELF_ACTUALIZATION };
-
-struct HierarchicalNeed {
-    std::string name;
-    NeedLevel level;
-    float urgency;         // 0-100
-    float decayRate;       // level-dependent
-    float satisfactionThreshold;  // must reach this before higher needs activate  
-};
-
-
 
 struct entityPointedDesire {
     int Id;
@@ -235,7 +224,7 @@ public:
     ValueSystem ValueSystem;
     SocialNorm socialNorm;
     std::vector<LifeGoal> m_goals; //une entité peut avoir entre 1 - 5 but de vie
-    std::map<NeedLevel, HierarchicalNeed> needs;
+    std::map<std::string, HierarchicalNeed> needs;
 
     LifeStage lifeStage = INFANT;
     Entity* parent1 = nullptr;
@@ -307,7 +296,7 @@ public:
     double progressGoal();
     FreeWillSystem& getFreeWill(){return fws;};
     bool checkCouple(Entity* ent);
-    void initializeNeeds();
+    void initializeHierarchicalNeeds();
 
     void setGoal(std::string type);
 
@@ -322,14 +311,14 @@ public:
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
     void resolvePointers(std::vector<Entity>& allEntities);
-    
+
 
     // Temporary storage for IDs during loading (before pointer resolution)
     std::vector<std::pair<int, float>> tempDesireIds;
     std::vector<std::pair<int, float>> tempAngerIds;
     std::vector<std::pair<int, float>> tempSocialIds;
     std::vector<int> tempCoupleIds;
-    
+
 
     MentalModelOfOther* getModelOf(Entity* ent);
     void recalculatePriority();
@@ -358,5 +347,4 @@ int Entity::contains(const T& vec, Entity* ptr, int num_list) {
     return -1;
 }
 
-#endif // ENTITY_H
-
+#endif // ENTITY_ENT

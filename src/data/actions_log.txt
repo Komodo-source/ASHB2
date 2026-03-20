@@ -1,0 +1,2 @@
+[2024-01-15 14:22:45] Entity 1 (Alice) performed: Socialize targeting Bob - targeted action
+[2024-01-15 14:23:10] Entity 2 (Bob) performed: Work - self-directed action

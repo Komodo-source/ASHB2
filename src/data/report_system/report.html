@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+        body{
+            background-color: #111;
+            font-family: "Roboto", sans-serif;
+        }
+        .list_entities{
+            border: 1px #fff solid;
+            color: #fff;
+            width: 15rem;
+            height: 80rem;
+
+        }
+        .entity{
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0.2rem 0.8rem;
+            border-radius: 6px;
+        }
+
+        .entity:hover{
+            background: rgba(255,255,255,0.1);
+        }
+
+
+        .values{
+            width: 600px;
+            background:#0f1116;
+            border-radius:10px;
+            padding:1rem;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color:#e6e6e6;
+        }
+
+        .report-title{
+            font-size:1.3rem;
+            margin-bottom:0.8rem;
+            border-bottom:1px solid #333;
+            padding-bottom:0.3rem;
+        }
+
+        /* zone scrollable */
+        .log-container{
+            max-height:400px;
+            overflow-y:auto;
+            padding-right:5px;
+        }
+
+        /* entrée */
+        .log-entry{
+            background:#171a22;
+            border-left:4px solid #4aa3ff;
+            padding:0.8rem;
+            margin-bottom:0.6rem;
+            border-radius:6px;
+            transition:0.2s;
+        }
+
+        .log-entry:hover{
+            background:#1e2230;
+        }
+
+        /* header */
+        .log-header{
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:0.5rem;
+        }
+
+        .action{
+            font-weight:600;
+        }
+
+        .tag{
+            font-size:0.8rem;
+            background:#2c3142;
+            padding:0.2rem 0.5rem;
+            border-radius:4px;
+        }
+
+        /* metrics */
+        .metrics{
+            display:grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap:6px;
+            font-size:0.9rem;
+        }
+
+        .metrics strong{
+            color:#8bbcff;
+        }
+
+
+        .top > h1{
+          text-align: center;
+          font-family: "Roboto", sans-serif;
+          color: #111;
+        }
+        .top > p{
+          text-align: center;
+          font-family: "Roboto", sans-serif;
+          color: rgb(76, 76, 76);
+        }
+        body{
+          background-color: #faf9f9;
+        }
+
+
+        .data{
+          display: flex;
+          margin-top: 5rem;
+        }
+
+        .log > h3, .ai_summary > h3{
+          text-align: center;
+          font-family: "Roboto", sans-serif;
+        }
+        .logs{
+          overflow: hidden;
+          height: 50rem;
+          overflow-y: scroll;
+        }
+        .logs > p {
+          font-family: "ui-monospace", sans-serif;
+        }
+
+        .log > h3{
+          border-bottom: #232222 solid 1px;
+        }
+
+        .log{
+          width: 40%;
+          margin-left: 2rem;
+          padding-bottom: 2rem;
+          border: 1px #232222 solid;
+        }
+
+        button{
+              width: 30%;
+            height: 2rem;
+            border: transparent;
+            background-color: green;
+            color: #fff;
+            cursor: pointer;
+
+        }
+        .ai_summary > h3{
+          border-bottom: #232222 solid 1px;
+        }
+
+        .ai_summary{
+          width: 60%;
+            margin-left: 2rem;
+          padding-bottom: 2rem;
+          border: 1px #232222 solid;
+        }
+
+         .ai_summary > p{
+          margin-left: 2rem;
+          font-family: "Roboto", sans-serif;
+          margin-right: 2rem;
+          line-height: 22px;
+        }
+    </style>
+    <div class="list_entities">
+        <div class="entity"><p>Sammy // 1</p></div>
+        <div class="entity"><p>Pierre // 2</p></div>
+        <div class="entity"><p>Alexander // 3</p></div>
+        <div class="entity"><p>Griffin // 4</p></div>
+        <div class="entity"><p>Rayan // 5</p></div>
+        <div class="entity"><p>Yahir // 6</p></div>
+    </div>
+
+
+
+    <div class="values">
+
+        <h2 class="report-title">Simulation Report</h2>
+
+        <div class="log-container">
+
+            <div class="log-entry">
+                <div class="log-header">
+                    <span class="action">Work on Project</span>
+                    <span class="tag">achievement</span>
+                </div>
+
+                <div class="metrics">
+                    <div><strong>Satisfaction</strong> 25.00</div>
+                    <div><strong>Outcome</strong> 0.125</div>
+                    <div><strong>Stress</strong> 17.00</div>
+                    <div><strong>Happiness</strong> 15.00</div>
+                    <div><strong>Boredom</strong> -20.00</div>
+                    <div><strong>Loneliness</strong> 10.00</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="charts">
+        <h3>Hapiness</h3>
+        <div id="chart-area"></div>
+
+        <script>
+        var optionsArea = {
+          series: [{
+          data: [1, 2, 3, 4, 5]
+        }],
+          chart: {
+          id: 'yt',
+          group: 'social',
+          type: 'area',
+          height: 160
+        },
+        colors: ['#00E396']
+        };
+
+        var chartArea = new ApexCharts(document.querySelector("#chart-area"), optionsArea);
+        chartArea.render();
+        </script>
+    </div>
+
+</body>
+</html>

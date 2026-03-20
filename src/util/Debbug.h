@@ -15,7 +15,8 @@ white        37         47
 */
 
 
-  void debbug_log(auto val, int col=37){
+  template<typename T>
+  void debbug_log(T val, int col=37){
     std::cout << "\033[1;31m red text\033[0m\n";
     std::cout << "\033[1;" << col << "m" <<  val << "\033[0m\n";
   }

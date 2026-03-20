@@ -10,6 +10,7 @@
 #include <memory>
 #include <deque>
 #include <fstream>
+#include "./NeedLevel.h"
 
 class Entity;
 
@@ -268,6 +269,8 @@ public:
     void tickValueGoalAlignment(Entity* entity);
     float applyValueSatisfaction(Entity* entity,  const Action& action);
     void tickEmotionalSuppression(Entity* entity);
+
+    float getMaxUrgencyForLevel(const Entity* target, NeedLevel lvl);
 };
 
 #endif

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHB2 — Anthropological Simulation Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Lora:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f2ee; /* Soft linen/paper */
+      --panel: #ffffff;
+      --panel-strong: #faf9f7;
+      --text: #2b2b28; /* Charcoal */
+      --muted: #6e6d69;
+      --accent: #c45543; /* Terracotta/Clay */
+      --accent2: #627c65; /* Sage/Nature */
+      --border: #dfdbd3;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+      --radius: 4px; /* Sharper, document-like edges */
+      --font-serif: 'Lora', serif;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      /* Subtle graph paper texture for a "research" feel */
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center top;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 3rem 2rem 2rem;
+      max-width: 1460px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 2rem;
+      border-bottom: 2px solid var(--text);
+    }
+
+    .brand {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .brand span {
+      display: block;
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      margin-top: 0.5rem;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      align-items: center;
+    }
+
+    .meta div {
+      display: flex;
+      flex-direction: column;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .meta div strong {
+      font-family: var(--font-sans);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      border-radius: var(--radius);
+      padding: 0.6rem 1.25rem;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    main {
+      padding: 2rem 2rem 4rem;
+      max-width: 1460px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1100px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      position: relative;
+    }
+
+    /* Top accent line to mimic a folder/file */
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+      border-top-left-radius: var(--radius);
+      border-top-right-radius: var(--radius);
+      opacity: 0.8;
+    }
+
+    .panel:nth-child(even)::before {
+      background: var(--accent2);
+    }
+
+    .panel h2 {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      margin: 0 0 1.25rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .report-body {
+      color: var(--text);
+      font-size: 1rem;
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .logs {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .log-block {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .log-block .log-header {
+      padding: 0.75rem 1.25rem;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      background: var(--panel);
+    }
+
+    .log-block pre {
+      padding: 1.25rem;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      overflow: auto;
+      height: 100%;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--muted);
+    }
+
+    /* Emphasize entities/actions in logs slightly */
+    .log-block pre strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .chart-container {
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+    }
+
+    .chart-container h3 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .network {
+      height: 480px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--panel-strong);
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">ASHB2 <span>Observation & Behavior Report</span></div>
+  <div class="meta">
+    <div><strong>Session Start</strong>2024-01-15 14:16:45</div>
+    <div><strong>Session End</strong>2024-01-15 14:35:20</div>
+    <div><strong>Duration</strong>18m 35s</div>
+    <div><strong>Recorded Ticks</strong>5</div>
+  </div>
+  <div class="actions">
+    <button id="download-report" class="btn">Print Dossier (HTML)</button>
+    <button id="download-data" class="btn">Export Raw Data</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Observer Summary</h2>
+    <div class="report-body"><p>Qualitative analysis currently pending. Awaiting primary researcher input.</p></div>
+  </section>
+
+  <section class="panel" style="grid-row: span 3;">
+    <h2>Longitudinal Metrics</h2>
+    <div class="chart-row" id="charts-slot"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Behavioral Frequency</h2>
+    <canvas id="actionChart" style="width:100%;height:300px"></canvas>
+  </section>
+
+  <section class="panel">
+    <h2>Social Sociogram</h2>
+    <div id="relationship-network" class="network"></div>
+  </section>
+
+  <section class="panel" style="grid-column: 1 / -1;">
+    <h2>Raw Event Transcripts</h2>
+    <div class="logs">
+      <div class="log-block"><div class="log-header">actions_log.txt</div><pre>[2024-01-15 14:22:45] Entity 1 (Alice) performed: Socialize targeting Bob - targeted action
+[2024-01-15 14:23:10] Entity 2 (Bob) performed: Work - self-directed action</pre></div>
+      <div class="log-block"><div class="log-header">diseases_log.txt</div><pre>[2024-01-15 14:20:15] Entity 3 (Diana) contracted Plague
+[2024-01-15 14:25:30] Entity 3 (Diana) cured from Plague</pre></div>
+      <div class="log-block"><div class="log-header">deaths_log.txt</div><pre>[2024-01-15 14:30:25] Entity 5 (Alice, age 45) died: health depletion
+[2024-01-15 14:35:10] Entity 12 (Bob, age 32) died: murder by Charlie</pre></div>
+      <div class="log-block"><div class="log-header">movements_log.txt</div><pre>[2024-01-15 14:21:30] Entity 1 (Alice) moved from (100,100) to (105,98) - environmental factors
+[2024-01-15 14:22:15] Entity 2 (Bob) moved from (200,150) to (195,152) - seeking safety</pre></div>
+      <div class="log-block"><div class="log-header">events_log.txt</div><pre>[2024-01-15 14:16:45] simulation_start: Simulation initialized with 10 entities
+[2024-01-15 14:35:20] breeding: Reproduction between Alice and Bob</pre></div>
+      <div class="log-block"><div class="log-header">relationships_log.txt</div><pre>[2024-01-15 14:18:20] Relationship: Alice (1) and Bob (2) - couple formed
+[2024-01-15 14:19:45] Relationship: Charlie (3) and Diana (4) - social bond strengthened</pre></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // Original Data Setup (Unchanged)
+  const reportData = {
+    "start": "2024-01-15 14:16:45",
+    "end": "2024-01-15 14:35:20",
+    "duration": "18m 35s",
+    "ticks": "5",
+    "actionCounts": {"Work on Project": 2, "Exercise": 2, "Desire": 1, "GoodConnection": 3, "couple": 4, "SeekTherapy": 3, "LearnSkill": 1, "Breeding": 1, "QuitGiveUp": 1, "Sleep": 4, "CreativeActivity": 2, "Date": 3, "Prayer": 2, "Discrimination": 1, "Gossip": 1, "Betray": 1, "Socialize": 3, "EatMeal": 1, "Flirt": 1, "Read": 2, "Rest": 1}
+  };
+  const ticks = [0, 1, 2, 3, 4];
+  const attributesData = {
+    "Happiness": [[64.5553, 93.2128, 66.7234, 50.1127, 50.1127], [75.244, 81.0488, 66.939, 60.2753, 95.4461], [89.7899, 81.1326, 81.5665, 76.6855, 100.0]],
+    "Loneliness": [[34.4719, 0.0, 8.35029, 25.0, 25.0], [59.4719, 25.0, 33.3503, 56.9629, 24.3035], [71.8082, 50.0, 58.3503, 65.6479, 52.4552]],
+    "Stress": [[18.9681, 19.3275, 0.0, 21.9614, 0.0], [9.11003, 4.25504, 0.0, 9.56841, 20.3463], [3.82993, 0.0, 7.94131, 1.97207, 21.3947]]
+  };
+  const actionCounts = reportData.actionCounts;
+  const relationshipNodes = [{"id": 1, "label": "Alice"}, {"id": 2, "label": "Bob"}, {"id": 3, "label": "Charlie"}, {"id": 4, "label": "Diana"}];
+  const relationshipEdges = [{"from": 1, "to": 2, "label": "couple formed"}, {"from": 3, "to": 4, "label": "bond strengthened"}];
+
+  // Buttons Logic
+  function downloadBlob(blob, filename) {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => { URL.revokeObjectURL(link.href); link.remove(); }, 200);
+  }
+
+  document.getElementById('download-report').addEventListener('click', () => {
+    downloadBlob(new Blob([document.documentElement.outerHTML], { type: 'text/html' }), 'ashb2-report.html');
+  });
+
+  document.getElementById('download-data').addEventListener('click', () => {
+    downloadBlob(new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' }), 'ashb2-data.json');
+  });
+
+  // Updated Warm/Organic Palette for Charts
+  const chartColors = ['#c45543', '#627c65', '#dca954', '#6c849c', '#9c6b78', '#a8a28e'];
+
+  // Set global Chart.js defaults to match the theme
+  Chart.defaults.color = '#6e6d69';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+
+  // Build per-attribute charts
+  const chartsSlot = document.getElementById('charts-slot');
+  let colorIdx = 0;
+
+  for (const [attrName, agentsArray] of Object.entries(attributesData)) {
+    const container = document.createElement('div');
+    container.className = 'chart-container';
+    container.innerHTML = `<h3>${attrName} Variation</h3><canvas id="chart-${attrName}"></canvas>`;
+    chartsSlot.appendChild(container);
+
+    const datasets = agentsArray.map((agentData, index) => {
+      const color = chartColors[(colorIdx + index) % chartColors.length];
+      return {
+        label: `Subject ${index + 1}`,
+        data: agentData,
+        borderColor: color,
+        backgroundColor: color + '22', // add transparency
+        borderWidth: 2,
+        pointBackgroundColor: color,
+        pointRadius: 2,
+        tension: 0.3,
+      };
+    });
+
+    new Chart(document.getElementById(`chart-${attrName}`), {
+      type: 'line',
+      data: { labels: ticks, datasets },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+        scales: {
+          x: { grid: { color: '#dfdbd3' } },
+          y: { grid: { color: '#dfdbd3' } }
+        }
+      }
+    });
+    colorIdx++;
+  }
+
+  // Action frequency chart
+  (function renderActionChart() {
+    const ctx = document.getElementById('actionChart').getContext('2d');
+    const labels = Object.keys(actionCounts).sort((a, b) => actionCounts[b] - actionCounts[a]);
+    const data = labels.map(l => actionCounts[l]);
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Frequency',
+          data,
+          backgroundColor: labels.map((_, idx) => chartColors[idx % chartColors.length]),
+          borderRadius: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: '#dfdbd3' } }
+        }
+      }
+    });
+  })();
+
+  // Relationship network
+  (function renderNetwork() {
+    const container = document.getElementById('relationship-network');
+    const data = {
+      nodes: new vis.DataSet(relationshipNodes),
+      edges: new vis.DataSet(relationshipEdges)
+    };
+    const options = {
+      physics: { stabilization: true, barnesHut: { gravitationalConstant: -3000 } },
+      edges: {
+        smooth: { enabled: true, type: 'continuous' },
+        font: { align: 'top', color: '#6e6d69', strokeWidth: 0 },
+        color: { color: '#dfdbd3', highlight: '#c45543' }
+      },
+      nodes: {
+        shape: 'dot',
+        size: 16,
+        font: { color: '#2b2b28', face: 'Inter' },
+        color: {
+          border: '#c45543',
+          background: '#ffffff',
+          highlight: { border: '#2b2b28', background: '#c45543' }
+        },
+        borderWidth: 2
+      }
+    };
+    new vis.Network(container, data, options);
+  })();
+</script>
+</body>
+</html>

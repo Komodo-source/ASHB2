@@ -18,6 +18,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Entity.cpp" "CMakeFiles/app.dir/src/Entity.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Entity.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Graph.cpp" "CMakeFiles/app.dir/src/Graph.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Graph.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Heritage.cpp" "CMakeFiles/app.dir/src/Heritage.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Heritage.cpp.obj.d"
+  "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Logging.cpp" "CMakeFiles/app.dir/src/Logging.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Logging.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/SaveLoad.cpp" "CMakeFiles/app.dir/src/SaveLoad.cpp.obj" "gcc" "CMakeFiles/app.dir/src/SaveLoad.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/SpatialMesh.cpp" "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj" "gcc" "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/UI.cpp" "CMakeFiles/app.dir/src/UI.cpp.obj" "gcc" "CMakeFiles/app.dir/src/UI.cpp.obj.d"

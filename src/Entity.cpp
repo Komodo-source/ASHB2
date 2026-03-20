@@ -13,6 +13,7 @@
 #include "./header/FreeWillSystem.h"
 #include "header/BetterRand.h"
 #include "./header/SocialNormSystem.h"
+#include "./header/NeedLevel.h"
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -411,7 +412,7 @@ void Entity::loadFrom(std::ifstream& file) {
         goal.type = gdata.substr(0, g1);
         goal.priority = std::stof(gdata.substr(g1 + 1, g2 - g1 - 1));
         goal.progressToward = std::stoi(gdata.substr(g2 + 1, g3 - g2 - 1));
-        
+
         if (g3 != std::string::npos && g4 != std::string::npos) {
             goal.frustrationLevel = std::stof(gdata.substr(g3 + 1, g4 - g3 - 1));
             goal.ticksSinceProgress = std::stoi(gdata.substr(g4 + 1));
@@ -521,29 +522,29 @@ void Entity::resolvePointers(std::vector<Entity>& allEntities) {
 //    this->m_goal.type = type;
 //    this->m_goal.progressToward = 0.0;
 //}
-// 
+//
 
-void FreeWillSystem::initializeNeeds() {
+void Entity::initializeHierarchicalNeeds() {
     // PHYSIOLOGICAL — fast decay, always fighting to stay satisfied
-    needs["hunger"]  = Need("hunger",  PHYSIOLOGICAL, 0.25f);
-    needs["sleep"]   = Need("sleep",   PHYSIOLOGICAL, 0.18f);
-    needs["health"]  = Need("health",  PHYSIOLOGICAL, 0.08f);
-    needs["hygiene"] = Need("hygiene", PHYSIOLOGICAL, 0.12f);
+    needs["hunger"]  = HierarchicalNeed("hunger",  PHYSIOLOGICAL, 0.25f);
+    needs["sleep"]   = HierarchicalNeed("sleep",   PHYSIOLOGICAL, 0.18f);
+    needs["health"]  = HierarchicalNeed("health",  PHYSIOLOGICAL, 0.08f);
+    needs["hygiene"] = HierarchicalNeed("hygiene", PHYSIOLOGICAL, 0.12f);
 
     // SAFETY — medium decay
-    needs["safety"]  = Need("safety",  SAFETY, 0.06f);
+    needs["safety"]  = HierarchicalNeed("safety",  SAFETY, 0.06f);
 
     // BELONGING — medium decay
-    needs["social"]  = Need("social",  BELONGING, 0.15f);
-    needs["love"]    = Need("love",    BELONGING, 0.10f);
+    needs["social"]  = HierarchicalNeed("social",  BELONGING, 0.15f);
+    needs["love"]    = HierarchicalNeed("love",    BELONGING, 0.10f);
 
     // ESTEEM — slow decay
-    needs["achievement"] = Need("achievement", ESTEEM, 0.05f);
-    needs["recognition"] = Need("recognition", ESTEEM, 0.04f);
+    needs["achievement"] = HierarchicalNeed("achievement", ESTEEM, 0.05f);
+    needs["recognition"] = HierarchicalNeed("recognition", ESTEEM, 0.04f);
 
     // SELF-ACTUALIZATION — slowest decay
-    needs["meaning"]    = Need("meaning",    SELF_ACTUALIZATION, 0.03f);
-    needs["creativity"] = Need("creativity", SELF_ACTUALIZATION, 0.02f);
+    needs["meaning"]    = HierarchicalNeed("meaning",    SELF_ACTUALIZATION, 0.03f);
+    needs["creativity"] = HierarchicalNeed("creativity", SELF_ACTUALIZATION, 0.02f);
 }
 
 
@@ -558,7 +559,7 @@ LifeGoal Entity::SearchGoal(const std::string& goal_name) {
     return new_life_goal;
 }
 
-void Entity::recalculatePriority() {    
+void Entity::recalculatePriority() {
     for (LifeGoal& goal : m_goals) {
         if (goal.type == "find_partner" && !list_entityPointedCouple.empty()) {
             goal.priority *= 0.3f;
@@ -595,7 +596,7 @@ void Entity::addOrBoostGoal(const std::string& goal_name, float value){
 void Entity::onMajorEventAddOrBoostGoal(const std::string& eventType) {
     if (eventType == "loss_death") {
         addOrBoostGoal("find_meaning", 2.3f);
-    } 
+    }
     else if (eventType == "couple") {
         addOrBoostGoal("find_partner", 1.1f);
         addOrBoostGoal("build_family", 0.6f);
@@ -646,5 +647,6 @@ MentalModelOfOther* Entity::getModelOf(Entity* ent){
             return md;
         }
     }
+    return nullptr;
 }
 

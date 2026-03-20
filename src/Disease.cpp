@@ -4,6 +4,9 @@
 #include "./header/BetterRand.h"
 #include "./header/Disease.h"
 #include "iostream"
+#include "./header/Logging.h"
+
+extern Logger* globalLogger;
 
 const int Disease::DISEASE_1 = 1;
 const char* Disease::DISEASE_1_NAME = "Plague";
@@ -59,6 +62,7 @@ const char* Disease::DISEASE_4_NAME = "Typhus";
     ent->entityAntiBody += BetterRand::genNrInInterval(4, 15);
     if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 20) > 100){
       std::cout << ent->getName() + " was cured from " + Disease::getDiseaseName(ent->entityDiseaseType) << std::endl;
+      if(globalLogger) globalLogger->logDisease(ent->getId(), ent->getName(), Disease::getDiseaseName(ent->entityDiseaseType), true);
       ent->entityDiseaseType = -1;
     }
   }

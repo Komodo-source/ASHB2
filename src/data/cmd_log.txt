@@ -1,0 +1,92 @@
+hygiene: 94
+  loneliness: 61.547
+  mentalHealth: 100
+  stress: 21.5419
+Outcome Success: 0.25
+Updating Personnality
+>>>> Action completed. Memory recorded. Time now: 32
+== Movement Applied ==
+ Pierre new pos->(252;68)
+
+=== Choosing Action for Entity 4 ===
+Number of neighbors: 0
+Context: Night=1 Weekend=0 AtWork=0 InPublic=0 PeopleNearby=0
+Personality: E=50.1121 A=56.7649 C=45.0834 N=76.2954 O=19.4048
+
+Action: Socialize
+  RequirementFitness:   1.09455
+  NeedSatisfaction:     0.12
+  MemoryBias:           0.261023
+  VarietyBonus:         1
+  SocialInfluence:      0.5
+  ContextualWeight:     0
+  PersonalityModifier:  1.00112
+  GriefModifier:        1
+  EnvModifier:          0.99224
+  RarityMultiplier:     1
+  Combined Weight (pre-sort): 0 (RandomFactor: 1.0491)
+
+Action: Desire
+  RequirementFitness:   1.5
+  NeedSatisfaction:     0.18
+  MemoryBias:           0.5
+  VarietyBonus:         1
+  SocialInfluence:      0.5
+  ContextualWeight:     1
+  PersonalityModifier:  1.00112
+  GriefModifier:        1
+  EnvModifier:          0.826558
+  RarityMultiplier:     1
+  Combined Weight (pre-sort): 0.465941 (RandomFactor: 1.03318)
+
+Action: GoodConnection
+  RequirementFitness:   1.42987
+  NeedSatisfaction:     0.21
+  MemoryBias:           0.134874
+  VarietyBonus:         1
+  SocialInfluence:      0.5
+  ContextualWeight:     1
+  PersonalityModifier:  1.06885
+  GriefModifier:        1
+  EnvModifier:          0.99224
+  RarityMultiplier:     1
+  Combined Weight (pre-sort): 0.547211 (RandomFactor: 1.0279)
+
+Action: AngerConnection
+  RequirementFitness:   0.00350567
+  NeedSatisfaction:     0.09
+  MemoryBias:           0.5
+  VarietyBonus:         1
+  SocialInfluence:      0.5
+  ContextualWeight:     1
+  PersonalityModifier:  0.933397
+  GriefModifier:        1
+  EnvModifier:          0.826558
+  RarityMultiplier:     1
+  Combined Weight (pre-sort): 0.169734 (RandomFactor: 0.985674)
+
+Action: Murder
+  RequirementFitness:   0.501696
+  NeedSatisfaction:     5
+  MemoryBias:           0.5
+  VarietyBonus:         1
+  SocialInfluence:      0.5
+  ContextualWeight:     1
+  PersonalityModifier:  0.932351
+  GriefModifier:        1
+  EnvModifier:          1
+  RarityMultiplier:     0.05
+  Combined Weight (pre-sort): 0.0715801 (RandomFactor: 0.990413)
+
+Action: Discrimination
+  RequirementFitness:   0.477199
+  NeedSatisfaction:     0.03
+  MemoryBias:           0.5
+  VarietyBonus:         1
+  SocialInfluence:      0.5
+  ContextualWeight:     1
+  PersonalityModifier:  0.933397
+  GriefModifier:        1
+  EnvModifier:          0.826558
+  RarityMultiplier:     0.25
+  Combined Weight (pre-sort): 0.0597686 (RandomFactor: 1.02291)

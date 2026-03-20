@@ -368,6 +368,30 @@ src/Heritage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Heritage.cpp.s
 .PHONY : src/Heritage.cpp.s
 
+src/Logging.obj: src/Logging.cpp.obj
+.PHONY : src/Logging.obj
+
+# target to build an object file
+src/Logging.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Logging.cpp.obj
+.PHONY : src/Logging.cpp.obj
+
+src/Logging.i: src/Logging.cpp.i
+.PHONY : src/Logging.i
+
+# target to preprocess a source file
+src/Logging.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Logging.cpp.i
+.PHONY : src/Logging.cpp.i
+
+src/Logging.s: src/Logging.cpp.s
+.PHONY : src/Logging.s
+
+# target to generate assembly for a file
+src/Logging.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Logging.cpp.s
+.PHONY : src/Logging.cpp.s
+
 src/SaveLoad.obj: src/SaveLoad.cpp.obj
 .PHONY : src/SaveLoad.obj
 
@@ -599,6 +623,9 @@ help:
 	@echo ... src/Heritage.obj
 	@echo ... src/Heritage.i
 	@echo ... src/Heritage.s
+	@echo ... src/Logging.obj
+	@echo ... src/Logging.i
+	@echo ... src/Logging.s
 	@echo ... src/SaveLoad.obj
 	@echo ... src/SaveLoad.i
 	@echo ... src/SaveLoad.s

@@ -1,0 +1,2 @@
+[2024-01-15 14:21:30] Entity 1 (Alice) moved from (100,100) to (105,98) - environmental factors
+[2024-01-15 14:22:15] Entity 2 (Bob) moved from (200,150) to (195,152) - seeking safety

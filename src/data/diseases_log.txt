@@ -1,0 +1,2 @@
+[2024-01-15 14:20:15] Entity 3 (Diana) contracted Plague
+[2024-01-15 14:25:30] Entity 3 (Diana) cured from Plague

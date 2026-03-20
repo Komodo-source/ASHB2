@@ -24,6 +24,7 @@
 #include "./util/clear.h"
 #include "./header/SaveLoad.h"
 #include "./header/heritage.h"
+#include "./header/Logging.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -54,6 +55,7 @@ void applyDisease(Entity* ent, int neighSize, int sickClose){
         if(disease != -1){
             std::cout << "Entity contaminated: " << ent->getId() << " " << ent->getName()
                       << " => " << d.getDiseaseName(disease) << std::endl;
+            globalLogger->logDisease(ent->getId(), ent->getName(), d.getDiseaseName(disease));
             ent->entityDiseaseType = disease;
         }
     }
@@ -269,7 +271,12 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             entity->tickGrief(1.0f);
 
             //apply movement (now env-aware)
+            float oldX = entity->posX;
+            float oldY = entity->posY;
             applyMovement(entity, group, env);
+            if(oldX != entity->posX || oldY != entity->posY){
+                globalLogger->logMovement(entity->entityId, entity->name, oldX, oldY, entity->posX, entity->posY, "environmental factors");
+            }
 
             if(entity->entityHealth <= 0.0f){
                 handleDeath(entity, group);
@@ -295,9 +302,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosen = sys.chooseAction(entity, neighbors, context);
-            
+
             //Update Hierachical need
-            sys.updateHieratchicalNeed(entity, chosen);
+            sys.updateHieratchicalNeed(entity, *chosen);
             sys.updateNeeds(currentDay);
 
             // we ondulate the loneliness wether it has neighboor or not
@@ -335,6 +342,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 sys.executeAction(entity, chosen, context, target);
                 //saving data
                 entity->saveEntityStats(chosen);
+                globalLogger->logAction(entity->entityId, entity->name, chosen->name, target->name, "targeted action");
 
                 // Update relationship based on action
                 sys.pointedAssimilation(entity, target, chosen);
@@ -342,6 +350,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 // Detect murder: if target just died, trigger grief in all connected entities
                 if(targetWasAlive && target->entityHealth <= 0.0f){
                     std::cout << "DEATH EVENT: " << target->name << " was killed. Propagating grief.\n";
+                    globalLogger->logDeath(target->entityId, target->name, target->entityAge, "murder by " + entity->name);
                     for(Entity* other : group){
                         if(other == target || other->entityHealth <= 0.0f) continue;
                         bool hadBond = false;
@@ -362,6 +371,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 sys.executeAction(entity, chosen, context);
                 //saving data
                 entity->saveEntityStats(chosen);
+                globalLogger->logAction(entity->entityId, entity->name, chosen->name, "", "self-directed action");
             }
 
             sys.applyEmotionalContagion(entity, group);
@@ -392,21 +402,29 @@ void sync_clock_stats(Entity* ent, int neighboors){
 }
 
 int main() {
+
+
+    // Initialize logger (this redirects std::cout to cmd_log.txt)
+    Logger logger;
+    globalLogger = &logger;
+
     std::cout << "clearing files... \n" ;
     rm_data_file();
     rm_data_act_file();
+    rm_log_files();  // Clear all log files
+    globalLogger->clearAllLogs();  // Ensure logs are cleared
 
     // Clear tick history file
-    std::ofstream tick_history("./src/data/tick_history.jsonl", std::ios::trunc);
+    std::ofstream tick_history("./src/data/tick_history.json", std::ios::trunc);
     tick_history.close();
 
     std::cout << "done \n" ;
     int entity_num;
-    std::cout << "Welcome to Arificial Simulation of Human Behavior \n";
+    std::cout << "Welcome to Artificial Simulation of Human Behavior \n";
     std::cout << "complete simulation can be found at /data/complete_logs.txt\n";
     std::cout << "you can save and load simulation at any moment\n";
     std::cout << "@author: Komodo \n";
-    std::cout << "enter enity number (int): ";
+    std::cout << "enter entity number (int): ";
     std::cin >> entity_num;
 
 
@@ -427,9 +445,6 @@ int main() {
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
-
-
-
 
     UI instanceUI;
 
@@ -484,6 +499,7 @@ int main() {
         for(int i = entities.size() - 1; i >= 0; i--){
             if(entities[i].entityHealth <= 0.0f){
                 std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
+                globalLogger->logDeath(entities[i].getId(), entities[i].getName(), entities[i].entityAge, "health depletion");
 
                 //Birthday,
                 // une année = 100 jours

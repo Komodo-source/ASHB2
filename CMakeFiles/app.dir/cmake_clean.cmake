@@ -19,6 +19,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/Graph.cpp.obj.d"
   "CMakeFiles/app.dir/src/Heritage.cpp.obj"
   "CMakeFiles/app.dir/src/Heritage.cpp.obj.d"
+  "CMakeFiles/app.dir/src/Logging.cpp.obj"
+  "CMakeFiles/app.dir/src/Logging.cpp.obj.d"
   "CMakeFiles/app.dir/src/SaveLoad.cpp.obj"
   "CMakeFiles/app.dir/src/SaveLoad.cpp.obj.d"
   "CMakeFiles/app.dir/src/SpatialMesh.cpp.obj"

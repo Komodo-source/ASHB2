@@ -13,6 +13,10 @@
 #include "./header/BetterRand.h"
 #include "./header/heritage.h"
 #include "./header/SocialNormSystem.h"
+#include "./header/Logging.h"
+#include "./header/NeedLevel.h"
+
+extern Logger* globalLogger;
 
     // Calculate memory weight (more recent = more weight)
     float FreeWillSystem::getMemoryWeight(int memoryAge) {
@@ -44,40 +48,54 @@
         }
         return totalWeight > 0 ? totalFitness / totalWeight : 1.0f;
     }
+    float FreeWillSystem::getMaxUrgencyForLevel(const Entity* target, NeedLevel lvl) {
+        float maxUrgency = 0.0f;
+        for (const auto& [name, need] : target->needs) {
+            if (need.level == lvl) {
+                maxUrgency = std::max(maxUrgency, need.urgency);
+            }
+        }
+        return maxUrgency;
+    }
 
     // Calculate how much this action addresses current needs
     float FreeWillSystem::calculateNeedSatisfaction(const Action& action, Entity* targetNeed) {
         float satisfaction = 0.0f;
         float hierarchyMultiplier = 0.0f;
 
-        auto needIt = needs.find(action.needCategory);
-        if (needIt != needs.end()) {
+        // Base satisfaction from action
+        auto needIt = targetNeed->needs.find(action.needCategory);
+        if (needIt != targetNeed->needs.end()) {
             satisfaction += needIt->second.urgency * 0.01f * action.baseSatisfaction;
         }
 
-        NeedLevel choosen_need_level  = updateHieratchicalNeed(targetNeed, action);
+        // Update the need and get the chosen level
+        NeedLevel choosen_need_level = updateHieratchicalNeed(targetNeed, action);
 
+        // Get maximum urgency for that level
+        float urgency = getMaxUrgencyForLevel(targetNeed, choosen_need_level);
+
+        // Calculate hierarchy multiplier based on Maslow priority
         switch (choosen_need_level) {
             case PHYSIOLOGICAL:
-                // Physiological needs get massive boost when urgent
-                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 3.0f; // up to 4x
+                hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 3.0f;
                 break;
             case SAFETY:
-                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 2.0f; // up to 3x
+                hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 2.0f;
                 break;
             case BELONGING:
-                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 1.0f; // up to 2x
+                hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 1.0f;
                 break;
             case ESTEEM:
-                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 0.5f; // up to 1.5x
+                hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 0.5f;
                 break;
             case SELF_ACTUALIZATION:
-                hierarchyMultiplier = 1.0f + (targetNeed->needs[choosen_need_level].urgency / 100.0f) * 0.3f; // up to 1.3x
+                hierarchyMultiplier = 1.0f + (urgency / 100.0f) * 0.3f; 
                 break;
+        }
 
         return satisfaction + hierarchyMultiplier;
     }
-}
 
     void FreeWillSystem::applyEmotionalContagion(Entity* entity, const std::vector<Entity*>& neighbors) {
         if (neighbors.empty()) return;
@@ -1602,55 +1620,87 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             std::cout << ">>> Default fallback to: " << availableActions[0].name << " <<<\n";
             return &availableActions[0];
         }
+NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& action) {
 
-    NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& action){
+    if (!ent) return SELF_ACTUALIZATION;
 
-        // Physiological: hunger, sleep, health (fast decay, highest priority)
-        //Safety: physical security, financial stability, predictability (medium decay)
-        //Belonging: social connection, love, friendship, family (medium decay)
-        //Esteem: achievement, recognition, self-respect (slow decay)
-        //Self-Actualization: creativity, meaning, legacy (slowest decay)
-        if(action.name == "Desire" ||
-            action.name == "GoodConnection" ||
-            action.name == "Gossip" ||
-            action.name == "Betray" ||
-            action.name == "Flirt" ||
-            action.name == "couple"){
-            ent->needs[BELONGING].satisfactionThreshold += 5.0f;
-            ent->needs[BELONGING].satisfactionThreshold -= ent->needs[BELONGING].decayRate;
-            return BELONGING;
-        }else if(action.name == "Prayer" ||
-            action.name == "Read" ||
-            action.name == "WatchEntertainment" ||
-            action.name == "Gaming" ||
-            action.name == "WatchEntertainment"){
-            ent->needs[SELF_ACTUALIZATION].satisfactionThreshold += 5.0f;
-            return SELF_ACTUALIZATION;
-        }else if(action.name == "EatMeal" || action.name == "Sleep"
-            || action.name == "Take Shower" ||
-            action.name == "Rest"){
-            ent->needs[PHYSIOLOGICAL].satisfactionThreshold += 5.0f;
-            ent->needs[PHYSIOLOGICAL].satisfactionThreshold -= ent->needs[PHYSIOLOGICAL].decayRate;
-            return PHYSIOLOGICAL;
+    auto& needs = ent->needs;
 
-        }else if(action.name == "LearnSkill" || action.name == "Work on Project" ){
-            ent->needs[ESTEEM].satisfactionThreshold += 5.0f;
-            ent->needs[ESTEEM].satisfactionThreshold -= ent->needs[ESTEEM].decayRate;
-            return ESTEEM;
+    // BELONGING
+    if (action.name == "Desire" ||
+        action.name == "GoodConnection" ||
+        action.name == "Gossip" ||
+        action.name == "Betray" ||
+        action.name == "Flirt" ||
+        action.name == "couple") {
 
-        }else if(action.name == "Discrimination" || action.name == "Murder"
-            || action.name == "SetBoundaries"){
-            ent->needs[SAFETY].satisfactionThreshold += 5.0f;
-            ent->needs[SAFETY].satisfactionThreshold -= ent->needs[SAFETY].decayRate;
-            return SAFETY;
+        needs["social"].satisfactionThreshold += 5.0f;
+        needs["social"].satisfactionThreshold -= needs["social"].decayRate;
 
-        }else if(action.name == "QuitGiveUP"){
-            ent->needs[SELF_ACTUALIZATION].satisfactionThreshold -= 2.0f;
-            ent->needs[SELF_ACTUALIZATION].satisfactionThreshold -= ent->needs[SELF_ACTUALIZATION].decayRate;
-            return SELF_ACTUALIZATION;
-        }
-        //decay
+        needs["love"].satisfactionThreshold += 5.0f;
+        needs["love"].satisfactionThreshold -= needs["love"].decayRate;
+
+        return BELONGING;
     }
+
+    // SELF ACTUALIZATION
+    else if (action.name == "Prayer" ||
+             action.name == "Read" ||
+             action.name == "WatchEntertainment" ||
+             action.name == "Gaming") {
+
+        needs["meaning"].satisfactionThreshold += 5.0f;
+        needs["creativity"].satisfactionThreshold += 5.0f;
+
+        return SELF_ACTUALIZATION;
+    }
+
+    // PHYSIOLOGICAL
+    else if (action.name == "EatMeal" ||
+             action.name == "Sleep" ||
+             action.name == "Take Shower" ||
+             action.name == "Rest") {
+
+        needs["hunger"].satisfactionThreshold += 5.0f;
+        needs["sleep"].satisfactionThreshold += 5.0f;
+        needs["hygiene"].satisfactionThreshold += 5.0f;
+
+        return PHYSIOLOGICAL;
+    }
+
+    // ESTEEM
+    else if (action.name == "LearnSkill" ||
+             action.name == "Work on Project") {
+
+        needs["achievement"].satisfactionThreshold += 5.0f;
+        needs["recognition"].satisfactionThreshold += 5.0f;
+
+        return ESTEEM;
+    }
+
+    // SAFETY
+    else if (action.name == "Discrimination" ||
+             action.name == "Murder" ||
+             action.name == "SetBoundaries") {
+
+        needs["safety"].satisfactionThreshold += 5.0f;
+        needs["safety"].satisfactionThreshold -= needs["safety"].decayRate;
+
+        return SAFETY;
+    }
+
+    // NEGATIVE CASE
+    else if (action.name == "QuitGiveUP") {
+
+        needs["meaning"].satisfactionThreshold -= 2.0f;
+        needs["creativity"].satisfactionThreshold -= 2.0f;
+
+        return SELF_ACTUALIZATION;
+    }
+
+    return SELF_ACTUALIZATION;
+}
+
 
     //ici on assimile l'action pointé vers sur celui qui est pointé
     //par le pointeur
@@ -1839,6 +1889,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 pointed->onMajorEventAddOrBoostGoal("reproduction");
 
                 std::cout << "Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
+                if(globalLogger) globalLogger->logEvent("breeding", "Reproduction between " + pointer->name + " and " + pointed->name);
                 Entity baby = Entity(5, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 5, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
                 baby.posX = pointer->posX + 3;
                 baby.posY = pointer->posY + 3;
@@ -1941,6 +1992,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
 
 
                 std::cout << "Nouveau couple ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
+                if(globalLogger) globalLogger->logRelationship(pointer->entityId, pointer->name, pointed->entityId, pointed->name, "couple formed");
                 pointer->addCouple({1, pointed});
                 // Also add the reverse couple link for the pointed entity
                 pointed->addCouple({1, pointer});

@@ -1,0 +1,2 @@
+[2024-01-15 14:16:45] simulation_start: Simulation initialized with 10 entities`
+[2024-01-15 14:35:20] breeding: Reproduction between Alice and Bob

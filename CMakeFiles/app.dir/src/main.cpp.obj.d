@@ -244,6 +244,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/deque \
  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/NeedLevel.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SpatialMesh.h \
@@ -366,4 +367,6 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/util/clear.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SaveLoad.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/heritage.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Logging.h \
+ C:/mingw64/include/c++/14.2.0/chrono
