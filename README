@@ -1,2 +1,36 @@
-to build
-# cmake --build .
+# ASHB2 - Human Simulation
+
+A multi-agent simulation modeling human-like entities with needs, emotions, relationships, and behaviors.
+
+## Building
+
+### Linux
+1. Make sure you have the required dependencies:
+   ```bash
+   sudo apt-get update
+   sudo apt-get install build-essential cmake libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+   ```
+
+2. Run the build script:
+   ```bash
+   chmod +x build_linux.sh
+   ./build_linux.sh
+   ```
+
+3. Run the simulation:
+   ```bash
+   cd build
+   ./app
+   ```
+
+### Windows
+```bash
+cmake -B build
+cmake --build build
+```
+
+## Dependencies
+- GLFW3 (handled by vcpkg)
+- OpenGL
+- ImGui (included)
+- C++17 compatible compiler

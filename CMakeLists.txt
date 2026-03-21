@@ -5,8 +5,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Chemins vers les bibliothèques
-set(GLFW_DIR "${CMAKE_SOURCE_DIR}/libs/glfw")
+# Use vcpkg if available
+if(DEFINED ENV{VCPKG_ROOT})
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
+# Find packages
+find_package(glfw3 CONFIG REQUIRED)
+find_package(OpenGL REQUIRED)
+
+# Chemins vers les bibliothèques locales (fallback)
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/libs/imgui")
 
 # Fichiers ImGui
@@ -25,13 +33,7 @@ set(IMGUI_SOURCES
 include_directories(
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
-    ${GLFW_DIR}/include
 )
-
-# Link directories
-link_directories(${GLFW_DIR}/lib-mingw-w64)
-
-find_package(OpenGL REQUIRED)
 
 # Créer l'exécutable
 add_executable(app
@@ -52,8 +54,17 @@ src/Graph.cpp
 )
 
 # Lier les bibliothèques
-target_link_libraries(app
-    ${GLFW_DIR}/lib-mingw-w64/libglfw3.a
-    OpenGL::GL
-    gdi32
-)
+if(WIN32)
+    target_link_libraries(app
+        glfw
+        OpenGL::GL
+        gdi32
+    )
+else()
+    target_link_libraries(app
+        glfw
+        OpenGL::GL
+        ${CMAKE_DL_LIBS}
+        pthread
+    )
+endif()
