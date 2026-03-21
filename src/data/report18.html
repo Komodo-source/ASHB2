@@ -1,36 +1,4 @@
-import csv
-import os
-import threading
-import json
-import re
-from datetime import datetime
-from ollama import chat
-from ollama import ChatResponse
-import ftplib
-
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-prompt = """
-Context:
-- This is a multi-agent simulation modeling human-like entities with needs, emotions, relationships, and behaviors
-- Entities have attributes: health, happiness, stress, loneliness, personality traits (extraversion, agreeableness, conscientiousness, neuroticism, openness)
-- Simulation includes: disease spread, social interactions, reproduction, movement, aging, and death
-- Time progresses in "days" with entities making decisions every few frames
-Analysis Requirements:
-1. Executive Summary (2-3 paragraphs)
-2. Population Analysis
-3. Disease and Health Dynamics
-4. Social Dynamics
-5. Behavioral Patterns
-6. Key Events Timeline
-7. Conclusions and Insights
-Report Style:
-- Write in formal scientific/academic tone
-- Use clear headings and subheadings
-- Focus on patterns, trends, and insights rather than listing every individual event
-"""
-
-HTML_SHELL = r"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -325,10 +293,10 @@ HTML_SHELL = r"""<!DOCTYPE html>
       <div class="brand-sub">Anthropological Simulation Data</div>
     </div>
     <div class="meta-grid">
-      <div class="meta-item"><span class="meta-label">Start</span><span class="mono">{SIM_START}</span></div>
-      <div class="meta-item"><span class="meta-label">End</span><span class="mono">{SIM_END}</span></div>
-      <div class="meta-item"><span class="meta-label">Duration</span><span class="mono">{SIM_DURATION}</span></div>
-      <div class="meta-item"><span class="meta-label">Ticks</span><span class="mono">{SIM_TICKS}</span></div>
+      <div class="meta-item"><span class="meta-label">Start</span><span class="mono">2024-01-15 14:16:45</span></div>
+      <div class="meta-item"><span class="meta-label">End</span><span class="mono">2024-01-15 14:35:20</span></div>
+      <div class="meta-item"><span class="meta-label">Duration</span><span class="mono">18m 35s</span></div>
+      <div class="meta-item"><span class="meta-label">Ticks</span><span class="mono">5</span></div>
     </div>
     <button id="btn-export" class="btn">Export Data</button>
   </header>
@@ -345,7 +313,7 @@ HTML_SHELL = r"""<!DOCTYPE html>
     <div class="overview-grid">
       <div class="panel">
         <div class="panel-title">Analysis Report</div>
-        <div class="report-body">{AI_SUMMARY}</div>
+        <div class="report-body"><em>// No Analysis Generated //</em></div>
       </div>
       <div class="gap-col">
         <div class="panel">
@@ -472,12 +440,31 @@ HTML_SHELL = r"""<!DOCTYPE html>
 </div>
 
 <script>
-const reportData     = {REPORT_JSON};
-const ticks          = {CHART_TICKS};
-const attributesData = {CHART_DATA};
-const actionCounts   = {ACTION_COUNTS};
-const relNodes       = {RELATION_NODES};
-const relEdges       = {RELATION_EDGES};
+const reportData     = {
+  "start": "2024-01-15 14:16:45",
+  "end": "2024-01-15 14:35:20",
+  "duration": "18m 35s",
+  "ticks": "5",
+  "actionCounts": {
+    "couple": 16,
+    "breeding": 4
+  },
+  "logs": {
+    "cmd": "",
+    "actions": "[2024-01-15 14:22:45] Entity 1 (Alice) performed: Socialize targeting Bob - targeted action\n[2024-01-15 14:23:10] Entity 2 (Bob) performed: Work - self-directed action\n",
+    "diseases": "[2024-01-15 14:20:15] Entity 3 (Diana) contracted Plague\n[2024-01-15 14:25:30] Entity 3 (Diana) cured from Plague\n",
+    "deaths": "[2024-01-15 14:30:25] Entity 5 (Alice, age 45) died: health depletion\n[2024-01-15 14:35:10] Entity 12 (Bob, age 32) died: murder by Charlie\n",
+    "movements": "[2024-01-15 14:21:30] Entity 1 (Alice) moved from (100,100) to (105,98) - environmental factors\n[2024-01-15 14:22:15] Entity 2 (Bob) moved from (200,150) to (195,152) - seeking safety\n",
+    "births": "[2024-01-15 14:40:00] Birth: Entity 15 (Eve) born to Alice (1) and Bob (2)\n",
+    "events": "[2024-01-15 14:16:45] simulation_start: Simulation initialized with 10 entities`\n[2024-01-15 14:35:20] breeding: Reproduction between Alice and Bob\n",
+    "relationships": "[2024-01-15 14:18:20] Relationship: Alice (1) and Bob (2) - couple formed\n[2024-01-15 14:19:45] Relationship: Charlie (3) and Diana (4) - social bond strengthened\n"
+  }
+};
+const ticks          = [0, 1, 2, 3, 4];
+const attributesData = {"Antibody": [[0.0, 0.0, 0.0, 0.0, 0.0], [11.0, 13.0, 13.0, 6.0, 2.0], [13.0, 21.0, 16.0, 8.0, 10.0], [24.0, 24.0, 27.0, 21.0, 14.0]], "Boredom": [[0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]], "Anger": [[0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]], "Happiness": [[94.4039, 95.3507, 95.2375, 95.5955, 95.4396], [100.0, 100.0, 100.0, 100.0, 100.0], [100.0, 100.0, 100.0, 100.0, 100.0], [100.0, 100.0, 100.0, 100.0, 100.0]], "Health": [[100.0, 100.0, 100.0, 100.0, 100.0], [99.0, 98.0, 97.0, 97.0, 96.0], [98.0, 96.0, 93.0, 95.0, 95.0], [95.0, 94.0, 90.0, 94.0, 91.0]], "Hygiene": [[100.0, 100.0, 100.0, 100.0, 100.0], [99.0, 98.0, 97.0, 97.0, 96.0], [98.0, 96.0, 93.0, 95.0, 95.0], [95.0, 94.0, 90.0, 94.0, 91.0]], "Loneliness": [[0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]], "Mental Health": [[99.9012, 99.9012, 99.9012, 99.9012, 99.9012], [99.7449, 99.7449, 99.7449, 99.7449, 99.7449], [99.554, 99.554, 99.554, 99.554, 99.554], [99.3545, 99.3545, 99.3545, 99.3545, 99.3545]], "Stress": [[22.0272, 20.8501, 21.0092, 22.4781, 21.6976], [42.8621, 40.0027, 43.5148, 42.8782, 41.3874], [64.7364, 60.8478, 62.6308, 64.9052, 61.0838], [86.5921, 81.6342, 81.6451, 86.9799, 80.0129]]};
+const actionCounts   = {"couple": 16, "breeding": 4};
+const relNodes       = [{"id": 1, "label": "Alice"}, {"id": 2, "label": "Bob"}, {"id": 3, "label": "Charlie"}, {"id": 4, "label": "Diana"}];
+const relEdges       = [{"from": 1, "to": 2, "label": "couple formed", "title": "couple formed\n2024-01-15 14:18:20"}, {"from": 3, "to": 4, "label": "social bond strengthened", "title": "social bond strengthened\n2024-01-15 14:19:45"}];
 
 const ATTR_NAMES = ['Antibody','Boredom','Anger','Happiness','Health','Hygiene','Loneliness','Mental Health','Stress'];
 const ATTR_COLOR = {
@@ -865,247 +852,3 @@ function renderNetwork() {
 </script>
 </body>
 </html>
-"""
-
-report_data = {
-    "ai_summary":          "<em>// No Analysis Generated //</em>",
-    "cmd_log":             "",
-    "actions_log":         "",
-    "diseases_log":        "",
-    "deaths_log":          "",
-    "movements_log":       "",
-    "births_log":          "",
-    "events_log":          "",
-    "relationships_log":   "",
-    "sim_start":           "UNKNOWN",
-    "sim_end":             "UNKNOWN",
-    "sim_duration":        "UNKNOWN",
-    "sim_ticks":           "0",
-    "chart_ticks":         "[]",
-    "chart_data":          "{}",
-    "action_counts":       "{}",
-    "relationship_nodes":  "[]",
-    "relationship_edges":  "[]",
-    "report_json":         "{}"
-}
-
-
-def safe_read(filepath):
-    full_path = filepath if os.path.isabs(filepath) else os.path.join(BASE_DIR, filepath)
-    try:
-        with open(full_path, "r", encoding="utf-8") as f:
-            return f.read()
-    except Exception as e:
-        return f"[File not found or unreadable: {full_path}]"
-
-
-def log_logs():
-    cmd_content = safe_read("../cmd_log.txt")
-    report_data["cmd_log"] = cmd_content
-    try:
-        response: ChatResponse = chat(model='qwen2.5:14b', messages=[
-            {'role': 'user', 'content': prompt + "\n\n" + cmd_content},
-        ])
-        ai_text = str(response.message.content)
-        ai_text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', ai_text, flags=re.MULTILINE)
-        ai_text = re.sub(r'^## (.+)$',  r'<h2>\1</h2>', ai_text, flags=re.MULTILINE)
-        ai_text = re.sub(r'^# (.+)$',   r'<h2>\1</h2>', ai_text, flags=re.MULTILINE)
-        paragraphs = []
-        for block in re.split(r'\n{2,}', ai_text):
-            block = block.strip()
-            if block and not block.startswith('<h'):
-                block = f'<p>{block}</p>'
-            paragraphs.append(block)
-        report_data["ai_summary"] = '\n'.join(paragraphs)
-    except Exception as e:
-        report_data["ai_summary"] = f"<p>Error generating analysis: {e}</p>"
-
-
-def _parse_timestamp_range(log_text: str):
-    timestamps = []
-    for m in re.finditer(r'^\[([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\]',
-                         log_text, flags=re.MULTILINE):
-        try:
-            timestamps.append(datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S"))
-        except Exception:
-            continue
-    if not timestamps:
-        return None, None
-    return min(timestamps), max(timestamps)
-
-
-def _format_duration(delta):
-    if delta is None:
-        return ""
-    days = delta.days
-    hours, rem = divmod(delta.seconds, 3600)
-    minutes, seconds = divmod(rem, 60)
-    parts = []
-    if days:    parts.append(f"{days}d")
-    if hours:   parts.append(f"{hours}h")
-    if minutes: parts.append(f"{minutes}m")
-    if seconds or not parts: parts.append(f"{seconds}s")
-    return ' '.join(parts)
-
-
-def log_all():
-    report_data["deaths_log"]        = safe_read("deaths_log.txt")
-    report_data["diseases_log"]      = safe_read("diseases_log.txt")
-    report_data["actions_log"]       = safe_read("actions_log.txt")
-    report_data["movements_log"]     = safe_read("movements_log.txt")
-    report_data["births_log"]        = safe_read("births_log.txt")
-    report_data["events_log"]        = safe_read("events_log.txt")
-    report_data["relationships_log"] = safe_read("relationships_log.txt")
-
-    start, end = _parse_timestamp_range(report_data["events_log"])
-    if start is None or end is None:
-        start, end = _parse_timestamp_range(report_data["deaths_log"])
-    if start is None or end is None:
-        start, end = _parse_timestamp_range(report_data["cmd_log"])
-
-    report_data["sim_start"]    = start.strftime("%Y-%m-%d %H:%M:%S") if start else "UNKNOWN"
-    report_data["sim_end"]      = end.strftime("%Y-%m-%d %H:%M:%S")   if end   else "UNKNOWN"
-    report_data["sim_duration"] = _format_duration(end - start)        if (start and end) else "UNKNOWN"
-
-    action_counts = {}
-    try:
-        for i in range(1000):
-            filepath = os.path.join(BASE_DIR, f'act_{i}.csv')
-            if not os.path.exists(filepath):
-                break
-            with open(filepath, encoding="utf-8") as f:
-                line = f.readline().strip()
-                for action in re.findall(r'([A-Za-z0-9 _\-]+)(?=,category:)', line):
-                    action = action.strip()
-                    if not action:
-                        continue
-                    action_counts[action] = action_counts.get(action, 0) + 1
-    except Exception as e:
-        print(f"Error parsing action CSVs: {e}")
-
-    nodes = {}
-    edges = []
-    for line in report_data["relationships_log"].splitlines():
-        m = re.match(
-            r'^\[([^\]]+)\]\s*Relationship:\s*(.+?)\s*\((\d+)\)\s*and\s*(.+?)\s*\((\d+)\)\s*-\s*([^\-\n]+)(?:-\s*(.*))?$',
-            line
-        )
-        if not m:
-            continue
-        timestamp, name1, id1, name2, id2, reltype, details = m.groups()
-        id1, id2 = int(id1), int(id2)
-        nodes[id1] = name1.strip()
-        nodes[id2] = name2.strip()
-        title = f"{reltype.strip()}\n{timestamp}"
-        if details:
-            title += f"\n{details.strip()}"
-        edges.append({"from": id1, "to": id2, "label": reltype.strip(), "title": title})
-
-    attr_names = ['Antibody', 'Boredom', 'Anger', 'Happiness', 'Health',
-                  'Hygiene', 'Loneliness', 'Mental Health', 'Stress']
-    entities_data = {name: {} for name in attr_names}
-    ticks = []
-
-    try:
-        for i in range(1000):
-            filepath = os.path.join(BASE_DIR, f'{i}.csv')
-            if not os.path.exists(filepath):
-                break
-            ticks.append(i)
-            with open(filepath, newline='', encoding="utf-8") as csvfile:
-                reader = csv.reader(csvfile)
-                for row_idx, row in enumerate(reader):
-                    if row_idx not in entities_data['Antibody']:
-                        for name in attr_names:
-                            entities_data[name][row_idx] = []
-                    for col_idx, name in enumerate(attr_names):
-                        if col_idx < len(row):
-                            try:
-                                val = float(row[col_idx])
-                            except ValueError:
-                                val = 0.0
-                            entities_data[name][row_idx].append(val)
-    except Exception as e:
-        print(f"Error parsing CSVs: {e}")
-
-    clean_chart_data = {}
-    for name in attr_names:
-        clean_chart_data[name] = [
-            entities_data[name][agent_id]
-            for agent_id in sorted(entities_data[name].keys())
-        ]
-
-    report_data["chart_ticks"]        = json.dumps(ticks)
-    report_data["chart_data"]         = json.dumps(clean_chart_data)
-    report_data["action_counts"]      = json.dumps(action_counts)
-    report_data["relationship_nodes"] = json.dumps([{"id": k, "label": v} for k, v in nodes.items()])
-    report_data["relationship_edges"] = json.dumps(edges)
-    report_data["sim_ticks"]          = str(len(ticks))
-
-    report_data["report_json"] = json.dumps({
-        "start":        report_data["sim_start"],
-        "end":          report_data["sim_end"],
-        "duration":     report_data["sim_duration"],
-        "ticks":        report_data["sim_ticks"],
-        "actionCounts": action_counts,
-        "logs": {
-            "cmd":           report_data["cmd_log"],
-            "actions":       report_data["actions_log"],
-            "diseases":      report_data["diseases_log"],
-            "deaths":        report_data["deaths_log"],
-            "movements":     report_data["movements_log"],
-            "births":        report_data["births_log"],
-            "events":        report_data["events_log"],
-            "relationships": report_data["relationships_log"],
-        }
-    }, ensure_ascii=False, indent=2)
-
-
-t1 = threading.Thread(target=log_all)
-#t2 = threading.Thread(target=log_logs)   # uncomment to enable AI summary
-t1.start()
-#t2.start()
-t1.join()
-#t2.join()
-
-final_html = HTML_SHELL
-replacements = {
-    '{AI_SUMMARY}':     report_data["ai_summary"],
-    '{SIM_START}':      report_data["sim_start"],
-    '{SIM_END}':        report_data["sim_end"],
-    '{SIM_DURATION}':   report_data["sim_duration"],
-    '{SIM_TICKS}':      report_data["sim_ticks"],
-    '{CHART_TICKS}':    report_data["chart_ticks"],
-    '{CHART_DATA}':     report_data["chart_data"],
-    '{ACTION_COUNTS}':  report_data["action_counts"],
-    '{RELATION_NODES}': report_data["relationship_nodes"],
-    '{RELATION_EDGES}': report_data["relationship_edges"],
-    '{REPORT_JSON}':    report_data["report_json"],
-    '{TIMESTAMP}':      datetime.now().strftime('%Y-%m-%d %H:%M'),
-}
-for placeholder, value in replacements.items():
-    final_html = final_html.replace(placeholder, value)
-
-
-f = ""
-with open("./simulation_continuity.txt", 'r') as version:
-    f = version.readline()
-
-with open("./simulation_continuity.txt", 'w') as version:
-    version.write(str(int(f) + 1))
-
-print(f"report{f}.html")
-output_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", f"report{f}.html"))
-with open(output_path, "w", encoding="utf-8") as out:
-    out.write(final_html)
-
-print(f"[ASHB2] Report generated → {output_path}")
-
-session = ftplib.FTP('ftpupload.net','if0_37377007','bujsYxINZZBY4')
-session.cwd("arena.ct.ws")
-session.cwd("htdocs")
-file = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", f"report{f}.html")),'rb')
-session.storbinary(f'STOR {f"report{f}.html"}', file)
-file.close()
-session.quit()
-print("file saved to the server")
