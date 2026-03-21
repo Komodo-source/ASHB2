@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHB2 — SIMULATION REPORT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    :root {
+      --bg:          #050a05;
+      --bg2:         #080e08;
+      --panel-bg:    #070d07;
+      --green:       #39ff14;
+      --green-dim:   #1a7a0a;
+      --green-faint: #0d3d06;
+      --amber:       #ffb700;
+      --amber-dim:   #7a5800;
+      --cyan:        #00e5ff;
+      --red:         #ff3131;
+      --white:       #d4f5d4;
+      --dim:         #4a7a4a;
+      --faint:       #2a4a2a;
+      --border:      #1a4a1a;
+      --border-hi:   #2a8a2a;
+      --scan-color:  rgba(0,255,0,0.03);
+      --pixel: 2px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @keyframes scanlines {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 4px; }
+    }
+    @keyframes flicker {
+      0%,100% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: 0.94; }
+      94% { opacity: 1; }
+      96% { opacity: 0.97; }
+    }
+    @keyframes blink {
+      0%,49% { opacity: 1; }
+      50%,100% { opacity: 0; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes glow-pulse {
+      0%,100% { text-shadow: 0 0 8px var(--green), 0 0 16px var(--green-dim); }
+      50%      { text-shadow: 0 0 12px var(--green), 0 0 24px var(--green-dim), 0 0 40px #0a3a0a; }
+    }
+    @keyframes grid-drift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: var(--bg);
+      color: var(--green);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      animation: flicker 8s infinite;
+    }
+
+    /* CRT scanline overlay */
+    body::before {
+      content: '';
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        var(--scan-color) 3px,
+        var(--scan-color) 4px
+      );
+      animation: scanlines 0.1s linear infinite;
+    }
+
+    /* Grid background */
+    body::after {
+      content: '';
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(var(--faint) 1px, transparent 1px),
+        linear-gradient(90deg, var(--faint) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.25;
+      animation: grid-drift 20s linear infinite;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── PIXEL BORDER MIXIN ── */
+    .pixel-box {
+      border: var(--pixel) solid var(--green-dim);
+      box-shadow:
+        0 0 0 var(--pixel) var(--bg),
+        0 0 0 calc(var(--pixel)*2) var(--border),
+        inset 0 0 0 var(--pixel) var(--green-faint);
+    }
+    .pixel-box-hi {
+      border: var(--pixel) solid var(--green);
+      box-shadow:
+        0 0 0 var(--pixel) var(--bg),
+        0 0 0 calc(var(--pixel)*2) var(--green-dim),
+        0 0 16px rgba(57,255,20,0.15),
+        inset 0 0 0 var(--pixel) var(--green-faint);
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 0;
+      border-bottom: var(--pixel) solid var(--green-dim);
+      background: var(--panel-bg);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 0 var(--bg), 0 4px 0 var(--border), 0 6px 20px rgba(0,0,0,0.8);
+    }
+
+    .header-top {
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .brand {
+      font-family: 'VT323', monospace;
+      font-size: 2.2rem;
+      color: var(--green);
+      letter-spacing: 0.1em;
+      line-height: 1;
+      animation: glow-pulse 3s ease-in-out infinite;
+    }
+
+    .brand-sub {
+      font-size: 0.65rem;
+      color: var(--dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .meta-item {
+      font-size: 0.7rem;
+      color: var(--white);
+      border: 1px solid var(--border-hi);
+      padding: 0.25rem 0.6rem;
+      background: var(--green-faint);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .meta-label {
+      color: var(--dim);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .btn {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      border: var(--pixel) solid var(--green);
+      background: var(--green-faint);
+      color: var(--green);
+      cursor: pointer;
+      padding: 0.4rem 1rem;
+      text-transform: uppercase;
+      transition: all 0.1s;
+      box-shadow: 2px 2px 0 var(--green-dim), 0 0 8px rgba(57,255,20,0.2);
+    }
+    .btn:hover {
+      background: var(--green-dim);
+      color: var(--bg);
+      box-shadow: 4px 4px 0 var(--green), 0 0 16px rgba(57,255,20,0.4);
+      transform: translate(-1px,-1px);
+    }
+    .btn:active {
+      transform: translate(2px,2px);
+      box-shadow: 0 0 0 var(--green-dim);
+    }
+
+    /* ── TAB NAV ── */
+    .tab-nav {
+      display: flex;
+      background: var(--bg);
+      border-bottom: var(--pixel) solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 1.5rem;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      background: none;
+      border: none;
+      border-bottom: var(--pixel) solid transparent;
+      color: var(--dim);
+      cursor: pointer;
+      padding: 0.7rem 1.2rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: color 0.15s;
+      position: relative;
+    }
+    .tab-btn::before {
+      content: '> ';
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .tab-btn:hover { color: var(--white); }
+    .tab-btn:hover::before { opacity: 0.4; }
+    .tab-btn.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+      text-shadow: 0 0 8px var(--green);
+    }
+    .tab-btn.active::before { opacity: 1; }
+
+    /* ── PAGES ── */
+    .tab-page {
+      display: none;
+      padding: 1.5rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+    .tab-page.visible {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    /* ── PANELS ── */
+    .panel {
+      background: var(--panel-bg);
+      padding: 1.2rem;
+      position: relative;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 0 1px var(--green-faint), inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    .panel-title {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .panel-title::before {
+      content: '■';
+      color: var(--green);
+      font-size: 0.6rem;
+    }
+
+    /* Corner decorations */
+    .panel::before, .panel::after {
+      content: '+';
+      position: absolute;
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: var(--green-dim);
+    }
+    .panel::before { top: -2px; left: 2px; }
+    .panel::after  { bottom: -2px; right: 2px; }
+
+    /* ── LAYOUTS ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.2rem;
+    }
+    @media (max-width: 1000px) { .overview-grid { grid-template-columns: 1fr; } }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .gap-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    /* ── CHART WRAPPERS ── */
+    .chart-wrap {
+      background: var(--bg);
+      padding: 0.8rem;
+      border: 1px solid var(--border);
+    }
+
+    .chart-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: var(--amber);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+    }
+    .cdot {
+      width: 6px; height: 6px;
+      border: 1px solid currentColor;
+    }
+
+    /* ── ENTITY ── */
+    .entity-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.2rem;
+      align-items: start;
+    }
+    @media (max-width: 800px) { .entity-layout { grid-template-columns: 1fr; } }
+
+    .entity-sidebar {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 100px;
+      max-height: calc(100vh - 140px);
+      overflow: hidden;
+      box-shadow: 0 0 0 1px var(--green-faint);
+    }
+
+    .sidebar-hdr {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--green-faint);
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sidebar-hdr-title {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
+
+    .entity-count-pill {
+      font-size: 0.7rem;
+      color: var(--green);
+      background: var(--bg);
+      border: 1px solid var(--green-dim);
+      padding: 0.1rem 0.5rem;
+    }
+
+    .entity-search-wrap {
+      padding: 0.6rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .entity-search {
+      width: 100%;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-hi);
+      color: var(--green);
+      padding: 0.4rem 0.6rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      outline: none;
+    }
+    .entity-search::placeholder { color: var(--dim); }
+    .entity-search:focus { border-color: var(--green); box-shadow: 0 0 8px rgba(57,255,20,0.2); }
+
+    .entity-list {
+      overflow-y: auto;
+      flex: 1;
+      scrollbar-width: thin;
+      scrollbar-color: var(--green-dim) transparent;
+    }
+
+    .entity-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.6rem 0.8rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    .entity-item:hover { background: var(--green-faint); }
+    .entity-item.selected {
+      background: rgba(57,255,20,0.08);
+      border-left: 3px solid var(--green);
+      padding-left: calc(0.8rem - 3px);
+    }
+
+    .avatar {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      flex-shrink: 0;
+      background: var(--bg);
+      border: 1px solid var(--green-dim);
+      color: var(--green);
+    }
+
+    .entity-item-name {
+      font-size: 0.78rem;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .entity-item-id { font-size: 0.65rem; color: var(--dim); }
+
+    .entity-detail { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .entity-empty {
+      border: 1px dashed var(--border-hi);
+      background: var(--panel-bg);
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--dim);
+    }
+    .entity-empty p {
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+    }
+    .entity-empty p::before { content: '> '; }
+
+    .entity-hero {
+      border: 1px solid var(--border);
+      background: var(--panel-bg);
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    .entity-hero-avatar {
+      width: 56px; height: 56px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'VT323', monospace;
+      font-size: 2rem;
+      flex-shrink: 0;
+      background: var(--bg);
+      border: 2px solid var(--green);
+      color: var(--green);
+      box-shadow: 0 0 12px rgba(57,255,20,0.3), inset 0 0 8px rgba(57,255,20,0.1);
+    }
+
+    .entity-hero-name {
+      font-family: 'VT323', monospace;
+      font-size: 1.6rem;
+      letter-spacing: 0.1em;
+      color: var(--green);
+      text-shadow: 0 0 8px var(--green);
+    }
+
+    .entity-hero-sub { font-size: 0.72rem; color: var(--dim); margin-bottom: 0.6rem; }
+
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .badge {
+      font-family: 'VT323', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      padding: 0.1rem 0.5rem;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+    .badge.alive  { color: var(--green); border-color: var(--green-dim); background: var(--green-faint); }
+    .badge.dead   { color: var(--red); border-color: var(--red); background: rgba(255,49,49,0.1); }
+    .badge.info   { color: var(--amber); border-color: var(--amber-dim); background: rgba(255,183,0,0.08); }
+
+    /* ── STAT BARS ── */
+    .stat-bars-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 600px) { .stat-bars-grid { grid-template-columns: 1fr; } }
+
+    .stat-bar-row { display: flex; flex-direction: column; gap: 0.3rem; }
+    .stat-bar-meta { display: flex; justify-content: space-between; align-items: baseline; }
+    .stat-bar-name {
+      font-size: 0.65rem;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .stat-bar-val {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+    }
+    .stat-bar-track {
+      height: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .stat-bar-fill {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .entity-charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.8rem;
+    }
+
+    /* ── LOGS ── */
+    .logs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    @media (max-width: 1000px) { .logs-grid { grid-template-columns: 1fr; } }
+
+    .log-block {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .log-block-hdr {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--green-faint);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .log-block-title {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--white);
+    }
+    .log-type-dot { width: 6px; height: 6px; border: 1px solid currentColor; }
+    .log-count-badge {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.4rem;
+      background: var(--bg);
+      color: var(--green);
+      border: 1px solid var(--green-dim);
+    }
+
+    .log-search-wrap {
+      padding: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .log-search {
+      width: 100%;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      color: var(--green);
+      padding: 0.3rem 0.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      outline: none;
+    }
+    .log-search:focus { border-color: var(--green-dim); }
+
+    .log-entries {
+      overflow-y: auto;
+      max-height: 360px;
+      padding: 0.4rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--green-dim) transparent;
+    }
+
+    .log-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding: 0.4rem 0.6rem;
+      margin-bottom: 3px;
+      background: var(--bg);
+      border-left: 2px solid transparent;
+    }
+    .log-entry-header { display: flex; gap: 0.4rem; align-items: center; }
+    .le-ts {
+      font-size: 0.6rem;
+      color: var(--faint);
+    }
+    .le-body { font-size: 0.72rem; line-height: 1.4; color: var(--dim); }
+    .le-tag {
+      font-family: 'VT323', monospace;
+      font-size: 0.7rem;
+      padding: 0 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .ev-death    { border-left-color: var(--red); }
+    .ev-death    .le-tag { color: var(--red); background: rgba(255,49,49,0.1); }
+    .ev-birth    { border-left-color: var(--green); }
+    .ev-birth    .le-tag { color: var(--green); background: var(--green-faint); }
+    .ev-disease  { border-left-color: var(--amber); }
+    .ev-disease  .le-tag { color: var(--amber); background: rgba(255,183,0,0.08); }
+    .ev-relation { border-left-color: var(--cyan); }
+    .ev-relation .le-tag { color: var(--cyan); background: rgba(0,229,255,0.08); }
+    .ev-action   { border-left-color: var(--green-dim); }
+    .ev-action   .le-tag { color: var(--green); background: var(--green-faint); }
+    .ev-move     { border-left-color: var(--faint); }
+    .ev-move     .le-tag { color: var(--dim); background: var(--bg); border: 1px solid var(--border); }
+    .ev-event    { border-left-color: var(--border-hi); }
+    .ev-event    .le-tag { color: var(--dim); background: var(--bg); border: 1px solid var(--border); }
+
+    /* ── NETWORK ── */
+    .network-canvas {
+      height: 500px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+
+    /* ── REPORT BODY ── */
+    .report-body {
+      color: var(--white);
+      font-size: 0.8rem;
+      line-height: 1.7;
+    }
+    .report-body h2 {
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin: 1.5rem 0 0.6rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .report-body h2:first-child { margin-top: 0; }
+    .report-body h2::before { content: '>> '; color: var(--green-dim); }
+    .report-body h3 {
+      font-family: 'VT323', monospace;
+      font-size: 0.95rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin: 1rem 0 0.3rem;
+    }
+    .report-body h3::before { content: '> '; color: var(--green-dim); }
+    .report-body p {
+      margin-bottom: 0.8rem;
+      color: var(--dim);
+    }
+
+    /* ── DECORATIVE HEADER DIVIDER ── */
+    .retro-divider {
+      font-family: 'VT323', monospace;
+      font-size: 0.7rem;
+      color: var(--green-dim);
+      letter-spacing: 0.3em;
+      padding: 0.3rem 1.5rem;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    /* ── CURSOR BLINK ── */
+    .cursor-blink::after {
+      content: '█';
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+      font-size: 0.8em;
+    }
+
+    /* ── SCROLLBARS ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--green-dim); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      font-family: 'VT323', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 1.5rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      background: var(--green-faint);
+      border-top: 1px solid var(--border);
+      color: var(--green);
+    }
+    .status-bar span { color: var(--dim); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <header>
+    <div class="header-top">
+      <div class="brand-block">
+        <div class="brand cursor-blink">ASHB2</div>
+        <div class="brand-sub">▸ Anthropological Simulation Hub Build 2 — Data Analysis Terminal</div>
+      </div>
+      <div class="meta-strip">
+        <div class="meta-item"><span class="meta-label">Start</span><span>2024-01-15 14:16:45</span></div>
+        <div class="meta-item"><span class="meta-label">End</span><span>2024-01-15 14:35:20</span></div>
+        <div class="meta-item"><span class="meta-label">Duration</span><span>18m 35s</span></div>
+        <div class="meta-item"><span class="meta-label">Ticks</span><span>5</span></div>
+      </div>
+      <button id="btn-export" class="btn">[ Export Data ]</button>
+    </div>
+    <div class="retro-divider" id="ticker-text">
+      ░░ SYSTEM READY ░░ AGENTS LOADED ░░ TELEMETRY ACTIVE ░░ PRESS ANY KEY TO CONTINUE ░░ SIMULATION COMPLETE ░░ DATA ARCHIVED ░░
+    </div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="global-stats">Telemetry</button>
+    <button class="tab-btn" data-tab="entities">Agents</button>
+    <button class="tab-btn" data-tab="network">Network</button>
+    <button class="tab-btn" data-tab="logs">Logs</button>
+  </nav>
+
+  <div id="tab-overview" class="tab-page visible">
+    <div class="overview-grid">
+      <div class="panel">
+        <div class="panel-title">Analysis Report</div>
+        <div class="report-body"><em>// No Analysis Generated //</em></div>
+      </div>
+      <div class="gap-col">
+        <div class="panel">
+          <div class="panel-title">Action Frequency</div>
+          <canvas id="actionChart" style="max-height:220px"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Population Status</div>
+          <canvas id="popChart" style="max-height:180px"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-global-stats" class="tab-page">
+    <div class="stats-grid" id="global-charts-slot"></div>
+  </div>
+
+  <div id="tab-entities" class="tab-page">
+    <div class="entity-layout">
+      <div class="entity-sidebar">
+        <div class="sidebar-hdr">
+          <div class="sidebar-hdr-title">Agent Directory</div>
+          <span class="entity-count-pill" id="entity-count-badge">0</span>
+        </div>
+        <div class="entity-search-wrap">
+          <input class="entity-search" id="entity-search" type="text" placeholder="> Search ID or Name...">
+        </div>
+        <div class="entity-list" id="entity-items"></div>
+      </div>
+      <div id="entity-detail-area">
+        <div class="entity-empty">
+          <p>Select an agent from the directory to view details.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-network" class="tab-page">
+    <div class="panel">
+      <div class="panel-title">Social Network Graph</div>
+      <div id="relationship-network" class="network-canvas"></div>
+    </div>
+  </div>
+
+  <div id="tab-logs" class="tab-page">
+    <div class="logs-grid">
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--dim)"></span>Events</div>
+          <span class="log-count-badge" id="lc-events">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-events',this.value)"></div>
+        <div class="log-entries" id="log-events"></div>
+      </div>
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--green)"></span>Actions</div>
+          <span class="log-count-badge" id="lc-actions">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-actions',this.value)"></div>
+        <div class="log-entries" id="log-actions"></div>
+      </div>
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--red)"></span>Deaths</div>
+          <span class="log-count-badge" id="lc-deaths">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-deaths',this.value)"></div>
+        <div class="log-entries" id="log-deaths"></div>
+      </div>
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--amber)"></span>Diseases</div>
+          <span class="log-count-badge" id="lc-diseases">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-diseases',this.value)"></div>
+        <div class="log-entries" id="log-diseases"></div>
+      </div>
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--green)"></span>Births</div>
+          <span class="log-count-badge" id="lc-births">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-births',this.value)"></div>
+        <div class="log-entries" id="log-births"></div>
+      </div>
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--dim)"></span>Movements</div>
+          <span class="log-count-badge" id="lc-movements">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-movements',this.value)"></div>
+        <div class="log-entries" id="log-movements"></div>
+      </div>
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--cyan)"></span>Relationships</div>
+          <span class="log-count-badge" id="lc-relationships">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-relationships',this.value)"></div>
+        <div class="log-entries" id="log-relationships"></div>
+      </div>
+
+      <div class="log-block">
+        <div class="log-block-hdr">
+          <div class="log-block-title"><span class="log-type-dot" style="color:var(--border-hi)"></span>System</div>
+          <span class="log-count-badge" id="lc-cmd">0</span>
+        </div>
+        <div class="log-search-wrap"><input class="log-search" placeholder="> Filter..." oninput="filterLog('log-cmd',this.value)"></div>
+        <div class="log-entries" id="log-cmd"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span>SYS:</span> ASHB2 v2.0
+    <span>MODE:</span> ANALYSIS
+    <span>STATUS:</span> <span style="color:var(--green)">■ ONLINE</span>
+    <span style="margin-left:auto;color:var(--faint)">2026-03-21 22:25</span>
+  </div>
+
+</div>
+
+<script>
+const reportData     = {
+  "start": "2024-01-15 14:16:45",
+  "end": "2024-01-15 14:35:20",
+  "duration": "18m 35s",
+  "ticks": "5",
+  "actionCounts": {
+    "couple": 16,
+    "breeding": 4
+  },
+  "logs": {
+    "cmd": "",
+    "actions": "[2024-01-15 14:22:45] Entity 1 (Alice) performed: Socialize targeting Bob - targeted action\n[2024-01-15 14:23:10] Entity 2 (Bob) performed: Work - self-directed action\n",
+    "diseases": "[2024-01-15 14:20:15] Entity 3 (Diana) contracted Plague\n[2024-01-15 14:25:30] Entity 3 (Diana) cured from Plague\n",
+    "deaths": "[2024-01-15 14:30:25] Entity 5 (Alice, age 45) died: health depletion\n[2024-01-15 14:35:10] Entity 12 (Bob, age 32) died: murder by Charlie\n",
+    "movements": "[2024-01-15 14:21:30] Entity 1 (Alice) moved from (100,100) to (105,98) - environmental factors\n[2024-01-15 14:22:15] Entity 2 (Bob) moved from (200,150) to (195,152) - seeking safety\n",
+    "births": "[2024-01-15 14:40:00] Birth: Entity 15 (Eve) born to Alice (1) and Bob (2)\n",
+    "events": "[2024-01-15 14:16:45] simulation_start: Simulation initialized with 10 entities`\n[2024-01-15 14:35:20] breeding: Reproduction between Alice and Bob\n",
+    "relationships": "[2024-01-15 14:18:20] Relationship: Alice (1) and Bob (2) - couple formed\n[2024-01-15 14:19:45] Relationship: Charlie (3) and Diana (4) - social bond strengthened\n"
+  }
+};
+const ticks          = [0, 1, 2, 3, 4];
+const attributesData = {"Antibody": [[0.0, 0.0, 0.0, 0.0, 0.0], [11.0, 13.0, 13.0, 6.0, 2.0], [13.0, 21.0, 16.0, 8.0, 10.0], [24.0, 24.0, 27.0, 21.0, 14.0]], "Boredom": [[0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]], "Anger": [[0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]], "Happiness": [[94.4039, 95.3507, 95.2375, 95.5955, 95.4396], [100.0, 100.0, 100.0, 100.0, 100.0], [100.0, 100.0, 100.0, 100.0, 100.0], [100.0, 100.0, 100.0, 100.0, 100.0]], "Health": [[100.0, 100.0, 100.0, 100.0, 100.0], [99.0, 98.0, 97.0, 97.0, 96.0], [98.0, 96.0, 93.0, 95.0, 95.0], [95.0, 94.0, 90.0, 94.0, 91.0]], "Hygiene": [[100.0, 100.0, 100.0, 100.0, 100.0], [99.0, 98.0, 97.0, 97.0, 96.0], [98.0, 96.0, 93.0, 95.0, 95.0], [95.0, 94.0, 90.0, 94.0, 91.0]], "Loneliness": [[0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]], "Mental Health": [[99.9012, 99.9012, 99.9012, 99.9012, 99.9012], [99.7449, 99.7449, 99.7449, 99.7449, 99.7449], [99.554, 99.554, 99.554, 99.554, 99.554], [99.3545, 99.3545, 99.3545, 99.3545, 99.3545]], "Stress": [[22.0272, 20.8501, 21.0092, 22.4781, 21.6976], [42.8621, 40.0027, 43.5148, 42.8782, 41.3874], [64.7364, 60.8478, 62.6308, 64.9052, 61.0838], [86.5921, 81.6342, 81.6451, 86.9799, 80.0129]]};
+const actionCounts   = {"couple": 16, "breeding": 4};
+const relNodes       = [{"id": 1, "label": "Alice"}, {"id": 2, "label": "Bob"}, {"id": 3, "label": "Charlie"}, {"id": 4, "label": "Diana"}];
+const relEdges       = [{"from": 1, "to": 2, "label": "couple formed", "title": "couple formed\n2024-01-15 14:18:20"}, {"from": 3, "to": 4, "label": "social bond strengthened", "title": "social bond strengthened\n2024-01-15 14:19:45"}];
+
+const ATTR_NAMES = ['Antibody','Boredom','Anger','Happiness','Health','Hygiene','Loneliness','Mental Health','Stress'];
+const ATTR_COLOR = {
+  'Antibody':'#39ff14','Boredom':'#ffb700','Anger':'#ff3131','Happiness':'#00e5ff',
+  'Health':'#39ff14','Hygiene':'#7fff7f','Loneliness':'#ff6b6b','Mental Health':'#00bfff','Stress':'#ff8c00',
+};
+const BAD_HIGH = new Set(['Stress','Loneliness','Boredom','Anger']);
+const NUM_ENTITIES = (attributesData['Health']||[]).length;
+const entityNameMap = {};
+relNodes.forEach(n => { entityNameMap[n.id] = n.label; });
+
+// Ticker scroll
+(function() {
+  const el = document.getElementById('ticker-text');
+  if (!el) return;
+  let pos = 0;
+  const text = el.textContent + '   ';
+  setInterval(() => {
+    pos = (pos + 1) % text.length;
+    el.textContent = text.slice(pos) + text.slice(0, pos);
+  }, 80);
+})();
+
+// Tab nav
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('visible'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('visible');
+    if (btn.dataset.tab === 'network') renderNetwork();
+  });
+});
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(reportData,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'ashb2-data.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 200);
+});
+
+// Chart.js retro theme
+Chart.defaults.color          = '#4a7a4a';
+Chart.defaults.borderColor    = '#0d3d06';
+Chart.defaults.font.family    = "'Share Tech Mono', monospace";
+Chart.defaults.font.size      = 10;
+
+(function() {
+  const labels  = Object.keys(actionCounts).sort((a,b) => actionCounts[b]-actionCounts[a]);
+  const palette = ['#39ff14','#ffb700','#00e5ff','#ff3131','#7fff7f','#ff8c00','#00bfff','#ff6b6b','#c0ff00'];
+  new Chart(document.getElementById('actionChart'), {
+    type:'bar',
+    data:{ labels, datasets:[{
+      label:'Count', data:labels.map(l=>actionCounts[l]),
+      backgroundColor:labels.map((_,i)=>palette[i%palette.length]+'33'),
+      borderColor:labels.map((_,i)=>palette[i%palette.length]),
+      borderWidth:1, borderRadius:0, borderSkipped:false
+    }]},
+    options:{
+      responsive:true, plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{maxRotation:40,color:'#4a7a4a'},grid:{color:'#0d3d06',lineWidth:1}},
+        y:{grid:{color:'#0d3d06',lineWidth:1},ticks:{color:'#4a7a4a'}}
+      }
+    }
+  });
+})();
+
+(function() {
+  const alive      = (attributesData['Health']||[]).length;
+  const deathCount = (reportData.logs.deaths||'').split('\n').filter(l=>l.trim()).length;
+  const birthCount = (reportData.logs.births||'').split('\n').filter(l=>l.trim()).length;
+  new Chart(document.getElementById('popChart'), {
+    type:'doughnut',
+    data:{
+      labels:['Alive','Deaths','Births'],
+      datasets:[{
+        data:[alive,deathCount,birthCount],
+        backgroundColor:['#39ff1422','#ff313122','#00e5ff22'],
+        borderColor:['#39ff14','#ff3131','#00e5ff'],
+        borderWidth:2, hoverOffset:4,
+      }]
+    },
+    options:{
+      responsive:true, cutout:'72%',
+      plugins:{legend:{position:'right',labels:{padding:12,boxWidth:8,usePointStyle:true,color:'#4a7a4a'}}}
+    }
+  });
+})();
+
+(function() {
+  const slot = document.getElementById('global-charts-slot');
+  ATTR_NAMES.forEach(attrName => {
+    const agentsArray = attributesData[attrName]||[];
+    const color = ATTR_COLOR[attrName];
+    const wrap = document.createElement('div');
+    wrap.className = 'chart-wrap';
+    const cid = 'gc-'+attrName.replace(/\s/g,'_');
+    wrap.innerHTML = `
+      <div class="chart-label">
+        <span class="cdot" style="color:${color};border-color:${color}"></span>${attrName}
+      </div>
+      <canvas id="${cid}" style="max-height:180px"></canvas>`;
+    slot.appendChild(wrap);
+    const datasets = agentsArray.map((vals,idx) => {
+      const hue = (ATTR_NAMES.indexOf(attrName)*40 + idx*23)%360;
+      return { label:entityNameMap[idx]||`Agent ${idx}`, data:vals,
+        borderColor:`hsl(${hue},80%,55%)`, backgroundColor:`hsla(${hue},80%,55%,0.05)`,
+        borderWidth:1, pointRadius:0, tension:0.1 };
+    });
+    new Chart(document.getElementById(cid), {
+      type:'line', data:{labels:ticks,datasets},
+      options:{
+        responsive:true, animation:false,
+        plugins:{
+          legend:{display:agentsArray.length<=8,labels:{boxWidth:6,padding:8,color:'#4a7a4a'}},
+          tooltip:{mode:'index',intersect:false,backgroundColor:'#070d07',titleColor:'#39ff14',bodyColor:'#4a7a4a',borderColor:'#1a4a1a',borderWidth:1}
+        },
+        scales:{
+          x:{title:{display:true,text:'Tick',color:'#2a4a2a'},grid:{color:'#0d3d06'},ticks:{color:'#2a4a2a'}},
+          y:{grid:{color:'#0d3d06'},ticks:{color:'#2a4a2a'}}
+        }
+      }
+    });
+  });
+})();
+
+const entityItemsEl    = document.getElementById('entity-items');
+const entityDetailEl   = document.getElementById('entity-detail-area');
+const entityCountBadge = document.getElementById('entity-count-badge');
+const entityChartRefs  = {};
+
+function buildEntityList(filter) {
+  entityItemsEl.innerHTML = ''; let shown = 0;
+  for (let i=0;i<NUM_ENTITIES;i++) {
+    const name = entityNameMap[i]||`Agent ${i}`;
+    if (filter && !name.toLowerCase().includes(filter.toLowerCase()) && !String(i).includes(filter)) continue;
+    shown++;
+    const item = document.createElement('div');
+    item.className = 'entity-item'; item.dataset.idx = i;
+    item.innerHTML = `
+      <div class="avatar">${name[0].toUpperCase()}</div>
+      <div>
+        <div class="entity-item-name">${name}</div>
+        <div class="entity-item-id">ID: ${i}</div>
+      </div>`;
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.entity-item').forEach(e=>e.classList.remove('selected'));
+      item.classList.add('selected'); renderEntityDetail(i);
+    });
+    entityItemsEl.appendChild(item);
+  }
+  entityCountBadge.textContent = shown;
+}
+buildEntityList('');
+document.getElementById('entity-search').addEventListener('input', e=>buildEntityList(e.target.value));
+
+function getLastVal(attrName,idx) {
+  const arr = (attributesData[attrName]||[])[idx];
+  return (!arr||!arr.length)?0:arr[arr.length-1];
+}
+function statBarColor(attrName,val) {
+  if (BAD_HIGH.has(attrName)) { if(val>70)return'#ff3131';if(val>40)return'#ffb700';return'#39ff14'; }
+  if(val<30)return'#ff3131';if(val<60)return'#ffb700';return'#39ff14';
+}
+
+function renderEntityDetail(idx) {
+  const name = entityNameMap[idx]||`Agent ${idx}`;
+  if (entityChartRefs[idx]) entityChartRefs[idx].forEach(c=>c.destroy());
+  entityChartRefs[idx] = [];
+
+  const statBarsHtml = ATTR_NAMES.map(attr => {
+    const val=getLastVal(attr,idx), pct=Math.min(100,Math.max(0,val)).toFixed(1);
+    const barClr=statBarColor(attr,val);
+    return `<div class="stat-bar-row">
+      <div class="stat-bar-meta">
+        <span class="stat-bar-name">${attr}</span>
+        <span class="stat-bar-val" style="color:${barClr}">${parseFloat(val).toFixed(1)}</span>
+      </div>
+      <div class="stat-bar-track">
+        <div class="stat-bar-fill" style="width:${pct}%;background:${barClr}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const chartIds   = ATTR_NAMES.map(a=>`ec-${idx}-${a.replace(/\s/g,'_')}`);
+  const chartsHtml = ATTR_NAMES.map((attr,ai) => {
+    const clr2=ATTR_COLOR[attr];
+    return `<div class="chart-wrap">
+      <div class="chart-label"><span class="cdot" style="color:${clr2};border-color:${clr2}"></span>${attr}</div>
+      <canvas id="${chartIds[ai]}" style="max-height:100px"></canvas>
+    </div>`;
+  }).join('');
+
+  const entityActions = getEntityActions(idx,name);
+  const entityLogs    = filterEntityLogs(idx,name);
+  const partners = [];
+  relEdges.forEach(e => {
+    if(e.from===idx) partners.push({id:e.to,  name:entityNameMap[e.to]  ||`Agent ${e.to}`,  label:e.label});
+    if(e.to  ===idx) partners.push({id:e.from,name:entityNameMap[e.from]||`Agent ${e.from}`,label:e.label});
+  });
+
+  const linksHtml = partners.length
+    ? partners.map(p => `
+        <div style="display:flex;align-items:center;gap:0.7rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+          <div class="avatar">${p.name[0].toUpperCase()}</div>
+          <span style="font-size:0.78rem;color:var(--white)">${p.name}</span>
+          <span class="badge info" style="margin-left:auto">${p.label}</span>
+        </div>`).join('')
+    : `<p style="color:var(--dim);font-size:0.75rem;font-family:'Share Tech Mono',monospace">> No relationships recorded.</p>`;
+
+  entityDetailEl.innerHTML = `<div class="entity-detail">
+    <div class="entity-hero">
+      <div class="entity-hero-avatar">${name[0].toUpperCase()}</div>
+      <div>
+        <div class="entity-hero-name">${name}</div>
+        <div class="entity-hero-sub">ID: ${idx} | Active Ticks: ${ticks.length}</div>
+        <div class="badge-row">
+          <span class="badge alive">Alive</span>
+          <span class="badge info">${ticks.length} Ticks</span>
+          ${partners.length?`<span class="badge info">${partners.length} Link${partners.length>1?'s':''}</span>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Current Stats</div>
+      <div class="stat-bars-grid">${statBarsHtml}</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">History</div>
+      <div class="entity-charts-grid">${chartsHtml}</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Relationships</div>
+      ${linksHtml}
+    </div>
+    ${entityActions?`<div class="panel"><div class="panel-title">Actions Performed</div><canvas id="eac-${idx}" style="max-height:200px"></canvas></div>`:''}
+    <div class="panel">
+      <div class="panel-title">Log History</div>
+      <div class="log-entries" style="max-height:300px;background:var(--bg);border:1px solid var(--border)">
+        ${entityLogs||'<div style="color:var(--dim);padding:1rem;font-size:0.75rem">> No log entries found.</div>'}
+      </div>
+    </div>
+  </div>`;
+
+  requestAnimationFrame(() => {
+    ATTR_NAMES.forEach((attr,ai) => {
+      const canvas=document.getElementById(chartIds[ai]);
+      if(!canvas)return;
+      const vals=(attributesData[attr]||[])[idx]||[];
+      const clr2=ATTR_COLOR[attr];
+      const c=new Chart(canvas,{
+        type:'line',
+        data:{labels:ticks,datasets:[{label:attr,data:vals,borderColor:clr2,backgroundColor:clr2+'11',borderWidth:1.5,pointRadius:0,tension:0.1,fill:true}]},
+        options:{responsive:true,animation:false,
+          plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#070d07',titleColor:'#39ff14',bodyColor:'#4a7a4a',borderColor:'#1a4a1a',borderWidth:1}},
+          scales:{x:{display:false},y:{grid:{color:'#0d3d06'},ticks:{color:'#2a4a2a',font:{size:9}}}}}
+      });
+      entityChartRefs[idx].push(c);
+    });
+    if (entityActions) {
+      const eacCanvas=document.getElementById(`eac-${idx}`);
+      if(eacCanvas){
+        const palette=['#39ff14','#ffb700','#00e5ff','#ff3131','#7fff7f','#ff8c00'];
+        const labels=Object.keys(entityActions).sort((a,b)=>entityActions[b]-entityActions[a]);
+        const c=new Chart(eacCanvas,{
+          type:'bar',
+          data:{labels,datasets:[{label:'Count',data:labels.map(l=>entityActions[l]),
+            backgroundColor:labels.map((_,i)=>palette[i%palette.length]+'22'),
+            borderColor:labels.map((_,i)=>palette[i%palette.length]),
+            borderWidth:1,borderRadius:0,borderSkipped:false}]},
+          options:{responsive:true,plugins:{legend:{display:false}},
+            scales:{x:{ticks:{maxRotation:35,color:'#4a7a4a'},grid:{color:'#0d3d06'}},
+                    y:{grid:{color:'#0d3d06'},ticks:{color:'#4a7a4a'}}}}
+        });
+        entityChartRefs[idx].push(c);
+      }
+    }
+  });
+}
+
+function getEntityActions(idx,name) {
+  const text=reportData.logs.actions||'';
+  const nameRe=new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');
+  const idRe=new RegExp(`\\(${idx}\\)|Agent ${idx}[^0-9]`,'i');
+  const counts={};
+  text.split('\n').forEach(line=>{
+    if(!line.trim()||(!nameRe.test(line)&&!idRe.test(line)))return;
+    const m=line.match(/performed[:\s]+([^\-\n,]+)/i);
+    if(m){const act=m[1].trim();counts[act]=(counts[act]||0)+1;}
+  });
+  return Object.keys(counts).length?counts:null;
+}
+function filterEntityLogs(idx,name) {
+  const nameRe=new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');
+  const idRe=new RegExp(`\\(${idx}\\)|Agent ${idx}[^0-9]`,'i');
+  const sources=[
+    {text:reportData.logs.actions||'',cls:'ev-action'},
+    {text:reportData.logs.deaths||'',cls:'ev-death'},
+    {text:reportData.logs.births||'',cls:'ev-birth'},
+    {text:reportData.logs.diseases||'',cls:'ev-disease'},
+    {text:reportData.logs.relationships||'',cls:'ev-relation'},
+    {text:reportData.logs.events||'',cls:'ev-event'},
+  ];
+  let html='';
+  sources.forEach(({text,cls})=>{
+    text.split('\n').forEach(line=>{
+      if(!line.trim()||(!nameRe.test(line)&&!idRe.test(line)))return;
+      html+=renderLogLine(line,cls);
+    });
+  });
+  return html;
+}
+
+const LOG_TYPE_LABELS={'ev-death':'Death','ev-birth':'Birth','ev-disease':'Health','ev-relation':'Social','ev-action':'Action','ev-move':'Move','ev-event':'Event','ev-cmd':'System'};
+function detectLogClass(line,hint) {
+  if(hint)return hint;
+  const l=line.toLowerCase();
+  if(l.includes('died')||l.includes('death'))return'ev-death';
+  if(l.includes('born')||l.includes('birth'))return'ev-birth';
+  if(l.includes('contracted')||l.includes('disease')||l.includes('cured')||l.includes('plague'))return'ev-disease';
+  if(l.includes('relationship'))return'ev-relation';
+  if(l.includes('moved')||l.includes('movement'))return'ev-move';
+  if(l.includes('performed')||l.includes('action'))return'ev-action';
+  return'ev-event';
+}
+function renderLogLine(line,hintClass) {
+  if(!line.trim())return'';
+  const cls=detectLogClass(line,hintClass);
+  const typeLabel=LOG_TYPE_LABELS[cls]||'Info';
+  const tsMatch=line.match(/^\[([^\]]+)\]\s*(.*)/s);
+  const tagHtml=`<span class="le-tag">${typeLabel}</span>`;
+  if(tsMatch){
+    return `<div class="log-entry ${cls}">
+      <div class="log-entry-header">${tagHtml}<span class="le-ts">[${tsMatch[1]}]</span></div>
+      <div class="le-body">${tsMatch[2].replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>`;
+  }
+  return `<div class="log-entry ${cls}">
+    <div class="log-entry-header">${tagHtml}</div>
+    <div class="le-body">${line.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+  </div>`;
+}
+function populateLog(containerId,text,countId,hintClass) {
+  const el=document.getElementById(containerId);
+  const counter=document.getElementById(countId);
+  const lines=text.split('\n').filter(l=>l.trim());
+  el.innerHTML=lines.map(l=>renderLogLine(l,hintClass)).join('');
+  if(counter)counter.textContent=lines.length;
+  el.dataset.raw=text;
+}
+function filterLog(containerId,query) {
+  const el=document.getElementById(containerId);
+  const raw=el.dataset.raw||'';
+  const q=query.toLowerCase();
+  const lines=raw.split('\n').filter(l=>l.trim());
+  el.innerHTML=(q?lines.filter(l=>l.toLowerCase().includes(q)):lines).map(l=>renderLogLine(l,'')).join('');
+}
+populateLog('log-events',       reportData.logs.events       ||'','lc-events',       'ev-event');
+populateLog('log-actions',      reportData.logs.actions      ||'','lc-actions',      'ev-action');
+populateLog('log-deaths',       reportData.logs.deaths       ||'','lc-deaths',       'ev-death');
+populateLog('log-diseases',     reportData.logs.diseases     ||'','lc-diseases',     'ev-disease');
+populateLog('log-births',       reportData.logs.births       ||'','lc-births',       'ev-birth');
+populateLog('log-movements',    reportData.logs.movements    ||'','lc-movements',    'ev-move');
+populateLog('log-relationships',reportData.logs.relationships||'','lc-relationships','ev-relation');
+populateLog('log-cmd',          reportData.logs.cmd          ||'','lc-cmd',          '');
+
+let networkRendered=false;
+function renderNetwork() {
+  if(networkRendered)return;
+  networkRendered=true;
+  const container=document.getElementById('relationship-network');
+  const data={nodes:new vis.DataSet(relNodes),edges:new vis.DataSet(relEdges)};
+  const options={
+    physics:{stabilization:{iterations:200},barnesHut:{gravitationalConstant:-9000,springLength:140}},
+    edges:{
+      smooth:{enabled:true,type:'cubicBezier'},
+      font:{align:'top',color:'#4a7a4a',size:10,face:"'Share Tech Mono',monospace"},
+      color:{color:'#1a4a1a',highlight:'#39ff14'},
+      width:1,
+    },
+    nodes:{
+      shape:'box',
+      size:12,
+      font:{color:'#39ff14',size:11,face:"'VT323',monospace",strokeWidth:0},
+      color:{
+        border:'#39ff14',background:'#070d07',
+        highlight:{border:'#ffb700',background:'#0d1f0d'},
+        hover:    {border:'#00e5ff',background:'#070d07'},
+      },
+      borderWidth:1,
+      shapeProperties:{borderRadius:0}
+    },
+    interaction:{hover:true,tooltipDelay:100},
+  };
+  new vis.Network(container,data,options);
+}
+</script>
+</body>
+</html>
