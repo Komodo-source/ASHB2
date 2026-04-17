@@ -651,6 +651,8 @@ void MentalModelOfOther::updateFromObservation(Entity* observed, float observerA
     estimatedHappiness = observed->entityHapiness * observerAccuracy + estimatedHappiness * (1.0f - observerAccuracy);
     estimatedAnger     = observed->entityGeneralAnger * observerAccuracy + estimatedAnger * (1.0f - observerAccuracy);
     estimatedStress    = observed->entityStress * observerAccuracy + estimatedStress * (1.0f - observerAccuracy);
+
+    
 }
 
 MentalModelOfOther* Entity::getModelOf(Entity* ent) {

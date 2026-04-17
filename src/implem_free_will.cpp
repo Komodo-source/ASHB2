@@ -17,6 +17,7 @@
 #include "./header/NeedLevel.h"
 
 std::vector<Entity> FreeWillSystem::new_borns;
+int FreeWillSystem::day;
 extern Logger* globalLogger;
 
     // Calculate memory weight (more recent = more weight)
@@ -145,6 +146,33 @@ extern Logger* globalLogger;
         entity->entityStress       = std::max(0.0f, std::min(100.0f, entity->entityStress));
         entity->entityMentalHealth = std::max(0.0f, std::min(100.0f, entity->entityMentalHealth));
     }
+
+    float FreeWillSystem::calculateLifeMemoryBias(Entity* entity, const Action& action) {
+    float bias = 1.0f;
+    int currentDay = day;
+
+    for (const LifeMemory& mem : entity->lifeMemories) {
+        int age = currentDay - mem.simulationDay;
+        float decayFactor = std::exp(-age / 300.0f);  // fait que la mémoire devient flou
+
+        // Formative memories have stronger and longer effect
+        float intensity = mem.emotionalIntensity * decayFactor;
+        if (mem.isFormative) intensity *= 2.5f;
+
+        if (mem.eventType == "loss_death" || mem.eventType == "breakup") {
+            if (action.needCategory == "social") bias -= intensity * 0.4f;
+            if (action.name == "DrinkAlcohol" || action.name == "Smoke") bias += intensity * 0.5f;
+        }
+        if (mem.eventType == "positive_bond" || mem.eventType == "first_love") {
+            if (action.name == "Flirt" || action.name == "Date") bias += intensity * 0.3f;
+        }
+        if (mem.eventType == "trauma") {
+            if (action.name == "SelfHarm" || action.name == "Anxiety") bias += intensity * 0.4f;
+            if (action.needCategory == "social") bias -= intensity * 0.2f;
+        }
+    }
+    return std::max(0.1f, std::min(3.0f, bias));
+}
 
     // Calculate bias from memory (learn from past experiences)
     float FreeWillSystem::calculateMemoryBias(int actionId) {
@@ -1028,6 +1056,22 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         smoke.baseSatisfaction = 10.0f;
         availableActions.push_back(smoke);
 
+
+         // Social media Scrolling dopamine
+        Action scrolling("Scrolling", 13, "health");
+        scrolling.requirements = {
+            {"stress", 35.0f, 0.5f},
+        };
+        scrolling.statChanges = {
+            {"stress", -4.0f},
+            {"happiness", -2.0f},
+            {"boredom", 5.0f},
+            {"loneliness", 15.0f},
+            {"mentalHealth", -8.0f}
+        };
+        scrolling.baseSatisfaction = 8.0f;
+        availableActions.push_back(scrolling);
+
         // ==================== INTIMATE/ROMANTIC ACTIONS ====================
 
         // Flirt (social)
@@ -1204,25 +1248,57 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         };
         work.baseSatisfaction = 25.0f;
         availableActions.push_back(work);
+
+
+
     }
 
     void FreeWillSystem::updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess){
-        if(act.name == "Murder" || act.name == "SelfHarm"){
-            ent->personality.neuroticism += 1.2f;
-            ent->personality.agreeableness -= 1.5f;
-        }else if((act.name == "Socialize" || act.name == "Gossip") && outcomeSuccess > 0.7){
-            ent->personality.agreeableness += 1.0f;
-            ent->personality.openness += 0.9f;
-        }else if(act.name == "Paryer" && outcomeSuccess > 0.55){
-            ent->personality.conscientiousness += 1.3f;
-        }else if(act.name == "DrinkAlcohol" || act.name == "Smoke"){
-            ent->personality.neuroticism += 0.9f;
-        }else if(act.name == "Take Shower" || act.name == "Rest" || act.name == "Sleep"){
-            ent->personality.neuroticism -= 0.2f;
-        }else if((act.name == "Flirt" || act.name == "Date") && outcomeSuccess > 0.6){
-            ent->personality.neuroticism -= 0.3f;
-            ent->personality.agreeableness += 1.6f;
-            ent->personality.openness += 1.6f;
+        std::vector<std::string> actions_possible = {"Murder", "SelfHarm", "Gossip", "Socialize", "Paryer", "Paryer", "DrinkAlcohol", "Smoke", "Rest", "Sleep", "Flirt", "Date", "Take Shower"};
+        if (std::find(actions_possible.begin(), actions_possible.end(), act.name) != actions_possible.end() ){ //si une action qui change la personnalité de l'expérience on entre
+            if(act.name == "Murder" || act.name == "SelfHarm"){
+                ent->personality.neuroticism += 1.2f;
+                ent->personality.agreeableness -= 1.5f;
+
+                ent->SelfConcept.perceivedAgreeableness -= 1.2f;
+                ent->SelfConcept.perceivedNeuroticism +=  1.12f;
+                ent->SelfConcept.selfEsteem += 1.1f;
+                ent->SelfConcept.selfEfficacy += 1.1f;
+
+            }else if((act.name == "Socialize" || act.name == "Gossip") && outcomeSuccess > 0.7){
+                ent->personality.agreeableness += 1.0f;
+                ent->personality.openness += 0.9f;
+
+                ent->SelfConcept.perceivedExtraversion += 0.9f;
+                ent->SelfConcept.perceivedAgreeableness += 0.6f;
+                ent->SelfConcept.selfEsteem += 1.1f;
+                ent->SelfConcept.selfEfficacy += 1.1f;
+            }else if(act.name == "Paryer" && outcomeSuccess > 0.55){
+                ent->personality.conscientiousness += 1.3f;
+            }else if(act.name == "DrinkAlcohol" || act.name == "Smoke"){
+                ent->personality.neuroticism += 0.9f;
+
+                ent->SelfConcept.selfEsteem += 1.1f;
+                ent->SelfConcept.selfEfficacy += 1.1f;
+                ent->SelfConcept.perceivedAgreeableness -= 0.2f;
+                ent->SelfConcept.perceivedNeuroticism += 0.7f;
+            }else if(act.name == "Take Shower" || act.name == "Rest" || act.name == "Sleep"){
+                ent->personality.neuroticism -= 0.2f;
+            }else if((act.name == "Flirt" || act.name == "Date") && outcomeSuccess > 0.6){
+                ent->personality.neuroticism -= 0.3f;
+
+                ent->SelfConcept.selfEsteem += 1.1f;
+                ent->SelfConcept.selfEfficacy += 1.1f;
+                ent->personality.agreeableness += 1.6f;
+                ent->personality.openness += 1.6f;
+                ent->SelfConcept.perceivedExtraversion += 1.2f;
+            }
+        }else{
+            ent->SelfConcept.perceivedAgreeableness -= 0.2f;
+            ent->SelfConcept.perceivedExtraversion -= 0.2f;
+            ent->SelfConcept.perceivedNeuroticism -= 0.2f;
+            ent->SelfConcept.selfEsteem -= 0.2f;
+            ent->SelfConcept.selfEfficacy -= 0.5f;
         }
     }
     // Calculate social influence from neighbors
@@ -1434,6 +1510,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
     Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context) {
         // Attempt the cognitive pipeline path first
         Action* cp = cognitiveChooseAction(entity, neighbors, context);
+
         if (cp != nullptr) return cp;
         // Fallback to legacy scoring if pipeline did not produce a result
         // (legacy path retained for compatibility)
@@ -1463,6 +1540,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 float requirementFitness = calculateRequirementFitness(entity, action);
                 float needSatisfaction = calculateNeedSatisfaction(action, entity);
                 float memoryBias = calculateMemoryBias(action.actionId);
+                float lifeMemoryBiad = calculateLifeMemoryBias(entity, action);
                 float varietyBonus = calculateVarietyBonus(action.actionId);
                 float socialInfluence = calculateSocialInfluence(entity, neighbors, action);
                 float contextualWeight = calculateContextualWeight(action, context);
@@ -1483,6 +1561,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 std::cout << "  ContextualWeight:     " << contextualWeight << "\n";
                 std::cout << "  PersonalityModifier:  " << personalityModifier << "\n";
                 std::cout << "  ValueSatisfaction:    " << valueSatisfaction << "\n";
+                std::cout << "  Life Memory Bias      " << lifeMemoryBiad << "\n";
                 std::cout << "  GriefModifier:        " << calculateGriefModifier(entity, action) << "\n";
                 std::cout << "  EnvModifier:          " << calculateEnvironmentalModifier(entity, action, context.env) << "\n";
                 std::cout << "  NormModifier:         " << normModifier << "\n";
@@ -1503,7 +1582,8 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                             + needSatisfaction * 0.25f
                             + memoryBias * 0.10f
                             + varietyBonus * 0.10f
-                            + socialInfluence * 0.10f;
+                            + socialInfluence * 0.10f
+                            + lifeMemoryBiad * 0.15f;
 
                 weight *= contextualWeight;
                 weight *= personalityModifier;
@@ -1512,6 +1592,7 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 weight *= envModifier;
                 //weight *= normModifier;
 
+                float selfConceptMultiplier = 1.0f;
                 // rarete + condition de stats
                 float rarityMultiplier = 1.0f;
                 if (action.name == "Murder") {
@@ -1579,11 +1660,33 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                    rarityMultiplier = 0.25f;
                 }
 
+                //self concept
+                else if (entity->SelfConcept.selfEfficacy < 40.0f && action.name == "Procrastinate"){
+                    selfConceptMultiplier = 1.22f;
+                }else if (entity->SelfConcept.selfEfficacy < 40.0f &&  action.name == "WatchEntertainement"){
+                    selfConceptMultiplier = 1.15f;
+                }else if (entity->SelfConcept.selfEfficacy < 40.0f &&  action.name == "Gaming"){
+                    selfConceptMultiplier = 1.18f;
+                }else if (entity->SelfConcept.selfEfficacy < 40.0f &&  action.name == "Rest"){
+                    selfConceptMultiplier = 1.18f;
+                }
+
+                else if (entity->SelfConcept.selfEfficacy > 60.0f && action.name == "Work on Project"){
+                    selfConceptMultiplier = 1.22f;
+                }else if (entity->SelfConcept.selfEfficacy > 60.0f &&  action.name == "Read"){
+                    selfConceptMultiplier = 1.15f;
+                }else if (entity->SelfConcept.selfEfficacy > 60.0f &&  action.name == "CreativeActivity"){
+                    selfConceptMultiplier = 1.18f;
+                }else if (entity->SelfConcept.selfEfficacy > 60.0f &&  action.name == "LearnSkill"){
+                    selfConceptMultiplier = 1.18f;
+                }
+
                 weight *= rarityMultiplier;
 
                 std::uniform_real_distribution<float> dist(0.95f, 1.05f);
                 float randomFactor = dist(rng);
                 weight *= randomFactor;
+                weight *= selfConceptMultiplier;
 
                 std::cout << "  RarityMultiplier:     " << rarityMultiplier << "\n";
                 std::cout << "  Combined Weight (pre-sort): " << weight
@@ -1610,6 +1713,9 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
 
             float cumulative = 0.0f;
             for (const auto& aw : actionWeights) {
+
+                calculateGoalAlignmentModifier(entity, aw.first);
+
                 cumulative += aw.second;
                 if (selection <= cumulative) {
                     // on update les norms social ici
@@ -1624,8 +1730,6 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             std::cout << ">>> Default fallback to: " << availableActions[0].name << " <<<\n";
             return &availableActions[0];
         }
-
-
 
 NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& action) {
 
@@ -1722,13 +1826,13 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
 
 
 
-
     //ici on assimile l'action pointé vers sur celui qui est pointé
     //par le pointeur
     void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action){
 
         if(action->name == "Desire"){
-            // Natural attraction checks - cannot be attracted if target has poor hygiene or is unhappy
+            // Natural attraction c hecks
+            // cannot be attracted if target has poor hygiene or is unhappy
             if(pointed->entityHygiene < 40){
                 std::cout << "Desire bloqué: " << pointed->getName() << " a une hygiène trop basse (" << pointed->entityHygiene << ")\n";
                 return;
@@ -1911,7 +2015,11 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
 
                 std::cout << "Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
                 if(globalLogger) globalLogger->logEvent("breeding", "Reproduction between " + pointer->name + " and " + pointed->name);
-                Entity baby = Entity(5, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 5, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
+
+                static int nextBabyId = 1000;
+                Entity baby = Entity(nextBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1, nullptr, nullptr, nullptr, nullptr ,"happiness");
+
+                if(globalLogger) globalLogger->logBirth(baby.entityId, baby.getName(), pointer->getId(), pointed->getId(), pointer->getName(), pointed->getName());
                 baby.posX = pointer->posX + 3;
                 baby.posY = pointer->posY + 3;
                 baby.parent1 = pointed;
@@ -2072,6 +2180,17 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
                 }
             }else{
                 std::cout << "Gossip: " << pointer->getName() << " parle de " << pointed->getName() << " (non découvert)\n";
+            }
+
+            Entity* gossipSubject = pointer;
+            if (gossipSubject) {
+                MentalModelOfOther* gossiperView = pointer->getModelOf(gossipSubject);
+                if (gossiperView) {
+                    // Listener updates their reputation map with a noisy version of gossiper's view
+                    float noiseFactor = 0.4f; // hearsay is inaccurate
+                    pointed->reputationMap[gossipSubject->entityId].positiveScore += (gossiperView->estimatedHappiness - 50.0f) * 0.1f * (1.0f - noiseFactor);
+                    pointed->reputationMap[gossipSubject->entityId].timesGossipedAbout++;
+                }
             }
         }
         else if(action->name == "Apologize"){
@@ -2477,6 +2596,48 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         return needs;
     }
 
+    float FreeWillSystem::calculateGoalAlignmentModifier(Entity* entity,  Action* action) {
+    float modifier = 1.0f;
+
+    for (const LifeGoal& goal : entity->m_goals) {
+        if (goal.priority < 20.0f) continue; // dormant goal
+
+        float frustrationBoost = 1.0f + (goal.frustrationLevel / 100.0f) * 0.5f;
+
+        if (goal.type == "build_career") {
+            if (action->name == "Work on Project" || action->name == "LearnSkill")
+                modifier *= 1.5f * frustrationBoost;
+            if (action->needCategory == "entertainment")
+                modifier *= 0.7f;
+        }
+        else if (goal.type == "find_partner") {
+            if (action->name == "Flirt" || action->name == "Date" || action->name == "couple")
+                modifier *= 1.6f * frustrationBoost;
+            if (action->name == "Socialize")
+                modifier *= 1.2f;
+        }
+        else if (goal.type == "make_friends") {
+            if (action->needCategory == "social")
+                modifier *= 1.3f * frustrationBoost;
+        }
+        else if (goal.type == "self") {
+            if (action->name == "Prayer" || action->name == "SeekTherapy" ||
+                action->name == "CreativeActivity" || action->name == "Read")
+                modifier *= 1.4f * frustrationBoost;
+        }
+        else if (goal.type == "happiness") {
+            if (action->statChanges.size() > 0) {
+                float happinessGain = 0.0f;
+                for (const auto& sc : action->statChanges) {
+                    if (sc.statName == "happiness") happinessGain += sc.changeValue;
+                }
+                if (happinessGain > 0) modifier *= 1.0f + happinessGain * 0.02f;
+            }
+        }
+    }
+    return std::max(0.3f, std::min(3.0f, modifier));
+}
+
     std::map<std::string, float> FreeWillSystem::captureEntityStats(Entity* entity) {
         return {
             {"health", entity->entityHealth},
@@ -2687,6 +2848,8 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
     appraisal.agentBlame = 0.0f;
     appraisal.novelty = clamp01(appraisal.novelty);
 
+
+
     // Generate 3-7 candidates using existing scoring utilities
     std::vector<ActionCandidate> candidates;
     for (const Action& act : availableActions){
@@ -2718,6 +2881,8 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
 
 
 
+
+
     // Ensure at least 3 candidates
     if (candidates.size() < 3){
         for (const Action& act : availableActions){ ActionCandidate c(&act); c.score = calculateNeedSatisfaction(act, entity) + calculateContextualWeight(act, context); candidates.push_back(c); if (candidates.size() >= 3) break; }
@@ -2730,6 +2895,28 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
     delib.internalReasoning = "Cognitive Pipeline: chosen by top-scoring candidate";
     delib.isImpulsive = (entity->entityStress > 60.0f) || (appraisal.novelty > 0.6f);
     lastDeliberation = delib;
+
+    //Internal conflict
+    ValueSystem& v = entity->ValueSystem;
+
+    // Detect high-value conflicts
+    float conflictLevel = 0.0f;
+    if (v.familyOrientation > 70.0f && v.achievementDrive > 70.0f) conflictLevel += 0.3f;
+    if (v.hedonism > 70.0f && v.spiritualNeed > 70.0f)             conflictLevel += 0.4f;
+    if (v.collectivism > 70.0f && v.hedonism > 60.0f)              conflictLevel += 0.2f;
+
+    if (conflictLevel > 0.0f && candidates.size() >= 2) {
+        // Under conflict, entities sometimes choose the second-best option
+        // (the one aligned with the competing value)
+        std::mt19937 rng(std::random_device{}());
+        std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+        if (roll(rng) < conflictLevel) {
+            // Swap winner to candidate aligned with second value
+            std::swap(candidates[0], candidates[1]);
+            delib.internalReasoning = "Value conflict: chose against dominant preference";
+        }
+    }
+
 
     if (delib.chosenAction != nullptr) return const_cast<Action*>(delib.chosenAction);
     return nullptr;

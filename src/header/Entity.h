@@ -59,6 +59,32 @@ struct LifeMemory {
     std::string internalNarrative;
 };
 
+// How entity X perceives entity Y (from direct experience + heard information)
+struct PerceivedReputation {
+    int entityId;
+    float positiveScore = 50.0f;
+    float negativeScore = 50.0f;
+    int timesGossipedAbout = 0;
+    float trustworthiness  = 50.0f;
+};
+
+//self concept
+struct SelfConcept {
+    float perceivedExtraversion   = 50.0f;
+    float perceivedAgreeableness  = 50.0f;
+    float perceivedNeuroticism    = 50.0f;
+
+    // Identity labels the entity has adopted
+    // "loner", "caregiver", "achiever", "rebel"
+    std::string primaryIdentity = "undefined";
+    //pas utile à mon avis
+
+    float selfEsteem     = 50.0f;
+
+    float selfEfficacy   = 50.0f; //croyance que nos actions ont vraiment une sortie utile
+
+    float calibration    = 0.0f; //comment ma vision correspond à celle de comment les autres me percoit
+};
 
 
 struct GriefState {
@@ -230,10 +256,13 @@ public:
     Entity* parent1 = nullptr;
     Entity* parent2 = nullptr;
 
+    float fatigueLevel = 0.0f;
+
     std::vector<LifeMemory> lifeMemories;
     EmotionalState emotionalState;
     std::vector<MentalModelOfOther*> list_MentalModelOfOther;
-
+    SelfConcept SelfConcept;
+    std::map<int, PerceivedReputation> reputationMap;
     float Esteem;
 
 
@@ -242,7 +271,6 @@ public:
     entityPointedAnger pointedAnger;
     entityPointedCouple pointedCouple;
     entityPointedSocial social;
-
 
     // Constructors
     Entity(int id);

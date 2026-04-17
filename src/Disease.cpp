@@ -44,16 +44,16 @@ int Disease::region;
   }
 
   int Disease::calculateDisease(int neighboorsSize, Entity* ent, int nbSickClose){
-    int ranchoice = BetterRand::genNrInInterval(0,15);
+    int ranchoice = BetterRand::genNrInInterval(0,4);
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
-
-      if(hygiene - (ranchoice * region) - neighboorsSize - (3*nbSickClose) + (1.3 * ent->entityAntiBody) < 0){
-        return diseasePicked;
-      }else{
-        return -1;
+      if (ent->entityAntiBody < 100 ){
+        if(hygiene - (ranchoice * region) - neighboorsSize - (1.15 * nbSickClose) + (2.2 * ent->entityAntiBody) < 0){
+          return diseasePicked;
+        }else{
+          return -1;
+        }
       }
-
   }
 
   void Disease::manageSickness(Entity* ent){

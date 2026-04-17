@@ -13,6 +13,7 @@
 #include "./header/implot_internal.h"
 #include <sstream>
 #include <filesystem>
+#include <fstream>
 
 // ShowEntityWindow implementation
 
@@ -213,42 +214,78 @@ void UI::showSystemInformation(){
         }
         ImGui::Separator();
 
+        //std::ofstream MyFile("test_links.txt");
+
         ImGui::Text("== Pointed Attributes ==");
-        if(entity->list_entityPointedDesire.size() > 0){
-            ImGui::Text("Desire List");
-            for(int i=0; i < entity->list_entityPointedDesire.size(); i++){
-                Entity* pointed = entity->list_entityPointedDesire.at(i).pointedEntity;
-                ImGui::Text("%.1f -> %d : %s", entity->list_entityPointedDesire.at(i).desire,
-                        pointed->entityId, pointed->name.c_str());
-            }
-        }
 
-        if(entity->list_entityPointedAnger.size() > 0){
-            ImGui::Text("Anger List");
-            for(int i=0; i < entity->list_entityPointedAnger.size(); i++){
-                Entity* pointed = entity->list_entityPointedAnger.at(i).pointedEntity;
-                ImGui::Text("%.1f -> %d : %s", entity->list_entityPointedAnger.at(i).anger,
-                        pointed->entityId, pointed->name.c_str());
-            }
-        }
+// DESIRE — pink
+if (!entity->list_entityPointedDesire.empty()) {
+    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.7f, 1.0f), "Desire (%d)", (int)entity->list_entityPointedDesire.size());
+    for (auto& d : entity->list_entityPointedDesire) {
+        if (!d.pointedEntity) continue;
+        ImGui::Text("  %s (#%d)", d.pointedEntity->name.c_str(), d.pointedEntity->entityId);
+        ImGui::SameLine(160);
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.4f, 0.7f, 0.85f));
+        char label[32]; snprintf(label, sizeof(label), "##des%d", d.pointedEntity->entityId);
+        ImGui::ProgressBar(d.desire / 100.0f, ImVec2(100.0f, 12.0f), label);
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); ImGui::Text("%.0f", d.desire);
+    }
+    ImGui::Spacing();
+}
 
-        if(entity->list_entityPointedCouple.size() > 0){
-            ImGui::Text("Couple List");
-            for(int i=0; i < entity->list_entityPointedCouple.size(); i++){
-                Entity* pointed = entity->list_entityPointedCouple.at(i).pointedEntity;
-                ImGui::Text("=> %.1f : %s", pointed->entityId, pointed->name.c_str());
-            }
-        }
+// ANGER — red
+if (!entity->list_entityPointedAnger.empty()) {
+    ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Anger (%d)", (int)entity->list_entityPointedAnger.size());
+    for (auto& a : entity->list_entityPointedAnger) {
+        if (!a.pointedEntity) continue;
+        ImGui::Text("  %s (#%d)", a.pointedEntity->name.c_str(), a.pointedEntity->entityId);
+        ImGui::SameLine(160);
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.2f, 0.2f, 0.85f));
+        char label[32]; snprintf(label, sizeof(label), "##ang%d", a.pointedEntity->entityId);
+        ImGui::ProgressBar(a.anger / 100.0f, ImVec2(100.0f, 12.0f), label);
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); ImGui::Text("%.0f", a.anger);
+    }
+    ImGui::Spacing();
+}
 
-        if(entity->list_entityPointedSocial.size() > 0){
-            ImGui::Text("Social List");
-            for(int i=0; i < entity->list_entityPointedSocial.size(); i++){
-                Entity* pointed = entity->list_entityPointedSocial.at(i).pointedEntity;
-                ImGui::Text("%.1f -> %d : %s", entity->list_entityPointedSocial.at(i).social,
-                        pointed->entityId, pointed->name.c_str());
-
-            }
+    // SOCIAL — cyan
+    if (!entity->list_entityPointedSocial.empty()) {
+        ImGui::TextColored(ImVec4(0.2f, 0.9f, 0.9f, 1.0f), "Social bonds (%d)", (int)entity->list_entityPointedSocial.size());
+        for (auto& s : entity->list_entityPointedSocial) {
+            if (!s.pointedEntity) continue;
+            ImGui::Text("  %s (#%d)", s.pointedEntity->name.c_str(), s.pointedEntity->entityId);
+            ImGui::SameLine(160);
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.9f, 0.9f, 0.85f));
+            char label[32]; snprintf(label, sizeof(label), "##soc%d", s.pointedEntity->entityId);
+            ImGui::ProgressBar(s.social / 100.0f, ImVec2(100.0f, 12.0f), label);
+            ImGui::PopStyleColor();
+            ImGui::SameLine(); ImGui::Text("%.0f", s.social);
         }
+        ImGui::Spacing();
+    }
+
+    // COUPLE — gold
+    if (!entity->list_entityPointedCouple.empty()) {
+        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "Partner");
+        for (auto& c : entity->list_entityPointedCouple) {
+            if (!c.pointedEntity) continue;
+            ImGui::Text("  Couple  %s (#%d)", c.pointedEntity->name.c_str(), c.pointedEntity->entityId);
+        }
+        ImGui::Spacing();
+    }
+
+    // If no relationships at all
+    if (entity->list_entityPointedDesire.empty() &&
+        entity->list_entityPointedAnger.empty() &&
+        entity->list_entityPointedSocial.empty() &&
+        entity->list_entityPointedCouple.empty()) {
+        ImGui::TextDisabled("  No relationships yet.");
+    }
+
+
+        //MyFile.close();
 
         ImGui::End();
     }
@@ -256,8 +293,63 @@ void UI::showSystemInformation(){
 // DrawGrid implementation
 void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+
+    // Draw lines between entities FIRST so they appear under the circles
+    for (auto& entity : entities) {
+        // Draw couple ties (pink, thick)
+        for (auto& d : entity->list_entityPointedDesire) {
+            if (!d.pointedEntity) continue;
+            float alpha = std::min(1.0f, d.desire / 100.0f);
+            ImU32 col = IM_COL32(255, 80, 180, (int)(alpha * 180));
+            float thickness = 1.0f + (d.desire / 100.0f) * 3.0f;
+            draw_list->AddLine(
+                ImVec2(entity->posX, entity->posY),
+                ImVec2(d.pointedEntity->posX, d.pointedEntity->posY),
+                col, thickness);
+        }
+
+        // ANGER → red
+        for (auto& a : entity->list_entityPointedAnger) {
+            if (!a.pointedEntity) continue;
+            float alpha = std::min(1.0f, a.anger / 100.0f);
+            ImU32 col = IM_COL32(255, 40, 40, (int)(alpha * 180));
+            float thickness = 1.0f + (a.anger / 100.0f) * 3.0f;
+            draw_list->AddLine(
+                ImVec2(entity->posX, entity->posY),
+                ImVec2(a.pointedEntity->posX, a.pointedEntity->posY),
+                col, thickness);
+        }
+
+        // SOCIAL → cyan/teal
+        for (auto& s : entity->list_entityPointedSocial) {
+            if (!s.pointedEntity) continue;
+            float alpha = std::min(1.0f, s.social / 100.0f);
+            ImU32 col = IM_COL32(60, 220, 220, (int)(alpha * 150));
+            float thickness = 1.0f + (s.social / 100.0f) * 2.5f;
+            draw_list->AddLine(
+                ImVec2(entity->posX, entity->posY),
+                ImVec2(s.pointedEntity->posX, s.pointedEntity->posY),
+                col, thickness);
+        }
+
+        // COUPLE → gold, always thick
+        for (auto& c : entity->list_entityPointedCouple) {
+            if (!c.pointedEntity) continue;
+            draw_list->AddLine(
+                ImVec2(entity->posX, entity->posY),
+                ImVec2(c.pointedEntity->posX, c.pointedEntity->posY),
+                IM_COL32(255, 215, 0, 220), 3.5f);
+        }
+    }
+
     for (auto& entity : entities) {
         ImU32 color = entity->selected ? IM_COL32(255, 100, 100, 255) : IM_COL32(200, 200, 200, 255);
+        draw_list->AddCircleFilled(ImVec2(entity->posX, entity->posY), pointSize, color);
+    }
+    for (auto& entity : entities) {
+        ImU32 color = entity->selected
+            ? IM_COL32(255, 100, 100, 255)
+            : IM_COL32(200, 200, 200, 255);
         draw_list->AddCircleFilled(ImVec2(entity->posX, entity->posY), pointSize, color);
     }
 }

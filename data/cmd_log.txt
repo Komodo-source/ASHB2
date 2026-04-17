@@ -1,23 +1,38 @@
-[2026-03-20 23:41:39] done
-[2026-03-20 23:42:05] Entity 0 personality: E=52.9626 A=48.7203 C=23.2506 N=18.5979 O=47.5928
-[2026-03-20 23:42:05] Entity 1 personality: E=0 A=51.1222 C=53.1434 N=41.7832 O=29.8826
-[2026-03-20 23:42:05] Entity 2 personality: E=65.7489 A=29.4618 C=98.5662 N=55.8028 O=47.6969
-[2026-03-20 23:42:05] Entity 3 personality: E=48.5761 A=10.0428 C=61.5283 N=44.751 O=41.6865
-[2026-03-20 23:42:05] Entity 4 personality: E=65.0998 A=29.5168 C=32.5587 N=52.9584 O=69.4035
-[2026-03-20 23:42:06] Entity contaminated: 0 Campbell => Plague
-[2026-03-20 23:42:06] Entity contaminated: 1 Julien => Fever
-[2026-03-20 23:42:06] Entity contaminated: 2 Yahir => Malaria
-[2026-03-20 23:42:06] Entity contaminated: 3 Makaila => Malaria
-[2026-03-20 23:42:06] Entity contaminated: 4 Alexander => Typhus
-[2026-03-20 23:42:07] Entity contaminated: 0 Campbell => Plague
-[2026-03-20 23:42:07] Entity contaminated: 1 Julien => Fever
-[2026-03-20 23:42:07] Entity contaminated: 2 Yahir => Typhus
-[2026-03-20 23:42:07] Entity contaminated: 3 Makaila => Fever
-[2026-03-20 23:42:07] Entity contaminated: 4 Alexander => Plague
-[2026-03-20 23:42:08] Entity contaminated: 0 Campbell => Malaria
-[2026-03-20 23:42:08] Entity contaminated: 2 Yahir => Malaria
-[2026-03-20 23:42:08] Entity contaminated: 3 Makaila => Plague
-[2026-03-20 23:42:08] Entity contaminated: 4 Alexander => Typhus
-[2026-03-20 23:42:09] Entity contaminated: 1 Julien => Plague
-[2026-03-20 23:42:09] Entity contaminated: 2 Yahir => Malaria
-[2026-03-20 23:42:09] Entity contaminated: 4 Alexander => Plague
+[2026-04-17 23:31:32] done
+[2026-04-17 23:31:36] Entity 0 personality: E=78.5607 A=71.3346 C=63.9033 N=41.5266 O=41.5183
+[2026-04-17 23:31:36] Entity 1 personality: E=53.529 A=44.9931 C=77.7585 N=38.0798 O=61.5649
+[2026-04-17 23:31:36] Entity 2 personality: E=49.2426 A=29.5735 C=60.8572 N=47.5462 O=75.1853
+[2026-04-17 23:31:36] Entity 3 personality: E=41.1842 A=31.6254 C=64.4104 N=73.474 O=50.1112
+[2026-04-17 23:31:36] Entity 4 personality: E=41.8162 A=47.5494 C=21.9424 N=28.1906 O=24.7467
+[2026-04-17 23:31:36] Entity 5 personality: E=100 A=45.0354 C=55.8553 N=77.0191 O=51.4243
+[2026-04-17 23:31:36] Entity 6 personality: E=55.4364 A=64.9267 C=62.922 N=51.241 O=74.7923
+[2026-04-17 23:31:36] Entity 7 personality: E=46.1731 A=41.9539 C=21.9979 N=69.7852 O=62.7516
+[2026-04-17 23:31:36] Entity 8 personality: E=88.9652 A=57.5139 C=43.665 N=52.7049 O=66.5446
+[2026-04-17 23:31:36] Entity 9 personality: E=58.7726 A=74.2458 C=84.8985 N=0 O=27.4954
+[2026-04-17 23:31:36] Entity 10 personality: E=64.9453 A=55.7331 C=61.0729 N=52.7038 O=31.2955
+[2026-04-17 23:31:36] Entity 11 personality: E=43.3511 A=35.0642 C=47.646 N=37.8718 O=36.6629
+[2026-04-17 23:31:36] Entity 12 personality: E=60.4593 A=27.5641 C=36.5502 N=26.7274 O=73.8577
+[2026-04-17 23:31:36] Entity 13 personality: E=86.0169 A=62.2051 C=39.9581 N=38.6864 O=56.0734
+[2026-04-17 23:31:36] Entity 14 personality: E=50.4111 A=33.0177 C=32.4072 N=67.4122 O=69.4799
+[2026-04-17 23:31:36] Entity 15 personality: E=39.5748 A=66.8483 C=47.851 N=53.0092 O=53.5547
+[2026-04-17 23:31:36] Entity 16 personality: E=27.4101 A=28.4299 C=51.6951 N=43.2511 O=88.5166
+[2026-04-17 23:31:36] Entity 17 personality: E=73.041 A=61.4476 C=71.1441 N=46.728 O=51.4174
+[2026-04-17 23:31:36] Entity 18 personality: E=26.8299 A=28.3704 C=64.403 N=69.0196 O=67.5707
+[2026-04-17 23:31:36] Entity 19 personality: E=15.0285 A=43.3463 C=28.6243 N=33.8107 O=56.869
+[2026-04-17 23:33:23] Entity contaminated: 0 Julien => Typhus
+[2026-04-17 23:33:23] Entity contaminated: 7 Casey => Typhus
+[2026-04-17 23:33:23] Entity contaminated: 3 Jazlynn => Fever
+[2026-04-17 23:33:24] Entity contaminated: 0 Julien => Typhus
+[2026-04-17 23:33:24] Entity contaminated: 7 Casey => Plague
+[2026-04-17 23:33:24] Entity contaminated: 3 Jazlynn => Malaria
+[2026-04-17 23:33:25] Entity contaminated: 7 Casey => Fever
+[2026-04-17 23:33:29] Entity contaminated: 3 Jazlynn => Typhus
+[2026-04-17 23:34:36] Entity contaminated: 5 Griffin => Typhus
+[2026-04-17 23:34:36] Entity contaminated: 6 Jazlynn => Plague
+[2026-04-17 23:34:37] Entity contaminated: 19 Fletcher => Plague
+[2026-04-17 23:34:40] Entity contaminated: 19 Fletcher => Plague
+[2026-04-17 23:34:40] Entity contaminated: 6 Jazlynn => Fever
+[2026-04-17 23:34:43] Entity contaminated: 19 Fletcher => Malaria
+[2026-04-17 23:41:18] Entity contaminated: 3 Jazlynn => Fever
+[2026-04-17 23:41:20] Entity contaminated: 7 Casey => Typhus
+[2026-04-17 23:41:22] Entity contaminated: 0 Julien => Typhus

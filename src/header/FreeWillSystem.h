@@ -160,8 +160,8 @@ struct ActionContext {
 
 struct Habit {
     int actionId;
-    float strength;          // 0-1, grows with repetition
-    ActionContext triggerContext;  // when does this habit fire?
+    float strength;
+    ActionContext triggerContext;
     int consecutiveExecutions;
 
     Habit(int id, ActionContext ctx)
@@ -235,6 +235,7 @@ private:
 public:
     SocialNormSystem socialNormInstance;
     static std::vector<Entity> new_borns;
+    static int day;
     FreeWillSystem();
 
     void initializeNeeds();
@@ -250,6 +251,7 @@ public:
     Action* cognitiveChooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context);
     void executeAction(Entity* entity, Action* &action, const ActionContext& context = ActionContext(), Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
+    float calculateGoalAlignmentModifier(Entity* entity,  Action* action);
 
     void updateNeeds(float deltaTime);
     NeedLevel updateHieratchicalNeed(Entity* ent, const Action& action);
@@ -257,6 +259,8 @@ public:
 
     const std::deque<ActionMemory>& getActionHistory() const;
     const std::map<std::string, Need>& getNeeds() const;
+
+    void tickChildDevelopment(Entity* child, float deltaTime);
 
     // Helper for social environment influence
     float calculateSocialInfluence(Entity* entity, const std::vector<Entity*>& neighbors, const Action& action);
@@ -268,7 +272,6 @@ public:
     void loadFrom(std::ifstream& file);
     void updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess);
         void finalizeChildhood(Entity* child);
-    void tickChildDevelopment(Entity* child, float deltaTime);
 
     void updateValuesFromExperiences(Entity* ent, Action* &action, float outcomeSuccess);
     void tickValueGoalAlignment(Entity* entity);
@@ -277,6 +280,7 @@ public:
 
     float getMaxUrgencyForLevel(const Entity* target, NeedLevel lvl);
     static void clear_new_borns();
+    float calculateLifeMemoryBias(Entity* entity, const Action& action);
 };
 
 #endif

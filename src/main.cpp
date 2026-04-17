@@ -51,7 +51,7 @@ void applyDisease(Entity* ent, int neighSize, int sickClose){
         //already sick we manage it
         d.manageSickness(ent);
     }
-    if(neighSize >= 2){
+    if(neighSize >= 3){
         d.reduceAntiBody(ent);
         int disease = d.calculateDisease(neighSize, ent, sickClose);
         if(disease != -1){
@@ -221,10 +221,13 @@ Personality generateRandomPersonality() {
 }
 
 void implementRegion(){
+    std::cout << "\n";
     std::cout << "Choose a world region (h to help): \n";
-    std::cout << "1 /// Paris, France; 48° 51′ 24″ north, 2° 21′ 07″ east /// Oceanic\n";
-    std::cout << "2 /// Guangzhou, China; 23° 07′ 48″ north, 113° 15′ 36″ east /// monsoon\n";
-    std::cout << "3 /// Addis-Abeba, Ethiopia; 9° 1′ 48″ north, 38° 44′ 24″ east /// arid\n";
+    std::cout << "1 /// Paris, France | 48 51' 24'' north, 2 21' 07'' east /// Oceanic\n";
+    std::cout << "2 /// Guangzhou, China | 23 07' 48'' north, 113 15' 36'' east /// monsoon\n";
+    std::cout << "3 /// Addis-Abeba, Ethiopia | 9 1' 48'' north, 38 44' 24'' east /// arid\n";
+    std::cout << ">";
+
     char choice;
     std::cin >> choice;
     if(choice == 'h'){
@@ -251,8 +254,38 @@ std::vector<Entity> get_new_borns(){
     return FreeWillSystem::new_borns;
 }
 
+
+void tickRelationshipDecay(Entity* ent, float deltaTime) {
+    // Social bonds decay slowly without reinforcement
+    for (auto& social : ent->list_entityPointedSocial) {
+        social.social -= 0.02f * deltaTime;
+        if (social.social < 0.5f) {
+            social.social = 0.0f;
+        }
+    }
+
+    for (auto& desire : ent->list_entityPointedDesire) {
+        desire.desire -= 0.04f * deltaTime;
+        desire.desire = std::max(0.0f, desire.desire);
+    }
+
+    float forgivenessRate = 0.015f * (ent->personality.agreeableness / 100.0f) * deltaTime;
+    for (auto& anger : ent->list_entityPointedAnger) {
+        anger.anger -= forgivenessRate;
+        anger.anger = std::max(0.0f, anger.anger);
+    }
+
+    // Clean up zeroed bonds
+    ent->list_entityPointedSocial.erase(
+        std::remove_if(ent->list_entityPointedSocial.begin(), ent->list_entityPointedSocial.end(),
+            [](const entityPointedSocial& s){ return s.social <= 0.0f; }),
+        ent->list_entityPointedSocial.end());
+}
+
+
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
     EnvironmentalFactors env = generateEnvFactors(currentDay);
+
 
     // Process each group of close entities
     for(auto& group : entityGroups){
@@ -291,6 +324,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             // Tick grief recovery
             entity->tickGrief(1.0f);
 
+
+
             //apply movement (now env-aware)
             float oldX = entity->posX;
             float oldY = entity->posY;
@@ -311,7 +346,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             // Apply direct environmental stat effects
             sys.applyEnvironmentalEffects(entity, env);
 
-
+            //apply tick relationship
+            tickRelationshipDecay(entity, currentDay);
 
             std::vector<Entity*> neighbors;
             for(Entity* potential_neighbor : group){
@@ -325,6 +361,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosen = sys.chooseAction(entity, neighbors, context);
+
+
 
             //Update Hierachical need
             sys.updateHieratchicalNeed(entity, *chosen);
@@ -352,7 +390,21 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                                    chosen->name == "AngerConnection" ||
                                    chosen->name == "Murder" ||
                                    chosen->name == "Discrimination" ||
-                                   chosen->name == "Breeding");
+                                   chosen->name == "breeding" ||
+                                   chosen->name == "couple" ||
+                                   chosen->name == "Gossip" ||
+                                   chosen->name == "Apologize" ||
+                                   chosen->name == "HelpSupport" ||
+                                   chosen->name == "IgnoreAvoid" ||
+                                   chosen->name == "Insult" ||
+                                   chosen->name == "Manipulate" ||
+                                   chosen->name == "Jealousy" ||
+                                   chosen->name == "Betray" ||
+                                   chosen->name == "Flirt" ||
+                                   chosen->name == "Date" ||
+                                   chosen->name == "BreakUp" ||
+                                   chosen->name == "Reconcile" ||
+                                   chosen->name == "SetBoundaries");
 
             Entity* target = nullptr;
             if(isPointedAction && !neighbors.empty()){
@@ -360,7 +412,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 //better neightboor selection
                 //int targetIndex = BetterRand::genNrInInterval(0, (int) neighbors.size() - 1);
                 //target = neighbors[targetIndex];
-                target = selectSocialTarget(entity, group, chosen);
+                target = selectSocialTarget(entity, neighbors, chosen);
 
                 bool targetWasAlive = (target->entityHealth > 0.0f);
 
@@ -429,9 +481,13 @@ void sync_clock_stats(Entity* ent, int neighboors){
     fs.chooseAction(ent);
 }
 
+
+
+
 int main() {
 
-
+    std::cout << " I was meant to be perfect, ";
+    std::cout << "I was meant to be beautiful  \n\n";
    //// Initialize logger (this redirects std::cout to cmd_log.txt)
    Logger logger;
    globalLogger = &logger;
@@ -466,8 +522,8 @@ int main() {
     if (!glfwInit()) return -1;
 
 
-    const float height = 1050;
-    const float width = 1400;
+    const int height = 1050;
+    const int width = 1400;
 
     GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 TEST", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -489,8 +545,10 @@ int main() {
         for (int x = 0; x < entity_num; ++x){
             Entity entity = Entity(
                 count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
-            entity.posX = 100 + x * 60;
-            entity.posY = 100 + y * 60;
+
+
+            entity.posX = BetterRand::genNrInInterval(10, width - 10);
+            entity.posY = BetterRand::genNrInInterval(10, height - 10);;
             entity.selected = false;
             Heritage::UnlinkedNode(&entity);
             // Assign random personality to each entity
@@ -522,7 +580,8 @@ int main() {
     // std::thread statistics(applyFreeWill, std::ref(close_entity_together));
 
     int frameCounter = 0;
-    int day = 0;
+    int day = FreeWillSystem::day;
+
     const int UPDATE_FREQUENCY = 60; // Update free will every 60 frames
 
     while (!glfwWindowShouldClose(window)) {
@@ -533,7 +592,7 @@ int main() {
 
         //Birthday,
         // une année = 100 jours
-        if((day / 60) % 100 ){
+        if(day  % 100 ){
             for(Entity& ent : entities){
                 ent.IncrementBDay();
             }

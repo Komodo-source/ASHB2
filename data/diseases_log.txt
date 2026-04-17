@@ -1,17 +1,26 @@
-[2026-03-20 23:42:06] Entity 0 (Campbell) contracted Plague
-[2026-03-20 23:42:06] Entity 1 (Julien) contracted Fever
-[2026-03-20 23:42:06] Entity 2 (Yahir) contracted Malaria
-[2026-03-20 23:42:06] Entity 3 (Makaila) contracted Malaria
-[2026-03-20 23:42:06] Entity 4 (Alexander) contracted Typhus
-[2026-03-20 23:42:07] Entity 0 (Campbell) contracted Plague
-[2026-03-20 23:42:07] Entity 1 (Julien) contracted Fever
-[2026-03-20 23:42:07] Entity 2 (Yahir) contracted Typhus
-[2026-03-20 23:42:07] Entity 3 (Makaila) contracted Fever
-[2026-03-20 23:42:07] Entity 4 (Alexander) contracted Plague
-[2026-03-20 23:42:08] Entity 0 (Campbell) contracted Malaria
-[2026-03-20 23:42:08] Entity 2 (Yahir) contracted Malaria
-[2026-03-20 23:42:08] Entity 3 (Makaila) contracted Plague
-[2026-03-20 23:42:08] Entity 4 (Alexander) contracted Typhus
-[2026-03-20 23:42:09] Entity 1 (Julien) contracted Plague
-[2026-03-20 23:42:09] Entity 2 (Yahir) contracted Malaria
-[2026-03-20 23:42:09] Entity 4 (Alexander) contracted Plague
+[2026-04-17 23:33:23] Entity 0 (Julien) contracted Typhus
+[2026-04-17 23:33:23] Entity 7 (Casey) contracted Typhus
+[2026-04-17 23:33:23] Entity 3 (Jazlynn) contracted Fever
+[2026-04-17 23:33:24] Entity 0 (Julien) contracted Typhus
+[2026-04-17 23:33:24] Entity 7 (Casey) contracted Plague
+[2026-04-17 23:33:24] Entity 3 (Jazlynn) contracted Malaria
+[2026-04-17 23:33:25] Entity 7 (Casey) contracted Fever
+[2026-04-17 23:33:29] Entity 3 (Jazlynn) contracted Typhus
+[2026-04-17 23:33:36] Entity 7 (Casey) cured from Fever
+[2026-04-17 23:33:36] Entity 3 (Jazlynn) cured from Typhus
+[2026-04-17 23:33:37] Entity 0 (Julien) cured from Typhus
+[2026-04-17 23:34:36] Entity 5 (Griffin) contracted Typhus
+[2026-04-17 23:34:36] Entity 6 (Jazlynn) contracted Plague
+[2026-04-17 23:34:37] Entity 19 (Fletcher) contracted Plague
+[2026-04-17 23:34:40] Entity 19 (Fletcher) contracted Plague
+[2026-04-17 23:34:40] Entity 6 (Jazlynn) contracted Fever
+[2026-04-17 23:34:43] Entity 19 (Fletcher) contracted Malaria
+[2026-04-17 23:34:48] Entity 5 (Griffin) cured from Typhus
+[2026-04-17 23:34:49] Entity 19 (Fletcher) cured from Malaria
+[2026-04-17 23:34:49] Entity 6 (Jazlynn) cured from Fever
+[2026-04-17 23:41:18] Entity 3 (Jazlynn) contracted Fever
+[2026-04-17 23:41:20] Entity 7 (Casey) contracted Typhus
+[2026-04-17 23:41:22] Entity 0 (Julien) contracted Typhus
+[2026-04-17 23:41:25] Entity 3 (Jazlynn) cured from Fever
+[2026-04-17 23:41:27] Entity 7 (Casey) cured from Typhus
+[2026-04-17 23:41:32] Entity 0 (Julien) cured from Typhus
