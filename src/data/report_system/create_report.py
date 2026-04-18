@@ -41,7 +41,6 @@ HTML_SHELL = r"""<!DOCTYPE html>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <link rel="stylesheet" href="style.css">
-  <style>
 </head>
 <body>
 <div class="app-shell">

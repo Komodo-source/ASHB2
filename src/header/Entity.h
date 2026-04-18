@@ -140,11 +140,11 @@ struct Personality {
 
 
 struct ValueSystem {
-    float familyOrientation;     // How much family matters
-    float achievementDrive;      // Career/status
-    float spiritualNeed;         // Prayer/meaning-making
-    float hedonism;              // Pleasure-seeking
-    float collectivism;          // Group vs individual priority
+    float familyOrientation = 50.0f;     // How much family matters
+    float achievementDrive = 50.0f;      // Career/status
+    float spiritualNeed = 50.0f;         // Prayer/meaning-making
+    float hedonism = 50.0f;              // Pleasure-seeking
+    float collectivism = 50.0f;          // Group vs individual priority
 };
 
 enum LifeStage { INFANT, CHILD, ADOLESCENT, ADULT, ELDER };
@@ -359,12 +359,7 @@ public:
     //bool isActive(const std::map<NeedLevel, float>& levelSatisfaction) const;
 };
 
-// Move these outside the header to avoid multiple definition errors
-extern std::vector<entityPointedDesire> list_entityPointedDesire;
-extern std::vector<entityPointedAnger> list_entityPointedAnger;
-extern std::vector<entityPointedCouple> list_entityPointedCouple;
-extern std::vector<entityPointedSocial> list_entityPointedSocial;
-
+// Removed duplicate extern globals for pointed relationships
 // Template implementation must be in header
 template<typename T>
 int Entity::contains(const T& vec, Entity* ptr, int num_list) {

@@ -1646,11 +1646,11 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 }else if( entity->SearchGoal("build_career").type.empty()   && action.name == "LearnSkill"){
                    rarityMultiplier = 0.25f;
                 }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Flirt"){
-                   rarityMultiplier = 0.40f;
+                   rarityMultiplier = 0.30f;
                 }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Date"){
-                   rarityMultiplier = 0.40f;
+                   rarityMultiplier = 0.30f;
                 }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Reconcile"){
-                   rarityMultiplier = 0.40f;
+                   rarityMultiplier = 0.30f;
                 }
                 else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "breeding"){
                    rarityMultiplier = 0.75f;
@@ -1858,7 +1858,7 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
                 float attractiveness = (pointed->entityHygiene / 100.0f) * 0.3f +
                                        (pointed->entityHapiness / 100.0f) * 0.4f +
                                        (pointed->entityHealth / 100.0f) * 0.3f;
-                float desire = static_cast<float>(BetterRand::genNrInInterval(1,3)) * attractiveness;
+                float desire = static_cast<float>(BetterRand::genNrInInterval(4, 8)) * attractiveness;
                 std::cout << "Nouveau lien de desire ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
                 pointer->addDesire({1, pointed, desire});
 
@@ -1866,11 +1866,11 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
                 pointed->addSocial({1, pointer, desire * 0.7f});
             }else{ //le désire existe déjà
                 int index_social = pointer->contains(pointer->list_entityPointedSocial, pointed, 1);
-                int borne_haut = 3;
+                int borne_haut = 6;
                 if(index_social != -1){ //si a des liens social augmenté le désir
-                    borne_haut += (pointer->list_entityPointedSocial[index_social].social / 15);
+                    borne_haut += (int)(pointer->list_entityPointedSocial[index_social].social / 10);
                 }
-                float increment = static_cast<float>(BetterRand::genNrInInterval(1, borne_haut));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(3, borne_haut));
                 // Reduce increment if target's attractiveness is low
                 float attractiveness = (pointed->entityHygiene / 100.0f + pointed->entityHapiness / 100.0f) / 2.0f;
                 increment *= attractiveness;
@@ -1881,7 +1881,7 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         }else if(action->name == "AngerConnection"){
             int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
             if(index == -1){
-                float anger = static_cast<float>(BetterRand::genNrInInterval(1,5));
+                float anger = static_cast<float>(BetterRand::genNrInInterval(6,15));
                 std::cout << "Nouveau lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
                 pointer->addAnger({1, pointed, anger});
                 //Reciprocal link
@@ -1899,7 +1899,7 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         }else if(action->name == "Socialize"){
             int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(index == -1){
-                float social = static_cast<float>(BetterRand::genNrInInterval(1,2));
+                float social = static_cast<float>(BetterRand::genNrInInterval(5,12));
                 std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
                 pointer->addSocial({1, pointed, social});
                 pointed->addSocial({1, pointer, social * 0.8f}); // Slightly less impact
@@ -1912,7 +1912,7 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
             }else{
                 //Ici on choisit le lien social mais lorsqu'il sociabilise il se rend compte qu'il est malade donc on le
                 //met de poid plus fort
-                float increment = static_cast<float>(BetterRand::genNrInInterval(1,2));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(3,8));
                 if(pointed->entityDiseaseType != -1){
                     pointer->list_entityPointedSocial[index].social += increment - BetterRand::genNrInInterval(2,6);
                 }else{
@@ -2918,6 +2918,13 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
     }
 
 
-    if (delib.chosenAction != nullptr) return const_cast<Action*>(delib.chosenAction);
+    if (delib.chosenAction != nullptr) {
+        socialNormInstance.update(neighbors);
+        auto normIt = socialNormInstance.norms.find(delib.chosenAction->name);
+        if (normIt != socialNormInstance.norms.end()) {
+            entity->socialNorm = normIt->second;
+        }
+        return const_cast<Action*>(delib.chosenAction);
+    }
     return nullptr;
 }

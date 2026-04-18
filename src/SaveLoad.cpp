@@ -132,7 +132,20 @@ void exportTickHistory(const std::string& filepath, const std::vector<Entity>& e
         file << "\"c\":" << entity.personality.conscientiousness << ",";
         file << "\"n\":" << entity.personality.neuroticism << ",";
         file << "\"o\":" << entity.personality.openness;
-        file << "}";
+        file << "},";
+
+        file << "\"valueSystem\":{";
+        file << "\"family\":" << entity.ValueSystem.familyOrientation << ",";
+        file << "\"achieve\":" << entity.ValueSystem.achievementDrive << ",";
+        file << "\"spirit\":" << entity.ValueSystem.spiritualNeed << ",";
+        file << "\"hedonism\":" << entity.ValueSystem.hedonism << ",";
+        file << "\"collectivism\":" << entity.ValueSystem.collectivism;
+        file << "},";
+
+        file << "\"attachment\":" << entity.dv.attachmentStyle << ",";
+        file << "\"selfEsteem\":" << entity.SelfConcept.selfEsteem << ",";
+        file << "\"griefIntensity\":" << entity.getGriefIntensity() << ",";
+        file << "\"currentGoal\":\"" << escapeJSONString(entity.m_goals.empty() ? "none" : entity.m_goals.front().type) << "\"";
 
         file << "}";
         if (i < entities.size() - 1) {

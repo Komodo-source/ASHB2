@@ -3,3 +3,5 @@ libs
 CMakeFiles
 old
 vcpkg
+src/data
+data

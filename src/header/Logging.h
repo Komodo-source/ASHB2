@@ -19,6 +19,7 @@ private:
     std::ofstream movementsLogFile;
     std::ofstream birthsLogFile;
     std::ofstream eventsLogFile;
+    std::ofstream completeLogFile;
 
     std::string getTimestamp() {
         auto now = std::chrono::system_clock::now();
@@ -42,6 +43,7 @@ public:
         movementsLogFile.open("./data/movements_log.txt", std::ios::app);
         birthsLogFile.open("./data/births_log.txt", std::ios::app);
         eventsLogFile.open("./data/events_log.txt", std::ios::app);
+        completeLogFile.open("./data/complete_logs.txt", std::ios::app);
 
         // Redirect std::cout to cmd_log.txt
         // if (cmdLogFile.is_open()) {
@@ -59,62 +61,76 @@ public:
         movementsLogFile.close();
         birthsLogFile.close();
         eventsLogFile.close();
+        completeLogFile.close();
     }
 
     void logDeath(int entityId, const std::string& name, int age, const std::string& cause) {
         std::string timestamp = getTimestamp();
-        deathsLogFile << "[" << timestamp << "] Entity " << entityId << " (" << name << ", age " << age << ") died: " << cause << std::endl;
+        std::string msg = "[" + timestamp + "] Entity " + std::to_string(entityId) + " (" + name + ", age " + std::to_string(age) + ") died: " + cause;
+        deathsLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     void logDisease(int entityId, const std::string& name, const std::string& disease, bool cured = false) {
         std::string timestamp = getTimestamp();
         std::string action = cured ? "cured from" : "contracted";
-        diseasesLogFile << "[" << timestamp << "] Entity " << entityId << " (" << name << ") " << action << " " << disease << std::endl;
+        std::string msg = "[" + timestamp + "] Entity " + std::to_string(entityId) + " (" + name + ") " + action + " " + disease;
+        diseasesLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     void logAction(int entityId, const std::string& name, const std::string& action, const std::string& target = "", const std::string& details = "") {
         std::string timestamp = getTimestamp();
-        actionsLogFile << "[" << timestamp << "] Entity " << entityId << " (" << name << ") performed: " << action;
+        std::string msg = "[" + timestamp + "] Entity " + std::to_string(entityId) + " (" + name + ") performed: " + action;
         if (!target.empty()) {
-            actionsLogFile << " targeting " << target;
+            msg += " targeting " + target;
         }
         if (!details.empty()) {
-            actionsLogFile << " - " << details;
+            msg += " - " + details;
         }
-        actionsLogFile << std::endl;
+        actionsLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     void logRelationship(int entityId1, const std::string& name1, int entityId2, const std::string& name2, const std::string& relationshipType, const std::string& details = "") {
         std::string timestamp = getTimestamp();
-        relationshipsLogFile << "[" << timestamp << "] Relationship: " << name1 << " (" << entityId1 << ") and " << name2 << " (" << entityId2 << ") - " << relationshipType;
+        std::string msg = "[" + timestamp + "] Relationship: " + name1 + " (" + std::to_string(entityId1) + ") and " + name2 + " (" + std::to_string(entityId2) + ") - " + relationshipType;
         if (!details.empty()) {
-            relationshipsLogFile << " - " << details;
+            msg += " - " + details;
         }
-        relationshipsLogFile << std::endl;
+        relationshipsLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     void logMovement(int entityId, const std::string& name, float oldX, float oldY, float newX, float newY, const std::string& reason = "") {
         std::string timestamp = getTimestamp();
-        movementsLogFile << "[" << timestamp << "] Entity " << entityId << " (" << name << ") moved from (" << oldX << "," << oldY << ") to (" << newX << "," << newY << ")";
+        std::string msg = "[" + timestamp + "] Entity " + std::to_string(entityId) + " (" + name + ") moved from (" + std::to_string(oldX) + "," + std::to_string(oldY) + ") to (" + std::to_string(newX) + "," + std::to_string(newY) + ")";
         if (!reason.empty()) {
-            movementsLogFile << " - " << reason;
+            msg += " - " + reason;
         }
-        movementsLogFile << std::endl;
+        movementsLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     void logBirth(int entityId, const std::string& name, int parent1Id, int parent2Id, const std::string& parent1Name, const std::string& parent2Name) {
         std::string timestamp = getTimestamp();
-        birthsLogFile << "[" << timestamp << "] Birth: Entity " << entityId << " (" << name << ") born to " << parent1Name << " (" << parent1Id << ") and " << parent2Name << " (" << parent2Id << ")" << std::endl;
+        std::string msg = "[" + timestamp + "] Birth: Entity " + std::to_string(entityId) + " (" + name + ") born to " + parent1Name + " (" + std::to_string(parent1Id) + ") and " + parent2Name + " (" + std::to_string(parent2Id) + ")";
+        birthsLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     void logEvent(const std::string& eventType, const std::string& details) {
         std::string timestamp = getTimestamp();
-        eventsLogFile << "[" << timestamp << "] " << eventType << ": " << details << std::endl;
+        std::string msg = "[" + timestamp + "] " + eventType + ": " + details;
+        eventsLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     void logCmd(const std::string& message) {
         std::string timestamp = getTimestamp();
-        cmdLogFile << "[" << timestamp << "] " << message << std::endl;
+        std::string msg = "[" + timestamp + "] " + message;
+        cmdLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
     }
 
     // Utility function to clear all log files
@@ -127,6 +143,7 @@ public:
         movementsLogFile.close();
         birthsLogFile.close();
         eventsLogFile.close();
+        completeLogFile.close();
 
         // Reopen in truncate mode to clear
         cmdLogFile.open("./data/cmd_log.txt", std::ios::trunc);
@@ -137,6 +154,7 @@ public:
         movementsLogFile.open("./data/movements_log.txt", std::ios::trunc);
         birthsLogFile.open("./data/births_log.txt", std::ios::trunc);
         eventsLogFile.open("./data/events_log.txt", std::ios::trunc);
+        completeLogFile.open("./data/complete_logs.txt", std::ios::trunc);
 
         // Re-redirect cout
         // if (cmdLogFile.is_open()) {

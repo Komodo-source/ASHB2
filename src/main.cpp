@@ -347,7 +347,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             sys.applyEnvironmentalEffects(entity, env);
 
             //apply tick relationship
-            tickRelationshipDecay(entity, currentDay);
+            tickRelationshipDecay(entity, 1.0f);
 
             std::vector<Entity*> neighbors;
             for(Entity* potential_neighbor : group){
@@ -366,7 +366,6 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             //Update Hierachical need
             sys.updateHieratchicalNeed(entity, *chosen);
-            sys.updateNeeds(currentDay);
 
             // we ondulate the loneliness wether it has neighboor or not
             if (neighbors.size() > 0) {
@@ -541,18 +540,76 @@ int main() {
     //vector of Entity with positions
     std::vector<Entity> entities;
     int count = 0;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<float> distH(50.0f, 15.0f);
+    std::normal_distribution<float> distT(20.0f, 15.0f);
+    std::normal_distribution<float> distN(60.0f, 20.0f);
+    auto clamp = [](float val) { return std::max(0.0f, std::min(100.0f, val)); };
+
     for (int y = 0; y < 1; ++y){
         for (int x = 0; x < entity_num; ++x){
+            float startHapiness = clamp(distH(gen));
+            
             Entity entity = Entity(
-                count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
-
+                count, 0.0f, 100.0f, startHapiness, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
 
             entity.posX = BetterRand::genNrInInterval(10, width - 10);
-            entity.posY = BetterRand::genNrInInterval(10, height - 10);;
+            entity.posY = BetterRand::genNrInInterval(10, height - 10);
             entity.selected = false;
             Heritage::UnlinkedNode(&entity);
-            // Assign random personality to each entity
+            
+            // Assign random personality
             entity.personality = generateRandomPersonality();
+            entity.initializeHierarchicalNeeds();
+
+            std::uniform_real_distribution<float> jitter(-15.0f, 15.0f);
+
+            // Personality-informed starting state
+            entity.entityLoneliness = clamp(30.0f - entity.personality.extraversion * 0.3f + jitter(gen));
+            entity.entityStress     = clamp(20.0f + entity.personality.neuroticism * 0.2f + jitter(gen));
+            entity.entityHapiness   = clamp(55.0f + entity.personality.agreeableness * 0.15f + jitter(gen));
+            entity.entityBoredom    = clamp(20.0f + jitter(gen));
+            entity.entityHygiene    = clamp(70.0f + jitter(gen));
+
+            // Random life stage at startup (mix of ages)
+            int startAge = BetterRand::genNrInInterval(16, 45);
+            entity.entityAge = (float)startAge;
+            entity.IncrementBDay(); // sets correct LifeStage from age
+            
+            // Randomize DevelopmentalHistory and set attachment
+            entity.dv.childhoodTraumaScore = clamp(distT(gen));
+            entity.dv.childhoodNurturingScore = clamp(distN(gen));
+            
+            float trauma = entity.dv.childhoodTraumaScore;
+            float nurture = entity.dv.childhoodNurturingScore;
+            
+            if (trauma < 20 && nurture > 60) {
+                entity.dv.attachmentStyle = SECURE;
+                entity.dv.hadSecureAttachment = true;
+            } else if (trauma > 60) {
+                entity.dv.attachmentStyle = (nurture < 30) ? DISORGANIZED : ANXIOUS;
+            } else if (trauma > 30 && nurture < 40) {
+                entity.dv.attachmentStyle = AVOIDANT;
+            } else {
+                entity.dv.attachmentStyle = ANXIOUS;
+            }
+            
+            // Influence starting stats via attachment
+            if (entity.dv.attachmentStyle == ANXIOUS) {
+                entity.entityLoneliness = 20.0f + BetterRand::genNrInInterval(0, 20);
+                entity.entityStress = 15.0f + BetterRand::genNrInInterval(0, 15);
+            } else if (entity.dv.attachmentStyle == AVOIDANT) {
+                entity.entityLoneliness = 0.0f; // suppresses loneliness initially
+            }
+            
+            // Assign ValueSystem based on correlations (just some logical derivations)
+            entity.ValueSystem.familyOrientation = clamp(50.0f + (entity.personality.agreeableness - 50.0f) * 0.5f + (nurture - 50.0f) * 0.3f);
+            entity.ValueSystem.achievementDrive = clamp(50.0f + (entity.personality.conscientiousness - 50.0f) * 0.7f);
+            entity.ValueSystem.spiritualNeed = clamp(50.0f + (entity.personality.openness - 50.0f) * 0.4f);
+            entity.ValueSystem.hedonism = clamp(50.0f + (entity.personality.extraversion - 50.0f) * 0.6f - (entity.personality.conscientiousness - 50.0f) * 0.5f);
+            entity.ValueSystem.collectivism = clamp(50.0f - (entity.personality.extraversion - 50.0f) * 0.3f + (entity.personality.agreeableness - 50.0f) * 0.4f);
+
             std::stringstream ss;
             ss << "Entity " << count << " personality: E=" << entity.personality.extraversion
                       << " A=" << entity.personality.agreeableness
@@ -639,6 +696,11 @@ int main() {
                     entities.push_back(ent);
                 }
                 FreeWillSystem::clear_new_borns();
+
+                ent_quad.clear();
+                for(int j = 0; j < (int)entities.size(); j++){
+                    ent_quad.push_back(&entities[j]);
+                }
 
                 // Export current state to JSON lines for HTML viewer
                 exportTickHistory("./src/data/tick_history.jsonl", entities, day);
