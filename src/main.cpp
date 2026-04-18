@@ -1,4 +1,3 @@
-
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -76,9 +75,10 @@ int getNBSickClose(std::vector<Entity*> grp){
 }
 
 void applyMovement(Entity* ent, std::vector<Entity*> grp,
-                   const EnvironmentalFactors& env = EnvironmentalFactors()){
+                   const EnvironmentalFactors& env = EnvironmentalFactors(),
+                   float windowWidth = 1400.0f, float windowHeight = 1050.0f){
     Movement m;
-    m.applyMovement(ent, getNBSickClose(grp), (int)grp.size(), env);
+    m.applyMovement(ent, getNBSickClose(grp), (int)grp.size(), env, windowWidth, windowHeight);
 }
 
 // Generate simple pseudo-random EnvironmentalFactors that shift slowly over time
@@ -256,20 +256,20 @@ std::vector<Entity> get_new_borns(){
 
 
 void tickRelationshipDecay(Entity* ent, float deltaTime) {
-    // Social bonds decay slowly without reinforcement
+    // Social bonds fade slowly without reinforcement — gain ~2-4/action, decay ~0.01/tick
     for (auto& social : ent->list_entityPointedSocial) {
-        social.social -= 0.02f * deltaTime;
-        if (social.social < 0.5f) {
-            social.social = 0.0f;
-        }
+        social.social -= 0.01f * deltaTime;
+        if (social.social < 0.5f) social.social = 0.0f;
     }
 
+    // Desire fades a little faster if not pursued — gain ~1-3/action, decay ~0.015/tick
     for (auto& desire : ent->list_entityPointedDesire) {
-        desire.desire -= 0.04f * deltaTime;
+        desire.desire -= 0.015f * deltaTime;
         desire.desire = std::max(0.0f, desire.desire);
     }
 
-    float forgivenessRate = 0.015f * (ent->personality.agreeableness / 100.0f) * deltaTime;
+    // Anger fades based on agreeableness — already fine, keep small rate
+    float forgivenessRate = 0.02f * (ent->personality.agreeableness / 100.0f) * deltaTime;
     for (auto& anger : ent->list_entityPointedAnger) {
         anger.anger -= forgivenessRate;
         anger.anger = std::max(0.0f, anger.anger);
@@ -329,7 +329,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             //apply movement (now env-aware)
             float oldX = entity->posX;
             float oldY = entity->posY;
-            applyMovement(entity, group, env);
+            applyMovement(entity, group, env, 1400.0f, 1050.0f);
             if(oldX != entity->posX || oldY != entity->posY){
                 globalLogger->logMovement(entity->entityId, entity->name, oldX, oldY, entity->posX, entity->posY, "environmental factors");
             }
@@ -345,6 +345,66 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Apply direct environmental stat effects
             sys.applyEnvironmentalEffects(entity, env);
+
+            // -------------------------------------------------------
+            // PASSIVE STAT DRIFT — every tick, stats shift based on
+            // personality. This is what makes entities diverge over
+            // time without needing an action to trigger the change.
+            // -------------------------------------------------------
+            {
+                const Personality& p = entity->personality;
+                auto pdclamp = [](float v, float lo, float hi){ return std::max(lo, std::min(hi, v)); };
+
+                // Hygiene degrades very slowly — noticeable over many ticks, not per tick
+                float hygieneDecay = 0.08f + (1.0f - p.conscientiousness / 100.0f) * 0.10f;
+                entity->entityHygiene = pdclamp(entity->entityHygiene - hygieneDecay, 0.0f, 100.0f);
+
+                // Stress builds; neurotic entities accumulate it faster
+                float stressGrowth = 0.15f + (p.neuroticism / 100.0f) * 0.20f;
+                if (entity->entityLoneliness > 60.0f) stressGrowth += 0.08f;
+                entity->entityStress = pdclamp(entity->entityStress + stressGrowth, 0.0f, 100.0f);
+
+                // Boredom builds gently
+                float boredomGrowth = 0.10f + (p.openness / 100.0f) * 0.10f;
+                entity->entityBoredom = pdclamp(entity->entityBoredom + boredomGrowth, 0.0f, 100.0f);
+
+                // Anger decays naturally; agreeable people let it go faster
+                float angerDecay = 0.2f + (p.agreeableness / 100.0f) * 0.4f;
+                entity->entityGeneralAnger = pdclamp(entity->entityGeneralAnger - angerDecay, 0.0f, 100.0f);
+
+                // Loneliness builds slowly always; extraverts feel it faster
+                float lonelinessGrowth = 0.25f + (p.extraversion / 100.0f) * 0.25f;
+                entity->entityLoneliness = pdclamp(entity->entityLoneliness + lonelinessGrowth, 0.0f, 100.0f);
+
+                // Happiness drifts toward a personality-based setpoint
+                float happinessSetpoint = 40.0f + (p.agreeableness / 100.0f) * 15.0f
+                                                 - (p.neuroticism   / 100.0f) * 20.0f
+                                                 + (p.extraversion  / 100.0f) * 10.0f;
+                float happinessDrift = (happinessSetpoint - entity->entityHapiness) * 0.02f;
+                entity->entityHapiness = pdclamp(entity->entityHapiness + happinessDrift, 0.0f, 100.0f);
+
+                // Mental health degrades under chronic stress, recovers in calm
+                if (entity->entityStress > 70.0f)
+                    entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.15f, 0.0f, 100.0f);
+                else if (entity->entityStress < 30.0f)
+                    entity->entityMentalHealth = pdclamp(entity->entityMentalHealth + 0.08f, 0.0f, 100.0f);
+
+                // Health decays very slowly; high stress accelerates, conscientiousness slows it
+                float healthDecay = 0.005f + (entity->entityStress / 100.0f) * 0.015f
+                                          - (p.conscientiousness  / 100.0f) * 0.003f;
+                entity->entityHealth = pdclamp(entity->entityHealth - healthDecay, 0.0f, 100.0f);
+
+                // Low hygiene cascades into stress and happiness
+                if (entity->entityHygiene < 25.0f) {
+                    entity->entityStress   = pdclamp(entity->entityStress   + 0.4f, 0.0f, 100.0f);
+                    entity->entityHapiness = pdclamp(entity->entityHapiness - 0.3f, 0.0f, 100.0f);
+                }
+
+                // Extreme loneliness erodes mental health
+                if (entity->entityLoneliness > 80.0f)
+                    entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.1f, 0.0f, 100.0f);
+            }
+            // -------------------------------------------------------
 
             //apply tick relationship
             tickRelationshipDecay(entity, 1.0f);
@@ -366,6 +426,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             //Update Hierachical need
             sys.updateHieratchicalNeed(entity, *chosen);
+            sys.updateNeeds(currentDay);
 
             // we ondulate the loneliness wether it has neighboor or not
             if (neighbors.size() > 0) {
@@ -458,7 +519,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
     }
 }
 
-std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, float width, float height, float radius=100){
+std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, float width, float height, float radius=250){
     std::cout << "== Patial Mesh Separation ==\n";
     auto groups = getCloseEntityGroups(entities, width, height, radius);
     std::cout << "Found " << groups.size() << " groups of close entities:\n\n";
@@ -539,83 +600,137 @@ int main() {
 
     //vector of Entity with positions
     std::vector<Entity> entities;
+    entities.reserve(2048); // prevent reallocation — pointedEntity pointers would dangle
     int count = 0;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::normal_distribution<float> distH(50.0f, 15.0f);
-    std::normal_distribution<float> distT(20.0f, 15.0f);
-    std::normal_distribution<float> distN(60.0f, 20.0f);
-    auto clamp = [](float val) { return std::max(0.0f, std::min(100.0f, val)); };
-
     for (int y = 0; y < 1; ++y){
         for (int x = 0; x < entity_num; ++x){
-            float startHapiness = clamp(distH(gen));
-            
             Entity entity = Entity(
-                count, 0.0f, 100.0f, startHapiness, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
+                count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
+
 
             entity.posX = BetterRand::genNrInInterval(10, width - 10);
-            entity.posY = BetterRand::genNrInInterval(10, height - 10);
+            entity.posY = BetterRand::genNrInInterval(10, height - 10);;
             entity.selected = false;
             Heritage::UnlinkedNode(&entity);
-            
-            // Assign random personality
+
+            // --- Personality (Big Five, already randomized) ---
             entity.personality = generateRandomPersonality();
-            entity.initializeHierarchicalNeeds();
 
-            std::uniform_real_distribution<float> jitter(-15.0f, 15.0f);
+            // --- ValueSystem: the "soul" — what this person cares about ---
+            // Each value is correlated with personality for realism
+            std::mt19937 rng_spawn(std::random_device{}());
+            std::normal_distribution<float> vd(50.0f, 18.0f);
+            auto vc = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
 
-            // Personality-informed starting state
-            entity.entityLoneliness = clamp(30.0f - entity.personality.extraversion * 0.3f + jitter(gen));
-            entity.entityStress     = clamp(20.0f + entity.personality.neuroticism * 0.2f + jitter(gen));
-            entity.entityHapiness   = clamp(55.0f + entity.personality.agreeableness * 0.15f + jitter(gen));
-            entity.entityBoredom    = clamp(20.0f + jitter(gen));
-            entity.entityHygiene    = clamp(70.0f + jitter(gen));
+            entity.ValueSystem.familyOrientation  = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.3f);
+            entity.ValueSystem.achievementDrive   = vc(vd(rng_spawn) + (entity.personality.conscientiousness - 50.0f) * 0.4f);
+            entity.ValueSystem.spiritualNeed      = vc(vd(rng_spawn) - (entity.personality.openness - 50.0f) * 0.2f);
+            entity.ValueSystem.hedonism           = vc(vd(rng_spawn) + (entity.personality.extraversion - 50.0f) * 0.3f - (entity.personality.conscientiousness - 50.0f) * 0.2f);
+            entity.ValueSystem.collectivism       = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.35f - (entity.personality.openness - 50.0f) * 0.1f);
 
-            // Random life stage at startup (mix of ages)
-            int startAge = BetterRand::genNrInInterval(16, 45);
-            entity.entityAge = (float)startAge;
-            entity.IncrementBDay(); // sets correct LifeStage from age
-            
-            // Randomize DevelopmentalHistory and set attachment
-            entity.dv.childhoodTraumaScore = clamp(distT(gen));
-            entity.dv.childhoodNurturingScore = clamp(distN(gen));
-            
-            float trauma = entity.dv.childhoodTraumaScore;
-            float nurture = entity.dv.childhoodNurturingScore;
-            
-            if (trauma < 20 && nurture > 60) {
+            // --- Developmental History: childhood shapes the adult ---
+            float traumaRoll   = vc(static_cast<float>(BetterRand::genNrInInterval(0, 50)));
+            float nurtureRoll  = vc(100.0f - traumaRoll + static_cast<float>(BetterRand::genNrInInterval(-20, 20)));
+            entity.dv.childhoodTraumaScore    = traumaRoll;
+            entity.dv.childhoodNurturingScore = nurtureRoll;
+            entity.dv.hadSecureAttachment     = (traumaRoll < 20.0f && nurtureRoll > 55.0f);
+
+            // Attachment style derived from childhood
+            if (traumaRoll < 20.0f && nurtureRoll > 60.0f)
                 entity.dv.attachmentStyle = SECURE;
-                entity.dv.hadSecureAttachment = true;
-            } else if (trauma > 60) {
-                entity.dv.attachmentStyle = (nurture < 30) ? DISORGANIZED : ANXIOUS;
-            } else if (trauma > 30 && nurture < 40) {
+            else if (traumaRoll > 55.0f)
+                entity.dv.attachmentStyle = (nurtureRoll < 30.0f) ? DISORGANIZED : ANXIOUS;
+            else if (traumaRoll > 30.0f && nurtureRoll < 40.0f)
                 entity.dv.attachmentStyle = AVOIDANT;
-            } else {
+            else
                 entity.dv.attachmentStyle = ANXIOUS;
+
+            // Childhood permanently shifts personality at spawn (replicate finalizeChildhood effect)
+            entity.personality.neuroticism    = vc(entity.personality.neuroticism    + traumaRoll  * 0.25f);
+            entity.personality.agreeableness  = vc(entity.personality.agreeableness  - traumaRoll  * 0.15f + nurtureRoll * 0.12f);
+            entity.personality.extraversion   = vc(entity.personality.extraversion   - traumaRoll  * 0.10f + nurtureRoll * 0.10f);
+            entity.personality.openness       = vc(entity.personality.openness       + nurtureRoll * 0.15f);
+
+            // --- Starting emotional stats: no two people start at zero ---
+            // Neuroticism → more stress; conscientiousness → better hygiene; extraversion → less loneliness
+            entity.entityStress       = vc(static_cast<float>(BetterRand::genNrInInterval(5, 30))
+                                          + (entity.personality.neuroticism - 50.0f) * 0.25f
+                                          + traumaRoll * 0.15f);
+            entity.entityHygiene      = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
+                                          + (entity.personality.conscientiousness - 50.0f) * 0.20f);
+            entity.entityLoneliness   = vc(static_cast<float>(BetterRand::genNrInInterval(5, 45))
+                                          - (entity.personality.extraversion - 50.0f) * 0.25f
+                                          + traumaRoll * 0.10f);
+            entity.entityBoredom      = vc(static_cast<float>(BetterRand::genNrInInterval(10, 50))
+                                          + (entity.personality.openness - 50.0f) * 0.15f);
+            entity.entityGeneralAnger = vc(static_cast<float>(BetterRand::genNrInInterval(0, 25))
+                                          + traumaRoll * 0.12f
+                                          - (entity.personality.agreeableness - 50.0f) * 0.20f);
+            entity.entityHapiness     = vc(static_cast<float>(BetterRand::genNrInInterval(30, 72))
+                                          - traumaRoll * 0.15f
+                                          + nurtureRoll * 0.10f
+                                          + (entity.personality.extraversion - 50.0f) * 0.10f);
+            entity.entityMentalHealth = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
+                                          - traumaRoll * 0.20f
+                                          + nurtureRoll * 0.08f);
+            entity.entityHealth       = vc(static_cast<float>(BetterRand::genNrInInterval(70, 100)));
+
+            // --- Life goals: seeded by values and personality ---
+            {
+                // Clear the default goal and assign based on dominant value
+                entity.m_goals.clear();
+                struct GoalSeed { std::string type; float weight; };
+                std::vector<GoalSeed> seeds = {
+                    {"find_partner",  entity.ValueSystem.familyOrientation},
+                    {"build_career",  entity.ValueSystem.achievementDrive},
+                    {"make_friends",  entity.ValueSystem.collectivism},
+                    {"happiness",     entity.ValueSystem.hedonism},
+                    {"self",          entity.ValueSystem.spiritualNeed}
+                };
+                // Primary goal = highest value
+                auto best = std::max_element(seeds.begin(), seeds.end(),
+                    [](const GoalSeed& a, const GoalSeed& b){ return a.weight < b.weight; });
+                LifeGoal primary;
+                primary.type = best->type;
+                primary.priority = 100.0f;
+                primary.progressToward = 0.0f;
+                primary.frustrationLevel = 0.0f;
+                primary.ticksSinceProgress = 0;
+                entity.m_goals.push_back(primary);
+
+                // Secondary goal: random from remaining if value > 35
+                for (auto& s : seeds) {
+                    if (s.type != best->type && s.weight > 35.0f && entity.m_goals.size() < 3) {
+                        LifeGoal sec;
+                        sec.type = s.type;
+                        sec.priority = s.weight * 0.6f;
+                        sec.progressToward = 0.0f;
+                        sec.frustrationLevel = 0.0f;
+                        sec.ticksSinceProgress = 0;
+                        entity.m_goals.push_back(sec);
+                    }
+                }
             }
-            
-            // Influence starting stats via attachment
-            if (entity.dv.attachmentStyle == ANXIOUS) {
-                entity.entityLoneliness = 20.0f + BetterRand::genNrInInterval(0, 20);
-                entity.entityStress = 15.0f + BetterRand::genNrInInterval(0, 15);
-            } else if (entity.dv.attachmentStyle == AVOIDANT) {
-                entity.entityLoneliness = 0.0f; // suppresses loneliness initially
-            }
-            
-            // Assign ValueSystem based on correlations (just some logical derivations)
-            entity.ValueSystem.familyOrientation = clamp(50.0f + (entity.personality.agreeableness - 50.0f) * 0.5f + (nurture - 50.0f) * 0.3f);
-            entity.ValueSystem.achievementDrive = clamp(50.0f + (entity.personality.conscientiousness - 50.0f) * 0.7f);
-            entity.ValueSystem.spiritualNeed = clamp(50.0f + (entity.personality.openness - 50.0f) * 0.4f);
-            entity.ValueSystem.hedonism = clamp(50.0f + (entity.personality.extraversion - 50.0f) * 0.6f - (entity.personality.conscientiousness - 50.0f) * 0.5f);
-            entity.ValueSystem.collectivism = clamp(50.0f - (entity.personality.extraversion - 50.0f) * 0.3f + (entity.personality.agreeableness - 50.0f) * 0.4f);
 
             std::stringstream ss;
-            ss << "Entity " << count << " personality: E=" << entity.personality.extraversion
-                      << " A=" << entity.personality.agreeableness
-                      << " C=" << entity.personality.conscientiousness
-                      << " N=" << entity.personality.neuroticism
-                      << " O=" << entity.personality.openness;
+            ss << "Entity " << count
+               << " | Personality E=" << (int)entity.personality.extraversion
+               << " A=" << (int)entity.personality.agreeableness
+               << " C=" << (int)entity.personality.conscientiousness
+               << " N=" << (int)entity.personality.neuroticism
+               << " O=" << (int)entity.personality.openness
+               << " | Values Fam=" << (int)entity.ValueSystem.familyOrientation
+               << " Ach=" << (int)entity.ValueSystem.achievementDrive
+               << " Hed=" << (int)entity.ValueSystem.hedonism
+               << " Col=" << (int)entity.ValueSystem.collectivism
+               << " Spi=" << (int)entity.ValueSystem.spiritualNeed
+               << " | Attachment=" << entity.dv.attachmentStyle
+               << " Trauma=" << (int)entity.dv.childhoodTraumaScore
+               << " Nurture=" << (int)entity.dv.childhoodNurturingScore
+               << " | Start: Happy=" << (int)entity.entityHapiness
+               << " Stress=" << (int)entity.entityStress
+               << " Lonely=" << (int)entity.entityLoneliness
+               << " Goal=" << entity.m_goals[0].type;
             globalLogger->logCmd(ss.str());
             entities.push_back(entity);
             count++;
@@ -697,9 +812,44 @@ int main() {
                 }
                 FreeWillSystem::clear_new_borns();
 
-                ent_quad.clear();
-                for(int j = 0; j < (int)entities.size(); j++){
-                    ent_quad.push_back(&entities[j]);
+                // Rebuild ent_quad so new entities appear on map and pointers are fresh
+                if (!new_borns.empty()) {
+                    ent_quad.clear();
+                    for(int j = 0; j < (int)entities.size(); j++){
+                        ent_quad.push_back(&entities[j]);
+                    }
+                    // Repair all pointedEntity pointers — they point into entities[] which may
+                    // have reallocated. Re-resolve by matching stored entity IDs.
+                    for(Entity& e : entities){
+                        for(auto& d : e.list_entityPointedDesire){
+                            if(d.pointedEntity){
+                                int id = d.pointedEntity->entityId;
+                                for(Entity& other : entities)
+                                    if(other.entityId == id){ d.pointedEntity = &other; break; }
+                            }
+                        }
+                        for(auto& a : e.list_entityPointedAnger){
+                            if(a.pointedEntity){
+                                int id = a.pointedEntity->entityId;
+                                for(Entity& other : entities)
+                                    if(other.entityId == id){ a.pointedEntity = &other; break; }
+                            }
+                        }
+                        for(auto& s : e.list_entityPointedSocial){
+                            if(s.pointedEntity){
+                                int id = s.pointedEntity->entityId;
+                                for(Entity& other : entities)
+                                    if(other.entityId == id){ s.pointedEntity = &other; break; }
+                            }
+                        }
+                        for(auto& c : e.list_entityPointedCouple){
+                            if(c.pointedEntity){
+                                int id = c.pointedEntity->entityId;
+                                for(Entity& other : entities)
+                                    if(other.entityId == id){ c.pointedEntity = &other; break; }
+                            }
+                        }
+                    }
                 }
 
                 // Export current state to JSON lines for HTML viewer
@@ -708,11 +858,8 @@ int main() {
             }
         }
 
-
-        instanceUI.showSimulationInformation(day / 60 , entities.size(), UPDATE_FREQUENCY, {});
-
         std::string saveFilename;
-        int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename);
+        int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename, day / 60 , entities.size(), UPDATE_FREQUENCY, {});
         if (saveLoadAction == 1) {
             saveGame(saveFilename, entities, day, frameCounter);
         } else if (saveLoadAction == 2) {

@@ -22,8 +22,12 @@ UI::GridPoint UI::getGridPoint() {
 }
 
 //complementary_info = nombre de couple, nombre de mort etc etc
-void UI::showSimulationInformation(int day, int num_entity, int tick, std::map<std::string, int> complementary_information){
-    ImGui::Begin("=== Simulation Statistics ===");
+
+
+int UI::showSaveLoadButtons(std::string& filename, int day, int num_entity, int tick, std::map<std::string, int> complementary_information) {
+    int result = 0;
+    ImGui::Begin("=== Stats  + Save ===");
+
     ImGui::Text("Number Entities: %d", num_entity);
     ImGui::Text("day: %d", day);
     ImGui::Text("actual tick: %d", tick);
@@ -43,12 +47,8 @@ void UI::showSimulationInformation(int day, int num_entity, int tick, std::map<s
     for(auto& p : complementary_information){
         ImGui::Text("%s: %d", p.first,p.second);
     }
-    ImGui::End();
-}
 
-int UI::showSaveLoadButtons(std::string& filename) {
-    int result = 0;
-    ImGui::Begin("Save / Load");
+
     ImGui::InputText("File", saveLoadFilename, sizeof(saveLoadFilename));
     if (ImGui::Button("Save Game")) {
         result = 1;

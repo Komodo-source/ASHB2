@@ -26,23 +26,52 @@ extern Logger* globalLogger;
         return decay;
     }
 
-    // Calculate how well entity meets action requirements
+    // Calculate how well entity meets action requirements.
+    //
+    // Two classes of stat:
+    //   EXCESS stats  (stress, anger, loneliness, boredom) — action fires when stat IS HIGH
+    //   DEFICIENCY stats (hygiene, health, mentalHealth)   — action fires when stat IS LOW
+    //
+    // For EXCESS:   fitness peaks when currentValue >= requiredValue
+    // For DEFICIENCY: fitness peaks when currentValue <= requiredValue
+    //   (i.e. "Take Shower" requirement {hygiene, 50} means "shower when hygiene < 50")
     float FreeWillSystem::calculateRequirementFitness(Entity* entity, const Action& action) {
         float totalFitness = 0.0f;
         float totalWeight = 0.0f;
 
+        // Stats that represent problems when LOW (we act to restore them)
+        auto isDeficiencyStat = [](const std::string& s) -> bool {
+            return s == "hygiene" || s == "health" || s == "mentalHealth";
+        };
+
         for (const auto& req : action.requirements) {
-             float currentValue = getEntityStat(entity, req.statName);
-             if (entity->dv.attachmentStyle == AVOIDANT && req.statName == "loneliness") {
-                 currentValue = 0.0f; // Suppress loneliness
-             }
-            float difference = currentValue - req.requiredValue;
+            float currentValue = getEntityStat(entity, req.statName);
+
+            if (entity->dv.attachmentStyle == AVOIDANT && req.statName == "loneliness") {
+                currentValue = 0.0f; // avoidants suppress loneliness perception
+            }
 
             float fitness;
-            if (difference >= 0) {
-                 fitness = 1.0f + std::min(0.5f, difference / (req.requiredValue * 2.0f));
+            if (isDeficiencyStat(req.statName)) {
+                // We WANT to act when current < required threshold
+                // fitness = 1 when barely below threshold, max at 0, 0 when above threshold
+                float gap = req.requiredValue - currentValue; // positive = stat is too low
+                if (gap <= 0.0f) {
+                    // Stat is fine — very low fitness for this action
+                    fitness = std::max(0.0f, 1.0f - (-gap / (req.requiredValue + 1.0f)) * 2.0f);
+                    fitness *= 0.15f; // strong suppression when not needed
+                } else {
+                    // Stat is below threshold — fitness rises with urgency
+                    fitness = 1.0f + std::min(1.0f, gap / (req.requiredValue + 1.0f));
+                }
             } else {
-                fitness = std::max(0.0f, 1.0f + (difference / req.requiredValue));
+                // EXCESS stat: act when currentValue >= requiredValue
+                float difference = currentValue - req.requiredValue;
+                if (difference >= 0) {
+                    fitness = 1.0f + std::min(0.5f, difference / (req.requiredValue + 1.0f));
+                } else {
+                    fitness = std::max(0.0f, 1.0f + (difference / (req.requiredValue + 1.0f)));
+                }
             }
 
             totalFitness += fitness * req.weight;
@@ -632,43 +661,46 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
     void FreeWillSystem::initializeActions() {
 
         //POINTED actions (require a target entity)
+        // Socialize: fires whenever lonely OR bored — very accessible, the baseline human act
         Action socialize("Socialize", 1, "social");
         socialize.requirements = {
-            {"loneliness", 30.0f, 0.8f},
-            {"stress", 30.0f, 0.3f}
+            {"loneliness", 20.0f, 0.7f},  // fires with any loneliness (was 30)
+            {"boredom",    20.0f, 0.4f}    // boredom also drives socializing (was stress 30)
         };
         socialize.statChanges = {
-            {"loneliness", -7.0f},
-            {"happiness", 6.0f},
-            {"stress", -4.0f},
-            {"boredom", -9.0f}
+            {"loneliness", -8.0f},
+            {"happiness",  7.0f},
+            {"stress",    -5.0f},
+            {"boredom",   -10.0f}
         };
-        socialize.baseSatisfaction = 20.0f;
+        socialize.baseSatisfaction = 25.0f;
         availableActions.push_back(socialize);
 
+        // Desire: fires when lonely, threshold lowered from 40 to 25
         Action desire("Desire", 2, "social");
         desire.requirements = {
-            {"loneliness", 40.0f, 0.9f},
-            {"happiness", 40.0f, 0.6f}
+            {"loneliness", 25.0f, 0.8f},
+            {"happiness",  35.0f, 0.5f}
         };
         desire.statChanges = {
             {"loneliness", -12.0f},
-            {"happiness", 13.0f},
-            {"stress", -6.0f}
+            {"happiness",  13.0f},
+            {"stress",     -6.0f}
         };
         desire.baseSatisfaction = 30.0f;
         availableActions.push_back(desire);
 
+        // GoodConnection: fires with moderate loneliness (was 50 happiness gate — too restrictive)
         Action goodconn("GoodConnection", 3, "social");
         goodconn.requirements = {
-            {"happiness", 50.0f, 0.7f},
-            {"loneliness", 30.0f, 0.8f}
+            {"loneliness", 25.0f, 0.8f},   // only need to be somewhat lonely
+            {"stress",     65.0f, 0.3f}     // not too stressed (light gate)
         };
         goodconn.statChanges = {
-            {"happiness", 13.0f},
-            {"loneliness", -14.0f},
-            {"mentalHealth", 9.0f},
-            {"stress", -4.0f}
+            {"happiness",     13.0f},
+            {"loneliness",   -14.0f},
+            {"mentalHealth",   9.0f},
+            {"stress",        -4.0f}
         };
         goodconn.baseSatisfaction = 35.0f;
         availableActions.push_back(goodconn);
@@ -853,31 +885,31 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         // Eat Meal (health)
         Action eatMeal("EatMeal", 22, "health");
         eatMeal.requirements = {
-            {"health", 70.0f, 0.8f}  // health <70
+            {"health", 70.0f, 0.8f}
         };
         eatMeal.statChanges = {
-            {"health", 15.0f},
-            {"happiness", 8.0f},
-            {"hygiene", -2.0f},
-            {"boredom", 3.0f}
+            {"health",    6.0f},   // was 15 — gradual recovery not spike
+            {"happiness", 4.0f},
+            {"hygiene",  -1.0f},
+            {"boredom",   2.0f}
         };
-        eatMeal.baseSatisfaction = 15.0f;
+        eatMeal.baseSatisfaction = 12.0f;
         availableActions.push_back(eatMeal);
 
-        // Sleep (health)
+        // Sleep
         Action sleep("Sleep", 23, "health");
         sleep.requirements = {
             {"stress", 50.0f, 0.7f},
-            {"health", 60.0f, 0.6f}  // health <60
+            {"health", 60.0f, 0.6f}
         };
         sleep.statChanges = {
-            {"stress", -25.0f},
-            {"health", 20.0f},
-            {"mentalHealth", 12.0f},
-            {"hygiene", -5.0f},
-            {"boredom", 5.0f}
+            {"stress",       -12.0f},  // was -25
+            {"health",         8.0f},  // was 20
+            {"mentalHealth",   6.0f},  // was 12
+            {"hygiene",       -2.0f},
+            {"boredom",        3.0f}
         };
-        sleep.baseSatisfaction = 25.0f;
+        sleep.baseSatisfaction = 20.0f;
         availableActions.push_back(sleep);
 
         // Self-Harm (health) - concerning but realistic
@@ -1074,29 +1106,29 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
 
         // ==================== INTIMATE/ROMANTIC ACTIONS ====================
 
-        // Flirt (social)
+        // Flirt: fires when lonely, hygiene decent — accessible early-game
         Action flirt("Flirt", 35, "social");
         flirt.requirements = {
-            {"happiness", 40.0f, 0.6f},
-            {"loneliness", 40.0f, 0.7f},
-            {"hygiene", 50.0f, 0.5f}
+            {"loneliness", 30.0f, 0.7f},   // lonely drives flirting (was happiness 40)
+            {"hygiene",    40.0f, 0.5f}     // just needs to not be filthy
         };
         flirt.statChanges = {
             {"loneliness", -5.0f},
-            {"happiness", 8.0f}
+            {"happiness",   8.0f}
         };
-        flirt.baseSatisfaction = 12.0f;
+        flirt.baseSatisfaction = 15.0f;
         availableActions.push_back(flirt);
 
-        // Date (social)
+        // Date: requires existing desire built up via Flirt/Desire actions
         Action date("Date", 36, "social");
         date.requirements = {
-            {"hygiene", 60.0f, 0.7f}
+            {"loneliness", 35.0f, 0.6f},
+            {"hygiene",    45.0f, 0.6f}    // must be reasonably clean (deficiency stat — low = bad)
         };
         date.statChanges = {
             {"loneliness", -15.0f},
-            {"happiness", 15.0f},
-            {"stress", -8.0f}
+            {"happiness",  15.0f},
+            {"stress",     -8.0f}
         };
         date.baseSatisfaction = 25.0f;
         availableActions.push_back(date);
@@ -1162,30 +1194,26 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
 
         Action couple("couple", 41, "social");
         couple.requirements = {
-            {"happiness", 65.0f, 0.8f},
-            {"health", 60.0f, 0.7f},
-            {"hygiene", 70.0f, 0.68f}
+            {"loneliness", 30.0f, 0.7f},   // loneliness drives wanting a partner
+            {"stress",     60.0f, 0.4f}    // not too stressed (excess stat — high stress blocks it)
         };
         couple.statChanges = {
-            {"happiness", 45.0f},
+            {"happiness",  45.0f},
             {"loneliness", -25.0f},
-            {"stress", 20.0f},
+            {"stress",     20.0f},
         };
         couple.baseSatisfaction = 50.0f;
         availableActions.push_back(couple);
 
-
         Action breeding("breeding", 41, "social");
         breeding.requirements = {
-            {"happiness", 75.0f, 0.8f},
-            {"health", 65.0f, 0.7f},
-            {"stress", 25.0f, 0.4f},
-            {"hygiene", 70.0f, 0.68f}
+            {"loneliness", 20.0f, 0.5f},
+            {"stress",     40.0f, 0.5f}
         };
         breeding.statChanges = {
-            {"happiness", 45.0f},
+            {"happiness",  45.0f},
             {"loneliness", -25.0f},
-            {"stress", 20.0f},
+            {"stress",     20.0f},
         };
         breeding.baseSatisfaction = 50.0f;
         availableActions.push_back(breeding);
@@ -1212,11 +1240,11 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
             {"hygiene", 50.0f, 0.9f}
         };
         shower.statChanges = {
-            {"hygiene", 30.0f},
-            {"happiness", 5.0f},
-            {"stress", -5.0f}
+            {"hygiene", 12.0f},   // was 30 — smaller gain matches slower passive decay
+            {"happiness", 3.0f},
+            {"stress", -3.0f}
         };
-        shower.baseSatisfaction = 15.0f;
+        shower.baseSatisfaction = 10.0f;
         availableActions.push_back(shower);
 
         // Rest action
@@ -1646,11 +1674,11 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
                 }else if( entity->SearchGoal("build_career").type.empty()   && action.name == "LearnSkill"){
                    rarityMultiplier = 0.25f;
                 }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Flirt"){
-                   rarityMultiplier = 0.30f;
+                   rarityMultiplier = 0.40f;
                 }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Date"){
-                   rarityMultiplier = 0.30f;
+                   rarityMultiplier = 0.40f;
                 }else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "Reconcile"){
-                   rarityMultiplier = 0.30f;
+                   rarityMultiplier = 0.40f;
                 }
                 else if( entity->SearchGoal("find_partner").type.empty()   && action.name == "breeding"){
                    rarityMultiplier = 0.75f;
@@ -1853,35 +1881,33 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
             }
 
             int index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
-            if(index == -1){ // n'as pas de desire, créer un nouveau
-                // Desire starts lower, based on target's attractiveness factors
+            if(index == -1){ // no desire yet — create a new link
                 float attractiveness = (pointed->entityHygiene / 100.0f) * 0.3f +
                                        (pointed->entityHapiness / 100.0f) * 0.4f +
                                        (pointed->entityHealth / 100.0f) * 0.3f;
-                float desire = static_cast<float>(BetterRand::genNrInInterval(4, 8)) * attractiveness;
+                // Start at 3-8, scaled by attractiveness (min 0.4 so it's never zero)
+                float desire = static_cast<float>(BetterRand::genNrInInterval(3, 8)) * std::max(0.4f, attractiveness);
                 std::cout << "Nouveau lien de desire ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << desire << std::endl;
                 pointer->addDesire({1, pointed, desire});
-
-                //Reciprocal link
                 pointed->addSocial({1, pointer, desire * 0.7f});
-            }else{ //le désire existe déjà
+            }else{ // desire exists — reinforce it
                 int index_social = pointer->contains(pointer->list_entityPointedSocial, pointed, 1);
-                int borne_haut = 6;
-                if(index_social != -1){ //si a des liens social augmenté le désir
-                    borne_haut += (int)(pointer->list_entityPointedSocial[index_social].social / 10);
+                int borne_haut = 6; // base increment 3-6
+                if(index_social != -1){
+                    borne_haut += (int)(pointer->list_entityPointedSocial[index_social].social / 10.0f);
                 }
                 float increment = static_cast<float>(BetterRand::genNrInInterval(3, borne_haut));
-                // Reduce increment if target's attractiveness is low
-                float attractiveness = (pointed->entityHygiene / 100.0f + pointed->entityHapiness / 100.0f) / 2.0f;
+                // Only a light attractiveness touch — don't zero out the increment
+                float attractiveness = std::max(0.5f, (pointed->entityHygiene / 100.0f + pointed->entityHapiness / 100.0f) / 2.0f);
                 increment *= attractiveness;
-                pointer->list_entityPointedDesire[index].desire += increment;
+                pointer->list_entityPointedDesire[index].desire = std::min(100.0f, pointer->list_entityPointedDesire[index].desire + increment);
                 std::cout << "Desire renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
 
         }else if(action->name == "AngerConnection"){
             int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
             if(index == -1){
-                float anger = static_cast<float>(BetterRand::genNrInInterval(6,15));
+                float anger = static_cast<float>(BetterRand::genNrInInterval(1,5));
                 std::cout << "Nouveau lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
                 pointer->addAnger({1, pointed, anger});
                 //Reciprocal link
@@ -1899,38 +1925,29 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         }else if(action->name == "Socialize"){
             int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(index == -1){
-                float social = static_cast<float>(BetterRand::genNrInInterval(5,12));
+                float social = static_cast<float>(BetterRand::genNrInInterval(3, 6));
                 std::cout << "Nouveau lien social ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
                 pointer->addSocial({1, pointed, social});
-                pointed->addSocial({1, pointer, social * 0.8f}); // Slightly less impact
-
-                //applyStatChanges(pointer, action->statChanges);
-                //applyStatChanges(pointed, {
-                //    {"loneliness", -5.0f},  // They also feel less lonely
-                //    {"happiness", 4.0f}     // They also get happier
-                //});
+                pointed->addSocial({1, pointer, social * 0.8f});
             }else{
-                //Ici on choisit le lien social mais lorsqu'il sociabilise il se rend compte qu'il est malade donc on le
-                //met de poid plus fort
-                float increment = static_cast<float>(BetterRand::genNrInInterval(3,8));
+                float increment = static_cast<float>(BetterRand::genNrInInterval(3, 6));
                 if(pointed->entityDiseaseType != -1){
-                    pointer->list_entityPointedSocial[index].social += increment - BetterRand::genNrInInterval(2,6);
-                }else{
-                    pointer->list_entityPointedSocial[index].social += increment;
+                    // sick person: social still grows but less (avoidance is handled by passive decay)
+                    increment *= 0.5f;
                 }
+                pointer->list_entityPointedSocial[index].social = std::min(100.0f, pointer->list_entityPointedSocial[index].social + increment);
                 std::cout << "Social renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
         }else if(action->name == "GoodConnection"){
             int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
             if(index == -1){
-                float social = static_cast<float>(BetterRand::genNrInInterval(2,4));
+                float social = static_cast<float>(BetterRand::genNrInInterval(5, 10));
                 std::cout << "Nouveau lien social (good) ajouté entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " " <<social << std::endl;
                 pointer->addSocial({1, pointed, social});
-                //Reciprocal link
                 pointed->addSocial({1, pointer, social * 0.7f});
             }else{
-                float increment = static_cast<float>(BetterRand::genNrInInterval(2,4));
-                pointer->list_entityPointedSocial[index].social += increment;
+                float increment = static_cast<float>(BetterRand::genNrInInterval(5, 10));
+                pointer->list_entityPointedSocial[index].social = std::min(100.0f, pointer->list_entityPointedSocial[index].social + increment);
                 std::cout << "Social (good) renforcé entre: (" << pointer->getId() << ")" << pointer->getName()<< " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
             }
             pointed->onMajorEventAddOrBoostGoal("good_connection");
@@ -2876,6 +2893,63 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
         score *= griefModifier;
         score *= envModifier;
         score *= normModifier;
+
+        // --- Rarity / realism multipliers (mirror the legacy path) ---
+        float rarityMult = 1.0f;
+        const std::string& an = act.name;
+        bool isSocialAction = (an == "Socialize" || an == "GoodConnection" || an == "Desire" ||
+                               an == "AngerConnection" || an == "Gossip" || an == "HelpSupport" ||
+                               an == "Flirt" || an == "Date" || an == "Reconcile" || an == "couple" ||
+                               an == "breeding" || an == "Apologize" || an == "Insult" ||
+                               an == "Manipulate" || an == "Jealousy" || an == "Betray" ||
+                               an == "Discrimination" || an == "IgnoreAvoid" || an == "SetBoundaries");
+
+        // Social actions: impossible without neighbors, strongly boosted with neighbors
+        if (isSocialAction) {
+            if (neighbors.empty()) {
+                rarityMult = 0.0f; // cannot socialise alone
+            } else {
+                // More neighbours = more opportunity; extraverts lean harder into this
+                float neighborBonus = std::min(1.5f, 0.8f + neighbors.size() * 0.15f);
+                rarityMult *= neighborBonus;
+                // Make core positive social actions very attractive by default
+                if (an == "Socialize" || an == "GoodConnection" || an == "HelpSupport")
+                    rarityMult *= 1.4f;
+                if (an == "Flirt" || an == "Date" || an == "couple")
+                    rarityMult *= 1.2f;
+                if (an == "Gossip")
+                    rarityMult *= 0.7f;
+            }
+        }
+
+        // Extreme / rare actions get heavy suppression
+        if (an == "Murder")          rarityMult *= 0.02f;
+        if (an == "Suicide")         rarityMult *= 0.02f;
+        if (an == "SelfHarm")        rarityMult *= 0.03f;
+        if (an == "Discrimination")  rarityMult *= 0.25f;
+        if (an == "Anxiety")         rarityMult *= 0.30f;
+        if (an == "Betray")          rarityMult *= 0.15f;
+        if (an == "Manipulate")      rarityMult *= 0.30f;
+        if (an == "Insult")          rarityMult *= 0.40f;
+        if (an == "BreakUp")         rarityMult *= 0.25f;
+        if (an == "QuitGiveUp")      rarityMult *= 0.20f;
+        if (an == "DrinkAlcohol")    rarityMult *= 0.50f;
+        if (an == "Smoke")           rarityMult *= 0.50f;
+        if (an == "Jealousy")        rarityMult *= 0.35f;
+
+        // Prevent shower-spam: only attractive when hygiene is genuinely low
+        if (an == "Take Shower") {
+            float h = entity->entityHygiene;
+            rarityMult *= (h < 50.0f) ? (1.0f + (50.0f - h) / 50.0f)  // more urgent the dirtier
+                                       : (h < 70.0f ? 0.3f : 0.05f);   // barely matters when clean
+        }
+
+        score *= rarityMult;
+
+        // Small random jitter to prevent deterministic lock-in
+        std::uniform_real_distribution<float> jitter(0.93f, 1.07f);
+        score *= jitter(rng);
+
         if (score > 0.0f){ candidates.emplace_back(aPtr); candidates.back().score = score; }
     }
 
@@ -2918,13 +2992,8 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity, const std::vector<
     }
 
 
-    if (delib.chosenAction != nullptr) {
-        socialNormInstance.update(neighbors);
-        auto normIt = socialNormInstance.norms.find(delib.chosenAction->name);
-        if (normIt != socialNormInstance.norms.end()) {
-            entity->socialNorm = normIt->second;
-        }
-        return const_cast<Action*>(delib.chosenAction);
-    }
+    if (delib.chosenAction != nullptr) return const_cast<Action*>(delib.chosenAction);
     return nullptr;
 }
+
+

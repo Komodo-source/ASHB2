@@ -138,20 +138,20 @@ float Entity::getHealth() {
 }
 
 void Entity::addDesire(entityPointedDesire pointed) {
-    list_entityPointedDesire.push_back(pointed);
+    this->list_entityPointedDesire.push_back(pointed);
 }
 
 
 void Entity::addAnger(entityPointedAnger pointed) {
-    list_entityPointedAnger.push_back(pointed);
+    this->list_entityPointedAnger.push_back(pointed);
 }
 
 void Entity::addCouple(entityPointedCouple pointed) {
-    list_entityPointedCouple.push_back(pointed);
+    this->list_entityPointedCouple.push_back(pointed);
 }
 
 void Entity::addSocial(entityPointedSocial pointed) {
-    list_entityPointedSocial.push_back(pointed);
+    this->list_entityPointedSocial.push_back(pointed);
 }
 
 
@@ -248,10 +248,10 @@ void Entity::saveEntityStats(Action* act) {
     }
 }
 
-std::vector<entityPointedDesire> Entity::getListDesire(){ return list_entityPointedDesire;}
-std::vector<entityPointedAnger> Entity::getListAnger(){ return list_entityPointedAnger;}
-std::vector<entityPointedCouple> Entity::getListCouple(){ return list_entityPointedCouple;}
-std::vector<entityPointedSocial> Entity::getListSocial(){ return list_entityPointedSocial;}
+std::vector<entityPointedDesire> Entity::getListDesire(){ return this->list_entityPointedDesire;}
+std::vector<entityPointedAnger> Entity::getListAnger(){ return this->list_entityPointedAnger;}
+std::vector<entityPointedCouple> Entity::getListCouple(){ return this->list_entityPointedCouple;}
+std::vector<entityPointedSocial> Entity::getListSocial(){ return this->list_entityPointedSocial;}
 
 void Entity::addGrief(int lostId, float intensity, bool isDeath) {
     // If already grieving this person, refresh and intensify
@@ -652,13 +652,12 @@ void MentalModelOfOther::updateFromObservation(Entity* observed, float observerA
     estimatedAnger     = observed->entityGeneralAnger * observerAccuracy + estimatedAnger * (1.0f - observerAccuracy);
     estimatedStress    = observed->entityStress * observerAccuracy + estimatedStress * (1.0f - observerAccuracy);
 
-    
+
 }
 
 MentalModelOfOther* Entity::getModelOf(Entity* ent) {
     for (MentalModelOfOther* md : list_MentalModelOfOther) {
         if (md->entityPointed == ent) return md;
     }
-    return nullptr; // ← was missing
+    return nullptr;
 }
-

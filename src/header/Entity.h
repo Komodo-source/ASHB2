@@ -15,7 +15,6 @@ class Action;
 
 static std::vector<std::string> male_name = {
 "Sammy",
-"Pierre",
 "Alexander",
 "Griffin",
 "Rayan",
@@ -30,7 +29,6 @@ static std::vector<std::string> male_name = {
 static std::vector<std::string> female_name = {
 "Amari",
 "Campbell",
-"Irys",
 "Selah",
 "Kamila",
 "Makaila",

@@ -47,7 +47,7 @@ int Disease::region;
     int ranchoice = BetterRand::genNrInInterval(0,4);
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
-      if (ent->entityAntiBody < 100 || ent->entityDiseaseType != -1){ //a déja une maladie
+      if (ent->entityAntiBody < 70 || ent->entityDiseaseType != -1){ //a déja une maladie
         if(hygiene - (ranchoice * region) - neighboorsSize - (1.15 * nbSickClose) + (2.2 * ent->entityAntiBody) < 0){
           return diseasePicked;
         }else{
@@ -59,8 +59,8 @@ int Disease::region;
 
   void Disease::manageSickness(Entity* ent){
     // guerison
-    ent->entityHealth -= ent->entityDiseaseType;
-    ent->entityHygiene -= ent->entityDiseaseType;
+    ent->entityHealth -= ent->entityDiseaseType * 2;
+    ent->entityHygiene -= ent->entityDiseaseType * 2;
     ent->entityAntiBody += BetterRand::genNrInInterval(4, 15);
     if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 20) > 100){
       std::string dName = Disease::getDiseaseName(ent->entityDiseaseType);
