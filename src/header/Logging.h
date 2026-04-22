@@ -35,15 +35,16 @@ public:
         std::filesystem::create_directories("./data");
 
         // Open all log files in append mode
-        cmdLogFile.open("./data/cmd_log.txt", std::ios::app);
-        deathsLogFile.open("./data/deaths_log.txt", std::ios::app);
-        diseasesLogFile.open("./data/diseases_log.txt", std::ios::app);
-        actionsLogFile.open("./data/actions_log.txt", std::ios::app);
-        relationshipsLogFile.open("./data/relationships_log.txt", std::ios::app);
-        movementsLogFile.open("./data/movements_log.txt", std::ios::app);
-        birthsLogFile.open("./data/births_log.txt", std::ios::app);
-        eventsLogFile.open("./data/events_log.txt", std::ios::app);
-        completeLogFile.open("./data/complete_logs.txt", std::ios::app);
+        cmdLogFile.open("./src/data/cmd_log.txt", std::ios::app);
+        deathsLogFile.open("./src/data/deaths_log.txt", std::ios::app);
+        diseasesLogFile.open("./src/data/diseases_log.txt", std::ios::app);
+        actionsLogFile.open("./src/data/actions_log.txt", std::ios::app);
+        relationshipsLogFile.open("./src/data/relationships_log.txt", std::ios::app);
+        movementsLogFile.open("./src/data/movements_log.txt", std::ios::app);
+        birthsLogFile.open("./src/data/births_log.txt", std::ios::app);
+        eventsLogFile.open("./src/data/events_log.txt", std::ios::app);
+        completeLogFile.open("./src/data/complete_logs.txt", std::ios::app);
+        
 
         // Redirect std::cout to cmd_log.txt
         // if (cmdLogFile.is_open()) {
@@ -146,15 +147,15 @@ public:
         completeLogFile.close();
 
         // Reopen in truncate mode to clear
-        cmdLogFile.open("./data/cmd_log.txt", std::ios::trunc);
-        deathsLogFile.open("./data/deaths_log.txt", std::ios::trunc);
-        diseasesLogFile.open("./data/diseases_log.txt", std::ios::trunc);
-        actionsLogFile.open("./data/actions_log.txt", std::ios::trunc);
-        relationshipsLogFile.open("./data/relationships_log.txt", std::ios::trunc);
-        movementsLogFile.open("./data/movements_log.txt", std::ios::trunc);
-        birthsLogFile.open("./data/births_log.txt", std::ios::trunc);
-        eventsLogFile.open("./data/events_log.txt", std::ios::trunc);
-        completeLogFile.open("./data/complete_logs.txt", std::ios::trunc);
+        cmdLogFile.open("./src/data/cmd_log.txt", std::ios::trunc);
+        deathsLogFile.open("./src/data/deaths_log.txt", std::ios::trunc);
+        diseasesLogFile.open("./src/data/diseases_log.txt", std::ios::trunc);
+        actionsLogFile.open("./src/data/actions_log.txt", std::ios::trunc);
+        relationshipsLogFile.open("./src/data/relationships_log.txt", std::ios::trunc);
+        movementsLogFile.open("./src/data/movements_log.txt", std::ios::trunc);
+        birthsLogFile.open("./src/data/births_log.txt", std::ios::trunc);
+        eventsLogFile.open("./src/data/events_log.txt", std::ios::trunc);
+        completeLogFile.open("./src/data/complete_logs.txt", std::ios::trunc);
 
         // Re-redirect cout
         // if (cmdLogFile.is_open()) {

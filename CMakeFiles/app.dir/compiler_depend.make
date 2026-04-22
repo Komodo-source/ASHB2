@@ -1338,9 +1338,9 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   src/header/BetterRand.h \
   src/header/Disease.h \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Logging.h \
-  src/header/NeedLevel.h \
   src/header/SocialNormSystem.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
@@ -1579,8 +1579,8 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
 
 CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
-  src/header/NeedLevel.h \
   src/header/SocialNormSystem.h \
   src/header/random.hpp \
   C:/mingw64/include/c++/14.2.0/algorithm \
@@ -1817,9 +1817,9 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   libs/imgui/imgui.h \
   src/header/BetterRand.h \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
-  src/header/NeedLevel.h \
   src/header/SocialNormSystem.h \
   src/header/UI.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
@@ -2068,9 +2068,9 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
 CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   src/header/BetterRand.h \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
-  src/header/NeedLevel.h \
   src/header/SocialNormSystem.h \
   src/header/heritage.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
@@ -2472,8 +2472,8 @@ CMakeFiles/app.dir/src/Logging.cpp.obj: src/Logging.cpp \
 
 CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
-  src/header/NeedLevel.h \
   src/header/SaveLoad.h \
   src/header/SocialNormSystem.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
@@ -2696,7 +2696,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   libs/imgui/backends/imgui_impl_opengl3.h \
   libs/imgui/imconfig.h \
   libs/imgui/imgui.h \
-  src/header/NeedLevel.h \
+  src/header/ExternalData.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
@@ -2954,8 +2954,8 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   src/header/BetterRand.h \
   src/header/Disease.h \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
-  src/header/NeedLevel.h \
   src/header/SocialNormSystem.h \
   src/header/UI.h \
   src/header/implot.h \
@@ -3682,10 +3682,10 @@ CMakeFiles/app.dir/src/header/implot_items.cpp.obj: src/header/implot_items.cpp 
 CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   src/header/BetterRand.h \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
   src/header/Logging.h \
-  src/header/NeedLevel.h \
   src/header/SocialNormSystem.h \
   src/header/heritage.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
@@ -3933,11 +3933,11 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   src/header/BetterRand.h \
   src/header/Disease.h \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
   src/header/Logging.h \
   src/header/Movement.h \
-  src/header/NeedLevel.h \
   src/header/SaveLoad.h \
   src/header/SocialNormSystem.h \
   src/header/SpatialMesh.h \
@@ -4302,9 +4302,9 @@ CMakeFiles/app.dir/src/movement.cpp.obj: src/movement.cpp \
   libs/imgui/imgui.h \
   src/header/BetterRand.h \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Movement.h \
-  src/header/NeedLevel.h \
   src/header/SocialNormSystem.h \
   src/header/UI.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
@@ -4991,10 +4991,6 @@ libs/imgui/imgui_internal.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/rpc.h:
 
-C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h:
-
-C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/wmmintrin.h:
-
 libs/glfw/include/GLFW/glfw3.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/sys/types.h:
@@ -5136,8 +5132,6 @@ C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/float.h:
 C:/mingw64/x86_64-w64-mingw32/include/threadpoollegacyapiset.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/x86gprintrin.h:
-
-src/header/NeedLevel.h:
 
 C:/mingw64/include/c++/14.2.0/clocale:
 
@@ -5340,6 +5334,12 @@ C:/mingw64/x86_64-w64-mingw32/include/winnetwk.h:
 src/header/Entity.h:
 
 C:/mingw64/include/c++/14.2.0/bits/exception.h:
+
+C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h:
+
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/wmmintrin.h:
+
+src/header/ExternalData.h:
 
 src/header/SocialNormSystem.h:
 

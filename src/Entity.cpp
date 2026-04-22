@@ -13,7 +13,7 @@
 #include "./header/FreeWillSystem.h"
 #include "header/BetterRand.h"
 #include "./header/SocialNormSystem.h"
-#include "./header/NeedLevel.h"
+#include "./header/ExternalData.h"
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -598,7 +598,7 @@ void Entity::onMajorEventAddOrBoostGoal(const std::string& eventType) {
         addOrBoostGoal("find_meaning", 2.3f);
     }
     else if (eventType == "couple") {
-        addOrBoostGoal("find_partner", 1.1f);
+        addOrBoostGoal("find_partner", 0.8f);
         addOrBoostGoal("build_family", 0.6f);
     }
     else if (eventType == "reproduction") {

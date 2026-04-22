@@ -1,80 +1,152 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>log n°154</title>
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/charts.css/dist/charts.min.css"
-        />
-        
+        <title>Document</title>
     </head>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+        * {
+            font-family: "Roboto", sans-serif;
+        }
+        main {
+            margin-top: 2rem;
+            margin-left: 2rem;
+        }
+        .top {
+            text-align: center;
+        }
+        .reports > p {
+            margin: 0rem 0 0rem 2rem;
+        }
+        .reports {
+            transition: 0.7s;
+            cursor: pointer;
+            height: 2rem;
+            padding-top: 1.1rem;
+        }
+        .reports:hover {
+            border-left: 5px solid #111;
+            background-color: #dadada;
+        }
+        .reports_list, .reports_list2{
+            border: 1px solid #111;
+            width: 20rem;
+        }
+        .global-container{
+            display: flex;
+        }
+        .reports_list2{
+            margin-left: 1rem;
+        }
+        
+    </style>
     <body>
         <main>
             <div class="top">
-                <h1>Log of simulation : 154</h1>
-                <p id="detail">//// 10/03/2026 // 20:38 /03:45</p>
+                <h1>Recent report for A.S.H.B </h1>
+                <p>/ last Update 21:50 | 21/03/26</p>
             </div>
-            <div class="download_file">
-                <button>Download</button>
-            </div>
-            <div class="data">
-                <div class="log">
-                    <h3>Log History</h3>
-                    <div class="logs">
-                        <code> </code>
+            <div class="global-container">
+                
+            
+            
+            <div class="reports_list">
+                <p style="text-align: center; font-size: 19px; font-weight: 500;" >Simulation Reports</p>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report32.html'"
+                >
+                    <p>report32.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report31.html'"
+                >
+                    <p>report31.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report30.html'"
+                >
+                    <p>report30.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report26.html'"
+                >
+                    <p>report26.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report25.html'"
+                >
+                    <p>report25.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report22.html'"
+                >
+                    <p>report22.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report21.html'"
+                >
+                    <p>report21.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './report20.html'"
+                >
+                    <p>report20.html</p>
+                </div>
+                <div
+                    class="reports"
+                    onclick="window.location.href = './character.html'"
+                >
+                    <p>character.html</p>
+                </div>
+                
+            </div> 
+            
+                <div class="reports_list2">
+                    <p style="text-align: center; font-size: 19px; font-weight: 500;" >Devlogs</p>
+                    <div
+                        class="reports"
+                        onclick="window.location.href = './report32.html'"
+                    >
+                        <p>report32.html</p>
                     </div>
-                </div>
-
-                <div class="ai_summary">
-                    <h3>AI Summary</h3>
-                    <p>
-                        Je vais créer un fichier HTML complet avec le tableau,
-                        les boutons, et les fonctions JavaScript corrigées et
-                        complètes.Fichier créé, lu un fichierFichier créé, lu un
-                        fichierVoici le fichier HTML complet. Voici ce qui a été
-                        implémenté et corrigé par rapport à votre code :
-                        Corrections importantes : table_to_Desktop → renommée
-                        table_to_desktop (cohérence avec les boutons)
-                        mobile_to_table → renommée table_to_desktop (c'est la
-                        transformation inverse) Dans votre version originale,
-                        thead.appendChild(tr2) utilisait l'ancien sélecteur
-                        thead au lieu du nouvel élément thead2 — corrigé
-                        extraire_contenu() saute maintenant la 1ère colonne
-                        "Personnage" (index 0) Architecture des fonctions :
-                        extraire_contenu() — lit le DOM et peuple
-                        contenu.colonnes + contenu.lignes table_to_mobile() —
-                        extrait → vide → reconstruit en 2 colonnes (Discipline |
-                        Note) table_to_desktop() — vide → reconstruit le tableau
-                        original depuis contenu, puis recalcule moyennes et
-                        agrégations Les deux boutons appellent directement ces
-                        fonctions, avec un garde if (modeActuel === ...) pour
-                        éviter les doubles exécutions
-                    </p>
-                </div>
+                    <div
+                        class="reports"
+                        onclick="window.location.href = './report31.html'"
+                    >
+                        <p>report31.html</p>
+                    </div>
+                    <div
+                        class="reports"
+                        onclick="window.location.href = './report30.html'"
+                    >
+                        <p>report30.html</p>
+                    </div>
+                    <div
+                        class="reports"
+                        onclick="window.location.href = './report26.html'"
+                    >
+                        <p>report26.html</p>
+                    </div>
+                    <div
+                        class="reports"
+                        onclick="window.location.href = './report25.html'"
+                    >
+                        <p>report25.html</p>
+                    </div>
+                    
+                    </div>
             </div>
-            <div class="bottom_stats">
-                <div class="entity_statistics_over_time">
-                    <table class="charts-css line show-4-secondary-axes">
-                        <tr>
-                            <td style="--start: 0.2; --end: 0.4">
-                                <span class="data"> Data </span>
-                            </td>
-                            <td style="--start: 0.4; --end: 0.6">
-                                <span class="data"> Data </span>
-                            </td>
-                            <td style="--start: 0.6; --end: 0.8">
-                                <span class="data"> Data </span>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div class="dependency_graph">
-                    <h3>heritage Graph</h3>
-                </div>
-            </div>
+            
         </main>
     </body>
 </html>

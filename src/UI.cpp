@@ -130,7 +130,7 @@ void UI::showSystemInformation(){
         if(ImGui::Button("Show statistics")){
             showDetailedInfo = !showDetailedInfo;
         }
-        if(ImGui::Button("Show detailed Action Informatino")){
+        if(ImGui::Button("Show detailed Action Information")){
             showActionInfo = !showActionInfo;
         }
 

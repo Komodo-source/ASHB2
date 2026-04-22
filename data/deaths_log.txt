@@ -1,3 +1,0 @@
-[2026-04-22 10:12:24] Entity 15 (Casey, age 1129) died: health depletion
-[2026-04-22 10:12:31] Entity 16 (Sammy, age 1307) died: health depletion
-[2026-04-22 10:12:33] Entity 21 (Campbell, age 1367) died: health depletion

@@ -14,4 +14,12 @@ struct HierarchicalNeed {
         : name(n), level(lvl), urgency(50.0f), decayRate(decay), satisfactionThreshold(50.0f) {}
 };
 
+enum SocialTier {
+       STRANGER     = 0,
+       ACQUAINTANCE = 1,
+       FAMILIAR     = 2,
+       FRIEND       = 3,
+       CLOSE_FRIEND = 4
+   };
+
 

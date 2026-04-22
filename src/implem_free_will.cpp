@@ -2,7 +2,7 @@
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
 #include "./header/Logging.h"
-#include "./header/NeedLevel.h"
+#include "./header/ExternalData.h"
 #include "./header/SocialNormSystem.h"
 #include "./header/heritage.h"
 #include <algorithm>
@@ -747,7 +747,7 @@ void FreeWillSystem::initializeActions() {
   availableActions.push_back(goodconn);
 
   Action angconn("AngerConnection", 4, "social");
-  angconn.requirements = {{"anger", 60.0f, 0.9f}, {"stress", 50.0f, 0.7f}};
+  angconn.requirements = {{"anger", 40.0f, 0.8f}, {"stress", 50.0f, 0.4f}};
   angconn.statChanges = {{"anger", 13.0f},
                          {"stress", 17.0f},
                          {"happiness", -12.0f},
@@ -788,9 +788,9 @@ void FreeWillSystem::initializeActions() {
   availableActions.push_back(suicide);
 
   Action anxiety("Anxiety", 8, "health");
-  anxiety.requirements = {{"stress", 60.0f, 0.9f},
+  anxiety.requirements = {{"stress", 70.0f, 0.9f},
                           {"mentalHealth", 40.0f, 0.7f}};
-  anxiety.statChanges = {{"stress", 17.0f},
+  anxiety.statChanges = {{"stress", 19.0f},
                          {"mentalHealth", -10.0f},
                          {"health", -7.0f},
                          {"happiness", -10.0f}};
@@ -800,13 +800,13 @@ void FreeWillSystem::initializeActions() {
   // self care action - Meditation/Prayer (health)
   Action Prayer("Prayer", 14, "health");
   Prayer.requirements = {{"stress", 50.0f, 0.9f},
-                         {"mentalHealth", 45.0f, 0.6f}};
+                         {"mentalHealth", 55.0f, 0.7f}};
   
   Prayer.statChanges = {{"stress", -15.0f},
                         {"mentalHealth", 15.0f},
                         {"loneliness", 5.0f},
                         {"happiness", 8.0f}};
-  Prayer.baseSatisfaction = 13.0f;
+  Prayer.baseSatisfaction = 9.0f;
   availableActions.push_back(Prayer);
 
   // Read/Study (achievement)
@@ -825,13 +825,13 @@ void FreeWillSystem::initializeActions() {
 
   // Procrastinate (entertainment)
   Action procrastinate("Procrastinate", 17, "entertainment");
-  procrastinate.requirements = {{"stress", 40.0f, 0.6f},
-                                {"boredom", 30.0f, 0.5f}};
+  procrastinate.requirements = {{"stress", 40.0f, 0.7f},
+                                {"boredom", 40.0f, 0.7f}};
   procrastinate.statChanges = {{"boredom", -10.0f},
-                               {"happiness", 3.0f},
-                               {"stress", 12.0f},
+                               {"happiness", 5.0f},
+                               {"stress", 16.0f},
                                {"mentalHealth", -5.0f}};
-  procrastinate.baseSatisfaction = 8.0f;
+  procrastinate.baseSatisfaction = 5.0f;
   availableActions.push_back(procrastinate);
 
   // ==================== SOCIAL ACTIONS ====================
@@ -891,12 +891,12 @@ void FreeWillSystem::initializeActions() {
   // Sleep
   Action sleep("Sleep", 23, "health");
   sleep.requirements = {{"stress", 50.0f, 0.7f}, {"health", 60.0f, 0.6f}};
-  sleep.statChanges = {{"stress", -12.0f},     // was -25
-                       {"health", 8.0f},       // was 20
-                       {"mentalHealth", 6.0f}, // was 12
-                       {"hygiene", -2.0f},
-                       {"boredom", 3.0f}};
-  sleep.baseSatisfaction = 20.0f;
+  sleep.statChanges = {{"stress", -12.0f},     
+                       {"health", 8.0f},       
+                       {"mentalHealth", 7.0f}, 
+                       {"hygiene", -4.0f},
+                       {"boredom", 4.0f}};
+  sleep.baseSatisfaction = 13.0f;
   availableActions.push_back(sleep);
 
   // Self-Harm (health) - concerning but realistic
@@ -915,7 +915,7 @@ void FreeWillSystem::initializeActions() {
   
   watchEntertainment.statChanges = {
       {"boredom", -20.0f}, {"happiness", 8.0f}, {"stress", -8.0f}};
-  watchEntertainment.baseSatisfaction = 18.0f;
+  watchEntertainment.baseSatisfaction = 11.0f;
   availableActions.push_back(watchEntertainment);
 
   // Creative Activity (achievement)
@@ -933,7 +933,7 @@ void FreeWillSystem::initializeActions() {
   // Gaming/Play (entertainment)
   Action gaming("Gaming", 26, "entertainment");
   gaming.requirements = {
-      {"boredom", 50.0f, 0.7f}, {"stress", 80.0f, 0.5f} // stress <80
+      {"boredom", 50.0f, 0.8f}, {"stress", 80.0f, 0.5f} 
   };
   gaming.statChanges = {{"boredom", -20.0f},
                         {"happiness", 12.0f},
@@ -1029,14 +1029,14 @@ void FreeWillSystem::initializeActions() {
   // Drink Alcohol (entertainment/health)
   Action drinkAlcohol("DrinkAlcohol", 33, "entertainment");
   drinkAlcohol.requirements = {
-      {"stress", 60.0f, 0.7f} // stress 60+ OR happiness <40
+      {"stress", 55.0f, 0.8f}
   };
-  drinkAlcohol.statChanges = {{"stress", -20.0f},
-                              {"happiness", 10.0f},
-                              {"health", -8.0f},
-                              {"mentalHealth", -5.0f},
-                              {"hygiene", -3.0f}};
-  drinkAlcohol.baseSatisfaction = 15.0f;
+  drinkAlcohol.statChanges = {{"stress", -15.0f},
+                              {"happiness", 12.0f},
+                              {"health", -6.0f},
+                              {"mentalHealth", -6.0f},
+                              {"hygiene", -4.0f}};
+  drinkAlcohol.baseSatisfaction = 13.0f;
   availableActions.push_back(drinkAlcohol);
 
   // Smoke/Vape (health)
@@ -1050,15 +1050,15 @@ void FreeWillSystem::initializeActions() {
   // Social media Scrolling dopamine
   Action scrolling("Scrolling", 13, "health");
   scrolling.requirements = {
-      {"boredom", 25.0f, 0.6f},
-      {"stress",  25.0f, 0.4f} 
+      {"boredom", 25.0f, 0.7f},
+      {"stress",  25.0f, 0.5f} 
   };
-  scrolling.statChanges = {{"stress", -2.0f},
-                           {"happiness", -4.0f},
+  scrolling.statChanges = {{"stress", -4.0f},
+                           {"happiness", -11.0f},
                            {"boredom", 8.0f},
-                           {"loneliness", 18.0f},
-                           {"mentalHealth", -8.0f}};
-  scrolling.baseSatisfaction = 8.0f;
+                           {"loneliness", 19.0f},
+                           {"mentalHealth", -9.0f}};
+  scrolling.baseSatisfaction = 9.0f;
   availableActions.push_back(scrolling);
 
   // ==================== INTIMATE/ROMANTIC ACTIONS ====================
@@ -1119,11 +1119,11 @@ void FreeWillSystem::initializeActions() {
 
   // Seek Therapy/Help (health)
   Action seekTherapy("SeekTherapy", 40, "health");
-  seekTherapy.requirements = {{"mentalHealth", 30.0f, 0.9f}, // mentalHealth <30
+  seekTherapy.requirements = {{"mentalHealth", 30.0f, 0.9f},
                               {"stress", 70.0f, 0.7f}};
   seekTherapy.statChanges = {{"mentalHealth", 20.0f},
                              {"stress", -15.0f},
-                             {"happiness", 8.0f},
+                             {"happiness", 9.0f},
                              {"anger", -10.0f}};
   seekTherapy.baseSatisfaction = 25.0f;
   availableActions.push_back(seekTherapy);
@@ -1166,12 +1166,12 @@ void FreeWillSystem::initializeActions() {
 
   // Hygiene actions
   Action shower("Take Shower", 11, "hygiene");
-  shower.requirements = {{"hygiene", 20.0f, 0.9f}};
+  shower.requirements = {{"hygiene", 10.0f, 1.0f}};
   shower.statChanges = {
       {"hygiene", 15.0f}, 
       {"happiness", 3.0f},
       {"stress", -3.0f}};
-  shower.baseSatisfaction = 6.0f;
+  shower.baseSatisfaction = 4.0f;
   availableActions.push_back(shower);
 
   // Rest action
@@ -3339,13 +3339,18 @@ FreeWillSystem::cognitiveChooseAction(Entity *entity,
          an == "Manipulate" || an == "Jealousy" || an == "Betray" ||
          an == "Discrimination" || an == "IgnoreAvoid" ||
          an == "SetBoundaries");
+    
+    if(isSocialAction){
+        rarityMult = 1.25;
+    }
 
-    /*
-    // Social actions: impossible without neighbors, strongly boosted with
-    neighbors if (isSocialAction) { if (neighbors.empty()) { rarityMult = 0.0f;
-    // cannot socialise alone } else {
-            // More neighbours = more opportunity; extraverts lean harder into
-    this float neighborBonus = std::min(1.5f, 0.8f + neighbors.size() * 0.15f);
+    
+    // Social actions: impossible without neighbors
+     if (isSocialAction) {
+        if (neighbors.empty()) { 
+            rarityMult = 0.0f;
+
+        float neighborBonus = std::min(1.5f, 0.8f + neighbors.size() * 0.15f);
             rarityMult *= neighborBonus;
             // Make core positive social actions very attractive by default
             if (an == "Socialize" || an == "GoodConnection" || an ==
@@ -3365,20 +3370,14 @@ FreeWillSystem::cognitiveChooseAction(Entity *entity,
     if (an == "Insult")          rarityMult *= 0.40f;
     if (an == "BreakUp")         rarityMult *= 0.25f;
     if (an == "QuitGiveUp")      rarityMult *= 0.20f;
+    if (an == "Prayer")          rarityMult *= 0.35f;
     if (an == "DrinkAlcohol")    rarityMult *= 0.50f;
     if (an == "Smoke")           rarityMult *= 0.50f;
     if (an == "Jealousy")        rarityMult *= 0.35f;
     if (an == "Jealousy")        rarityMult *= 0.05f;
-
-    // Prevent shower-spam: only attractive when hygiene is genuinely low
-    if (an == "Take Shower") {
-        float h = entity->entityHygiene;
-        rarityMult *= (h < 50.0f) ? (1.0f + (50.0f - h) / 50.0f)  // more urgent
-    the dirtier : (h < 70.0f ? 0.3f : 0.05f);   // barely matters when clean
-    }
-
+/*
     score *= rarityMult;
-        */
+*/
 
     // Small random jitter to prevent deterministic lock-in
     std::uniform_real_distribution<float> jitter(0.93f, 1.07f);

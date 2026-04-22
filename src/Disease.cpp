@@ -36,8 +36,9 @@ int Disease::region;
   void Disease::reduceAntiBody(Entity* ent){
     // Estimate that antibody disapear in 50 days -> reduce by 2 every day after a disease
     // where antibody = 100
-    if(ent->entityAntiBody -2 >= 0 ){
-      ent->entityAntiBody -= 2;
+    int reducedAntiBody = BetterRand::genNrInInterval(2,6);
+    if(ent->entityAntiBody - reducedAntiBody >= 0 ){
+      ent->entityAntiBody -= reducedAntiBody;
     }else{
       ent->entityAntiBody = 0;
     }

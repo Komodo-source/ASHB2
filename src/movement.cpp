@@ -76,8 +76,6 @@ void Movement::applyMovement(Entity* ent, int closeSickEnt,
                               float windowWidth, float windowHeight){
   int pointMovement = BetterRand::genNrInInterval(1, 6) + (ent->entityHealth / 40);
 
-  // --- Low-safety flee behaviour ---
-  // Entities in dangerous areas move away randomly with an urgency boost
   if (env.safetyLevel < 40.0f) {
     float dangerFactor = (40.0f - env.safetyLevel) / 40.0f; // 0-1
     int fleeBoost = static_cast<int>(dangerFactor * 6.0f);

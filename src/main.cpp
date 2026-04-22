@@ -562,7 +562,6 @@ void sync_clock_stats(Entity* ent, int neighboors){
 
 
 int main() {
-
     std::cout << " I was meant to be perfect, ";
     std::cout << "I was meant to be beautiful  \n\n";
    //// Initialize logger (this redirects std::cout to cmd_log.txt)
@@ -574,10 +573,11 @@ int main() {
 
         rm_data_file();
         rm_data_act_file();
-        rm_log_files();  // Clear all log files
-        globalLogger->clearAllLogs();  // Ensure logs are cleared
+        rm_log_files();
+        globalLogger->clearAllLogs();
+      std::cout << "file clearing done!\n";
     }catch(...){
-        ;
+        std::cout << "error with file clearing! if it persist just reclone the repo!\n";
     }
 
     // Clear tick history file
@@ -622,7 +622,7 @@ int main() {
     for (int y = 0; y < 1; ++y){
         for (int x = 0; x < entity_num; ++x){
             Entity entity = Entity(
-                count, 0.0f, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
+                count, 15.0f, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
                 , BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 20.0f),
                 BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness");
 
@@ -782,7 +782,7 @@ int main() {
 
         //Birthday,
         // une année = 100 jours
-        if(day  % 100 ){
+        if((day / 60)  % 100 == 1){
             for(Entity& ent : entities){
                 ent.IncrementBDay();
             }

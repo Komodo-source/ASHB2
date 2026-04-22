@@ -5,3 +5,5 @@ old
 vcpkg
 src/data
 data
+.claude
+.vscode

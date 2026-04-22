@@ -10,7 +10,7 @@
 #include <memory>
 #include <deque>
 #include <fstream>
-#include "./NeedLevel.h"
+#include "./ExternalData.h"
 #include "SocialNormSystem.h"
 
 class Entity;
@@ -227,13 +227,7 @@ private:
     float calculateOutcomeSuccess(const std::map<std::string, float>& before,
                                   const std::map<std::string, float>& after);
 
- enum SocialTier {
-        STRANGER     = 0,
-        ACQUAINTANCE = 1,
-        FAMILIAR     = 2,
-        FRIEND       = 3,
-        CLOSE_FRIEND = 4
-    };
+ 
 
 
 

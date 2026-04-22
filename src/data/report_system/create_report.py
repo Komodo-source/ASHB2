@@ -1,12 +1,12 @@
 import csv
-import os
-import threading
-import json
-import re
-from datetime import datetime
-from ollama import chat
-from ollama import ChatResponse
 import ftplib
+import json
+import os
+import re
+import threading
+from datetime import datetime
+
+from ollama import ChatResponse, chat
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -594,30 +594,32 @@ function renderNetwork() {
 """
 
 report_data = {
-    "ai_summary":          "<em>// No Analysis Generated //</em>",
-    "cmd_log":             "",
-    "actions_log":         "",
-    "diseases_log":        "",
-    "deaths_log":          "",
-    "movements_log":       "",
-    "births_log":          "",
-    "events_log":          "",
-    "relationships_log":   "",
-    "sim_start":           "UNKNOWN",
-    "sim_end":             "UNKNOWN",
-    "sim_duration":        "UNKNOWN",
-    "sim_ticks":           "0",
-    "chart_ticks":         "[]",
-    "chart_data":          "{}",
-    "action_counts":       "{}",
-    "relationship_nodes":  "[]",
-    "relationship_edges":  "[]",
-    "report_json":         "{}"
+    "ai_summary": "",
+    "cmd_log": "",
+    "actions_log": "",
+    "diseases_log": "",
+    "deaths_log": "",
+    "movements_log": "",
+    "births_log": "",
+    "events_log": "",
+    "relationships_log": "",
+    "sim_start": "UNKNOWN",
+    "sim_end": "UNKNOWN",
+    "sim_duration": "UNKNOWN",
+    "sim_ticks": "0",
+    "chart_ticks": "[]",
+    "chart_data": "{}",
+    "action_counts": "{}",
+    "relationship_nodes": "[]",
+    "relationship_edges": "[]",
+    "report_json": "{}",
 }
 
 
 def safe_read(filepath):
-    full_path = filepath if os.path.isabs(filepath) else os.path.join(BASE_DIR, filepath)
+    full_path = (
+        filepath if os.path.isabs(filepath) else os.path.join(BASE_DIR, filepath)
+    )
     try:
         with open(full_path, "r", encoding="utf-8") as f:
             return f.read()
@@ -629,28 +631,34 @@ def log_logs():
     cmd_content = safe_read("../cmd_log.txt")
     report_data["cmd_log"] = cmd_content
     try:
-        response: ChatResponse = chat(model='qwen2.5:14b', messages=[
-            {'role': 'user', 'content': prompt + "\n\n" + cmd_content},
-        ])
+        response: ChatResponse = chat(
+            model="qwen2.5:14b",
+            messages=[
+                {"role": "user", "content": prompt + "\n\n" + cmd_content},
+            ],
+        )
         ai_text = str(response.message.content)
-        ai_text = re.sub(r'^### (.+)$', r'<h3>\1</h3>', ai_text, flags=re.MULTILINE)
-        ai_text = re.sub(r'^## (.+)$',  r'<h2>\1</h2>', ai_text, flags=re.MULTILINE)
-        ai_text = re.sub(r'^# (.+)$',   r'<h2>\1</h2>', ai_text, flags=re.MULTILINE)
+        ai_text = re.sub(r"^### (.+)$", r"<h3>\1</h3>", ai_text, flags=re.MULTILINE)
+        ai_text = re.sub(r"^## (.+)$", r"<h2>\1</h2>", ai_text, flags=re.MULTILINE)
+        ai_text = re.sub(r"^# (.+)$", r"<h2>\1</h2>", ai_text, flags=re.MULTILINE)
         paragraphs = []
-        for block in re.split(r'\n{2,}', ai_text):
+        for block in re.split(r"\n{2,}", ai_text):
             block = block.strip()
-            if block and not block.startswith('<h'):
-                block = f'<p>{block}</p>'
+            if block and not block.startswith("<h"):
+                block = f"<p>{block}</p>"
             paragraphs.append(block)
-        report_data["ai_summary"] = '\n'.join(paragraphs)
+        report_data["ai_summary"] = "\n".join(paragraphs)
     except Exception as e:
         report_data["ai_summary"] = f"<p>Error generating analysis: {e}</p>"
 
 
 def _parse_timestamp_range(log_text: str):
     timestamps = []
-    for m in re.finditer(r'^\[([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\]',
-                         log_text, flags=re.MULTILINE):
+    for m in re.finditer(
+        r"^\[([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\]",
+        log_text,
+        flags=re.MULTILINE,
+    ):
         try:
             timestamps.append(datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S"))
         except Exception:
@@ -667,20 +675,24 @@ def _format_duration(delta):
     hours, rem = divmod(delta.seconds, 3600)
     minutes, seconds = divmod(rem, 60)
     parts = []
-    if days:    parts.append(f"{days}d")
-    if hours:   parts.append(f"{hours}h")
-    if minutes: parts.append(f"{minutes}m")
-    if seconds or not parts: parts.append(f"{seconds}s")
-    return ' '.join(parts)
+    if days:
+        parts.append(f"{days}d")
+    if hours:
+        parts.append(f"{hours}h")
+    if minutes:
+        parts.append(f"{minutes}m")
+    if seconds or not parts:
+        parts.append(f"{seconds}s")
+    return " ".join(parts)
 
 
 def log_all():
-    report_data["deaths_log"]        = safe_read("deaths_log.txt")
-    report_data["diseases_log"]      = safe_read("diseases_log.txt")
-    report_data["actions_log"]       = safe_read("actions_log.txt")
-    report_data["movements_log"]     = safe_read("movements_log.txt")
-    report_data["births_log"]        = safe_read("births_log.txt")
-    report_data["events_log"]        = safe_read("events_log.txt")
+    report_data["deaths_log"] = safe_read("deaths_log.txt")
+    report_data["diseases_log"] = safe_read("diseases_log.txt")
+    report_data["actions_log"] = safe_read("actions_log.txt")
+    report_data["movements_log"] = safe_read("movements_log.txt")
+    report_data["births_log"] = safe_read("births_log.txt")
+    report_data["events_log"] = safe_read("events_log.txt")
     report_data["relationships_log"] = safe_read("relationships_log.txt")
 
     start, end = _parse_timestamp_range(report_data["events_log"])
@@ -689,19 +701,23 @@ def log_all():
     if start is None or end is None:
         start, end = _parse_timestamp_range(report_data["cmd_log"])
 
-    report_data["sim_start"]    = start.strftime("%Y-%m-%d %H:%M:%S") if start else "UNKNOWN"
-    report_data["sim_end"]      = end.strftime("%Y-%m-%d %H:%M:%S")   if end   else "UNKNOWN"
-    report_data["sim_duration"] = _format_duration(end - start)        if (start and end) else "UNKNOWN"
+    report_data["sim_start"] = (
+        start.strftime("%Y-%m-%d %H:%M:%S") if start else "UNKNOWN"
+    )
+    report_data["sim_end"] = end.strftime("%Y-%m-%d %H:%M:%S") if end else "UNKNOWN"
+    report_data["sim_duration"] = (
+        _format_duration(end - start) if (start and end) else "UNKNOWN"
+    )
 
     action_counts = {}
     try:
         for i in range(1000):
-            filepath = os.path.join(BASE_DIR, f'act_{i}.csv')
+            filepath = os.path.join(BASE_DIR, f"act_{i}.csv")
             if not os.path.exists(filepath):
                 break
             with open(filepath, encoding="utf-8") as f:
                 line = f.readline().strip()
-                for action in re.findall(r'([A-Za-z0-9 _\-]+)(?=,category:)', line):
+                for action in re.findall(r"([A-Za-z0-9 _\-]+)(?=,category:)", line):
                     action = action.strip()
                     if not action:
                         continue
@@ -713,8 +729,8 @@ def log_all():
     edges = []
     for line in report_data["relationships_log"].splitlines():
         m = re.match(
-            r'^\[([^\]]+)\]\s*Relationship:\s*(.+?)\s*\((\d+)\)\s*and\s*(.+?)\s*\((\d+)\)\s*-\s*([^\-\n]+)(?:-\s*(.*))?$',
-            line
+            r"^\[([^\]]+)\]\s*Relationship:\s*(.+?)\s*\((\d+)\)\s*and\s*(.+?)\s*\((\d+)\)\s*-\s*([^\-\n]+)(?:-\s*(.*))?$",
+            line,
         )
         if not m:
             continue
@@ -727,21 +743,30 @@ def log_all():
             title += f"\n{details.strip()}"
         edges.append({"from": id1, "to": id2, "label": reltype.strip(), "title": title})
 
-    attr_names = ['Antibody', 'Boredom', 'Anger', 'Happiness', 'Health',
-                  'Hygiene', 'Loneliness', 'Mental Health', 'Stress']
+    attr_names = [
+        "Antibody",
+        "Boredom",
+        "Anger",
+        "Happiness",
+        "Health",
+        "Hygiene",
+        "Loneliness",
+        "Mental Health",
+        "Stress",
+    ]
     entities_data = {name: {} for name in attr_names}
     ticks = []
 
     try:
         for i in range(1000):
-            filepath = os.path.join(BASE_DIR, f'{i}.csv')
+            filepath = os.path.join(BASE_DIR, f"{i}.csv")
             if not os.path.exists(filepath):
                 break
             ticks.append(i)
-            with open(filepath, newline='', encoding="utf-8") as csvfile:
+            with open(filepath, newline="", encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile)
                 for row_idx, row in enumerate(reader):
-                    if row_idx not in entities_data['Antibody']:
+                    if row_idx not in entities_data["Antibody"]:
                         for name in attr_names:
                             entities_data[name][row_idx] = []
                     for col_idx, name in enumerate(attr_names):
@@ -761,77 +786,88 @@ def log_all():
             for agent_id in sorted(entities_data[name].keys())
         ]
 
-    report_data["chart_ticks"]        = json.dumps(ticks)
-    report_data["chart_data"]         = json.dumps(clean_chart_data)
-    report_data["action_counts"]      = json.dumps(action_counts)
-    report_data["relationship_nodes"] = json.dumps([{"id": k, "label": v} for k, v in nodes.items()])
+    report_data["chart_ticks"] = json.dumps(ticks)
+    report_data["chart_data"] = json.dumps(clean_chart_data)
+    report_data["action_counts"] = json.dumps(action_counts)
+    report_data["relationship_nodes"] = json.dumps(
+        [{"id": k, "label": v} for k, v in nodes.items()]
+    )
     report_data["relationship_edges"] = json.dumps(edges)
-    report_data["sim_ticks"]          = str(len(ticks))
+    report_data["sim_ticks"] = str(len(ticks))
 
-    report_data["report_json"] = json.dumps({
-        "start":        report_data["sim_start"],
-        "end":          report_data["sim_end"],
-        "duration":     report_data["sim_duration"],
-        "ticks":        report_data["sim_ticks"],
-        "actionCounts": action_counts,
-        "logs": {
-            "cmd":           report_data["cmd_log"],
-            "actions":       report_data["actions_log"],
-            "diseases":      report_data["diseases_log"],
-            "deaths":        report_data["deaths_log"],
-            "movements":     report_data["movements_log"],
-            "births":        report_data["births_log"],
-            "events":        report_data["events_log"],
-            "relationships": report_data["relationships_log"],
-        }
-    }, ensure_ascii=False, indent=2)
+    report_data["report_json"] = json.dumps(
+        {
+            "start": report_data["sim_start"],
+            "end": report_data["sim_end"],
+            "duration": report_data["sim_duration"],
+            "ticks": report_data["sim_ticks"],
+            "actionCounts": action_counts,
+            "logs": {
+                "cmd": report_data["cmd_log"],
+                "actions": report_data["actions_log"],
+                "diseases": report_data["diseases_log"],
+                "deaths": report_data["deaths_log"],
+                "movements": report_data["movements_log"],
+                "births": report_data["births_log"],
+                "events": report_data["events_log"],
+                "relationships": report_data["relationships_log"],
+            },
+        },
+        ensure_ascii=False,
+        indent=2,
+    )
 
 
 t1 = threading.Thread(target=log_all)
-#t2 = threading.Thread(target=log_logs)   # uncomment to enable AI summary
+# t2 = threading.Thread(target=log_logs)   # uncomment to enable AI summary
 t1.start()
-#t2.start()
+# t2.start()
 t1.join()
-#t2.join()
+# t2.join()
 
 final_html = HTML_SHELL
 replacements = {
-    '{AI_SUMMARY}':     report_data["ai_summary"],
-    '{SIM_START}':      report_data["sim_start"],
-    '{SIM_END}':        report_data["sim_end"],
-    '{SIM_DURATION}':   report_data["sim_duration"],
-    '{SIM_TICKS}':      report_data["sim_ticks"],
-    '{CHART_TICKS}':    report_data["chart_ticks"],
-    '{CHART_DATA}':     report_data["chart_data"],
-    '{ACTION_COUNTS}':  report_data["action_counts"],
-    '{RELATION_NODES}': report_data["relationship_nodes"],
-    '{RELATION_EDGES}': report_data["relationship_edges"],
-    '{REPORT_JSON}':    report_data["report_json"],
-    '{TIMESTAMP}':      datetime.now().strftime('%Y-%m-%d %H:%M'),
+    "{AI_SUMMARY}": report_data["ai_summary"],
+    "{SIM_START}": report_data["sim_start"],
+    "{SIM_END}": report_data["sim_end"],
+    "{SIM_DURATION}": report_data["sim_duration"],
+    "{SIM_TICKS}": report_data["sim_ticks"],
+    "{CHART_TICKS}": report_data["chart_ticks"],
+    "{CHART_DATA}": report_data["chart_data"],
+    "{ACTION_COUNTS}": report_data["action_counts"],
+    "{RELATION_NODES}": report_data["relationship_nodes"],
+    "{RELATION_EDGES}": report_data["relationship_edges"],
+    "{REPORT_JSON}": report_data["report_json"],
+    "{TIMESTAMP}": datetime.now().strftime("%Y-%m-%d %H:%M"),
 }
 for placeholder, value in replacements.items():
     final_html = final_html.replace(placeholder, value)
 
 
 f = ""
-with open("./simulation_continuity.txt", 'r') as version:
+with open("./simulation_continuity.txt", "r") as version:
     f = version.readline()
 
-with open("./simulation_continuity.txt", 'w') as version:
+with open("./simulation_continuity.txt", "w") as version:
     version.write(str(int(f) + 1))
 
 print(f"report{f}.html")
-output_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", f"report{f}.html"))
+output_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", f"report{f}.html")
+)
 with open(output_path, "w", encoding="utf-8") as out:
     out.write(final_html)
 
 print(f"[ASHB2] Report generated → {output_path}")
 
-session = ftplib.FTP('ftpupload.net','if0_37377007','bujsYxINZZBY4')
+session = ftplib.FTP("ftpupload.net", "if0_37377007", "bujsYxINZZBY4")
 session.cwd("arena.ct.ws")
 session.cwd("htdocs")
-file = open(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", f"report{f}.html")),'rb')
-session.storbinary(f'STOR {f"report{f}.html"}', file)
+file = open(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", f"report{f}.html")),
+    "rb",
+)
+session.storbinary(f"STOR {f'report{f}.html'}", file)
 file.close()
 session.quit()
 print("file saved to the server")
