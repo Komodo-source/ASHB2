@@ -227,12 +227,19 @@ private:
     float calculateOutcomeSuccess(const std::map<std::string, float>& before,
                                   const std::map<std::string, float>& after);
 
-
-
+ enum SocialTier {
+        STRANGER     = 0,
+        ACQUAINTANCE = 1,
+        FAMILIAR     = 2,
+        FRIEND       = 3,
+        CLOSE_FRIEND = 4
+    };
 
 
 
 public:
+
+
     SocialNormSystem socialNormInstance;
     static std::vector<Entity> new_borns;
     static int day;
@@ -252,6 +259,8 @@ public:
     void executeAction(Entity* entity, Action* &action, const ActionContext& context = ActionContext(), Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
     float calculateGoalAlignmentModifier(Entity* entity,  Action* action);
+    bool isKnown(Entity* entity, Entity* target);
+    Entity* selectSocialTarget(Entity* entity, const std::vector<Entity*>& neighbors, const Action* action);
 
     void updateNeeds(float deltaTime);
     NeedLevel updateHieratchicalNeed(Entity* ent, const Action& action);
@@ -281,6 +290,7 @@ public:
     float getMaxUrgencyForLevel(const Entity* target, NeedLevel lvl);
     static void clear_new_borns();
     float calculateLifeMemoryBias(Entity* entity, const Action& action);
+    SocialTier getSocialTier(Entity* from, Entity* to) const;
 };
 
 #endif

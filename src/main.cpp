@@ -404,7 +404,6 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 if (entity->entityLoneliness > 80.0f)
                     entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.1f, 0.0f, 100.0f);
             }
-            // -------------------------------------------------------
 
             //apply tick relationship
             tickRelationshipDecay(entity, 1.0f);
@@ -420,12 +419,30 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             ActionContext context = createContextFromTime(currentDay, neighbors.size());
 
             // Choose action based on needs, social environment, context, personality, grief, and env
-            Action* chosen = sys.chooseAction(entity, neighbors, context);
+            Action* chosenAction = entity->fws.chooseAction(entity, neighbors, context);
+
+            if (chosenAction != nullptr) {
+                Entity* pointedTarget = nullptr;
+
+                bool needsTarget = (chosenAction->needCategory == "social" ||
+                                    chosenAction->name == "Murder" ||
+                                    chosenAction->name == "Betray");
+
+                if (needsTarget && !neighbors.empty()) {
+                    pointedTarget = entity->fws.selectSocialTarget(entity, neighbors, chosenAction);
+                }
+
+                entity->fws.executeAction(entity, chosenAction, context, pointedTarget);
+
+                if (pointedTarget != nullptr) {
+                    entity->fws.pointedAssimilation(entity, pointedTarget, chosenAction);
+                }
+            }
 
 
 
             //Update Hierachical need
-            sys.updateHieratchicalNeed(entity, *chosen);
+            sys.updateHieratchicalNeed(entity, *chosenAction);
             sys.updateNeeds(currentDay);
 
             // we ondulate the loneliness wether it has neighboor or not
@@ -444,27 +461,27 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             }
 
             // Determine if this is a pointed action (requires a target)
-            bool isPointedAction = (chosen->name == "Socialize" ||
-                                   chosen->name == "Desire" ||
-                                   chosen->name == "GoodConnection" ||
-                                   chosen->name == "AngerConnection" ||
-                                   chosen->name == "Murder" ||
-                                   chosen->name == "Discrimination" ||
-                                   chosen->name == "breeding" ||
-                                   chosen->name == "couple" ||
-                                   chosen->name == "Gossip" ||
-                                   chosen->name == "Apologize" ||
-                                   chosen->name == "HelpSupport" ||
-                                   chosen->name == "IgnoreAvoid" ||
-                                   chosen->name == "Insult" ||
-                                   chosen->name == "Manipulate" ||
-                                   chosen->name == "Jealousy" ||
-                                   chosen->name == "Betray" ||
-                                   chosen->name == "Flirt" ||
-                                   chosen->name == "Date" ||
-                                   chosen->name == "BreakUp" ||
-                                   chosen->name == "Reconcile" ||
-                                   chosen->name == "SetBoundaries");
+            bool isPointedAction = (chosenAction->name == "Socialize" ||
+                                   chosenAction->name == "Desire" ||
+                                   chosenAction->name == "GoodConnection" ||
+                                   chosenAction->name == "AngerConnection" ||
+                                   chosenAction->name == "Murder" ||
+                                   chosenAction->name == "Discrimination" ||
+                                   chosenAction->name == "breeding" ||
+                                   chosenAction->name == "couple" ||
+                                   chosenAction->name == "Gossip" ||
+                                   chosenAction->name == "Apologize" ||
+                                   chosenAction->name == "HelpSupport" ||
+                                   chosenAction->name == "IgnoreAvoid" ||
+                                   chosenAction->name == "Insult" ||
+                                   chosenAction->name == "Manipulate" ||
+                                   chosenAction->name == "Jealousy" ||
+                                   chosenAction->name == "Betray" ||
+                                   chosenAction->name == "Flirt" ||
+                                   chosenAction->name == "Date" ||
+                                   chosenAction->name == "BreakUp" ||
+                                   chosenAction->name == "Reconcile" ||
+                                   chosenAction->name == "SetBoundaries");
 
             Entity* target = nullptr;
             if(isPointedAction && !neighbors.empty()){
@@ -472,18 +489,18 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 //better neightboor selection
                 //int targetIndex = BetterRand::genNrInInterval(0, (int) neighbors.size() - 1);
                 //target = neighbors[targetIndex];
-                target = selectSocialTarget(entity, neighbors, chosen);
+                target = selectSocialTarget(entity, neighbors, chosenAction);
 
                 bool targetWasAlive = (target->entityHealth > 0.0f);
 
                 // Execute the action with the target
-                sys.executeAction(entity, chosen, context, target);
+                sys.executeAction(entity, chosenAction, context, target);
                 //saving data
-                entity->saveEntityStats(chosen);
-                globalLogger->logAction(entity->entityId, entity->name, chosen->name, target->name, "targeted action");
+                entity->saveEntityStats(chosenAction);
+                globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, target->name, "targeted action");
 
                 // Update relationship based on action
-                sys.pointedAssimilation(entity, target, chosen);
+                sys.pointedAssimilation(entity, target, chosenAction);
 
                 // Detect murder: if target just died, trigger grief in all connected entities
                 if(targetWasAlive && target->entityHealth <= 0.0f){
@@ -508,10 +525,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
             } else {
                 // Execute self-directed action
-                sys.executeAction(entity, chosen, context);
+                sys.executeAction(entity, chosenAction, context);
                 //saving data
-                entity->saveEntityStats(chosen);
-                globalLogger->logAction(entity->entityId, entity->name, chosen->name, "", "self-directed action");
+                entity->saveEntityStats(chosenAction);
+                globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, "", "self-directed action");
             }
 
             sys.applyEmotionalContagion(entity, group);
@@ -605,8 +622,9 @@ int main() {
     for (int y = 0; y < 1; ++y){
         for (int x = 0; x < entity_num; ++x){
             Entity entity = Entity(
-                count, 0.0f, 100.0f, 50.0f, 0.0f, 100.0f, "", 0.0f, 0.0f, 0.0f, 100.0f, 'A', 0, 0, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
-
+                count, 0.0f, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
+                , BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 20.0f),
+                BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness");
 
             entity.posX = BetterRand::genNrInInterval(10, width - 10);
             entity.posY = BetterRand::genNrInInterval(10, height - 10);;

@@ -264,6 +264,9 @@ public:
     float Esteem;
 
 
+    int meetingCount;
+
+
     // Optional attributes
     entityPointedDesire pointedDesire;
     entityPointedAnger pointedAnger;
