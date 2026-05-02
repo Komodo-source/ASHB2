@@ -191,9 +191,9 @@ Personality generateRandomPersonality() {
         MentalModelOfOther* model = self->getModelOf(neighbor);
 
         if (action->name == "Socialize" || action->name == "GoodConnection") {
-            score += self->searchConnSocial(neighbor) * 2.0f;  // prefer friends
+            score += self->searchConnSocial(neighbor) * 2.0f; 
             score += (model ? model->trustLevel : 0) * 1.5f;
-            score -= self->searchConnAng(neighbor) * 3.0f;     // avoid enemies
+            score -= self->searchConnAng(neighbor) * 3.0f; 
         } else if (action->name == "Desire" || action->name == "Flirt") {
             score += self->searchConnDesire(neighbor) * 3.0f;
             score -= self->searchConnAng(neighbor) * 2.0f;
@@ -224,8 +224,9 @@ void implementRegion(){
     std::cout << "\n";
     std::cout << "Choose a world region (h to help): \n";
     std::cout << "1 /// Paris, France | 48 51' 24'' north, 2 21' 07'' east /// Oceanic\n";
-    std::cout << "2 /// Guangzhou, China | 23 07' 48'' north, 113 15' 36'' east /// monsoon\n";
-    std::cout << "3 /// Addis-Abeba, Ethiopia | 9 1' 48'' north, 38 44' 24'' east /// arid\n";
+    std::cout << "2 /// Philadelphia, United States | 39 57' 10'' north, 75 09' 49'' west /// Continental\n";
+    std::cout << "3 /// Guangzhou, China | 23 07' 48'' north, 113 15' 36'' east /// monsoon\n";
+    std::cout << "4 /// Addis-Abeba, Ethiopia | 9 1' 48'' north, 38 44' 24'' east /// arid\n";
     std::cout << ">";
 
     char choice;
@@ -256,13 +257,11 @@ std::vector<Entity> get_new_borns(){
 
 
 void tickRelationshipDecay(Entity* ent, float deltaTime) {
-    // Social bonds fade slowly without reinforcement — gain ~2-4/action, decay ~0.01/tick
     for (auto& social : ent->list_entityPointedSocial) {
         social.social -= 0.01f * deltaTime;
         if (social.social < 0.5f) social.social = 0.0f;
     }
 
-    // Desire fades a little faster if not pursued — gain ~1-3/action, decay ~0.015/tick
     for (auto& desire : ent->list_entityPointedDesire) {
         desire.desire -= 0.015f * deltaTime;
         desire.desire = std::max(0.0f, desire.desire);
@@ -324,8 +323,12 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             // Tick grief recovery
             entity->tickGrief(1.0f);
 
+            //lower pheromones
+            if(!entity->pheromone.type.empty()){
+                entity->pheromone.releasing_level -= BetterRand::genNrInInterval(3.0,6.0); 
+            }
 
-
+            
             //apply movement (now env-aware)
             float oldX = entity->posX;
             float oldY = entity->posY;
@@ -341,16 +344,24 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
 
             FreeWillSystem& sys = entity->getFreeWill();
-            sys.updateNeeds(1.0f);
+            
+            //decay social
+            float deltaTime = 1.0f;
+            for (auto &link : entity->list_entityPointedSocial) {
+                link.social = std::max(0.0f, link.social - (0.005f * deltaTime)); 
+            }
+            
+            
+            //va avec l'update de needs
+            entity->entityLoneliness += 0.05f * deltaTime;
+            entity->entityBoredom   += 0.04f * deltaTime;
+            entity->entityLoneliness = std::min(100.0f, entity->entityLoneliness);
+            entity->entityBoredom   = std::min(100.0f, entity->entityBoredom);
 
             // Apply direct environmental stat effects
             sys.applyEnvironmentalEffects(entity, env);
 
-            // -------------------------------------------------------
-            // PASSIVE STAT DRIFT — every tick, stats shift based on
-            // personality. This is what makes entities diverge over
-            // time without needing an action to trigger the change.
-            // -------------------------------------------------------
+
             {
                 const Personality& p = entity->personality;
                 auto pdclamp = [](float v, float lo, float hi){ return std::max(lo, std::min(hi, v)); };
@@ -419,39 +430,42 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             ActionContext context = createContextFromTime(currentDay, neighbors.size());
 
             // Choose action based on needs, social environment, context, personality, grief, and env
-            Action* chosenAction = entity->fws.chooseAction(entity, neighbors, context);
+            Action* chosenAction = sys.chooseAction(entity, neighbors, context);
+            
 
-            if (chosenAction != nullptr) {
-                Entity* pointedTarget = nullptr;
-
-                bool needsTarget = (chosenAction->needCategory == "social" ||
-                                    chosenAction->name == "Murder" ||
-                                    chosenAction->name == "Betray");
-
-                if (needsTarget && !neighbors.empty()) {
-                    pointedTarget = entity->fws.selectSocialTarget(entity, neighbors, chosenAction);
+            
+            //social deficit
+            if (chosenAction && chosenAction->needCategory == "social" &&
+                chosenAction->name != "Murder" && chosenAction->name != "Betray" &&
+                chosenAction->name != "Discrimination") {
+                // Only real social fulfillment clears deficit
+                entity->socialDeficit = std::max(0.0f, entity->socialDeficit - 8.0f);
+                entity->dayWithoutSocialAction = 0;
+            } else {
+                if (entity->entityLoneliness > 10.0f) {  
+                    entity->socialDeficit += 2.0f;       
                 }
-
-                entity->fws.executeAction(entity, chosenAction, context, pointedTarget);
-
-                if (pointedTarget != nullptr) {
-                    entity->fws.pointedAssimilation(entity, pointedTarget, chosenAction);
-                }
+                entity->dayWithoutSocialAction++;
             }
-
+            entity->socialDeficit = std::min(50.0f, entity->socialDeficit);
 
 
             //Update Hierachical need
             sys.updateHieratchicalNeed(entity, *chosenAction);
-            sys.updateNeeds(currentDay);
+            sys.updateNeeds(currentDay, entity);
 
-            // we ondulate the loneliness wether it has neighboor or not
             if (neighbors.size() > 0) {
-                entity->entityLoneliness -= 2.0f * neighbors.size(); // decrease when with others
-                entity->entityLoneliness = std::max(0.0f, entity->entityLoneliness);
+                float socialDrain = 0.0f;
+                for (Entity* n : neighbors) {
+                    float bond = entity->searchConnSocial(n);
+                    if (bond > 10.0f) socialDrain += 0.15f;
+                    else socialDrain += 0.05f;  
+                }
+                entity->entityLoneliness = std::max(0.0f, entity->entityLoneliness - socialDrain);
             } else {
-                entity->entityLoneliness += 1.5f;
+                entity->entityLoneliness += 2.5f;  
             }
+            entity->entityLoneliness = std::min(100.0f, entity->entityLoneliness);
 
             //chaque 10 ticks on applique le développement
             // et on update les goals
@@ -495,12 +509,19 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
                 // Execute the action with the target
                 sys.executeAction(entity, chosenAction, context, target);
+                
+                //choosing side social action
+                if(entity->dayWithoutSocialAction > 3){
+                    Action* side_social_act = sys.ChooseSpecificSocialAction(entity);
+                    sys.executeAction(entity, side_social_act, context, target);
+                }
                 //saving data
                 entity->saveEntityStats(chosenAction);
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, target->name, "targeted action");
 
                 // Update relationship based on action
                 sys.pointedAssimilation(entity, target, chosenAction);
+                
 
                 // Detect murder: if target just died, trigger grief in all connected entities
                 if(targetWasAlive && target->entityHealth <= 0.0f){
@@ -562,8 +583,8 @@ void sync_clock_stats(Entity* ent, int neighboors){
 
 
 int main() {
-    std::cout << " I was meant to be perfect, ";
-    std::cout << "I was meant to be beautiful  \n\n";
+    std::cout << " \" I was meant to be perfect, ";
+    std::cout << "I was meant to be beautiful\" \n\n";
    //// Initialize logger (this redirects std::cout to cmd_log.txt)
    Logger logger;
    globalLogger = &logger;

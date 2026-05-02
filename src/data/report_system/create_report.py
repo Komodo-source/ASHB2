@@ -5,6 +5,7 @@ import os
 import re
 import threading
 from datetime import datetime
+import glob
 
 from ollama import ChatResponse, chat
 
@@ -687,12 +688,12 @@ def _format_duration(delta):
 
 
 def log_all():
-    report_data["deaths_log"] = safe_read("deaths_log.txt")
-    report_data["diseases_log"] = safe_read("diseases_log.txt")
-    report_data["actions_log"] = safe_read("actions_log.txt")
-    report_data["movements_log"] = safe_read("movements_log.txt")
-    report_data["births_log"] = safe_read("births_log.txt")
-    report_data["events_log"] = safe_read("events_log.txt")
+    report_data["deaths_log"]        = safe_read("deaths_log.txt")
+    report_data["diseases_log"]      = safe_read("diseases_log.txt")
+    report_data["actions_log"]       = safe_read("actions_log.txt")
+    report_data["movements_log"]     = safe_read("movements_log.txt")
+    report_data["births_log"]        = safe_read("births_log.txt")
+    report_data["events_log"]        = safe_read("events_log.txt")
     report_data["relationships_log"] = safe_read("relationships_log.txt")
 
     start, end = _parse_timestamp_range(report_data["events_log"])
@@ -701,30 +702,37 @@ def log_all():
     if start is None or end is None:
         start, end = _parse_timestamp_range(report_data["cmd_log"])
 
-    report_data["sim_start"] = (
-        start.strftime("%Y-%m-%d %H:%M:%S") if start else "UNKNOWN"
-    )
-    report_data["sim_end"] = end.strftime("%Y-%m-%d %H:%M:%S") if end else "UNKNOWN"
-    report_data["sim_duration"] = (
-        _format_duration(end - start) if (start and end) else "UNKNOWN"
-    )
+    report_data["sim_start"]    = start.strftime("%Y-%m-%d %H:%M:%S") if start else "UNKNOWN"
+    report_data["sim_end"]      = end.strftime("%Y-%m-%d %H:%M:%S")   if end   else "UNKNOWN"
+    report_data["sim_duration"] = _format_duration(end - start) if (start and end) else "UNKNOWN"
 
+    # ── FIX 3 & 4: use glob to find all act_*.csv, parse with csv.reader ──
     action_counts = {}
     try:
-        for i in range(1000):
-            filepath = os.path.join(BASE_DIR, f"act_{i}.csv")
-            if not os.path.exists(filepath):
-                break
-            with open(filepath, encoding="utf-8") as f:
-                line = f.readline().strip()
-                for action in re.findall(r"([A-Za-z0-9 _\-]+)(?=,category:)", line):
-                    action = action.strip()
-                    if not action:
-                        continue
-                    action_counts[action] = action_counts.get(action, 0) + 1
+        act_files = sorted(glob.glob(os.path.join(BASE_DIR, "act_*.csv")))
+        for filepath in act_files:
+            with open(filepath, newline="", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                # If no header, fall back to positional parsing
+                if reader.fieldnames and any("action" in h.lower() for h in reader.fieldnames):
+                    action_col = next(h for h in reader.fieldnames if "action" in h.lower())
+                    for row in reader:
+                        action = row.get(action_col, "").strip()
+                        if action:
+                            action_counts[action] = action_counts.get(action, 0) + 1
+                else:
+                    # Fallback: re-read as plain CSV, take first non-empty cell per row
+                    f.seek(0)
+                    plain = csv.reader(f)
+                    for row in plain:
+                        if row:
+                            action = row[0].strip()
+                            if action:
+                                action_counts[action] = action_counts.get(action, 0) + 1
     except Exception as e:
         print(f"Error parsing action CSVs: {e}")
 
+    # ── Relationships ──
     nodes = {}
     edges = []
     for line in report_data["relationships_log"].splitlines():
@@ -744,79 +752,89 @@ def log_all():
         edges.append({"from": id1, "to": id2, "label": reltype.strip(), "title": title})
 
     attr_names = [
-        "Antibody",
-        "Boredom",
-        "Anger",
-        "Happiness",
-        "Health",
-        "Hygiene",
-        "Loneliness",
-        "Mental Health",
-        "Stress",
+        "Antibody", "Boredom", "Anger", "Happiness", "Health",
+        "Hygiene", "Loneliness", "Mental Health", "Stress",
     ]
-    entities_data = {name: {} for name in attr_names}
+
+    # ── FIX 1 & 2: determine entity count from tick 0, skip blank rows ──
     ticks = []
+    num_entities = None                          # set from first valid tick
+    entities_data = {name: {} for name in attr_names}
 
     try:
         for i in range(1000):
             filepath = os.path.join(BASE_DIR, f"{i}.csv")
             if not os.path.exists(filepath):
                 break
-            ticks.append(i)
+
             with open(filepath, newline="", encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile)
-                for row_idx, row in enumerate(reader):
-                    if row_idx not in entities_data["Antibody"]:
-                        for name in attr_names:
-                            entities_data[name][row_idx] = []
-                    for col_idx, name in enumerate(attr_names):
-                        if col_idx < len(row):
-                            try:
-                                val = float(row[col_idx])
-                            except ValueError:
-                                val = 0.0
-                            entities_data[name][row_idx].append(val)
+                rows = [row for row in reader if any(cell.strip() for cell in row)]
+                # Skip entirely empty rows ↑ — this was the ghost-entity source
+
+            if num_entities is None:
+                # Anchor entity count to the first tick
+                num_entities = len(rows)
+                for name in attr_names:
+                    for eid in range(num_entities):
+                        entities_data[name][eid] = []
+
+            ticks.append(i)
+
+            for row_idx, row in enumerate(rows):
+                if row_idx >= num_entities:
+                    # Clamp: ignore extra rows that appeared in later ticks
+                    break
+                for col_idx, name in enumerate(attr_names):
+                    if col_idx < len(row):
+                        try:
+                            val = float(row[col_idx])
+                        except ValueError:
+                            val = 0.0
+                    else:
+                        val = 0.0
+                    entities_data[name][row_idx].append(val)
+
     except Exception as e:
         print(f"Error parsing CSVs: {e}")
 
     clean_chart_data = {}
     for name in attr_names:
         clean_chart_data[name] = [
-            entities_data[name][agent_id]
-            for agent_id in sorted(entities_data[name].keys())
+            entities_data[name][eid]
+            for eid in sorted(entities_data[name].keys())
         ]
 
-    report_data["chart_ticks"] = json.dumps(ticks)
-    report_data["chart_data"] = json.dumps(clean_chart_data)
-    report_data["action_counts"] = json.dumps(action_counts)
-    report_data["relationship_nodes"] = json.dumps(
+    report_data["chart_ticks"]          = json.dumps(ticks)
+    report_data["chart_data"]           = json.dumps(clean_chart_data)
+    report_data["action_counts"]        = json.dumps(action_counts)
+    report_data["relationship_nodes"]   = json.dumps(
         [{"id": k, "label": v} for k, v in nodes.items()]
     )
-    report_data["relationship_edges"] = json.dumps(edges)
-    report_data["sim_ticks"] = str(len(ticks))
+    report_data["relationship_edges"]   = json.dumps(edges)
+    report_data["sim_ticks"]            = str(len(ticks))
 
     report_data["report_json"] = json.dumps(
         {
-            "start": report_data["sim_start"],
-            "end": report_data["sim_end"],
-            "duration": report_data["sim_duration"],
-            "ticks": report_data["sim_ticks"],
+            "start":        report_data["sim_start"],
+            "end":          report_data["sim_end"],
+            "duration":     report_data["sim_duration"],
+            "ticks":        report_data["sim_ticks"],
             "actionCounts": action_counts,
             "logs": {
-                "cmd": report_data["cmd_log"],
-                "actions": report_data["actions_log"],
-                "diseases": report_data["diseases_log"],
-                "deaths": report_data["deaths_log"],
-                "movements": report_data["movements_log"],
-                "births": report_data["births_log"],
-                "events": report_data["events_log"],
+                "cmd":           report_data["cmd_log"],
+                "actions":       report_data["actions_log"],
+                "diseases":      report_data["diseases_log"],
+                "deaths":        report_data["deaths_log"],
+                "movements":     report_data["movements_log"],
+                "births":        report_data["births_log"],
+                "events":        report_data["events_log"],
                 "relationships": report_data["relationships_log"],
             },
         },
         ensure_ascii=False,
         indent=2,
     )
-
 
 t1 = threading.Thread(target=log_all)
 # t2 = threading.Thread(target=log_logs)   # uncomment to enable AI summary

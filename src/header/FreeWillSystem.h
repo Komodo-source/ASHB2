@@ -51,6 +51,8 @@ struct Action {
     float duration; // Time this action takes
     float outcomeSuccess;  //needed for statistics
 
+    Action();
+
     Action(std::string n, int id, std::string category = "general")
         : name(n), actionId(id), needCategory(category), baseSatisfaction(10.0f), duration(1.0f) {}
 };
@@ -88,7 +90,7 @@ struct EnvironmentalFactors {
 // Perception: what the entity notices filtered by personality/state
 struct PerceivedEvent {
     int eventId{0};
-    std::string eventType; // e.g., "Threat", "Opportunity", etc.
+    std::string eventType; 
     float intensity{0.0f};
     Entity* source{nullptr};
 };
@@ -218,7 +220,7 @@ private:
     float calculateRequirementFitness(Entity* entity, const Action& action);
     float calculateNeedSatisfaction(const Action& action, Entity* targetNeed);
     float calculateMemoryBias(int actionId);
-    float calculateVarietyBonus(int actionId);
+    float calculateVarietyBonus(int actionId, const Action& action);
     float calculateContextualWeight(const Action& action, const ActionContext& context);
     float calculatePersonalityModifier(Entity* entity, const Action& action);
     float calculateGriefModifier(Entity* entity, const Action& action);
@@ -255,13 +257,14 @@ public:
     float calculateGoalAlignmentModifier(Entity* entity,  Action* action);
     bool isKnown(Entity* entity, Entity* target);
     Entity* selectSocialTarget(Entity* entity, const std::vector<Entity*>& neighbors, const Action* action);
-
-    void updateNeeds(float deltaTime);
+    bool isActionSocial(const Action* act);
+    void updateNeeds(float deltaTime, Entity* ent);
     NeedLevel updateHieratchicalNeed(Entity* ent, const Action& action);
     void addAction(const Action& action);
-
+    void reinforce_link(Entity& a, Entity& b, float base_delta);
     const std::deque<ActionMemory>& getActionHistory() const;
     const std::map<std::string, Need>& getNeeds() const;
+    float calculateEnvironningPheromones(const std::vector<Entity*>& neighbors, const Action* action);
 
     void tickChildDevelopment(Entity* child, float deltaTime);
 
@@ -274,8 +277,8 @@ public:
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
     void updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess);
-        void finalizeChildhood(Entity* child);
-
+    void finalizeChildhood(Entity* child);
+    Action* ChooseSpecificSocialAction(Entity* ent);
     void updateValuesFromExperiences(Entity* ent, Action* &action, float outcomeSuccess);
     void tickValueGoalAlignment(Entity* entity);
     float applyValueSatisfaction(Entity* entity,  const Action& action);

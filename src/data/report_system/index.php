@@ -45,8 +45,8 @@
 <body>
   <main>
     <div class="top">
-                <h1>Recent report for A.S.H.B </h1>
-                <p>/ last Update <?php $date ?> </p>
+      <h1>Recent report for A.S.H.B </h1>
+      <p>/ last Update <?php $date ?> </p>
     </div>
     <div class="global-container">
     <div class="reports_list">

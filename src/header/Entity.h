@@ -117,7 +117,11 @@ struct LifeGoal {
 };
 
 
-
+struct PheromoneRelease {
+    std::string type = ""; 
+        //social, breeding, procreation_simulation
+    float releasing_level; //0-100
+};
 
 // Big Five personality traits
 struct Personality {
@@ -253,8 +257,12 @@ public:
     LifeStage lifeStage = INFANT;
     Entity* parent1 = nullptr;
     Entity* parent2 = nullptr;
-
+    
     float fatigueLevel = 0.0f;
+    
+    float socialDrain = 0.0f;
+    int dayWithoutSocialAction = 0;
+    float socialDeficit = 0.0f;
 
     std::vector<LifeMemory> lifeMemories;
     EmotionalState emotionalState;
@@ -265,13 +273,13 @@ public:
 
 
     int meetingCount;
-
-
     // Optional attributes
     entityPointedDesire pointedDesire;
     entityPointedAnger pointedAnger;
     entityPointedCouple pointedCouple;
     entityPointedSocial social;
+
+    PheromoneRelease pheromone;
 
     // Constructors
     Entity(int id);
@@ -330,6 +338,15 @@ public:
     void initializeHierarchicalNeeds();
 
     void setGoal(std::string type);
+    
+    bool isGoalType(std::string name){
+        for(LifeGoal goal : m_goals){
+            if(goal.type == name){
+                return true;
+            }
+        }
+        return false;
+    }
 
     // Grief system
     void addGrief(int lostId, float intensity, bool isDeath);
