@@ -113,7 +113,7 @@ void UI::showSystemInformation(){
         ImGui::Text("Loneliness: %.2f", entity->entityLoneliness);
         ImGui::Text("Anger: %.2f", entity->entityGeneralAnger);
         ImGui::Text("Birthday: %dth day", entity->entityBDay);
-        ImGui::Text("Hygiene: %d", entity->entityHygiene);
+        //ImGui::Text("Hygiene: %d", entity->entityHygiene);
 
         ImGui::Text("Life Goal: %s", entity->getTypeGoal().c_str());
         ImGui::Text("   ->: %.2f %%", (float)entity->progressGoal());

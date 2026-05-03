@@ -646,9 +646,9 @@ void FreeWillSystem::initializeActions() {
     availableActions.push_back(murder);
 
     Action discrimination("Discrimination", 6, "social");
-    discrimination.requirements = { {"anger", 30.0f, 0.8f}, {"mentalHealth", 20.0f, 0.6f}, {"stress", 30.0f, 0.5f} };
+    discrimination.requirements = { {"anger", 45.0f, 0.8f}, {"mentalHealth", 15.0f, 0.6f}, {"stress", 40.0f, 0.5f} };
     discrimination.statChanges = { {"anger", -14.0f}, {"mentalHealth", -12.0f}, {"stress", 5.0f}, {"happiness", -1.0f} };
-    discrimination.baseSatisfaction = 5.0f;
+    discrimination.baseSatisfaction = 3.0f;
     availableActions.push_back(discrimination);
 
     // Self-harm actions
@@ -1240,9 +1240,9 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         // Permet de balance les actions
         float rarityMultiplier = 1.0f;
         const std::string& an = action.name;
-        if (an == "Murder") rarityMultiplier = 0.04f;
-        else if (an == "Suicide") rarityMultiplier = 0.03f;
-        else if (an == "Discrimination") rarityMultiplier = 0.35f;
+        if (an == "Murder") rarityMultiplier = 0.03f;
+        else if (an == "Suicide") rarityMultiplier = 0.02f;
+        else if (an == "Discrimination") rarityMultiplier = 0.15f;
         else if (an == "Anxiety") rarityMultiplier = 0.11f;
         else if (an == "SelfHarm") rarityMultiplier = 0.12f;
         else if (an == "Betray") rarityMultiplier = 0.15f;
@@ -1493,12 +1493,16 @@ Action* FreeWillSystem::ChooseSpecificSocialAction(Entity* ent){
             bestScore = x.second;
         }
     }
-    std::cout << "side action chosen: " << bestSocialAction->name << " with a score of " << bestScore;
+    std::cout << "======> side action chosen: " << bestSocialAction->name << " with a score of " << bestScore;
     return bestSocialAction;
 }
 
 // ici on assimile l'action pointé vers sur celui qui est pointé par le pointeur
 void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action) {
+    if (!pointer || !pointed) {
+        return;
+    }
+    
     if(isActionSocial(action)){
         //on réduit le déficit
         pointer->socialDeficit -= BetterRand::genNrInInterval(1.0f,2.0f);
@@ -1635,7 +1639,10 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
         if (desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 15) {
             float current_desire = (desire_index == -1) ? 0 : pointer->list_entityPointedDesire[desire_index].desire;
-            std::cout << "Couple bloqué: " << pointer->getName() << " n'a pas assez de désir pour " << pointed->getName()
+            if (!pointer || !pointed) {
+                return;
+            }
+            std::cout << "Couple bloque: " << pointer->getName() << " n'a pas assez de desir pour " << pointed->getName()
                       << " (" << current_desire << " < 25)\n";
 
             pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(2, 9));
@@ -1644,7 +1651,10 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         int pointed_desire_index = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
         if (pointed_desire_index == -1 || pointed->list_entityPointedDesire[pointed_desire_index].desire < 15) {
             float pointed_desire = (pointed_desire_index == -1) ? 0 : pointed->list_entityPointedDesire[pointed_desire_index].desire;
-            std::cout << "Couple bloqué: " << pointed->getName() << " n'a pas assez de désir pour " << pointer->getName()
+            if (!pointer || !pointed) {
+                return;
+            }
+            std::cout << "Couple bloque: " << pointed->getName() << " n'a pas assez de desir pour " << pointer->getName()
                       << " (" << pointed_desire << " < 20)\n";
             pointer->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(2, 9));
 
@@ -1652,13 +1662,19 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         }
         int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
         if (anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 30) {
-            std::cout << "Reproduction bloqué: " << pointer->getName() << " a trop de colère envers " << pointed->getName() << "\n";
+            if (!pointer || !pointed) {
+                return;
+            }
+            std::cout << "Reproduction bloque: " << pointer->getName() << " a trop de colere envers " << pointed->getName() << "\n";
             pointer->list_entityPointedDesire[anger_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[anger_index].desire + BetterRand::genNrInInterval(2, 6));
             return;
         }
         int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
         if (pointed_anger_index != -1 && pointed->list_entityPointedAnger[pointed_anger_index].anger > 10) {
-            std::cout << "Reproduction bloqué: " << pointed->getName() << " a trop de colère envers " << pointer->getName() << "\n";
+            if (!pointer || !pointed) {
+                return;
+            }
+            std::cout << "Reproduction bloque: " << pointed->getName() << " a trop de colere envers " << pointer->getName() << "\n";
             pointer->list_entityPointedDesire[pointed_anger_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[pointed_anger_index].desire + BetterRand::genNrInInterval(1, 4));
             return;
         }
@@ -2637,11 +2653,12 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
             if (an == "Gossip") rarityMult *= 3.7f;
         }
 
-        if (an == "Murder") rarityMult = 0.03f;
+        if (an == "Murder") rarityMult = 0.02f;
         else if (an == "Suicide") rarityMult = 0.02f;
-        else if (an == "SelfHarm") rarityMult = 0.08f;
+        else if (an == "SelfHarm") rarityMult = 0.04f;
         else if (an == "Betray") rarityMult = 0.25f;
         else if (an == "Exercise") rarityMult = 0.09f;
+        else if (an == "Discrimination") rarityMult = 0.15f;
         else if (an == "Sleep") rarityMult = 0.2f;
         else if (an == "Take Shower") rarityMult = 0.05f;
         else if (an == "SeekTherapy") rarityMult = 0.2f;

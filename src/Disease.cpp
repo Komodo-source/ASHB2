@@ -36,7 +36,7 @@ int Disease::region;
   void Disease::reduceAntiBody(Entity* ent){
     // Estimate that antibody disapear in 50 days -> reduce by 2 every day after a disease
     // where antibody = 100
-    int reducedAntiBody = BetterRand::genNrInInterval(2,6);
+    int reducedAntiBody = BetterRand::genNrInInterval(1,4);
     if(ent->entityAntiBody - reducedAntiBody >= 0 ){
       ent->entityAntiBody -= reducedAntiBody;
     }else{
@@ -48,8 +48,8 @@ int Disease::region;
     int ranchoice = BetterRand::genNrInInterval(0,4);
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
-      if (ent->entityAntiBody < 70 || ent->entityDiseaseType != -1){ //a déja une maladie
-        if(hygiene - (ranchoice * region) - neighboorsSize - (1.15 * nbSickClose) + (2.2 * ent->entityAntiBody) < 0){
+      if (ent->entityAntiBody < 60 || ent->entityDiseaseType != -1){ //a déja une maladie
+        if(hygiene - (ranchoice * region) - neighboorsSize - (1.15 * nbSickClose) + (2.3 * ent->entityAntiBody) < 0){
           return diseasePicked;
         }else{
           return -1;
@@ -60,12 +60,14 @@ int Disease::region;
 
   void Disease::manageSickness(Entity* ent){
     // guerison
-    ent->entityHealth -= ent->entityDiseaseType * 2;
-    ent->entityHygiene -= ent->entityDiseaseType * 2;
-    ent->entityAntiBody += BetterRand::genNrInInterval(4, 15);
-    if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 20) > 100){
+    ent->entityHealth -= ent->entityDiseaseType * 1.15;
+    ent->entityHygiene -= ent->entityDiseaseType * 1.3;
+    ent->entityAntiBody += BetterRand::genNrInInterval(6, 19);
+    if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 20) > 90){
       std::string dName = Disease::getDiseaseName(ent->entityDiseaseType);
       std::cout << ent->getName() + " was cured from " + dName << std::endl;
+      //we give a solid base of antibody to make him avoid getting sick again
+      ent->entityAntiBody = 80;
       ent->entityDiseaseType = -1;
       if(globalLogger) globalLogger->logDisease(ent->getId(), ent->getName(), dName, true);
     }

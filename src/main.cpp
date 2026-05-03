@@ -511,7 +511,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 sys.executeAction(entity, chosenAction, context, target);
                 
                 //choosing side social action
-                if(entity->dayWithoutSocialAction > 3){
+                if(entity->dayWithoutSocialAction > 5){
                     Action* side_social_act = sys.ChooseSpecificSocialAction(entity);
                     sys.executeAction(entity, side_social_act, context, target);
                 }
@@ -612,7 +612,7 @@ int main() {
     std::cout << "you can save and load simulation at any moment\n";
     std::cout << "@author: Komodo \n";
     implementRegion();
-    std::cout << "enter entity number (int): ";
+    std::cout << "enter entity number (int : 40 is ok ): ";
     std::cin >> entity_num;
 
 
@@ -813,7 +813,7 @@ int main() {
         for(int i = entities.size() - 1; i >= 0; i--){
             if(entities[i].entityHealth <= 0.0f){
                 std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
-                globalLogger->logDeath(entities[i].getId(), entities[i].getName(), entities[i].entityAge, "health depletion");
+                //globalLogger->logDeath(entities[i].getId(), entities[i].getName(), entities[i].entityAge, "health depletion");
 
                 entities.erase(entities.begin() + i);
 
