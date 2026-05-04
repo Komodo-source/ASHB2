@@ -1,9 +1,39 @@
-build
-libs
-CMakeFiles
-old
-vcpkg
-src/data
-data
-.claude
-.vscode
+```
+# Build artifacts
+*.o
+*.obj
+*.out
+build/
+dist/
+
+# Dependencies
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# System files
+.DS_Store
+Thumbs.db
+```
