@@ -1,24 +1,29 @@
 ```
-# Build artifacts
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+
+# Compiler object files
 *.o
 *.obj
+*.obj.d
+
+# Executables
+*.exe
 *.out
+
+# Build directories
 build/
 dist/
-
-# Dependencies
-venv/
-.venv/
-__pycache__/
-*.egg-info/
-node_modules/
 
 # IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
 
 # Logs
 *.log
@@ -28,12 +33,24 @@ node_modules/
 .env.local
 *.env.*
 
-# Coverage
+# Coverage reports
 coverage/
 htmlcov/
 .coverage
 
-# System files
+# Package manager caches
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.conda/
+
+# OS generated files
 .DS_Store
 Thumbs.db
 ```
