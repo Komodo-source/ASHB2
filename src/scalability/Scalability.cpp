@@ -327,7 +327,7 @@ SpatialPartitioner::SpatialPartitioner(float cellSz, float worldWidth, float wor
 }
 
 void SpatialPartitioner::partition(std::vector<Entity*>& entities,
-                                   std::vector<std::vector<Entity*>&> partitions) {
+                                   std::vector<std::vector<Entity*>>& partitions) {
     partitions.clear();
     partitions.resize(gridWidth * gridHeight);
     

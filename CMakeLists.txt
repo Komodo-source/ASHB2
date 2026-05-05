@@ -15,17 +15,21 @@ endif()
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/libs/glfw")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/libs/imgui")
 
-# Fichiers ImGui
-set(IMGUI_SOURCES
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_tables.cpp
-    ${IMGUI_DIR}/imgui_widgets.cpp
-    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
-    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
-    src/header/implot.cpp
-    src/header/implot_items.cpp
-)
+# Fichiers ImGui (optional - only if libraries exist)
+if(EXISTS ${IMGUI_DIR}/imgui.cpp)
+    set(IMGUI_SOURCES
+        ${IMGUI_DIR}/imgui.cpp
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+        src/header/implot.cpp
+        src/header/implot_items.cpp
+    )
+else()
+    set(IMGUI_SOURCES "")
+endif()
 
 # Include directories
 include_directories(
@@ -43,7 +47,9 @@ include_directories(
 # Link directories
 link_directories(${GLFW_DIR}/lib-mingw-w64)
 
-find_package(OpenGL REQUIRED)
+# OpenGL is optional - only needed for visualization
+# find_package(OpenGL REQUIRED)
+find_package(OpenGL QUIET)
 
 # New modular source files
 set(VALIDATION_SOURCES
@@ -76,7 +82,7 @@ src/Logging.cpp
 ${IMGUI_SOURCES}
 src/implem_free_will.cpp
 src/SpatialMesh.cpp
-src/Movement.cpp
+src/movement.cpp
 src/SaveLoad.cpp
 src/Heritage.cpp
 src/Graph.cpp
@@ -94,9 +100,13 @@ ${OBSERVABILITY_SOURCES}
 # Lier les bibliothèques
 target_link_libraries(app
     ${GLFW_DIR}/lib-mingw-w64/libglfw3.a
-    OpenGL::GL
     gdi32
 )
+
+# OpenGL linking (only if found)
+if(OpenGL_FOUND)
+    target_link_libraries(app OpenGL::GL)
+endif()
 
 # Link OpenMP if available
 if(OpenMP_CXX_FOUND)

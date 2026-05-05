@@ -11,6 +11,10 @@
 #include <condition_variable>
 #include <memory>
 #include <unordered_map>
+#include <random>
+#include <algorithm>
+#include <numeric>
+#include <deque>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -167,7 +171,7 @@ class PartitionStrategy {
 public:
     virtual ~PartitionStrategy() = default;
     virtual void partition(std::vector<Entity*>& entities,
-                          std::vector<std::vector<Entity*>&> partitions) = 0;
+                          std::vector<std::vector<Entity*>>& partitions) = 0;
 };
 
 // Spatial partitioning for parallel processing
@@ -181,7 +185,7 @@ public:
     SpatialPartitioner(float cellSz, float worldWidth, float worldHeight);
     
     void partition(std::vector<Entity*>& entities,
-                  std::vector<std::vector<Entity*>&> partitions) override;
+                  std::vector<std::vector<Entity*>>& partitions) override;
     
     // Get entities in neighboring cells
     std::vector<Entity*> getNearbyEntities(Entity* entity,
