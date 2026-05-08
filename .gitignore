@@ -36,7 +36,9 @@ dist/
 # Coverage reports
 coverage/
 htmlcov/
+*.html
 .coverage
+data
 
 # Package manager caches
 node_modules/

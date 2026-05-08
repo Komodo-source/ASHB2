@@ -222,7 +222,10 @@ void UI::showSystemInformation(){
 if (!entity->list_entityPointedDesire.empty()) {
     ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.7f, 1.0f), "Desire (%d)", (int)entity->list_entityPointedDesire.size());
     for (auto& d : entity->list_entityPointedDesire) {
+        
         if (!d.pointedEntity) continue;
+        if(d.pointedEntity->entityHealth > 0.0f){
+            
         ImGui::Text("  %s (#%d)", d.pointedEntity->name.c_str(), d.pointedEntity->entityId);
         ImGui::SameLine(160);
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.4f, 0.7f, 0.85f));
@@ -230,6 +233,7 @@ if (!entity->list_entityPointedDesire.empty()) {
         ImGui::ProgressBar(d.desire / 100.0f, ImVec2(100.0f, 12.0f), label);
         ImGui::PopStyleColor();
         ImGui::SameLine(); ImGui::Text("%.0f", d.desire);
+        }
     }
     ImGui::Spacing();
 }
@@ -239,6 +243,8 @@ if (!entity->list_entityPointedAnger.empty()) {
     ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Anger (%d)", (int)entity->list_entityPointedAnger.size());
     for (auto& a : entity->list_entityPointedAnger) {
         if (!a.pointedEntity) continue;
+        if(a.pointedEntity->entityHealth > 0.0f){
+            
         ImGui::Text("  %s (#%d)", a.pointedEntity->name.c_str(), a.pointedEntity->entityId);
         ImGui::SameLine(160);
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.2f, 0.2f, 0.85f));
@@ -246,6 +252,7 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::ProgressBar(a.anger / 100.0f, ImVec2(100.0f, 12.0f), label);
         ImGui::PopStyleColor();
         ImGui::SameLine(); ImGui::Text("%.0f", a.anger);
+        }
     }
     ImGui::Spacing();
 }
@@ -255,6 +262,8 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::TextColored(ImVec4(0.2f, 0.9f, 0.9f, 1.0f), "Social bonds (%d)", (int)entity->list_entityPointedSocial.size());
         for (auto& s : entity->list_entityPointedSocial) {
             if (!s.pointedEntity) continue;
+            if(s.pointedEntity->entityHealth > 0.0f){
+                
             ImGui::Text("  %s (#%d)", s.pointedEntity->name.c_str(), s.pointedEntity->entityId);
             ImGui::SameLine(160);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.9f, 0.9f, 0.85f));
@@ -262,6 +271,7 @@ if (!entity->list_entityPointedAnger.empty()) {
             ImGui::ProgressBar(s.social / 100.0f, ImVec2(100.0f, 12.0f), label);
             ImGui::PopStyleColor();
             ImGui::SameLine(); ImGui::Text("%.0f", s.social);
+            }
         }
         ImGui::Spacing();
     }
@@ -271,7 +281,9 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "Partner");
         for (auto& c : entity->list_entityPointedCouple) {
             if (!c.pointedEntity) continue;
+            if(c.pointedEntity->entityHealth > 0.0f){
             ImGui::Text("  Couple  %s (#%d)", c.pointedEntity->name.c_str(), c.pointedEntity->entityId);
+            }
         }
         ImGui::Spacing();
     }

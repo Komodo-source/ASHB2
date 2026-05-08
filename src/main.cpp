@@ -191,9 +191,9 @@ Personality generateRandomPersonality() {
         MentalModelOfOther* model = self->getModelOf(neighbor);
 
         if (action->name == "Socialize" || action->name == "GoodConnection") {
-            score += self->searchConnSocial(neighbor) * 2.0f; 
+            score += self->searchConnSocial(neighbor) * 2.0f;
             score += (model ? model->trustLevel : 0) * 1.5f;
-            score -= self->searchConnAng(neighbor) * 3.0f; 
+            score -= self->searchConnAng(neighbor) * 3.0f;
         } else if (action->name == "Desire" || action->name == "Flirt") {
             score += self->searchConnDesire(neighbor) * 3.0f;
             score -= self->searchConnAng(neighbor) * 2.0f;
@@ -257,13 +257,34 @@ std::vector<Entity> get_new_borns(){
 
 
 void tickRelationshipDecay(Entity* ent, float deltaTime) {
+    // FIX: Relationship decay now depends on relationship strength
+    // Strong relationships decay much slower than weak ones
     for (auto& social : ent->list_entityPointedSocial) {
-        social.social -= 0.01f * deltaTime;
+        // Decay formula: base_decay / (1 + strength_factor)
+        // Strong bonds (80+) decay at 20% of normal rate
+        // Medium bonds (40-80) decay at 50% of normal rate
+        // Weak bonds (<40) decay at full rate
+        float decayRate = 0.01f;
+        if (social.social > 80.0f) {
+            decayRate = 0.002f; // Very slow decay for strong bonds
+        } else if (social.social > 50.0f) {
+            decayRate = 0.005f; // Moderate decay for medium bonds
+        } else if (social.social > 20.0f) {
+            decayRate = 0.008f; // Light decay for forming bonds
+        }
+        social.social -= decayRate * deltaTime;
         if (social.social < 0.5f) social.social = 0.0f;
     }
 
+    // FIX: Desire decay also slowed for established attractions
     for (auto& desire : ent->list_entityPointedDesire) {
-        desire.desire -= 0.015f * deltaTime;
+        float decayRate = 0.015f;
+        if (desire.desire > 60.0f) {
+            decayRate = 0.003f; // Strong attraction persists
+        } else if (desire.desire > 30.0f) {
+            decayRate = 0.008f;
+        }
+        desire.desire -= decayRate * deltaTime;
         desire.desire = std::max(0.0f, desire.desire);
     }
 
@@ -325,10 +346,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             //lower pheromones
             if(!entity->pheromone.type.empty()){
-                entity->pheromone.releasing_level -= BetterRand::genNrInInterval(3.0,6.0); 
+                entity->pheromone.releasing_level -= BetterRand::genNrInInterval(3.0,6.0);
             }
 
-            
+
             //apply movement (now env-aware)
             float oldX = entity->posX;
             float oldY = entity->posY;
@@ -344,14 +365,15 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
 
             FreeWillSystem& sys = entity->getFreeWill();
-            
-            //decay social
+
+            // FIX: Remove duplicate social decay - now handled properly in tickRelationshipDecay
+            // This was causing double decay which prevented relationships from forming
+            // float deltaTime = 1.0f;
+            // for (auto &link : entity->list_entityPointedSocial) {
+            //     link.social = std::max(0.0f, link.social - (0.005f * deltaTime));
+            // }
             float deltaTime = 1.0f;
-            for (auto &link : entity->list_entityPointedSocial) {
-                link.social = std::max(0.0f, link.social - (0.005f * deltaTime)); 
-            }
-            
-            
+
             //va avec l'update de needs
             entity->entityLoneliness += 0.05f * deltaTime;
             entity->entityBoredom   += 0.04f * deltaTime;
@@ -431,9 +453,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosenAction = sys.chooseAction(entity, neighbors, context);
-            
 
-            
+
+
             //social deficit
             if (chosenAction && chosenAction->needCategory == "social" &&
                 chosenAction->name != "Murder" && chosenAction->name != "Betray" &&
@@ -442,8 +464,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 entity->socialDeficit = std::max(0.0f, entity->socialDeficit - 8.0f);
                 entity->dayWithoutSocialAction = 0;
             } else {
-                if (entity->entityLoneliness > 10.0f) {  
-                    entity->socialDeficit += 2.0f;       
+                if (entity->entityLoneliness > 10.0f) {
+                    entity->socialDeficit += 2.0f;
                 }
                 entity->dayWithoutSocialAction++;
             }
@@ -459,11 +481,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 for (Entity* n : neighbors) {
                     float bond = entity->searchConnSocial(n);
                     if (bond > 10.0f) socialDrain += 0.15f;
-                    else socialDrain += 0.05f;  
+                    else socialDrain += 0.05f;
                 }
                 entity->entityLoneliness = std::max(0.0f, entity->entityLoneliness - socialDrain);
             } else {
-                entity->entityLoneliness += 2.5f;  
+                entity->entityLoneliness += 2.5f;
             }
             entity->entityLoneliness = std::min(100.0f, entity->entityLoneliness);
 
@@ -509,7 +531,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
                 // Execute the action with the target
                 sys.executeAction(entity, chosenAction, context, target);
-                
+
                 //choosing side social action
                 if(entity->dayWithoutSocialAction > 5){
                     Action* side_social_act = sys.ChooseSpecificSocialAction(entity);
@@ -521,7 +543,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
                 // Update relationship based on action
                 sys.pointedAssimilation(entity, target, chosenAction);
-                
+
 
                 // Detect murder: if target just died, trigger grief in all connected entities
                 if(targetWasAlive && target->entityHealth <= 0.0f){

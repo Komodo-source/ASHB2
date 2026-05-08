@@ -1,6 +1,7 @@
 #include "./header/Entity.h"
 #include "./header/random.hpp"
 #include <cstddef>
+#include <list>
 #include <string>
 #include "./header/FreeWillSystem.h"
 
@@ -660,4 +661,32 @@ MentalModelOfOther* Entity::getModelOf(Entity* ent) {
         if (md->entityPointed == ent) return md;
     }
     return nullptr;
+}
+
+
+void Entity::upgradeDesire(Entity* pointed, float value){
+    for (entityPointedDesire list_ptr: list_entityPointedDesire) {
+        if(pointed == list_ptr.pointedEntity){
+            list_ptr.desire += value;
+            return ;
+        }
+    }
+}
+void Entity::upgradeAnger(Entity* pointed, float value){
+    for (entityPointedAnger list_ptr : list_entityPointedAnger) {
+        if(pointed == list_ptr.pointedEntity){
+            list_ptr.anger += value;
+            return ;
+        }
+
+    }
+}
+void Entity::upgradeSocial(Entity* pointed, float value){
+    for (entityPointedSocial list_ptr:  list_entityPointedSocial) {
+        if(list_ptr.pointedEntity == pointed){
+            list_ptr.social += value;
+            return ;
+        }
+
+    }
 }

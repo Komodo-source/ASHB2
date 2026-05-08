@@ -10,6 +10,7 @@
 #include <chrono>
 #include <mutex>
 #include <atomic>
+#include <math.h>
 #include <functional>
 
 namespace observability {
@@ -301,6 +302,7 @@ private:
     mutable std::mutex mutex;
     
 public:
+    static Profiler& getInstance();
     void begin(const std::string& name);
     void end(const std::string& name);
     

@@ -313,6 +313,11 @@ public:
     void addAnger(entityPointedAnger pointed);
     void addCouple(entityPointedCouple pointed);
     void addSocial(entityPointedSocial pointed);
+
+    void upgradeDesire(Entity* pointed, float value);
+    void upgradeAnger(Entity* pointed, float value);
+    void upgradeSocial(Entity* pointed, float value);
+    
     void IncrementBDay();
     void saveEntityStats(Action* act);
     Entity* mostAngryConn();

@@ -415,7 +415,7 @@ float FreeWillSystem::calculateGriefModifier(Entity* entity, const Action& actio
 }
 
 // Basing in only neighboorhood pheromones try to calculate how much impact does it have on anyone
-// 
+//
 float FreeWillSystem::calculateEnvironningPheromones(const std::vector<Entity*>& neighbors, const Action* action) {
     float modifier = 1.0f;
     if(season == "spring"){
@@ -439,7 +439,7 @@ float FreeWillSystem::calculateEnvironningPheromones(const std::vector<Entity*>&
             if(neighboor->pheromone.type == "breeding"){
                 modifier += ((neighboor->pheromone.releasing_level) / 100) * 1.0;
             }
-            
+
         }else if  (an == "Desire" || an == "Flirt" || an == "Date" || an == "Reconcile" ||
                                       an == "couple" || an == "breeding" || an == "Jealousy" || an == "SetBoundaries"){
             if(neighboor->pheromone.type == "procreation_simulation" || neighboor->pheromone.type == "sex"){
@@ -1502,7 +1502,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
     if (!pointer || !pointed) {
         return;
     }
-    
+
     if(isActionSocial(action)){
         //on réduit le déficit
         pointer->socialDeficit -= BetterRand::genNrInInterval(1.0f,2.0f);
@@ -1637,45 +1637,77 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
     }
     else if (action->name == "breeding") {
         int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
-        if (desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 15) {
-            float current_desire = (desire_index == -1) ? 0 : pointer->list_entityPointedDesire[desire_index].desire;
+
+        // FIX: Create relationship entry if it doesn't exist
+        if (desire_index == -1) {
+            entityPointedDesire newDesire;
+            newDesire.Id = pointed->entityId;
+            newDesire.pointedEntity = pointed;
+            newDesire.desire = 0.0f;
+            pointer->list_entityPointedDesire.push_back(newDesire);
+            desire_index = static_cast<int>(pointer->list_entityPointedDesire.size()) - 1;
+        }
+
+        if (pointer->list_entityPointedDesire[desire_index].desire < 15) {
+            float current_desire = pointer->list_entityPointedDesire[desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointer->getName() << " n'a pas assez de desir pour " << pointed->getName()
                       << " (" << current_desire << " < 25)\n";
 
-            pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(2, 9));
+            // FIX: Slower buildup but more sustainable
+            pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f,
+                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(3, 7));
             return;
         }
+
         int pointed_desire_index = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
-        if (pointed_desire_index == -1 || pointed->list_entityPointedDesire[pointed_desire_index].desire < 15) {
-            float pointed_desire = (pointed_desire_index == -1) ? 0 : pointed->list_entityPointedDesire[pointed_desire_index].desire;
+
+        // FIX: Create relationship entry if it doesn't exist
+        if (pointed_desire_index == -1) {
+            entityPointedDesire newDesire;
+            newDesire.Id = pointer->entityId;
+            newDesire.pointedEntity = pointer;
+            newDesire.desire = 0.0f;
+            pointed->list_entityPointedDesire.push_back(newDesire);
+            pointed_desire_index = static_cast<int>(pointed->list_entityPointedDesire.size()) - 1;
+        }
+
+        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < 15) {
+            float pointed_desire = pointed->list_entityPointedDesire[pointed_desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointed->getName() << " n'a pas assez de desir pour " << pointer->getName()
                       << " (" << pointed_desire << " < 20)\n";
-            pointer->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(2, 9));
+
+            // FIX: Use correct index (pointed_desire_index not pointed_desire_index on pointer!)
+            pointed->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f,
+                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(3, 7));
 
             return;
         }
+
         int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
         if (anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 30) {
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Reproduction bloque: " << pointer->getName() << " a trop de colere envers " << pointed->getName() << "\n";
-            pointer->list_entityPointedDesire[anger_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[anger_index].desire + BetterRand::genNrInInterval(2, 6));
+            // FIX: Reduce anger instead of increasing desire incorrectly
+            pointer->list_entityPointedAnger[anger_index].anger -= BetterRand::genNrInInterval(5, 10);
             return;
         }
+
         int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
         if (pointed_anger_index != -1 && pointed->list_entityPointedAnger[pointed_anger_index].anger > 10) {
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Reproduction bloque: " << pointed->getName() << " a trop de colere envers " << pointer->getName() << "\n";
-            pointer->list_entityPointedDesire[pointed_anger_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[pointed_anger_index].desire + BetterRand::genNrInInterval(1, 4));
+            // FIX: Reduce anger instead of increasing desire incorrectly
+            pointed->list_entityPointedAnger[pointed_anger_index].anger -= BetterRand::genNrInInterval(3, 8);
             return;
         }
 
@@ -1698,7 +1730,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             pointer->onMajorEventAddOrBoostGoal("reproduction");
             pointed->onMajorEventAddOrBoostGoal("reproduction");
 
-            std::cout << "Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()
+            std::cout << "@@@@@@ Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()
                       << " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
             if (globalLogger) globalLogger->logEvent("breeding", "Reproduction between " + pointer->name + " and " + pointed->name);
 
@@ -1720,7 +1752,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             baby.pheromone.type = "procreation_simulation";
             baby.pheromone.releasing_level = BetterRand::genNrInInterval(40.0, 70.0);
 
-            
+
             if (anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 10) {
                 baby.dv.childhoodTraumaScore = pointer->list_entityPointedAnger[anger_index].anger;
                 baby.dv.childhoodNurturingScore = 0.0f;
@@ -1757,42 +1789,87 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         else if (pointer->dv.attachmentStyle == ANXIOUS) required_desire = 15.0f;
 
         int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
-        if (desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < required_desire) {
-            float current_desire = (desire_index == -1) ? 0 : pointer->list_entityPointedDesire[desire_index].desire;
+
+        // FIX: Create relationship entry if it doesn't exist
+        if (desire_index == -1) {
+            entityPointedDesire newDesire;
+            newDesire.Id = pointed->entityId;
+            newDesire.pointedEntity = pointed;
+            newDesire.desire = 0.0f;
+            pointer->list_entityPointedDesire.push_back(newDesire);
+            desire_index = static_cast<int>(pointer->list_entityPointedDesire.size()) - 1;
+        }
+
+        if (pointer->list_entityPointedDesire[desire_index].desire < required_desire) {
+            float current_desire = pointer->list_entityPointedDesire[desire_index].desire;
             std::cout << "Couple bloqué: " << pointer->getName() << " n'a pas assez de désir pour " << pointed->getName()
                       << " (" << current_desire << " < " << required_desire << ")\n";
-            pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(2, 11));
+            pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f,
+                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(3, 8));
             return;
         }
+
         float required_pointed_desire = 15.0f;
         if (pointed->dv.attachmentStyle == AVOIDANT) required_pointed_desire = 35.0f;
         else if (pointed->dv.attachmentStyle == ANXIOUS) required_pointed_desire = 10.0f;
+
         int pointed_desire_index = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
-        if (pointed_desire_index == -1 || pointed->list_entityPointedDesire[pointed_desire_index].desire < required_pointed_desire) {
-            float pointed_desire = (pointed_desire_index == -1) ? 0 : pointed->list_entityPointedDesire[pointed_desire_index].desire;
+
+        // FIX: Create relationship entry if it doesn't exist
+        if (pointed_desire_index == -1) {
+            entityPointedDesire newDesire;
+            newDesire.Id = pointer->entityId;
+            newDesire.pointedEntity = pointer;
+            newDesire.desire = 0.0f;
+            pointed->list_entityPointedDesire.push_back(newDesire);
+            pointed_desire_index = static_cast<int>(pointed->list_entityPointedDesire.size()) - 1;
+        }
+
+        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < required_pointed_desire) {
+            float pointed_desire = pointed->list_entityPointedDesire[pointed_desire_index].desire;
             std::cout << "Couple bloqué: " << pointed->getName() << " n'a pas assez de désir pour " << pointer->getName()
                       << " (" << pointed_desire << " < " << required_pointed_desire << ")\n";
-            pointer->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(2, 11));
+            // FIX: Use correct index on pointed entity
+            pointed->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f,
+                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(3, 8));
             return;
         }
+
         int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
         if (anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 10) {
             std::cout << "Couple bloqué: " << pointer->getName() << " a trop de colère envers " << pointed->getName() << "\n";
-            pointer->list_entityPointedDesire[anger_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[anger_index].desire + BetterRand::genNrInInterval(2, 7));
+            // FIX: Reduce anger instead of incorrectly modifying desire
+            pointer->list_entityPointedAnger[anger_index].anger -= BetterRand::genNrInInterval(5, 10);
             return;
         }
+
         int pointed_anger_index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
         if (pointed_anger_index != -1 && pointed->list_entityPointedAnger[pointed_anger_index].anger > 10) {
             std::cout << "Couple bloqué: " << pointed->getName() << " a trop de colère envers " << pointer->getName() << "\n";
-            pointer->list_entityPointedDesire[pointed_anger_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[pointed_anger_index].desire + BetterRand::genNrInInterval(2, 7));
+            // FIX: Reduce anger instead of incorrectly modifying desire
+            pointed->list_entityPointedAnger[pointed_anger_index].anger -= BetterRand::genNrInInterval(3, 8);
             return;
         }
+
         int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
-        if (social_index == -1 || pointer->list_entityPointedSocial[social_index].social < 15) {
-            float current_social = (social_index == -1) ? 0 : pointer->list_entityPointedSocial[social_index].social;
+
+        // FIX: Create social entry if it doesn't exist
+        if (social_index == -1) {
+            entityPointedSocial newSocial;
+            newSocial.Id = pointed->entityId;
+            newSocial.pointedEntity = pointed;
+            newSocial.social = 0.0f;
+            pointer->list_entityPointedSocial.push_back(newSocial);
+            social_index = static_cast<int>(pointer->list_entityPointedSocial.size()) - 1;
+        }
+
+        if (pointer->list_entityPointedSocial[social_index].social < 15) {
+            float current_social = pointer->list_entityPointedSocial[social_index].social;
             std::cout << "Couple bloqué: lien social insuffisant entre " << pointer->getName() << " et " << pointed->getName()
                       << " (" << current_social << " < 15)\n";
-            pointer->list_entityPointedDesire[social_index].desire = std::min(100.0f, pointer->list_entityPointedDesire[social_index].desire + BetterRand::genNrInInterval(2, 7));
+            // FIX: Increase social not desire
+            pointer->list_entityPointedSocial[social_index].social = std::min(100.0f,
+                pointer->list_entityPointedSocial[social_index].social + BetterRand::genNrInInterval(3, 7));
             return;
         }
         int index = pointer->contains(pointer->list_entityPointedCouple, pointed, 3);

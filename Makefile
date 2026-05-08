@@ -464,6 +464,30 @@ src/UI.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/UI.cpp.s
 .PHONY : src/UI.cpp.s
 
+src/environment/EnvironmentModel.obj: src/environment/EnvironmentModel.cpp.obj
+.PHONY : src/environment/EnvironmentModel.obj
+
+# target to build an object file
+src/environment/EnvironmentModel.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj
+.PHONY : src/environment/EnvironmentModel.cpp.obj
+
+src/environment/EnvironmentModel.i: src/environment/EnvironmentModel.cpp.i
+.PHONY : src/environment/EnvironmentModel.i
+
+# target to preprocess a source file
+src/environment/EnvironmentModel.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.i
+.PHONY : src/environment/EnvironmentModel.cpp.i
+
+src/environment/EnvironmentModel.s: src/environment/EnvironmentModel.cpp.s
+.PHONY : src/environment/EnvironmentModel.s
+
+# target to generate assembly for a file
+src/environment/EnvironmentModel.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.s
+.PHONY : src/environment/EnvironmentModel.cpp.s
+
 src/header/implot.obj: src/header/implot.cpp.obj
 .PHONY : src/header/implot.obj
 
@@ -560,6 +584,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/modules/BehavioralModule.obj: src/modules/BehavioralModule.cpp.obj
+.PHONY : src/modules/BehavioralModule.obj
+
+# target to build an object file
+src/modules/BehavioralModule.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj
+.PHONY : src/modules/BehavioralModule.cpp.obj
+
+src/modules/BehavioralModule.i: src/modules/BehavioralModule.cpp.i
+.PHONY : src/modules/BehavioralModule.i
+
+# target to preprocess a source file
+src/modules/BehavioralModule.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.i
+.PHONY : src/modules/BehavioralModule.cpp.i
+
+src/modules/BehavioralModule.s: src/modules/BehavioralModule.cpp.s
+.PHONY : src/modules/BehavioralModule.s
+
+# target to generate assembly for a file
+src/modules/BehavioralModule.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.s
+.PHONY : src/modules/BehavioralModule.cpp.s
+
 src/movement.obj: src/movement.cpp.obj
 .PHONY : src/movement.obj
 
@@ -583,6 +631,78 @@ src/movement.s: src/movement.cpp.s
 src/movement.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/movement.cpp.s
 .PHONY : src/movement.cpp.s
+
+src/observability/Observability.obj: src/observability/Observability.cpp.obj
+.PHONY : src/observability/Observability.obj
+
+# target to build an object file
+src/observability/Observability.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/observability/Observability.cpp.obj
+.PHONY : src/observability/Observability.cpp.obj
+
+src/observability/Observability.i: src/observability/Observability.cpp.i
+.PHONY : src/observability/Observability.i
+
+# target to preprocess a source file
+src/observability/Observability.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/observability/Observability.cpp.i
+.PHONY : src/observability/Observability.cpp.i
+
+src/observability/Observability.s: src/observability/Observability.cpp.s
+.PHONY : src/observability/Observability.s
+
+# target to generate assembly for a file
+src/observability/Observability.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/observability/Observability.cpp.s
+.PHONY : src/observability/Observability.cpp.s
+
+src/scalability/Scalability.obj: src/scalability/Scalability.cpp.obj
+.PHONY : src/scalability/Scalability.obj
+
+# target to build an object file
+src/scalability/Scalability.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj
+.PHONY : src/scalability/Scalability.cpp.obj
+
+src/scalability/Scalability.i: src/scalability/Scalability.cpp.i
+.PHONY : src/scalability/Scalability.i
+
+# target to preprocess a source file
+src/scalability/Scalability.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/scalability/Scalability.cpp.i
+.PHONY : src/scalability/Scalability.cpp.i
+
+src/scalability/Scalability.s: src/scalability/Scalability.cpp.s
+.PHONY : src/scalability/Scalability.s
+
+# target to generate assembly for a file
+src/scalability/Scalability.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/scalability/Scalability.cpp.s
+.PHONY : src/scalability/Scalability.cpp.s
+
+src/validation/ValidationFramework.obj: src/validation/ValidationFramework.cpp.obj
+.PHONY : src/validation/ValidationFramework.obj
+
+# target to build an object file
+src/validation/ValidationFramework.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj
+.PHONY : src/validation/ValidationFramework.cpp.obj
+
+src/validation/ValidationFramework.i: src/validation/ValidationFramework.cpp.i
+.PHONY : src/validation/ValidationFramework.i
+
+# target to preprocess a source file
+src/validation/ValidationFramework.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.i
+.PHONY : src/validation/ValidationFramework.cpp.i
+
+src/validation/ValidationFramework.s: src/validation/ValidationFramework.cpp.s
+.PHONY : src/validation/ValidationFramework.s
+
+# target to generate assembly for a file
+src/validation/ValidationFramework.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.s
+.PHONY : src/validation/ValidationFramework.cpp.s
 
 # Help Target
 help:
@@ -635,6 +755,9 @@ help:
 	@echo ... src/UI.obj
 	@echo ... src/UI.i
 	@echo ... src/UI.s
+	@echo ... src/environment/EnvironmentModel.obj
+	@echo ... src/environment/EnvironmentModel.i
+	@echo ... src/environment/EnvironmentModel.s
 	@echo ... src/header/implot.obj
 	@echo ... src/header/implot.i
 	@echo ... src/header/implot.s
@@ -647,9 +770,21 @@ help:
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
+	@echo ... src/modules/BehavioralModule.obj
+	@echo ... src/modules/BehavioralModule.i
+	@echo ... src/modules/BehavioralModule.s
 	@echo ... src/movement.obj
 	@echo ... src/movement.i
 	@echo ... src/movement.s
+	@echo ... src/observability/Observability.obj
+	@echo ... src/observability/Observability.i
+	@echo ... src/observability/Observability.s
+	@echo ... src/scalability/Scalability.obj
+	@echo ... src/scalability/Scalability.i
+	@echo ... src/scalability/Scalability.s
+	@echo ... src/validation/ValidationFramework.obj
+	@echo ... src/validation/ValidationFramework.i
+	@echo ... src/validation/ValidationFramework.s
 .PHONY : help
 
 
