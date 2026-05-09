@@ -368,6 +368,30 @@ src/Heritage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Heritage.cpp.s
 .PHONY : src/Heritage.cpp.s
 
+src/Image.obj: src/Image.cpp.obj
+.PHONY : src/Image.obj
+
+# target to build an object file
+src/Image.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.obj
+.PHONY : src/Image.cpp.obj
+
+src/Image.i: src/Image.cpp.i
+.PHONY : src/Image.i
+
+# target to preprocess a source file
+src/Image.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.i
+.PHONY : src/Image.cpp.i
+
+src/Image.s: src/Image.cpp.s
+.PHONY : src/Image.s
+
+# target to generate assembly for a file
+src/Image.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.s
+.PHONY : src/Image.cpp.s
+
 src/Logging.obj: src/Logging.cpp.obj
 .PHONY : src/Logging.obj
 
@@ -391,6 +415,30 @@ src/Logging.s: src/Logging.cpp.s
 src/Logging.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Logging.cpp.s
 .PHONY : src/Logging.cpp.s
+
+src/SDLEngine.obj: src/SDLEngine.cpp.obj
+.PHONY : src/SDLEngine.obj
+
+# target to build an object file
+src/SDLEngine.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SDLEngine.cpp.obj
+.PHONY : src/SDLEngine.cpp.obj
+
+src/SDLEngine.i: src/SDLEngine.cpp.i
+.PHONY : src/SDLEngine.i
+
+# target to preprocess a source file
+src/SDLEngine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SDLEngine.cpp.i
+.PHONY : src/SDLEngine.cpp.i
+
+src/SDLEngine.s: src/SDLEngine.cpp.s
+.PHONY : src/SDLEngine.s
+
+# target to generate assembly for a file
+src/SDLEngine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SDLEngine.cpp.s
+.PHONY : src/SDLEngine.cpp.s
 
 src/SaveLoad.obj: src/SaveLoad.cpp.obj
 .PHONY : src/SaveLoad.obj
@@ -743,9 +791,15 @@ help:
 	@echo ... src/Heritage.obj
 	@echo ... src/Heritage.i
 	@echo ... src/Heritage.s
+	@echo ... src/Image.obj
+	@echo ... src/Image.i
+	@echo ... src/Image.s
 	@echo ... src/Logging.obj
 	@echo ... src/Logging.i
 	@echo ... src/Logging.s
+	@echo ... src/SDLEngine.obj
+	@echo ... src/SDLEngine.i
+	@echo ... src/SDLEngine.s
 	@echo ... src/SaveLoad.obj
 	@echo ... src/SaveLoad.i
 	@echo ... src/SaveLoad.s

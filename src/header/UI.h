@@ -24,7 +24,7 @@ public:
         bool selected = false;
     };
 
-    void ShowEntityWindow(Entity* entity, bool* p_open = nullptr);
+    void ShowEntityWindow(Entity* entity, bool* p_open, std::vector<Entity*> entities);
     void DrawGrid(std::vector<Entity*>& entities, float pointSize = 8.0f);
     int HandlePointMovement(std::vector<Entity*>& entities);
     void createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText);

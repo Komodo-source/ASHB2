@@ -65,7 +65,7 @@ int Disease::region;
     ent->entityAntiBody += BetterRand::genNrInInterval(6, 19);
     if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 20) > 90){
       std::string dName = Disease::getDiseaseName(ent->entityDiseaseType);
-      std::cout << ent->getName() + " was cured from " + dName << std::endl;
+      std::cout << "## " <<ent->getName() + " was cured from " + dName << " ##"<< std::endl;
       //we give a solid base of antibody to make him avoid getting sick again
       ent->entityAntiBody = 80;
       ent->entityDiseaseType = -1;

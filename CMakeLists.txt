@@ -14,6 +14,7 @@ endif()
 # Chemins vers les bibliothèques
 set(GLFW_DIR "${CMAKE_SOURCE_DIR}/libs/glfw")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/libs/imgui")
+set(SDL2_DIR "${CMAKE_SOURCE_DIR}/libs/SDL2")
 
 # Fichiers ImGui (optional - only if libraries exist)
 if(EXISTS ${IMGUI_DIR}/imgui.cpp)
@@ -36,6 +37,8 @@ include_directories(
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
     ${GLFW_DIR}/include
+    ${SDL2_DIR}/include
+    ${SDL2_DIR}/include/SDL2
     src/header
     src/validation
     src/scalability
@@ -45,7 +48,7 @@ include_directories(
 )
 
 # Link directories
-link_directories(${GLFW_DIR}/lib-mingw-w64)
+link_directories(${GLFW_DIR}/lib-mingw-w64 ${SDL2_DIR}/lib)
 
 # OpenGL is optional - only needed for visualization
 # find_package(OpenGL REQUIRED)
@@ -86,6 +89,8 @@ src/movement.cpp
 src/SaveLoad.cpp
 src/Heritage.cpp
 src/Graph.cpp
+src/SDLEngine.cpp
+src/Image.cpp
 
 # Modular components
 ${VALIDATION_SOURCES}
@@ -101,6 +106,10 @@ ${OBSERVABILITY_SOURCES}
 target_link_libraries(app
     ${GLFW_DIR}/lib-mingw-w64/libglfw3.a
     gdi32
+    mingw32
+    SDL2main
+    SDL2
+    SDL2_image
 )
 
 # OpenGL linking (only if found)

@@ -6,11 +6,24 @@ import re
 import threading
 from datetime import datetime
 import glob
-from collections import defaultdict
+from collections import defaultdict, Counter
+from typing import Dict, List, Tuple, Set
 
 from ollama import ChatResponse, chat
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+# === CONFIGURATION FOR DATA REDUCTION ===
+MAX_LOG_ENTRIES_PER_CATEGORY = 500  # Cap logs per category
+SAMPLE_MOVEMENTS = True  # Only log 10% of movements
+AGGREGATE_ACTIONS = True  # Group similar actions
+TOP_ENTITIES_TO_CHART = 50  # Only chart top N most active entities
+SIGNIFICANT_EVENT_THRESHOLD = 0.7  # Only log events with impact > threshold
+MOVEMENT_SAMPLE_RATE = 0.1  # 10% sampling for movements
+ENABLE_AI_SUMMARY = False  # Disable by default to save time
+TICK_SAMPLING_ENABLED = True  # Enable tick sampling for long simulations
+TARGET_TICK_COUNT = 500  # Target number of ticks to display in charts
+# ========================================
 
 prompt = """
 Context:
@@ -701,12 +714,147 @@ def _extract_entity_ids_from_logs():
     return entity_ids
 
 
+# DEPRECATED: These are now defined at module level above
+# Kept for backward compatibility but will be removed in future versions
+
+def _should_keep_movement(line, counter):
+    """Sample movement logs to reduce data volume."""
+    if not SAMPLE_MOVEMENTS:
+        return True
+    # Keep every 10th movement log
+    return counter % 10 == 0
+
+
+def _aggregate_similar_actions(action_lines):
+    """Aggregate repetitive similar actions into summary entries."""
+    if not AGGREGATE_ACTIONS:
+        return action_lines
+
+    from collections import defaultdict
+    action_counts = defaultdict(list)
+
+    for line in action_lines:
+        # Extract action type from log line
+        m = re.search(r'\] (\w+):', line)
+        if m:
+            action_type = m.group(1)
+            action_counts[action_type].append(line)
+        else:
+            action_counts['other'].append(line)
+
+    result = []
+    for action_type, lines in action_counts.items():
+        if len(lines) > 10:
+            # Summarize repetitive actions
+            first_ts = re.search(r'\[([^\]]+)\]', lines[0])
+            last_ts = re.search(r'\[([^\]]+)\]', lines[-1])
+            summary = f"[{first_ts.group(1) if first_ts else 'N/A'}] {action_type} repeated {len(lines)} times"
+            if last_ts and last_ts.group(1) != first_ts.group(1):
+                summary += f" (last: {last_ts.group(1)})"
+            result.append(summary + "\n")
+        else:
+            result.extend(lines)
+
+    return result
+
+
+def _filter_significant_events(log_text, attr_names):
+    """Keep only events with significant attribute changes."""
+    if not log_text:
+        return log_text
+
+    lines = log_text.splitlines()
+    significant = []
+
+    for line in lines:
+        # Keep all deaths, births, relationships
+        if any(keyword in line.lower() for keyword in ['death', 'birth', 'relationship', 'couple']):
+            significant.append(line)
+            continue
+
+        # For other events, check if they contain significant changes
+        try:
+            # Look for numeric values in the line
+            numbers = re.findall(r'(\d+\.?\d*)%', line)
+            if numbers and any(float(n) > SIGNIFICANT_EVENT_THRESHOLD * 100 for n in numbers):
+                significant.append(line)
+        except:
+            significant.append(line)
+
+    return '\n'.join(significant[-MAX_LOG_ENTRIES_PER_CATEGORY:])
+
+
+def _filter_and_truncate_logs(raw_logs: Dict[str, List[str]]) -> Dict[str, str]:
+    """Apply filtering, sampling, and truncation to reduce log data volume."""
+    filtered_logs = {}
+
+    for key, lines in raw_logs.items():
+        # Remove empty lines first
+        lines = [line for line in lines if line.strip()]
+
+        # Apply type-specific filtering
+        if 'movement' in key:
+            # Heavy sampling for movements (keep only 10%)
+            if SAMPLE_MOVEMENTS and len(lines) > MAX_LOG_ENTRIES_PER_CATEGORY:
+                sample_rate = max(1, len(lines) // MAX_LOG_ENTRIES_PER_CATEGORY)
+                lines = [lines[i] for i in range(0, len(lines), sample_rate)]
+        elif 'action' in key:
+            # Aggregate similar actions
+            if AGGREGATE_ACTIONS and len(lines) > MAX_LOG_ENTRIES_PER_CATEGORY:
+                lines = _aggregate_similar_actions(lines)
+        elif 'event' in key or 'disease' in key:
+            # Filter for significant events only
+            lines_str = '\n'.join(lines)
+            attr_names = ["Antibody", "Boredom", "Anger", "Happiness", "Health",
+                         "Hygiene", "Loneliness", "Mental Health", "Stress"]
+            filtered_str = _filter_significant_events(lines_str, attr_names)
+            lines = filtered_str.splitlines() if filtered_str else []
+
+        # Truncate to max entries (always keep most recent)
+        if len(lines) > MAX_LOG_ENTRIES_PER_CATEGORY:
+            lines = lines[-MAX_LOG_ENTRIES_PER_CATEGORY:]
+
+        filtered_logs[key] = ''.join(lines)
+
+    return filtered_logs
+
+
+def _sample_ticks(ticks: List[int], target_count: int = TARGET_TICK_COUNT) -> Tuple[List[int], float]:
+    """Sample ticks to maintain a reasonable number for charting."""
+    if not TICK_SAMPLING_ENABLED or len(ticks) <= target_count:
+        return ticks, 1.0
+
+    sample_rate = len(ticks) / target_count
+    sampled_ticks = [ticks[i] for i in range(0, len(ticks), int(sample_rate))]
+
+    # Ensure we always have at least first and last tick
+    if ticks[-1] not in sampled_ticks:
+        sampled_ticks.append(ticks[-1])
+
+    return sampled_ticks, sample_rate
+
+
 def log_all():
-    """Main data processing function."""
+    """Main data processing function with aggressive data reduction."""
     # Load all log files
-    for key in ["deaths_log", "diseases_log", "actions_log", "movements_log", 
+    raw_logs = {}
+    for key in ["deaths_log", "diseases_log", "actions_log", "movements_log",
                 "births_log", "events_log", "relationships_log"]:
-        report_data[key] = safe_read(f"{key.replace('_log', '')}_log.txt")
+        filepath = f"{key.replace('_log', '')}_log.txt"
+        full_path = filepath if os.path.isabs(filepath) else os.path.join(BASE_DIR, filepath)
+        try:
+            with open(full_path, "r", encoding="utf-8") as f:
+                raw_logs[key] = f.readlines()
+        except Exception as e:
+            raw_logs[key] = []
+            print(f"⚠️  Could not read {filepath}: {e}")
+
+    # Apply filtering and sampling to reduce data volume
+    filtered_logs = _filter_and_truncate_logs(raw_logs)
+
+    # Update report data with filtered logs
+    for key, content in filtered_logs.items():
+        report_data[key] = content
 
     # Parse simulation timestamps
     start, end = _parse_timestamp_range(report_data["events_log"])
@@ -727,7 +875,7 @@ def log_all():
             with open(filepath, newline="", encoding="utf-8") as f:
                 reader = csv.reader(f)
                 header = next(reader, None)
-                
+
                 if header and any("action" in h.lower() for h in header):
                     action_col_idx = next((i for i, h in enumerate(header) if "action" in h.lower()), 0)
                     for row in reader:
@@ -750,7 +898,7 @@ def log_all():
     nodes = {}
     edges = []
     seen_edges = set()
-    
+
     for line in report_data["relationships_log"].splitlines():
         line = line.strip()
         if not line: continue
@@ -761,77 +909,96 @@ def log_all():
         if not m: continue
         timestamp, name1, id1, name2, id2, reltype, details = m.groups()
         id1, id2 = int(id1), int(id2)
-        
+
         nodes[id1] = name1.strip()
         nodes[id2] = name2.strip()
-        
+
         # Prevent duplicate edges
         edge_key = tuple(sorted([id1, id2]) + [reltype.strip()])
         if edge_key in seen_edges: continue
         seen_edges.add(edge_key)
-        
+
         title = f"{reltype.strip()}\n{timestamp}"
         if details: title += f"\n{details.strip()}"
         edges.append({"from": id1, "to": id2, "label": reltype.strip(), "title": title})
 
-    # ── FIXED: Attribute CSV parsing ──
+    # ── OPTIMIZED: Attribute CSV parsing with entity limiting ──
     attr_names = ["Antibody", "Boredom", "Anger", "Happiness", "Health",
                   "Hygiene", "Loneliness", "Mental Health", "Stress"]
-    
+
     ticks = []
     entity_data = defaultdict(lambda: {name: [] for name in attr_names})
     known_entity_ids = set()
-    
+    entity_activity = defaultdict(int)  # Track how active each entity is
+
     try:
-        # First pass: collect all unique entity IDs
-        for i in range(1000):
+        # First pass: collect all unique entity IDs and their activity levels
+        files_processed = 0
+        max_ticks_to_scan = 2000  # Increased limit for longer simulations
+        for i in range(max_ticks_to_scan):
             filepath = os.path.join(BASE_DIR, f"{i}.csv")
             if not os.path.exists(filepath): break
-            
+
+            files_processed += 1
             with open(filepath, newline="", encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile)
                 for row in reader:
                     if not _is_valid_row(row): continue
                     if row and row[0].strip().lstrip('-').isdigit():
-                        known_entity_ids.add(int(row[0].strip()))
-        
+                        eid = int(row[0].strip())
+                        known_entity_ids.add(eid)
+                        entity_activity[eid] += 1
+
         # Fallback to log parsing if no IDs found in CSVs
         if not known_entity_ids:
             known_entity_ids = _extract_entity_ids_from_logs()
-        
+
         # If still empty, use nodes from relationships as last resort
         if not known_entity_ids and nodes:
             known_entity_ids = set(nodes.keys())
-        
+
+        # LIMIT ENTITIES: Only keep top N most active entities for charting
+        if len(known_entity_ids) > TOP_ENTITIES_TO_CHART:
+            sorted_by_activity = sorted(entity_activity.items(), key=lambda x: x[1], reverse=True)
+            known_entity_ids = set(eid for eid, _ in sorted_by_activity[:TOP_ENTITIES_TO_CHART])
+            print(f"ℹ️  Limited charting to top {TOP_ENTITIES_TO_CHART} most active entities (out of {len(entity_activity)})")
+
         # Initialize data structures
         for eid in known_entity_ids:
             for name in attr_names:
                 entity_data[eid][name] = []
-        
-        # Second pass: populate attribute values
-        for i in range(1000):
+
+        # SAMPLE TICKS: Use adaptive sampling to maintain ~TARGET_TICK_COUNT points
+        tick_sample_rate = 1
+        if files_processed > TARGET_TICK_COUNT:
+            tick_sample_rate = max(1, files_processed // TARGET_TICK_COUNT)
+            print(f"ℹ️  Sampling ticks at rate 1:{tick_sample_rate} (processing {files_processed // tick_sample_rate} of {files_processed} ticks)")
+
+        # Second pass: populate attribute values with sampling
+        sampled_file_count = 0
+        for i in range(0, max_ticks_to_scan, tick_sample_rate):
             filepath = os.path.join(BASE_DIR, f"{i}.csv")
             if not os.path.exists(filepath): break
-            
+
             with open(filepath, newline="", encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile)
                 rows = [row for row in reader if _is_valid_row(row)]
-            
+
             if not rows: continue
             ticks.append(i)
-            
+            sampled_file_count += 1
+
             for row in rows:
                 if len(row) < 2: continue
                 try:
                     eid = int(row[0].strip())
                 except ValueError:
                     continue
-                
+
+                # Skip entities not in our limited set
                 if eid not in known_entity_ids:
-                    known_entity_ids.add(eid)
-                    for name in attr_names:
-                        entity_data[eid][name] = []
-                
+                    continue
+
                 for col_idx, attr_name in enumerate(attr_names):
                     col_idx += 1  # Skip entity ID column
                     if col_idx < len(row):
@@ -842,7 +1009,9 @@ def log_all():
                     else:
                         val = 0.0
                     entity_data[eid][attr_name].append(val)
-        
+
+        print(f"ℹ️  Processed {sampled_file_count} tick files for {len(known_entity_ids)} entities")
+
         # Pad missing values for entities that don't appear in all ticks
         for eid in known_entity_ids:
             for attr_name in attr_names:
@@ -850,19 +1019,19 @@ def log_all():
                 if len(values) < len(ticks):
                     last_val = values[-1] if values else 0.0
                     entity_data[eid][attr_name].extend([last_val] * (len(ticks) - len(values)))
-        
+
         # Reorganize for charting: attr_name -> [entity0_series, entity1_series, ...]
         clean_chart_data = {}
         sorted_entity_ids = sorted(known_entity_ids)
-        
+
         for attr_name in attr_names:
             clean_chart_data[attr_name] = [
                 entity_data[eid][attr_name] for eid in sorted_entity_ids
             ]
-        
+
         report_data["chart_ticks"] = json.dumps(ticks)
         report_data["chart_data"] = json.dumps(clean_chart_data)
-        
+
     except Exception as e:
         print(f"⚠️  Error parsing attribute CSVs: {e}")
         report_data["chart_ticks"] = "[]"
@@ -893,13 +1062,16 @@ def log_all():
     }, ensure_ascii=False, indent=2)
 
 
-# Run processing
+# Run processing with optional AI summary (disabled by default for speed)
 t1 = threading.Thread(target=log_all)
-# t2 = threading.Thread(target=log_logs)  # Uncomment to enable AI summary
-t1.start()
-# t2.start()
+if ENABLE_AI_SUMMARY:
+    t2 = threading.Thread(target=log_logs)
+    t1.start()
+    t2.start()
+    t2.join()
+else:
+    t1.start()
 t1.join()
-# t2.join()
 
 # Generate HTML report
 final_html = HTML_SHELL
@@ -938,7 +1110,6 @@ with open(output_path, "w", encoding="utf-8") as out:
     out.write(final_html)
 
 print(f"[ASHB2] Report generated → {output_path}")
-
 # Optional FTP upload
 try:
     session = ftplib.FTP("ftpupload.net", "if0_37377007", "bujsYxINZZBY4")

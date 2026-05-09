@@ -170,7 +170,7 @@ void FreeWillSystem::applyEnvironmentalEffects(Entity* entity, const Environment
         entity->entityHapiness -= crowdDiscomfort * 1.0f;
     }
 
-    // Clamp all stats
+    // Clamp all stats 
     entity->entityHapiness = std::max(0.0f, std::min(100.0f, entity->entityHapiness));
     entity->entityStress = std::max(0.0f, std::min(100.0f, entity->entityStress));
     entity->entityMentalHealth = std::max(0.0f, std::min(100.0f, entity->entityMentalHealth));

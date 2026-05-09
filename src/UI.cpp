@@ -32,10 +32,7 @@ int UI::showSaveLoadButtons(std::string& filename, int day, int num_entity, int 
     ImGui::Text("day: %d", day);
     ImGui::Text("actual tick: %d", tick);
     ImGui::Separator();
-    if (ImGui::Button("Create Entity")) {
-        //createPlayer()
-        ;
-    }
+
     if (ImGui::Button(simulationPaused ? "Resume Simulation" : "Stop Simulation")) {
         simulationPaused = !simulationPaused;
     }
@@ -93,7 +90,7 @@ void UI::showSystemInformation(){
     ImGui::End();
 }*/
 
-    void UI::ShowEntityWindow(Entity* entity, bool* p_open) {
+    void UI::ShowEntityWindow(Entity* entity, bool* p_open, std::vector<Entity*> entities) {
         if (!ImGui::Begin("=== Entity Statistics ===", p_open, ImGuiWindowFlags_NoCollapse)) {
             ImGui::End();
             return;
@@ -224,7 +221,7 @@ if (!entity->list_entityPointedDesire.empty()) {
     for (auto& d : entity->list_entityPointedDesire) {
         
         if (!d.pointedEntity) continue;
-        if(d.pointedEntity->entityHealth > 0.0f){
+        if(std::find(entities.begin(), entities.end(), d.pointedEntity) != entities.end()){ 
             
         ImGui::Text("  %s (#%d)", d.pointedEntity->name.c_str(), d.pointedEntity->entityId);
         ImGui::SameLine(160);
@@ -243,7 +240,7 @@ if (!entity->list_entityPointedAnger.empty()) {
     ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Anger (%d)", (int)entity->list_entityPointedAnger.size());
     for (auto& a : entity->list_entityPointedAnger) {
         if (!a.pointedEntity) continue;
-        if(a.pointedEntity->entityHealth > 0.0f){
+        if(std::find(entities.begin(), entities.end(), a.pointedEntity) != entities.end()){ 
             
         ImGui::Text("  %s (#%d)", a.pointedEntity->name.c_str(), a.pointedEntity->entityId);
         ImGui::SameLine(160);
@@ -262,7 +259,7 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::TextColored(ImVec4(0.2f, 0.9f, 0.9f, 1.0f), "Social bonds (%d)", (int)entity->list_entityPointedSocial.size());
         for (auto& s : entity->list_entityPointedSocial) {
             if (!s.pointedEntity) continue;
-            if(s.pointedEntity->entityHealth > 0.0f){
+            if(std::find(entities.begin(), entities.end(), s.pointedEntity) != entities.end()){ 
                 
             ImGui::Text("  %s (#%d)", s.pointedEntity->name.c_str(), s.pointedEntity->entityId);
             ImGui::SameLine(160);
@@ -281,8 +278,10 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "Partner");
         for (auto& c : entity->list_entityPointedCouple) {
             if (!c.pointedEntity) continue;
-            if(c.pointedEntity->entityHealth > 0.0f){
-            ImGui::Text("  Couple  %s (#%d)", c.pointedEntity->name.c_str(), c.pointedEntity->entityId);
+            if(std::find(entities.begin(), entities.end(), c.pointedEntity) != entities.end()){ 
+                if(c.pointedEntity->entityHealth > 0.0f){
+                    ImGui::Text("  Couple  %s (#%d)", c.pointedEntity->name.c_str(), c.pointedEntity->entityId);
+                }
             }
         }
         ImGui::Spacing();

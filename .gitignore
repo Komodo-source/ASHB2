@@ -60,6 +60,9 @@ CVS/
 .svn/
 .hg/
 
+src/data
+
+
 # Compressed files
 *.zip
 *.gz

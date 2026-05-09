@@ -1,3 +1,4 @@
+#include <SDL.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -26,6 +27,8 @@
 #include "./header/SaveLoad.h"
 #include "./header/heritage.h"
 #include "./header/Logging.h"
+#include "header/SDLEngine.h"
+#include "header/Image.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -601,11 +604,42 @@ void sync_clock_stats(Entity* ent, int neighboors){
     fs.chooseAction(ent);
 }
 
+void initialiseSDL(){
+    SDLEngine SDLEngine("ASHB2 DEBUG");
+    Image obj(SDLEngine, "assets/background.jpg");
+    
+    bool running = true;
+    SDL_Event event;
+    while (running)
+    {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            }
+        }
+
+        SDLEngine.initialiserRendu();
+        obj.dessiner(0,0);
+        SDLEngine.finaliserRendu();
+    }
+}
+
+int getRenderingChoice(){
+    std::cout << "Choose your rendering method(1 or 2)\n  1-Simple Dots representing entities (=more statistics, less beautiful) \n  2-Graphic rendering with character moving(=less statistics, more beautiful)\n>";
+    std::string input;
+    std::cin >> input;
+    if(input == "1"){
+        return 1;
+    }else{
+        return 2;
+    }
+}
 
 
 
-int main() {
-    std::cout << " \" I was meant to be perfect, ";
+
+int main(int argc, char* argv[]) {
+    std::cout << " \"I was meant to be perfect, ";
     std::cout << "I was meant to be beautiful\" \n\n";
    //// Initialize logger (this redirects std::cout to cmd_log.txt)
    Logger logger;
@@ -636,334 +670,342 @@ int main() {
     implementRegion();
     std::cout << "enter entity number (int : 40 is ok ): ";
     std::cin >> entity_num;
+    int renderingType = getRenderingChoice();
 
+    if(renderingType == 1){
+        srand(time(NULL));
+        if (!glfwInit()) return -1;
 
-    srand(time(NULL));
-    if (!glfwInit()) return -1;
+        const int height = 1050;
+        const int width = 1400;
 
+        GLFWwindow* window = glfwCreateWindow(width, height, "ASHB", NULL, NULL);
+        if (!window) {
+            glfwTerminate();
+            return -1;
+        }
+        glfwMakeContextCurrent(window);
 
-    const int height = 1050;
-    const int width = 1400;
+        // Initialize ImGui
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init("#version 130");
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "ASHB2 TEST", nullptr, nullptr);
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+        glfwSwapInterval(1);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImPlot::CreateContext();
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+        UI instanceUI;
 
-    UI instanceUI;
+        std::vector<Entity> entities;
+        entities.reserve(2048);
+        int count = 0;
+        for (int y = 0; y < 1; ++y){
+            for (int x = 0; x < entity_num; ++x){
+                Entity entity = Entity(
+                    count, 15.0f, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
+                    , BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 20.0f),
+                    BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness");
 
-    //vector of Entity with positions
-    std::vector<Entity> entities;
-    entities.reserve(2048); // prevent reallocation — pointedEntity pointers would dangle
-    int count = 0;
-    for (int y = 0; y < 1; ++y){
-        for (int x = 0; x < entity_num; ++x){
-            Entity entity = Entity(
-                count, 15.0f, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
-                , BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 20.0f),
-                BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness");
+                entity.posX = BetterRand::genNrInInterval(10, width - 10);
+                entity.posY = BetterRand::genNrInInterval(10, height - 10);;
+                entity.selected = false;
+                Heritage::UnlinkedNode(&entity);
 
-            entity.posX = BetterRand::genNrInInterval(10, width - 10);
-            entity.posY = BetterRand::genNrInInterval(10, height - 10);;
-            entity.selected = false;
-            Heritage::UnlinkedNode(&entity);
+                // --- Personality (Big Five, already randomized) ---
+                entity.personality = generateRandomPersonality();
 
-            // --- Personality (Big Five, already randomized) ---
-            entity.personality = generateRandomPersonality();
+                // --- ValueSystem: the "soul" — what this person cares about ---
+                // Each value is correlated with personality for realism
+                std::mt19937 rng_spawn(std::random_device{}());
+                std::normal_distribution<float> vd(50.0f, 18.0f);
+                auto vc = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
 
-            // --- ValueSystem: the "soul" — what this person cares about ---
-            // Each value is correlated with personality for realism
-            std::mt19937 rng_spawn(std::random_device{}());
-            std::normal_distribution<float> vd(50.0f, 18.0f);
-            auto vc = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
+                entity.ValueSystem.familyOrientation  = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.3f);
+                entity.ValueSystem.achievementDrive   = vc(vd(rng_spawn) + (entity.personality.conscientiousness - 50.0f) * 0.4f);
+                entity.ValueSystem.spiritualNeed      = vc(vd(rng_spawn) - (entity.personality.openness - 50.0f) * 0.2f);
+                entity.ValueSystem.hedonism           = vc(vd(rng_spawn) + (entity.personality.extraversion - 50.0f) * 0.3f - (entity.personality.conscientiousness - 50.0f) * 0.2f);
+                entity.ValueSystem.collectivism       = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.35f - (entity.personality.openness - 50.0f) * 0.1f);
 
-            entity.ValueSystem.familyOrientation  = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.3f);
-            entity.ValueSystem.achievementDrive   = vc(vd(rng_spawn) + (entity.personality.conscientiousness - 50.0f) * 0.4f);
-            entity.ValueSystem.spiritualNeed      = vc(vd(rng_spawn) - (entity.personality.openness - 50.0f) * 0.2f);
-            entity.ValueSystem.hedonism           = vc(vd(rng_spawn) + (entity.personality.extraversion - 50.0f) * 0.3f - (entity.personality.conscientiousness - 50.0f) * 0.2f);
-            entity.ValueSystem.collectivism       = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.35f - (entity.personality.openness - 50.0f) * 0.1f);
+                // --- Developmental History: childhood shapes the adult ---
+                float traumaRoll   = vc(static_cast<float>(BetterRand::genNrInInterval(0, 50)));
+                float nurtureRoll  = vc(100.0f - traumaRoll + static_cast<float>(BetterRand::genNrInInterval(-20, 20)));
+                entity.dv.childhoodTraumaScore    = traumaRoll;
+                entity.dv.childhoodNurturingScore = nurtureRoll;
+                entity.dv.hadSecureAttachment     = (traumaRoll < 20.0f && nurtureRoll > 55.0f);
 
-            // --- Developmental History: childhood shapes the adult ---
-            float traumaRoll   = vc(static_cast<float>(BetterRand::genNrInInterval(0, 50)));
-            float nurtureRoll  = vc(100.0f - traumaRoll + static_cast<float>(BetterRand::genNrInInterval(-20, 20)));
-            entity.dv.childhoodTraumaScore    = traumaRoll;
-            entity.dv.childhoodNurturingScore = nurtureRoll;
-            entity.dv.hadSecureAttachment     = (traumaRoll < 20.0f && nurtureRoll > 55.0f);
+                // Attachment style derived from childhood
+                if (traumaRoll < 20.0f && nurtureRoll > 60.0f)
+                    entity.dv.attachmentStyle = SECURE;
+                else if (traumaRoll > 55.0f)
+                    entity.dv.attachmentStyle = (nurtureRoll < 30.0f) ? DISORGANIZED : ANXIOUS;
+                else if (traumaRoll > 30.0f && nurtureRoll < 40.0f)
+                    entity.dv.attachmentStyle = AVOIDANT;
+                else
+                    entity.dv.attachmentStyle = ANXIOUS;
 
-            // Attachment style derived from childhood
-            if (traumaRoll < 20.0f && nurtureRoll > 60.0f)
-                entity.dv.attachmentStyle = SECURE;
-            else if (traumaRoll > 55.0f)
-                entity.dv.attachmentStyle = (nurtureRoll < 30.0f) ? DISORGANIZED : ANXIOUS;
-            else if (traumaRoll > 30.0f && nurtureRoll < 40.0f)
-                entity.dv.attachmentStyle = AVOIDANT;
-            else
-                entity.dv.attachmentStyle = ANXIOUS;
+                // Childhood permanently shifts personality at spawn (replicate finalizeChildhood effect)
+                entity.personality.neuroticism    = vc(entity.personality.neuroticism    + traumaRoll  * 0.25f);
+                entity.personality.agreeableness  = vc(entity.personality.agreeableness  - traumaRoll  * 0.15f + nurtureRoll * 0.12f);
+                entity.personality.extraversion   = vc(entity.personality.extraversion   - traumaRoll  * 0.10f + nurtureRoll * 0.10f);
+                entity.personality.openness       = vc(entity.personality.openness       + nurtureRoll * 0.15f);
 
-            // Childhood permanently shifts personality at spawn (replicate finalizeChildhood effect)
-            entity.personality.neuroticism    = vc(entity.personality.neuroticism    + traumaRoll  * 0.25f);
-            entity.personality.agreeableness  = vc(entity.personality.agreeableness  - traumaRoll  * 0.15f + nurtureRoll * 0.12f);
-            entity.personality.extraversion   = vc(entity.personality.extraversion   - traumaRoll  * 0.10f + nurtureRoll * 0.10f);
-            entity.personality.openness       = vc(entity.personality.openness       + nurtureRoll * 0.15f);
+                // --- Starting emotional stats: no two people start at zero ---
+                // Neuroticism → more stress; conscientiousness → better hygiene; extraversion → less loneliness
+                entity.entityStress       = vc(static_cast<float>(BetterRand::genNrInInterval(5, 30))
+                                            + (entity.personality.neuroticism - 50.0f) * 0.25f
+                                            + traumaRoll * 0.15f);
+                entity.entityHygiene      = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
+                                            + (entity.personality.conscientiousness - 50.0f) * 0.20f);
+                entity.entityLoneliness   = vc(static_cast<float>(BetterRand::genNrInInterval(5, 45))
+                                            - (entity.personality.extraversion - 50.0f) * 0.25f
+                                            + traumaRoll * 0.10f);
+                entity.entityBoredom      = vc(static_cast<float>(BetterRand::genNrInInterval(10, 50))
+                                            + (entity.personality.openness - 50.0f) * 0.15f);
+                entity.entityGeneralAnger = vc(static_cast<float>(BetterRand::genNrInInterval(0, 25))
+                                            + traumaRoll * 0.12f
+                                            - (entity.personality.agreeableness - 50.0f) * 0.20f);
+                entity.entityHapiness     = vc(static_cast<float>(BetterRand::genNrInInterval(30, 72))
+                                            - traumaRoll * 0.15f
+                                            + nurtureRoll * 0.10f
+                                            + (entity.personality.extraversion - 50.0f) * 0.10f);
+                entity.entityMentalHealth = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
+                                            - traumaRoll * 0.20f
+                                            + nurtureRoll * 0.08f);
+                entity.entityHealth       = vc(static_cast<float>(BetterRand::genNrInInterval(70, 100)));
 
-            // --- Starting emotional stats: no two people start at zero ---
-            // Neuroticism → more stress; conscientiousness → better hygiene; extraversion → less loneliness
-            entity.entityStress       = vc(static_cast<float>(BetterRand::genNrInInterval(5, 30))
-                                          + (entity.personality.neuroticism - 50.0f) * 0.25f
-                                          + traumaRoll * 0.15f);
-            entity.entityHygiene      = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
-                                          + (entity.personality.conscientiousness - 50.0f) * 0.20f);
-            entity.entityLoneliness   = vc(static_cast<float>(BetterRand::genNrInInterval(5, 45))
-                                          - (entity.personality.extraversion - 50.0f) * 0.25f
-                                          + traumaRoll * 0.10f);
-            entity.entityBoredom      = vc(static_cast<float>(BetterRand::genNrInInterval(10, 50))
-                                          + (entity.personality.openness - 50.0f) * 0.15f);
-            entity.entityGeneralAnger = vc(static_cast<float>(BetterRand::genNrInInterval(0, 25))
-                                          + traumaRoll * 0.12f
-                                          - (entity.personality.agreeableness - 50.0f) * 0.20f);
-            entity.entityHapiness     = vc(static_cast<float>(BetterRand::genNrInInterval(30, 72))
-                                          - traumaRoll * 0.15f
-                                          + nurtureRoll * 0.10f
-                                          + (entity.personality.extraversion - 50.0f) * 0.10f);
-            entity.entityMentalHealth = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
-                                          - traumaRoll * 0.20f
-                                          + nurtureRoll * 0.08f);
-            entity.entityHealth       = vc(static_cast<float>(BetterRand::genNrInInterval(70, 100)));
+                // --- Life goals: seeded by values and personality ---
+                {
+                    // Clear the default goal and assign based on dominant value
+                    entity.m_goals.clear();
+                    struct GoalSeed { std::string type; float weight; };
+                    std::vector<GoalSeed> seeds = {
+                        {"find_partner",  entity.ValueSystem.familyOrientation},
+                        {"build_career",  entity.ValueSystem.achievementDrive},
+                        {"make_friends",  entity.ValueSystem.collectivism},
+                        {"happiness",     entity.ValueSystem.hedonism},
+                        {"self",          entity.ValueSystem.spiritualNeed}
+                    };
+                    // Primary goal = highest value
+                    auto best = std::max_element(seeds.begin(), seeds.end(),
+                        [](const GoalSeed& a, const GoalSeed& b){ return a.weight < b.weight; });
+                    LifeGoal primary;
+                    primary.type = best->type;
+                    primary.priority = 100.0f;
+                    primary.progressToward = 0.0f;
+                    primary.frustrationLevel = 0.0f;
+                    primary.ticksSinceProgress = 0;
+                    entity.m_goals.push_back(primary);
 
-            // --- Life goals: seeded by values and personality ---
-            {
-                // Clear the default goal and assign based on dominant value
-                entity.m_goals.clear();
-                struct GoalSeed { std::string type; float weight; };
-                std::vector<GoalSeed> seeds = {
-                    {"find_partner",  entity.ValueSystem.familyOrientation},
-                    {"build_career",  entity.ValueSystem.achievementDrive},
-                    {"make_friends",  entity.ValueSystem.collectivism},
-                    {"happiness",     entity.ValueSystem.hedonism},
-                    {"self",          entity.ValueSystem.spiritualNeed}
-                };
-                // Primary goal = highest value
-                auto best = std::max_element(seeds.begin(), seeds.end(),
-                    [](const GoalSeed& a, const GoalSeed& b){ return a.weight < b.weight; });
-                LifeGoal primary;
-                primary.type = best->type;
-                primary.priority = 100.0f;
-                primary.progressToward = 0.0f;
-                primary.frustrationLevel = 0.0f;
-                primary.ticksSinceProgress = 0;
-                entity.m_goals.push_back(primary);
-
-                // Secondary goal: random from remaining if value > 35
-                for (auto& s : seeds) {
-                    if (s.type != best->type && s.weight > 35.0f && entity.m_goals.size() < 3) {
-                        LifeGoal sec;
-                        sec.type = s.type;
-                        sec.priority = s.weight * 0.6f;
-                        sec.progressToward = 0.0f;
-                        sec.frustrationLevel = 0.0f;
-                        sec.ticksSinceProgress = 0;
-                        entity.m_goals.push_back(sec);
+                    // Secondary goal: random from remaining if value > 35
+                    for (auto& s : seeds) {
+                        if (s.type != best->type && s.weight > 35.0f && entity.m_goals.size() < 3) {
+                            LifeGoal sec;
+                            sec.type = s.type;
+                            sec.priority = s.weight * 0.6f;
+                            sec.progressToward = 0.0f;
+                            sec.frustrationLevel = 0.0f;
+                            sec.ticksSinceProgress = 0;
+                            entity.m_goals.push_back(sec);
+                        }
                     }
                 }
-            }
 
-            std::stringstream ss;
-            ss << "Entity " << count
-               << " | Personality E=" << (int)entity.personality.extraversion
-               << " A=" << (int)entity.personality.agreeableness
-               << " C=" << (int)entity.personality.conscientiousness
-               << " N=" << (int)entity.personality.neuroticism
-               << " O=" << (int)entity.personality.openness
-               << " | Values Fam=" << (int)entity.ValueSystem.familyOrientation
-               << " Ach=" << (int)entity.ValueSystem.achievementDrive
-               << " Hed=" << (int)entity.ValueSystem.hedonism
-               << " Col=" << (int)entity.ValueSystem.collectivism
-               << " Spi=" << (int)entity.ValueSystem.spiritualNeed
-               << " | Attachment=" << entity.dv.attachmentStyle
-               << " Trauma=" << (int)entity.dv.childhoodTraumaScore
-               << " Nurture=" << (int)entity.dv.childhoodNurturingScore
-               << " | Start: Happy=" << (int)entity.entityHapiness
-               << " Stress=" << (int)entity.entityStress
-               << " Lonely=" << (int)entity.entityLoneliness
-               << " Goal=" << entity.m_goals[0].type;
-            globalLogger->logCmd(ss.str());
-            entities.push_back(entity);
-            count++;
-        }
-    }
-
-    static bool showEntityWindow = false;
-    static int selectedEntityIndex = -1;
-    std::vector<Entity*> ent_quad;
-    for(int i=0; i<entities.size(); i++){
-        ent_quad.push_back(&entities[i]);
-    }
-
-    std::vector<std::vector<Entity*>> close_entity_together = separationQuad(ent_quad, width, height);
-
-    // ici on applique l'algorithme pour modification stats
-    // Note: For now, we'll run this in the main loop instead of a separate thread
-    // to avoid threading complexity with the UI
-    // std::thread statistics(applyFreeWill, std::ref(close_entity_together));
-
-    int frameCounter = 0;
-    int day = FreeWillSystem::day;
-
-    const int UPDATE_FREQUENCY = 60; // Update free will every 60 frames
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        //Birthday,
-        // une année = 100 jours
-        if((day / 60)  % 100 == 1){
-            for(Entity& ent : entities){
-                ent.IncrementBDay();
+                std::stringstream ss;
+                ss << "Entity " << count
+                << " | Personality E=" << (int)entity.personality.extraversion
+                << " A=" << (int)entity.personality.agreeableness
+                << " C=" << (int)entity.personality.conscientiousness
+                << " N=" << (int)entity.personality.neuroticism
+                << " O=" << (int)entity.personality.openness
+                << " | Values Fam=" << (int)entity.ValueSystem.familyOrientation
+                << " Ach=" << (int)entity.ValueSystem.achievementDrive
+                << " Hed=" << (int)entity.ValueSystem.hedonism
+                << " Col=" << (int)entity.ValueSystem.collectivism
+                << " Spi=" << (int)entity.ValueSystem.spiritualNeed
+                << " | Attachment=" << entity.dv.attachmentStyle
+                << " Trauma=" << (int)entity.dv.childhoodTraumaScore
+                << " Nurture=" << (int)entity.dv.childhoodNurturingScore
+                << " | Start: Happy=" << (int)entity.entityHapiness
+                << " Stress=" << (int)entity.entityStress
+                << " Lonely=" << (int)entity.entityLoneliness
+                << " Goal=" << entity.m_goals[0].type;
+                globalLogger->logCmd(ss.str());
+                entities.push_back(entity);
+                count++;
             }
         }
 
-        // Check for dead entities and remove them
-        for(int i = entities.size() - 1; i >= 0; i--){
-            if(entities[i].entityHealth <= 0.0f){
-                std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
-                //globalLogger->logDeath(entities[i].getId(), entities[i].getName(), entities[i].entityAge, "health depletion");
-
-                entities.erase(entities.begin() + i);
-
-                // Rebuild ent_quad pointer vector
-                ent_quad.clear();
-                for(int j = 0; j < entities.size(); j++){
-                    ent_quad.push_back(&entities[j]);
-                }
-
-                // Reset selected entity if it was removed
-                if(selectedEntityIndex == i){
-                    showEntityWindow = false;
-                    selectedEntityIndex = -1;
-                } else if(selectedEntityIndex > i){
-                    selectedEntityIndex--;
-                }
-            }
+        static bool showEntityWindow = false;
+        static int selectedEntityIndex = -1;
+        std::vector<Entity*> ent_quad;
+        for(int i=0; i<entities.size(); i++){
+            ent_quad.push_back(&entities[i]);
         }
 
-        // Update free will system periodically (only when not paused)
-        if (!instanceUI.isSimulationPaused()) {
-            frameCounter++;
-            if(frameCounter >= UPDATE_FREQUENCY){
-                frameCounter = 0;
+        std::vector<std::vector<Entity*>> close_entity_together = separationQuad(ent_quad, width, height);
 
-                // Recalculate entity groups based on current positions
-                close_entity_together = separationQuad(ent_quad, width, height);
+        // ici on applique l'algorithme pour modification stats
+        // Note: For now, we'll run this in the main loop instead of a separate thread
+        // to avoid threading complexity with the UI
+        // std::thread statistics(applyFreeWill, std::ref(close_entity_together));
 
-                // Apply free will to all entity groups with current day for context
-                std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
-                applyFreeWill(close_entity_together, day);
-                std::vector<Entity> new_borns = get_new_borns();
-                for(Entity ent: new_borns){
-                    entities.push_back(ent);
+        int frameCounter = 0;
+        int day = FreeWillSystem::day;
+
+        const int UPDATE_FREQUENCY = 60; // Update free will every 60 frames
+
+        while (!glfwWindowShouldClose(window)) {
+            glfwPollEvents();
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            //Birthday,
+            // une année = 100 jours
+            if((day / 60)  % 100 == 1){
+                for(Entity& ent : entities){
+                    ent.IncrementBDay();
                 }
-                FreeWillSystem::clear_new_borns();
+            }
 
-                // Rebuild ent_quad so new entities appear on map and pointers are fresh
-                if (!new_borns.empty()) {
+            // Check for dead entities and remove them
+            for(int i = entities.size() - 1; i >= 0; i--){
+                if(entities[i].entityHealth <= 0.0f){
+                    std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
+                    //globalLogger->logDeath(entities[i].getId(), entities[i].getName(), entities[i].entityAge, "health depletion");
+
+                    entities.erase(entities.begin() + i);
+
+                    // Rebuild ent_quad pointer vector
                     ent_quad.clear();
-                    for(int j = 0; j < (int)entities.size(); j++){
+                    for(int j = 0; j < entities.size(); j++){
                         ent_quad.push_back(&entities[j]);
                     }
-                    // Repair all pointedEntity pointers — they point into entities[] which may
-                    // have reallocated. Re-resolve by matching stored entity IDs.
-                    for(Entity& e : entities){
-                        for(auto& d : e.list_entityPointedDesire){
-                            if(d.pointedEntity){
-                                int id = d.pointedEntity->entityId;
-                                for(Entity& other : entities)
-                                    if(other.entityId == id){ d.pointedEntity = &other; break; }
-                            }
+
+                    // Reset selected entity if it was removed
+                    if(selectedEntityIndex == i){
+                        showEntityWindow = false;
+                        selectedEntityIndex = -1;
+                    } else if(selectedEntityIndex > i){
+                        selectedEntityIndex--;
+                    }
+                }
+            }
+
+            // Update free will system periodically (only when not paused)
+            if (!instanceUI.isSimulationPaused()) {
+                frameCounter++;
+                if(frameCounter >= UPDATE_FREQUENCY){
+                    frameCounter = 0;
+
+                    // Recalculate entity groups based on current positions
+                    close_entity_together = separationQuad(ent_quad, width, height);
+
+                    // Apply free will to all entity groups with current day for context
+                    std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
+                    applyFreeWill(close_entity_together, day);
+                    std::vector<Entity> new_borns = get_new_borns();
+                    for(Entity ent: new_borns){
+                        entities.push_back(ent);
+                    }
+                    FreeWillSystem::clear_new_borns();
+
+                    // Rebuild ent_quad so new entities appear on map and pointers are fresh
+                    if (!new_borns.empty()) {
+                        ent_quad.clear();
+                        for(int j = 0; j < (int)entities.size(); j++){
+                            ent_quad.push_back(&entities[j]);
                         }
-                        for(auto& a : e.list_entityPointedAnger){
-                            if(a.pointedEntity){
-                                int id = a.pointedEntity->entityId;
-                                for(Entity& other : entities)
-                                    if(other.entityId == id){ a.pointedEntity = &other; break; }
+                        // Repair all pointedEntity pointers — they point into entities[] which may
+                        // have reallocated. Re-resolve by matching stored entity IDs.
+                        for(Entity& e : entities){
+                            for(auto& d : e.list_entityPointedDesire){
+                                if(d.pointedEntity){
+                                    int id = d.pointedEntity->entityId;
+                                    for(Entity& other : entities)
+                                        if(other.entityId == id){ d.pointedEntity = &other; break; }
+                                }
                             }
-                        }
-                        for(auto& s : e.list_entityPointedSocial){
-                            if(s.pointedEntity){
-                                int id = s.pointedEntity->entityId;
-                                for(Entity& other : entities)
-                                    if(other.entityId == id){ s.pointedEntity = &other; break; }
+                            for(auto& a : e.list_entityPointedAnger){
+                                if(a.pointedEntity){
+                                    int id = a.pointedEntity->entityId;
+                                    for(Entity& other : entities)
+                                        if(other.entityId == id){ a.pointedEntity = &other; break; }
+                                }
                             }
-                        }
-                        for(auto& c : e.list_entityPointedCouple){
-                            if(c.pointedEntity){
-                                int id = c.pointedEntity->entityId;
-                                for(Entity& other : entities)
-                                    if(other.entityId == id){ c.pointedEntity = &other; break; }
+                            for(auto& s : e.list_entityPointedSocial){
+                                if(s.pointedEntity){
+                                    int id = s.pointedEntity->entityId;
+                                    for(Entity& other : entities)
+                                        if(other.entityId == id){ s.pointedEntity = &other; break; }
+                                }
+                            }
+                            for(auto& c : e.list_entityPointedCouple){
+                                if(c.pointedEntity){
+                                    int id = c.pointedEntity->entityId;
+                                    for(Entity& other : entities)
+                                        if(other.entityId == id){ c.pointedEntity = &other; break; }
+                                }
                             }
                         }
                     }
+
+                    // Export current state to JSON lines for HTML viewer
+                    exportTickHistory("./src/data/tick_history.jsonl", entities, day);
+
                 }
+            }
 
-                // Export current state to JSON lines for HTML viewer
-                exportTickHistory("./src/data/tick_history.jsonl", entities, day);
+            std::string saveFilename;
+            int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename, day / 60 , entities.size(), UPDATE_FREQUENCY, {});
+            if (saveLoadAction == 1) {
+                saveGame(saveFilename, entities, day, frameCounter);
+            } else if (saveLoadAction == 2) {
+                if (loadGame(saveFilename, entities, day, frameCounter)) {
+                    // Rebuild pointer vectors after loading
+                    ent_quad.clear();
+                    for (int j = 0; j < (int)entities.size(); j++) {
+                        ent_quad.push_back(&entities[j]);
+                    }
+                    close_entity_together = separationQuad(ent_quad, width, height);
+                    showEntityWindow = false;
+                    selectedEntityIndex = -1;
+                }
+            }
 
+            int moved_entity = instanceUI.HandlePointMovement(ent_quad);
+            if (moved_entity != -1) {
+                selectedEntityIndex = moved_entity;
+                showEntityWindow = true;
+            }
+
+            if (showEntityWindow && selectedEntityIndex >= 0 && selectedEntityIndex < entities.size()) {
+                instanceUI.ShowEntityWindow(&entities.at(selectedEntityIndex), &showEntityWindow, ent_quad);
+            }
+
+            instanceUI.DrawGrid(ent_quad);
+
+            ImGui::Render();
+            int display_w, display_h;
+            glfwGetFramebufferSize(window, &display_w, &display_h);
+            glViewport(0, 0, display_w, display_h);
+            glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            glfwSwapBuffers(window);
+            if (!instanceUI.isSimulationPaused()) {
+                day++;
             }
         }
 
-        std::string saveFilename;
-        int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename, day / 60 , entities.size(), UPDATE_FREQUENCY, {});
-        if (saveLoadAction == 1) {
-            saveGame(saveFilename, entities, day, frameCounter);
-        } else if (saveLoadAction == 2) {
-            if (loadGame(saveFilename, entities, day, frameCounter)) {
-                // Rebuild pointer vectors after loading
-                ent_quad.clear();
-                for (int j = 0; j < (int)entities.size(); j++) {
-                    ent_quad.push_back(&entities[j]);
-                }
-                close_entity_together = separationQuad(ent_quad, width, height);
-                showEntityWindow = false;
-                selectedEntityIndex = -1;
-            }
-        }
-
-        int moved_entity = instanceUI.HandlePointMovement(ent_quad);
-        if (moved_entity != -1) {
-            selectedEntityIndex = moved_entity;
-            showEntityWindow = true;
-        }
-
-        if (showEntityWindow && selectedEntityIndex >= 0 && selectedEntityIndex < entities.size()) {
-            instanceUI.ShowEntityWindow(&entities.at(selectedEntityIndex), &showEntityWindow);
-        }
-
-        instanceUI.DrawGrid(ent_quad);
-
-        ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        glfwSwapBuffers(window);
-        if (!instanceUI.isSimulationPaused()) {
-            day++;
-        }
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        glfwTerminate();
+    }else{// sdl rendering
+        initialiseSDL();
     }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-    glfwTerminate();
     return 0;
 }
