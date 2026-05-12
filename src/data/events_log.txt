@@ -1,0 +1,13 @@
+[2026-05-12 12:07:00] breeding: Reproduction between Stella and Yahir
+[2026-05-12 12:07:28] breeding: Reproduction between Selah and Sammy
+[2026-05-12 12:07:50] breeding: Reproduction between Sammy and Selah
+[2026-05-12 12:07:55] breeding: Reproduction between Sammy and Selah
+[2026-05-12 12:08:05] breeding: Reproduction between Campbell and Yahir
+[2026-05-12 12:08:09] breeding: Reproduction between Yahir and Campbell
+[2026-05-12 12:09:58] breeding: Reproduction between Marques and Hadley
+[2026-05-12 12:11:31] breeding: Reproduction between Kamila and Selah
+[2026-05-12 12:17:01] breeding: Reproduction between Kamila and Campbell
+[2026-05-12 12:17:47] breeding: Reproduction between Kamila and Campbell
+[2026-05-12 12:21:43] breeding: Reproduction between Yahir and Stella
+[2026-05-12 12:22:38] breeding: Reproduction between Yahir and Makaila
+[2026-05-12 12:23:16] breeding: Reproduction between Campbell and Yahir

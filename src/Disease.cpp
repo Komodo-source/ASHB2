@@ -45,11 +45,11 @@ int Disease::region;
   }
 
   int Disease::calculateDisease(int neighboorsSize, Entity* ent, int nbSickClose){
-    int ranchoice = BetterRand::genNrInInterval(0,4);
+    int ranchoice = BetterRand::genNrInInterval(0,2);
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
       if (ent->entityAntiBody < 60 || ent->entityDiseaseType != -1){ //a déja une maladie
-        if(hygiene - (ranchoice * region) - neighboorsSize - (1.15 * nbSickClose) + (2.3 * ent->entityAntiBody) < 0){
+        if(hygiene - (ranchoice * region) - neighboorsSize - (1.09 * nbSickClose) + (2.5 * ent->entityAntiBody) < 0){
           return diseasePicked;
         }else{
           return -1;
@@ -60,10 +60,10 @@ int Disease::region;
 
   void Disease::manageSickness(Entity* ent){
     // guerison
-    ent->entityHealth -= ent->entityDiseaseType * 1.15;
+    ent->entityHealth -= ent->entityDiseaseType * 1.09;
     ent->entityHygiene -= ent->entityDiseaseType * 1.3;
-    ent->entityAntiBody += BetterRand::genNrInInterval(6, 19);
-    if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 20) > 90){
+    ent->entityAntiBody += BetterRand::genNrInInterval(3, 14);
+    if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 10) > 90){
       std::string dName = Disease::getDiseaseName(ent->entityDiseaseType);
       std::cout << "## " <<ent->getName() + " was cured from " + dName << " ##"<< std::endl;
       //we give a solid base of antibody to make him avoid getting sick again

@@ -157,7 +157,10 @@ void UI::showSystemInformation(){
         }
 
         if (showDetailedInfo) {
-            std::vector<std::string> labels = {
+            ImPlot::CreateContext();
+            try
+            {
+                std::vector<std::string> labels = {
                 "Anti Body", "Boredom", "Anger", "Happiness",
                 "Health", "Hygiene", "Loneliness", "Mental Health", "Stress"
             };
@@ -200,6 +203,14 @@ void UI::showSystemInformation(){
                 }
                 ImPlot::EndPlot();
             }
+
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+
+
         }
         ImGui::Separator();
         if(entity->entityDiseaseType == -1){
@@ -219,10 +230,10 @@ void UI::showSystemInformation(){
 if (!entity->list_entityPointedDesire.empty()) {
     ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.7f, 1.0f), "Desire (%d)", (int)entity->list_entityPointedDesire.size());
     for (auto& d : entity->list_entityPointedDesire) {
-        
+
         if (!d.pointedEntity) continue;
-        if(std::find(entities.begin(), entities.end(), d.pointedEntity) != entities.end()){ 
-            
+        if(std::find(entities.begin(), entities.end(), d.pointedEntity) != entities.end()){
+
         ImGui::Text("  %s (#%d)", d.pointedEntity->name.c_str(), d.pointedEntity->entityId);
         ImGui::SameLine(160);
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.4f, 0.7f, 0.85f));
@@ -240,8 +251,8 @@ if (!entity->list_entityPointedAnger.empty()) {
     ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Anger (%d)", (int)entity->list_entityPointedAnger.size());
     for (auto& a : entity->list_entityPointedAnger) {
         if (!a.pointedEntity) continue;
-        if(std::find(entities.begin(), entities.end(), a.pointedEntity) != entities.end()){ 
-            
+        if(std::find(entities.begin(), entities.end(), a.pointedEntity) != entities.end()){
+
         ImGui::Text("  %s (#%d)", a.pointedEntity->name.c_str(), a.pointedEntity->entityId);
         ImGui::SameLine(160);
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.2f, 0.2f, 0.85f));
@@ -259,8 +270,8 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::TextColored(ImVec4(0.2f, 0.9f, 0.9f, 1.0f), "Social bonds (%d)", (int)entity->list_entityPointedSocial.size());
         for (auto& s : entity->list_entityPointedSocial) {
             if (!s.pointedEntity) continue;
-            if(std::find(entities.begin(), entities.end(), s.pointedEntity) != entities.end()){ 
-                
+            if(std::find(entities.begin(), entities.end(), s.pointedEntity) != entities.end()){
+
             ImGui::Text("  %s (#%d)", s.pointedEntity->name.c_str(), s.pointedEntity->entityId);
             ImGui::SameLine(160);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.9f, 0.9f, 0.85f));
@@ -278,7 +289,7 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "Partner");
         for (auto& c : entity->list_entityPointedCouple) {
             if (!c.pointedEntity) continue;
-            if(std::find(entities.begin(), entities.end(), c.pointedEntity) != entities.end()){ 
+            if(std::find(entities.begin(), entities.end(), c.pointedEntity) != entities.end()){
                 if(c.pointedEntity->entityHealth > 0.0f){
                     ImGui::Text("  Couple  %s (#%d)", c.pointedEntity->name.c_str(), c.pointedEntity->entityId);
                 }

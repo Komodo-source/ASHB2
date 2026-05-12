@@ -1,0 +1,1277 @@
+[2026-05-12 11:56:59] Entity 0 (Selah) contracted Fever
+[2026-05-12 11:56:59] Entity 3 (Marques) contracted Plague
+[2026-05-12 11:56:59] Entity 16 (Kamila) contracted Plague
+[2026-05-12 11:56:59] Entity 20 (Griffin) contracted Plague
+[2026-05-12 11:56:59] Entity 15 (Marques) contracted Malaria
+[2026-05-12 11:56:59] Entity 29 (Jazlynn) contracted Malaria
+[2026-05-12 11:56:59] Entity 17 (Kamila) contracted Malaria
+[2026-05-12 11:56:59] Entity 11 (Hadley) contracted Fever
+[2026-05-12 11:56:59] Entity 7 (Bethany) contracted Plague
+[2026-05-12 11:56:59] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:56:59] Entity 36 (Rayan) contracted Plague
+[2026-05-12 11:56:59] Entity 31 (Mckinley) contracted Plague
+[2026-05-12 11:57:00] Entity 3 (Marques) contracted Fever
+[2026-05-12 11:57:00] Entity 25 (Makaila) contracted Fever
+[2026-05-12 11:57:00] Entity 16 (Kamila) contracted Fever
+[2026-05-12 11:57:00] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 11:57:00] Entity 1 (Selah) contracted Malaria
+[2026-05-12 11:57:00] Entity 23 (Sammy) contracted Fever
+[2026-05-12 11:57:00] Entity 34 (Kamila) contracted Typhus
+[2026-05-12 11:57:00] Entity 20 (Griffin) contracted Fever
+[2026-05-12 11:57:00] Entity 24 (Campbell) contracted Fever
+[2026-05-12 11:57:00] Entity 17 (Kamila) contracted Typhus
+[2026-05-12 11:57:00] Entity 4 (Casey) contracted Typhus
+[2026-05-12 11:57:00] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 11:57:00] Entity 32 (Stella) contracted Typhus
+[2026-05-12 11:57:00] Entity 27 (Makaila) contracted Fever
+[2026-05-12 11:57:01] Entity 0 (Selah) contracted Fever
+[2026-05-12 11:57:01] Entity 3 (Marques) contracted Typhus
+[2026-05-12 11:57:01] Entity 14 (Selah) contracted Malaria
+[2026-05-12 11:57:01] Entity 25 (Makaila) contracted Fever
+[2026-05-12 11:57:01] Entity 35 (Mckinley) contracted Typhus
+[2026-05-12 11:57:01] Entity 19 (Sammy) contracted Malaria
+[2026-05-12 11:57:01] Entity 1 (Selah) contracted Typhus
+[2026-05-12 11:57:01] Entity 5 (Isiah) contracted Fever
+[2026-05-12 11:57:01] Entity 20 (Griffin) contracted Fever
+[2026-05-12 11:57:01] Entity 24 (Campbell) contracted Malaria
+[2026-05-12 11:57:01] Entity 8 (Amari) contracted Plague
+[2026-05-12 11:57:01] Entity 32 (Stella) contracted Malaria
+[2026-05-12 11:57:01] Entity 18 (Stella) contracted Fever
+[2026-05-12 11:57:01] Entity 36 (Rayan) contracted Typhus
+[2026-05-12 11:57:01] Entity 39 (Sammy) contracted Typhus
+[2026-05-12 11:57:02] Entity 22 (Rayan) contracted Typhus
+[2026-05-12 11:57:02] Entity 25 (Makaila) contracted Plague
+[2026-05-12 11:57:02] Entity 35 (Mckinley) contracted Malaria
+[2026-05-12 11:57:02] Entity 19 (Sammy) contracted Plague
+[2026-05-12 11:57:02] Entity 37 (Yahir) contracted Plague
+[2026-05-12 11:57:02] Entity 8 (Amari) contracted Fever
+[2026-05-12 11:57:02] Entity 9 (Kamila) contracted Typhus
+[2026-05-12 11:57:02] Entity 26 (Sammy) contracted Malaria
+[2026-05-12 11:57:02] Entity 33 (Amari) contracted Malaria
+[2026-05-12 11:57:03] Entity 0 (Selah) contracted Typhus
+[2026-05-12 11:57:03] Entity 14 (Selah) contracted Plague
+[2026-05-12 11:57:03] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 11:57:03] Entity 19 (Sammy) contracted Fever
+[2026-05-12 11:57:03] Entity 37 (Yahir) contracted Fever
+[2026-05-12 11:57:03] Entity 2 (Stella) contracted Malaria
+[2026-05-12 11:57:03] Entity 24 (Campbell) contracted Plague
+[2026-05-12 11:57:03] Entity 4 (Casey) contracted Malaria
+[2026-05-12 11:57:03] Entity 7 (Bethany) contracted Malaria
+[2026-05-12 11:57:03] Entity 18 (Stella) contracted Plague
+[2026-05-12 11:57:03] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:57:03] Entity 33 (Amari) contracted Typhus
+[2026-05-12 11:57:04] Entity 13 (Griffin) contracted Fever
+[2026-05-12 11:57:04] Entity 21 (Yahir) contracted Typhus
+[2026-05-12 11:57:04] Entity 25 (Makaila) contracted Malaria
+[2026-05-12 11:57:04] Entity 10 (Selah) contracted Malaria
+[2026-05-12 11:57:05] Entity 37 (Yahir) contracted Plague
+[2026-05-12 11:57:05] Entity 4 (Casey) contracted Typhus
+[2026-05-12 11:57:05] Entity 7 (Bethany) contracted Plague
+[2026-05-12 11:57:05] Entity 18 (Stella) contracted Fever
+[2026-05-12 11:57:06] Entity 37 (Yahir) contracted Typhus
+[2026-05-12 11:57:06] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 11:57:06] Entity 6 (Alexander) contracted Fever
+[2026-05-12 11:57:06] Entity 32 (Stella) contracted Typhus
+[2026-05-12 11:57:06] Entity 28 (Fletcher) contracted Typhus
+[2026-05-12 11:57:06] Entity 39 (Sammy) contracted Fever
+[2026-05-12 11:57:06] Entity 33 (Amari) contracted Plague
+[2026-05-12 11:57:07] Entity 22 (Rayan) contracted Plague
+[2026-05-12 11:57:07] Entity 25 (Makaila) contracted Malaria
+[2026-05-12 11:57:07] Entity 1 (Selah) contracted Malaria
+[2026-05-12 11:57:07] Entity 5 (Isiah) contracted Fever
+[2026-05-12 11:57:07] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 11:57:07] Entity 15 (Marques) contracted Malaria
+[2026-05-12 11:57:07] Entity 8 (Amari) contracted Malaria
+[2026-05-12 11:57:07] Entity 32 (Stella) contracted Plague
+[2026-05-12 11:57:07] Entity 28 (Fletcher) contracted Malaria
+[2026-05-12 11:57:08] Entity 3 (Marques) contracted Plague
+[2026-05-12 11:57:08] Entity 14 (Selah) contracted Malaria
+[2026-05-12 11:57:08] Entity 1 (Selah) contracted Fever
+[2026-05-12 11:57:08] Entity 8 (Amari) contracted Malaria
+[2026-05-12 11:57:08] Entity 18 (Stella) contracted Typhus
+[2026-05-12 11:57:08] Entity 28 (Fletcher) contracted Plague
+[2026-05-12 11:57:09] Entity 14 (Selah) contracted Plague
+[2026-05-12 11:57:09] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 11:57:09] Entity 17 (Kamila) cured from Typhus
+[2026-05-12 11:57:10] Entity 0 (Selah) cured from Typhus
+[2026-05-12 11:57:10] Entity 34 (Kamila) cured from Typhus
+[2026-05-12 11:57:11] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 11:57:11] Entity 27 (Makaila) cured from Malaria
+[2026-05-12 11:57:11] Entity 36 (Rayan) cured from Typhus
+[2026-05-12 11:57:12] Entity 3 (Marques) cured from Plague
+[2026-05-12 11:57:12] Entity 13 (Griffin) cured from Fever
+[2026-05-12 11:57:12] Entity 30 (Campbell) cured from Malaria
+[2026-05-12 11:57:12] Entity 38 (Amari) contracted Fever
+[2026-05-12 11:57:12] Entity 32 (Stella) contracted Malaria
+[2026-05-12 11:57:12] Entity 31 (Mckinley) cured from Plague
+[2026-05-12 11:57:12] Entity 12 (Amari) contracted Malaria
+[2026-05-12 11:57:13] Entity 16 (Kamila) cured from Fever
+[2026-05-12 11:57:14] Entity 20 (Griffin) cured from Fever
+[2026-05-12 11:57:14] Entity 37 (Yahir) cured from Malaria
+[2026-05-12 11:57:14] Entity 15 (Marques) cured from Malaria
+[2026-05-12 11:57:14] Entity 7 (Bethany) cured from Plague
+[2026-05-12 11:57:14] Entity 9 (Kamila) cured from Typhus
+[2026-05-12 11:57:15] Entity 22 (Rayan) cured from Plague
+[2026-05-12 11:57:15] Entity 35 (Mckinley) cured from Malaria
+[2026-05-12 11:57:15] Entity 23 (Sammy) cured from Fever
+[2026-05-12 11:57:15] Entity 24 (Campbell) cured from Plague
+[2026-05-12 11:57:15] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 11:57:15] Entity 4 (Casey) cured from Typhus
+[2026-05-12 11:57:16] Entity 39 (Sammy) cured from Fever
+[2026-05-12 11:57:17] Entity 1 (Selah) cured from Fever
+[2026-05-12 11:57:17] Entity 19 (Sammy) cured from Fever
+[2026-05-12 11:57:18] Entity 21 (Yahir) cured from Malaria
+[2026-05-12 11:57:18] Entity 8 (Amari) cured from Malaria
+[2026-05-12 11:57:19] Entity 25 (Makaila) cured from Malaria
+[2026-05-12 11:57:19] Entity 10 (Selah) cured from Malaria
+[2026-05-12 11:57:19] Entity 2 (Stella) cured from Malaria
+[2026-05-12 11:57:19] Entity 32 (Stella) cured from Malaria
+[2026-05-12 11:57:19] Entity 28 (Fletcher) cured from Plague
+[2026-05-12 11:57:19] Entity 33 (Amari) cured from Plague
+[2026-05-12 11:57:20] Entity 14 (Selah) cured from Plague
+[2026-05-12 11:57:20] Entity 5 (Isiah) cured from Fever
+[2026-05-12 11:57:20] Entity 6 (Alexander) cured from Fever
+[2026-05-12 11:57:22] Entity 18 (Stella) cured from Typhus
+[2026-05-12 11:57:23] Entity 26 (Sammy) cured from Malaria
+[2026-05-12 11:57:25] Entity 3 (Marques) contracted Malaria
+[2026-05-12 11:57:26] Entity 0 (Selah) contracted Plague
+[2026-05-12 11:57:26] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 11:57:28] Entity 15 (Marques) contracted Typhus
+[2026-05-12 11:57:28] Entity 11 (Hadley) contracted Plague
+[2026-05-12 11:57:28] Entity 38 (Amari) cured from Fever
+[2026-05-12 11:57:29] Entity 22 (Rayan) contracted Malaria
+[2026-05-12 11:57:29] Entity 4 (Casey) contracted Fever
+[2026-05-12 11:57:29] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 11:57:29] Entity 12 (Amari) cured from Malaria
+[2026-05-12 11:57:30] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 11:57:30] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 11:57:30] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 11:57:30] Entity 8 (Amari) contracted Plague
+[2026-05-12 11:57:31] Entity 3 (Marques) cured from Malaria
+[2026-05-12 11:57:31] Entity 25 (Makaila) contracted Plague
+[2026-05-12 11:57:31] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 11:57:31] Entity 19 (Sammy) contracted Fever
+[2026-05-12 11:57:31] Entity 17 (Kamila) contracted Plague
+[2026-05-12 11:57:32] Entity 25 (Makaila) contracted Malaria
+[2026-05-12 11:57:32] Entity 13 (Griffin) contracted Typhus
+[2026-05-12 11:57:32] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 11:57:34] Entity 21 (Yahir) contracted Fever
+[2026-05-12 11:57:34] Entity 17 (Kamila) contracted Malaria
+[2026-05-12 11:57:35] Entity 0 (Selah) cured from Plague
+[2026-05-12 11:57:35] Entity 25 (Makaila) contracted Fever
+[2026-05-12 11:57:35] Entity 10 (Selah) contracted Fever
+[2026-05-12 11:57:35] Entity 5 (Isiah) contracted Malaria
+[2026-05-12 11:57:35] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 11:57:35] Entity 9 (Kamila) contracted Fever
+[2026-05-12 11:57:35] Entity 39 (Sammy) contracted Malaria
+[2026-05-12 11:57:36] Entity 35 (Mckinley) contracted Malaria
+[2026-05-12 11:57:36] Entity 2 (Stella) contracted Fever
+[2026-05-12 11:57:36] Entity 24 (Campbell) contracted Typhus
+[2026-05-12 11:57:36] Entity 4 (Casey) cured from Fever
+[2026-05-12 11:57:36] Entity 11 (Hadley) cured from Plague
+[2026-05-12 11:57:36] Entity 36 (Rayan) cured from Malaria
+[2026-05-12 11:57:36] Entity 39 (Sammy) contracted Fever
+[2026-05-12 11:57:37] Entity 16 (Kamila) contracted Malaria
+[2026-05-12 11:57:37] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:57:37] Entity 37 (Yahir) contracted Plague
+[2026-05-12 11:57:37] Entity 15 (Marques) cured from Typhus
+[2026-05-12 11:57:37] Entity 8 (Amari) cured from Plague
+[2026-05-12 11:57:37] Entity 18 (Stella) contracted Typhus
+[2026-05-12 11:57:37] Entity 32 (Stella) contracted Typhus
+[2026-05-12 11:57:37] Entity 7 (Bethany) contracted Typhus
+[2026-05-12 11:57:38] Entity 14 (Selah) contracted Typhus
+[2026-05-12 11:57:38] Entity 21 (Yahir) cured from Fever
+[2026-05-12 11:57:38] Entity 30 (Campbell) cured from Typhus
+[2026-05-12 11:57:38] Entity 35 (Mckinley) contracted Fever
+[2026-05-12 11:57:39] Entity 2 (Stella) contracted Fever
+[2026-05-12 11:57:39] Entity 32 (Stella) contracted Malaria
+[2026-05-12 11:57:39] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:57:40] Entity 22 (Rayan) cured from Malaria
+[2026-05-12 11:57:40] Entity 1 (Selah) contracted Malaria
+[2026-05-12 11:57:40] Entity 16 (Kamila) contracted Malaria
+[2026-05-12 11:57:40] Entity 19 (Sammy) cured from Fever
+[2026-05-12 11:57:40] Entity 37 (Yahir) contracted Typhus
+[2026-05-12 11:57:40] Entity 32 (Stella) contracted Fever
+[2026-05-12 11:57:40] Entity 7 (Bethany) contracted Malaria
+[2026-05-12 11:57:40] Entity 31 (Mckinley) contracted Plague
+[2026-05-12 11:57:41] Entity 25 (Makaila) cured from Fever
+[2026-05-12 11:57:41] Entity 1 (Selah) contracted Plague
+[2026-05-12 11:57:41] Entity 20 (Griffin) contracted Fever
+[2026-05-12 11:57:41] Entity 17 (Kamila) cured from Malaria
+[2026-05-12 11:57:41] Entity 6 (Alexander) contracted Plague
+[2026-05-12 11:57:41] Entity 38 (Amari) contracted Plague
+[2026-05-12 11:57:41] Entity 27 (Makaila) contracted Fever
+[2026-05-12 11:57:42] Entity 13 (Griffin) cured from Typhus
+[2026-05-12 11:57:42] Entity 10 (Selah) cured from Fever
+[2026-05-12 11:57:42] Entity 5 (Isiah) cured from Malaria
+[2026-05-12 11:57:42] Entity 34 (Kamila) cured from Malaria
+[2026-05-12 11:57:42] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 11:57:42] Entity 23 (Sammy) contracted Malaria
+[2026-05-12 11:57:42] Entity 6 (Alexander) contracted Malaria
+[2026-05-12 11:57:42] Entity 7 (Bethany) contracted Malaria
+[2026-05-12 11:57:43] Entity 20 (Griffin) contracted Typhus
+[2026-05-12 11:57:43] Entity 37 (Yahir) contracted Plague
+[2026-05-12 11:57:45] Entity 3 (Marques) contracted Plague
+[2026-05-12 11:57:45] Entity 23 (Sammy) contracted Fever
+[2026-05-12 11:57:45] Entity 24 (Campbell) cured from Typhus
+[2026-05-12 11:57:45] Entity 11 (Hadley) contracted Fever
+[2026-05-12 11:57:45] Entity 18 (Stella) cured from Typhus
+[2026-05-12 11:57:45] Entity 33 (Amari) contracted Malaria
+[2026-05-12 11:57:45] Entity 28 (Fletcher) contracted Typhus
+[2026-05-12 11:57:46] Entity 35 (Mckinley) cured from Fever
+[2026-05-12 11:57:46] Entity 20 (Griffin) contracted Typhus
+[2026-05-12 11:57:46] Entity 2 (Stella) cured from Fever
+[2026-05-12 11:57:46] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 11:57:46] Entity 28 (Fletcher) contracted Fever
+[2026-05-12 11:57:47] Entity 15 (Marques) contracted Typhus
+[2026-05-12 11:57:47] Entity 17 (Kamila) contracted Fever
+[2026-05-12 11:57:47] Entity 36 (Rayan) contracted Fever
+[2026-05-12 11:57:47] Entity 26 (Sammy) contracted Malaria
+[2026-05-12 11:57:47] Entity 39 (Sammy) cured from Fever
+[2026-05-12 11:57:48] Entity 14 (Selah) cured from Typhus
+[2026-05-12 11:57:48] Entity 22 (Rayan) contracted Fever
+[2026-05-12 11:57:48] Entity 16 (Kamila) cured from Malaria
+[2026-05-12 11:57:48] Entity 11 (Hadley) cured from Fever
+[2026-05-12 11:57:48] Entity 7 (Bethany) cured from Malaria
+[2026-05-12 11:57:48] Entity 9 (Kamila) cured from Fever
+[2026-05-12 11:57:49] Entity 0 (Selah) contracted Plague
+[2026-05-12 11:57:49] Entity 1 (Selah) cured from Plague
+[2026-05-12 11:57:50] Entity 20 (Griffin) contracted Plague
+[2026-05-12 11:57:50] Entity 32 (Stella) cured from Fever
+[2026-05-12 11:57:50] Entity 6 (Alexander) cured from Malaria
+[2026-05-12 11:57:50] Entity 38 (Amari) cured from Plague
+[2026-05-12 11:57:51] Entity 21 (Yahir) contracted Fever
+[2026-05-12 11:57:51] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 11:57:51] Entity 5 (Isiah) contracted Typhus
+[2026-05-12 11:57:51] Entity 37 (Yahir) cured from Plague
+[2026-05-12 11:57:51] Entity 24 (Campbell) contracted Typhus
+[2026-05-12 11:57:51] Entity 8 (Amari) contracted Plague
+[2026-05-12 11:57:51] Entity 27 (Makaila) cured from Fever
+[2026-05-12 11:57:51] Entity 12 (Amari) contracted Plague
+[2026-05-12 11:57:52] Entity 3 (Marques) cured from Plague
+[2026-05-12 11:57:52] Entity 17 (Kamila) cured from Fever
+[2026-05-12 11:57:52] Entity 36 (Rayan) cured from Fever
+[2026-05-12 11:57:53] Entity 29 (Jazlynn) contracted Malaria
+[2026-05-12 11:57:53] Entity 23 (Sammy) cured from Fever
+[2026-05-12 11:57:53] Entity 4 (Casey) contracted Plague
+[2026-05-12 11:57:53] Entity 18 (Stella) contracted Fever
+[2026-05-12 11:57:54] Entity 25 (Makaila) contracted Plague
+[2026-05-12 11:57:54] Entity 22 (Rayan) cured from Fever
+[2026-05-12 11:57:54] Entity 34 (Kamila) contracted Fever
+[2026-05-12 11:57:54] Entity 4 (Casey) contracted Fever
+[2026-05-12 11:57:55] Entity 31 (Mckinley) cured from Plague
+[2026-05-12 11:57:56] Entity 5 (Isiah) cured from Typhus
+[2026-05-12 11:57:56] Entity 24 (Campbell) cured from Typhus
+[2026-05-12 11:57:56] Entity 33 (Amari) cured from Malaria
+[2026-05-12 11:57:56] Entity 28 (Fletcher) cured from Fever
+[2026-05-12 11:57:57] Entity 25 (Makaila) contracted Malaria
+[2026-05-12 11:57:57] Entity 15 (Marques) cured from Typhus
+[2026-05-12 11:57:57] Entity 11 (Hadley) contracted Plague
+[2026-05-12 11:57:57] Entity 8 (Amari) cured from Plague
+[2026-05-12 11:57:57] Entity 26 (Sammy) cured from Malaria
+[2026-05-12 11:57:58] Entity 30 (Campbell) cured from Typhus
+[2026-05-12 11:57:58] Entity 18 (Stella) cured from Fever
+[2026-05-12 11:57:59] Entity 0 (Selah) cured from Plague
+[2026-05-12 11:57:59] Entity 13 (Griffin) contracted Fever
+[2026-05-12 11:57:59] Entity 14 (Selah) contracted Typhus
+[2026-05-12 11:57:59] Entity 21 (Yahir) cured from Fever
+[2026-05-12 11:57:59] Entity 16 (Kamila) contracted Fever
+[2026-05-12 11:57:59] Entity 35 (Mckinley) contracted Fever
+[2026-05-12 11:57:59] Entity 20 (Griffin) cured from Plague
+[2026-05-12 11:58:00] Entity 13 (Griffin) contracted Plague
+[2026-05-12 11:58:00] Entity 1 (Selah) contracted Malaria
+[2026-05-12 11:58:00] Entity 19 (Sammy) contracted Typhus
+[2026-05-12 11:58:00] Entity 37 (Yahir) contracted Plague
+[2026-05-12 11:58:01] Entity 29 (Jazlynn) cured from Malaria
+[2026-05-12 11:58:01] Entity 17 (Kamila) contracted Fever
+[2026-05-12 11:58:02] Entity 19 (Sammy) contracted Typhus
+[2026-05-12 11:58:02] Entity 4 (Casey) cured from Fever
+[2026-05-12 11:58:02] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 11:58:02] Entity 12 (Amari) cured from Plague
+[2026-05-12 11:58:03] Entity 3 (Marques) contracted Malaria
+[2026-05-12 11:58:03] Entity 25 (Makaila) cured from Malaria
+[2026-05-12 11:58:03] Entity 19 (Sammy) contracted Malaria
+[2026-05-12 11:58:03] Entity 10 (Selah) contracted Malaria
+[2026-05-12 11:58:03] Entity 34 (Kamila) cured from Fever
+[2026-05-12 11:58:03] Entity 11 (Hadley) cured from Plague
+[2026-05-12 11:58:03] Entity 38 (Amari) contracted Fever
+[2026-05-12 11:58:03] Entity 27 (Makaila) contracted Typhus
+[2026-05-12 11:58:03] Entity 7 (Bethany) contracted Malaria
+[2026-05-12 11:58:04] Entity 3 (Marques) contracted Typhus
+[2026-05-12 11:58:04] Entity 35 (Mckinley) cured from Fever
+[2026-05-12 11:58:04] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:58:05] Entity 14 (Selah) cured from Typhus
+[2026-05-12 11:58:05] Entity 16 (Kamila) cured from Fever
+[2026-05-12 11:58:05] Entity 10 (Selah) contracted Fever
+[2026-05-12 11:58:05] Entity 17 (Kamila) cured from Fever
+[2026-05-12 11:58:05] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:58:05] Entity 7 (Bethany) contracted Malaria
+[2026-05-12 11:58:07] Entity 22 (Rayan) contracted Typhus
+[2026-05-12 11:58:07] Entity 1 (Selah) cured from Malaria
+[2026-05-12 11:58:07] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:58:08] Entity 0 (Selah) contracted Plague
+[2026-05-12 11:58:08] Entity 24 (Campbell) contracted Typhus
+[2026-05-12 11:58:08] Entity 8 (Amari) contracted Malaria
+[2026-05-12 11:58:08] Entity 23 (Sammy) contracted Plague
+[2026-05-12 11:58:08] Entity 32 (Stella) contracted Malaria
+[2026-05-12 11:58:08] Entity 9 (Kamila) contracted Malaria
+[2026-05-12 11:58:09] Entity 37 (Yahir) cured from Plague
+[2026-05-12 11:58:09] Entity 15 (Marques) contracted Plague
+[2026-05-12 11:58:09] Entity 23 (Sammy) contracted Malaria
+[2026-05-12 11:58:09] Entity 38 (Amari) cured from Fever
+[2026-05-12 11:58:09] Entity 36 (Rayan) cured from Malaria
+[2026-05-12 11:58:09] Entity 39 (Sammy) contracted Plague
+[2026-05-12 11:58:10] Entity 3 (Marques) cured from Typhus
+[2026-05-12 11:58:10] Entity 30 (Campbell) contracted Fever
+[2026-05-12 11:58:10] Entity 13 (Griffin) cured from Plague
+[2026-05-12 11:58:10] Entity 19 (Sammy) cured from Malaria
+[2026-05-12 11:58:10] Entity 10 (Selah) cured from Fever
+[2026-05-12 11:58:10] Entity 5 (Isiah) contracted Plague
+[2026-05-12 11:58:10] Entity 6 (Alexander) contracted Typhus
+[2026-05-12 11:58:10] Entity 39 (Sammy) contracted Malaria
+[2026-05-12 11:58:11] Entity 22 (Rayan) cured from Typhus
+[2026-05-12 11:58:11] Entity 2 (Stella) cured from Plague
+[2026-05-12 11:58:11] Entity 7 (Bethany) cured from Malaria
+[2026-05-12 11:58:12] Entity 39 (Sammy) contracted Typhus
+[2026-05-12 11:58:13] Entity 8 (Amari) cured from Malaria
+[2026-05-12 11:58:13] Entity 28 (Fletcher) contracted Typhus
+[2026-05-12 11:58:14] Entity 0 (Selah) cured from Plague
+[2026-05-12 11:58:14] Entity 32 (Stella) cured from Malaria
+[2026-05-12 11:58:14] Entity 27 (Makaila) cured from Malaria
+[2026-05-12 11:58:15] Entity 33 (Amari) contracted Plague
+[2026-05-12 11:58:16] Entity 30 (Campbell) cured from Fever
+[2026-05-12 11:58:16] Entity 15 (Marques) cured from Plague
+[2026-05-12 11:58:16] Entity 9 (Kamila) cured from Malaria
+[2026-05-12 11:58:17] Entity 16 (Kamila) contracted Typhus
+[2026-05-12 11:58:17] Entity 29 (Jazlynn) contracted Typhus
+[2026-05-12 11:58:17] Entity 21 (Yahir) contracted Plague
+[2026-05-12 11:58:17] Entity 4 (Casey) contracted Plague
+[2026-05-12 11:58:17] Entity 23 (Sammy) cured from Malaria
+[2026-05-12 11:58:18] Entity 5 (Isiah) cured from Plague
+[2026-05-12 11:58:20] Entity 4 (Casey) contracted Malaria
+[2026-05-12 11:58:20] Entity 18 (Stella) contracted Typhus
+[2026-05-12 11:58:20] Entity 31 (Mckinley) contracted Malaria
+[2026-05-12 11:58:21] Entity 1 (Selah) contracted Typhus
+[2026-05-12 11:58:21] Entity 25 (Makaila) contracted Typhus
+[2026-05-12 11:58:21] Entity 29 (Jazlynn) contracted Plague
+[2026-05-12 11:58:21] Entity 4 (Casey) contracted Fever
+[2026-05-12 11:58:21] Entity 6 (Alexander) cured from Typhus
+[2026-05-12 11:58:21] Entity 28 (Fletcher) cured from Typhus
+[2026-05-12 11:58:22] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 11:58:22] Entity 18 (Stella) contracted Typhus
+[2026-05-12 11:58:22] Entity 26 (Sammy) contracted Typhus
+[2026-05-12 11:58:22] Entity 31 (Mckinley) contracted Malaria
+[2026-05-12 11:58:23] Entity 17 (Kamila) contracted Plague
+[2026-05-12 11:58:23] Entity 35 (Mckinley) contracted Typhus
+[2026-05-12 11:58:24] Entity 19 (Sammy) contracted Plague
+[2026-05-12 11:58:24] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:58:25] Entity 38 (Amari) contracted Malaria
+[2026-05-12 11:58:25] Entity 33 (Amari) cured from Plague
+[2026-05-12 11:58:26] Entity 16 (Kamila) cured from Typhus
+[2026-05-12 11:58:26] Entity 34 (Kamila) contracted Plague
+[2026-05-12 11:58:26] Entity 3 (Marques) contracted Typhus
+[2026-05-12 11:58:26] Entity 13 (Griffin) contracted Typhus
+[2026-05-12 11:58:26] Entity 12 (Amari) contracted Plague
+[2026-05-12 11:58:27] Entity 20 (Griffin) contracted Malaria
+[2026-05-12 11:58:27] Entity 10 (Selah) contracted Plague
+[2026-05-12 11:58:27] Entity 21 (Yahir) cured from Plague
+[2026-05-12 11:58:28] Entity 1 (Selah) cured from Typhus
+[2026-05-12 11:58:28] Entity 20 (Griffin) contracted Fever
+[2026-05-12 11:58:28] Entity 25 (Makaila) cured from Typhus
+[2026-05-12 11:58:28] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 11:58:28] Entity 7 (Bethany) contracted Fever
+[2026-05-12 11:58:28] Entity 8 (Amari) contracted Typhus
+[2026-05-12 11:58:28] Entity 18 (Stella) cured from Typhus
+[2026-05-12 11:58:28] Entity 36 (Rayan) contracted Plague
+[2026-05-12 11:58:28] Entity 12 (Amari) contracted Fever
+[2026-05-12 11:58:29] Entity 17 (Kamila) cured from Plague
+[2026-05-12 11:58:29] Entity 7 (Bethany) contracted Plague
+[2026-05-12 11:58:29] Entity 27 (Makaila) contracted Plague
+[2026-05-12 11:58:30] Entity 5 (Isiah) contracted Typhus
+[2026-05-12 11:58:30] Entity 29 (Jazlynn) cured from Plague
+[2026-05-12 11:58:30] Entity 15 (Marques) contracted Plague
+[2026-05-12 11:58:30] Entity 4 (Casey) cured from Fever
+[2026-05-12 11:58:30] Entity 8 (Amari) contracted Typhus
+[2026-05-12 11:58:30] Entity 32 (Stella) contracted Typhus
+[2026-05-12 11:58:32] Entity 14 (Selah) contracted Fever
+[2026-05-12 11:58:32] Entity 35 (Mckinley) cured from Typhus
+[2026-05-12 11:58:32] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 11:58:33] Entity 14 (Selah) contracted Typhus
+[2026-05-12 11:58:33] Entity 22 (Rayan) contracted Plague
+[2026-05-12 11:58:33] Entity 23 (Sammy) contracted Plague
+[2026-05-12 11:58:33] Entity 31 (Mckinley) cured from Malaria
+[2026-05-12 11:58:34] Entity 19 (Sammy) cured from Plague
+[2026-05-12 11:58:34] Entity 37 (Yahir) contracted Plague
+[2026-05-12 11:58:34] Entity 13 (Griffin) cured from Typhus
+[2026-05-12 11:58:34] Entity 10 (Selah) cured from Plague
+[2026-05-12 11:58:35] Entity 20 (Griffin) cured from Fever
+[2026-05-12 11:58:35] Entity 37 (Yahir) contracted Plague
+[2026-05-12 11:58:35] Entity 22 (Rayan) contracted Plague
+[2026-05-12 11:58:35] Entity 3 (Marques) cured from Typhus
+[2026-05-12 11:58:35] Entity 14 (Selah) contracted Plague
+[2026-05-12 11:58:35] Entity 38 (Amari) cured from Malaria
+[2026-05-12 11:58:36] Entity 5 (Isiah) cured from Typhus
+[2026-05-12 11:58:36] Entity 30 (Campbell) contracted Fever
+[2026-05-12 11:58:36] Entity 2 (Stella) cured from Plague
+[2026-05-12 11:58:36] Entity 37 (Yahir) contracted Fever
+[2026-05-12 11:58:36] Entity 14 (Selah) contracted Malaria
+[2026-05-12 11:58:36] Entity 7 (Bethany) cured from Plague
+[2026-05-12 11:58:37] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 11:58:37] Entity 21 (Yahir) contracted Plague
+[2026-05-12 11:58:37] Entity 8 (Amari) cured from Typhus
+[2026-05-12 11:58:37] Entity 23 (Sammy) cured from Plague
+[2026-05-12 11:58:37] Entity 27 (Makaila) cured from Plague
+[2026-05-12 11:58:39] Entity 34 (Kamila) cured from Malaria
+[2026-05-12 11:58:39] Entity 32 (Stella) cured from Typhus
+[2026-05-12 11:58:39] Entity 36 (Rayan) cured from Plague
+[2026-05-12 11:58:40] Entity 14 (Selah) contracted Malaria
+[2026-05-12 11:58:40] Entity 4 (Casey) contracted Typhus
+[2026-05-12 11:58:40] Entity 33 (Amari) contracted Malaria
+[2026-05-12 11:58:41] Entity 16 (Kamila) contracted Typhus
+[2026-05-12 11:58:41] Entity 25 (Makaila) contracted Typhus
+[2026-05-12 11:58:41] Entity 17 (Kamila) contracted Malaria
+[2026-05-12 11:58:41] Entity 22 (Rayan) cured from Plague
+[2026-05-12 11:58:41] Entity 18 (Stella) contracted Malaria
+[2026-05-12 11:58:41] Entity 12 (Amari) cured from Fever
+[2026-05-12 11:58:42] Entity 15 (Marques) cured from Plague
+[2026-05-12 11:58:42] Entity 10 (Selah) contracted Malaria
+[2026-05-12 11:58:43] Entity 29 (Jazlynn) contracted Plague
+[2026-05-12 11:58:43] Entity 9 (Kamila) contracted Malaria
+[2026-05-12 11:58:44] Entity 1 (Selah) contracted Plague
+[2026-05-12 11:58:44] Entity 30 (Campbell) cured from Malaria
+[2026-05-12 11:58:44] Entity 21 (Yahir) cured from Plague
+[2026-05-12 11:58:44] Entity 14 (Selah) cured from Malaria
+[2026-05-12 11:58:44] Entity 4 (Casey) cured from Typhus
+[2026-05-12 11:58:45] Entity 9 (Kamila) contracted Fever
+[2026-05-12 11:58:46] Entity 25 (Makaila) cured from Typhus
+[2026-05-12 11:58:46] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 11:58:46] Entity 18 (Stella) cured from Malaria
+[2026-05-12 11:58:46] Entity 33 (Amari) cured from Malaria
+[2026-05-12 11:58:47] Entity 19 (Sammy) contracted Malaria
+[2026-05-12 11:58:47] Entity 28 (Fletcher) contracted Typhus
+[2026-05-12 11:58:48] Entity 37 (Yahir) cured from Fever
+[2026-05-12 11:58:49] Entity 17 (Kamila) cured from Malaria
+[2026-05-12 11:58:49] Entity 13 (Griffin) contracted Malaria
+[2026-05-12 11:58:50] Entity 20 (Griffin) contracted Fever
+[2026-05-12 11:58:51] Entity 1 (Selah) cured from Plague
+[2026-05-12 11:58:51] Entity 29 (Jazlynn) cured from Plague
+[2026-05-12 11:58:51] Entity 10 (Selah) cured from Malaria
+[2026-05-12 11:58:51] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 11:58:51] Entity 31 (Mckinley) contracted Plague
+[2026-05-12 11:58:52] Entity 19 (Sammy) cured from Malaria
+[2026-05-12 11:58:52] Entity 5 (Isiah) contracted Fever
+[2026-05-12 11:58:53] Entity 8 (Amari) contracted Typhus
+[2026-05-12 11:58:53] Entity 27 (Makaila) contracted Plague
+[2026-05-12 11:58:54] Entity 36 (Rayan) contracted Plague
+[2026-05-12 11:58:54] Entity 38 (Amari) contracted Malaria
+[2026-05-12 11:58:55] Entity 3 (Marques) contracted Typhus
+[2026-05-12 11:58:55] Entity 7 (Bethany) contracted Fever
+[2026-05-12 11:58:55] Entity 8 (Amari) contracted Malaria
+[2026-05-12 11:58:55] Entity 27 (Makaila) contracted Fever
+[2026-05-12 11:58:55] Entity 28 (Fletcher) cured from Typhus
+[2026-05-12 11:58:56] Entity 15 (Marques) contracted Plague
+[2026-05-12 11:58:56] Entity 7 (Bethany) contracted Fever
+[2026-05-12 11:58:56] Entity 9 (Kamila) cured from Fever
+[2026-05-12 11:58:57] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:58:57] Entity 22 (Rayan) contracted Typhus
+[2026-05-12 11:58:57] Entity 23 (Sammy) contracted Plague
+[2026-05-12 11:58:57] Entity 31 (Mckinley) cured from Plague
+[2026-05-12 11:58:58] Entity 2 (Stella) contracted Fever
+[2026-05-12 11:58:58] Entity 22 (Rayan) contracted Fever
+[2026-05-12 11:58:58] Entity 13 (Griffin) cured from Malaria
+[2026-05-12 11:58:59] Entity 25 (Makaila) contracted Malaria
+[2026-05-12 11:58:59] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 11:58:59] Entity 14 (Selah) contracted Fever
+[2026-05-12 11:58:59] Entity 36 (Rayan) cured from Plague
+[2026-05-12 11:59:00] Entity 5 (Isiah) cured from Fever
+[2026-05-12 11:59:00] Entity 34 (Kamila) contracted Typhus
+[2026-05-12 11:59:01] Entity 14 (Selah) contracted Malaria
+[2026-05-12 11:59:01] Entity 32 (Stella) contracted Fever
+[2026-05-12 11:59:02] Entity 30 (Campbell) contracted Plague
+[2026-05-12 11:59:02] Entity 17 (Kamila) contracted Malaria
+[2026-05-12 11:59:02] Entity 15 (Marques) cured from Plague
+[2026-05-12 11:59:02] Entity 18 (Stella) contracted Typhus
+[2026-05-12 11:59:03] Entity 32 (Stella) contracted Fever
+[2026-05-12 11:59:03] Entity 18 (Stella) contracted Fever
+[2026-05-12 11:59:03] Entity 27 (Makaila) cured from Fever
+[2026-05-12 11:59:03] Entity 12 (Amari) contracted Fever
+[2026-05-12 11:59:04] Entity 1 (Selah) contracted Fever
+[2026-05-12 11:59:04] Entity 37 (Yahir) contracted Fever
+[2026-05-12 11:59:05] Entity 25 (Makaila) cured from Malaria
+[2026-05-12 11:59:05] Entity 22 (Rayan) cured from Fever
+[2026-05-12 11:59:05] Entity 10 (Selah) contracted Plague
+[2026-05-12 11:59:05] Entity 12 (Amari) contracted Malaria
+[2026-05-12 11:59:05] Entity 33 (Amari) contracted Fever
+[2026-05-12 11:59:06] Entity 19 (Sammy) contracted Plague
+[2026-05-12 11:59:06] Entity 29 (Jazlynn) contracted Plague
+[2026-05-12 11:59:06] Entity 3 (Marques) cured from Typhus
+[2026-05-12 11:59:06] Entity 8 (Amari) cured from Malaria
+[2026-05-12 11:59:07] Entity 34 (Kamila) cured from Typhus
+[2026-05-12 11:59:07] Entity 14 (Selah) cured from Malaria
+[2026-05-12 11:59:08] Entity 4 (Casey) contracted Typhus
+[2026-05-12 11:59:08] Entity 7 (Bethany) cured from Fever
+[2026-05-12 11:59:08] Entity 11 (Hadley) contracted Fever
+[2026-05-12 11:59:09] Entity 19 (Sammy) contracted Malaria
+[2026-05-12 11:59:10] Entity 30 (Campbell) cured from Plague
+[2026-05-12 11:59:10] Entity 4 (Casey) contracted Malaria
+[2026-05-12 11:59:10] Entity 32 (Stella) cured from Fever
+[2026-05-12 11:59:10] Entity 23 (Sammy) cured from Plague
+[2026-05-12 11:59:10] Entity 35 (Mckinley) contracted Plague
+[2026-05-12 11:59:10] Entity 28 (Fletcher) contracted Plague
+[2026-05-12 11:59:11] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 11:59:11] Entity 18 (Stella) cured from Fever
+[2026-05-12 11:59:11] Entity 9 (Kamila) contracted Typhus
+[2026-05-12 11:59:11] Entity 35 (Mckinley) contracted Plague
+[2026-05-12 11:59:12] Entity 1 (Selah) cured from Fever
+[2026-05-12 11:59:12] Entity 2 (Stella) cured from Fever
+[2026-05-12 11:59:12] Entity 37 (Yahir) cured from Fever
+[2026-05-12 11:59:12] Entity 15 (Marques) contracted Plague
+[2026-05-12 11:59:13] Entity 5 (Isiah) contracted Typhus
+[2026-05-12 11:59:13] Entity 10 (Selah) cured from Plague
+[2026-05-12 11:59:14] Entity 5 (Isiah) contracted Fever
+[2026-05-12 11:59:14] Entity 21 (Yahir) contracted Plague
+[2026-05-12 11:59:14] Entity 12 (Amari) cured from Malaria
+[2026-05-12 11:59:14] Entity 31 (Mckinley) contracted Typhus
+[2026-05-12 11:59:15] Entity 29 (Jazlynn) cured from Plague
+[2026-05-12 11:59:16] Entity 36 (Rayan) contracted Typhus
+[2026-05-12 11:59:16] Entity 28 (Fletcher) cured from Plague
+[2026-05-12 11:59:17] Entity 19 (Sammy) cured from Malaria
+[2026-05-12 11:59:17] Entity 33 (Amari) cured from Fever
+[2026-05-12 11:59:18] Entity 25 (Makaila) contracted Typhus
+[2026-05-12 11:59:19] Entity 11 (Hadley) cured from Fever
+[2026-05-12 11:59:19] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:59:20] Entity 22 (Rayan) contracted Typhus
+[2026-05-12 11:59:20] Entity 13 (Griffin) contracted Malaria
+[2026-05-12 11:59:20] Entity 14 (Selah) contracted Plague
+[2026-05-12 11:59:21] Entity 15 (Marques) cured from Plague
+[2026-05-12 11:59:22] Entity 13 (Griffin) contracted Typhus
+[2026-05-12 11:59:22] Entity 9 (Kamila) cured from Typhus
+[2026-05-12 11:59:23] Entity 5 (Isiah) cured from Fever
+[2026-05-12 11:59:23] Entity 25 (Makaila) cured from Typhus
+[2026-05-12 11:59:23] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 11:59:23] Entity 36 (Rayan) cured from Typhus
+[2026-05-12 11:59:24] Entity 7 (Bethany) contracted Fever
+[2026-05-12 11:59:25] Entity 18 (Stella) contracted Typhus
+[2026-05-12 11:59:25] Entity 32 (Stella) contracted Typhus
+[2026-05-12 11:59:26] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 11:59:26] Entity 35 (Mckinley) cured from Plague
+[2026-05-12 11:59:27] Entity 3 (Marques) contracted Fever
+[2026-05-12 11:59:27] Entity 21 (Yahir) cured from Plague
+[2026-05-12 11:59:27] Entity 8 (Amari) contracted Fever
+[2026-05-12 11:59:28] Entity 3 (Marques) contracted Typhus
+[2026-05-12 11:59:28] Entity 14 (Selah) cured from Plague
+[2026-05-12 11:59:28] Entity 27 (Makaila) cured from Malaria
+[2026-05-12 11:59:28] Entity 23 (Sammy) contracted Plague
+[2026-05-12 11:59:30] Entity 1 (Selah) contracted Plague
+[2026-05-12 11:59:30] Entity 30 (Campbell) cured from Malaria
+[2026-05-12 11:59:30] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 11:59:30] Entity 10 (Selah) contracted Malaria
+[2026-05-12 11:59:30] Entity 8 (Amari) contracted Plague
+[2026-05-12 11:59:32] Entity 29 (Jazlynn) contracted Malaria
+[2026-05-12 11:59:32] Entity 13 (Griffin) cured from Typhus
+[2026-05-12 11:59:33] Entity 2 (Stella) contracted Fever
+[2026-05-12 11:59:33] Entity 18 (Stella) cured from Typhus
+[2026-05-12 11:59:34] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:59:34] Entity 34 (Kamila) cured from Malaria
+[2026-05-12 11:59:35] Entity 7 (Bethany) cured from Fever
+[2026-05-12 11:59:36] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:59:36] Entity 19 (Sammy) contracted Typhus
+[2026-05-12 11:59:36] Entity 32 (Stella) cured from Typhus
+[2026-05-12 11:59:37] Entity 25 (Makaila) contracted Typhus
+[2026-05-12 11:59:37] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 11:59:37] Entity 23 (Sammy) cured from Plague
+[2026-05-12 11:59:38] Entity 1 (Selah) cured from Plague
+[2026-05-12 11:59:38] Entity 8 (Amari) cured from Plague
+[2026-05-12 11:59:38] Entity 11 (Hadley) contracted Fever
+[2026-05-12 11:59:38] Entity 36 (Rayan) contracted Fever
+[2026-05-12 11:59:38] Entity 12 (Amari) contracted Malaria
+[2026-05-12 11:59:39] Entity 37 (Yahir) cured from Malaria
+[2026-05-12 11:59:39] Entity 15 (Marques) contracted Fever
+[2026-05-12 11:59:40] Entity 10 (Selah) cured from Malaria
+[2026-05-12 11:59:40] Entity 12 (Amari) contracted Malaria
+[2026-05-12 11:59:41] Entity 29 (Jazlynn) cured from Malaria
+[2026-05-12 11:59:41] Entity 35 (Mckinley) contracted Malaria
+[2026-05-12 11:59:42] Entity 2 (Stella) cured from Plague
+[2026-05-12 11:59:42] Entity 14 (Selah) contracted Plague
+[2026-05-12 11:59:42] Entity 12 (Amari) contracted Fever
+[2026-05-12 11:59:43] Entity 19 (Sammy) cured from Typhus
+[2026-05-12 11:59:43] Entity 25 (Makaila) cured from Typhus
+[2026-05-12 11:59:46] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 11:59:46] Entity 15 (Marques) cured from Fever
+[2026-05-12 11:59:46] Entity 36 (Rayan) cured from Fever
+[2026-05-12 11:59:46] Entity 21 (Yahir) contracted Typhus
+[2026-05-12 11:59:47] Entity 28 (Fletcher) contracted Fever
+[2026-05-12 11:59:48] Entity 13 (Griffin) contracted Malaria
+[2026-05-12 11:59:48] Entity 35 (Mckinley) cured from Malaria
+[2026-05-12 11:59:49] Entity 32 (Stella) contracted Plague
+[2026-05-12 11:59:49] Entity 18 (Stella) contracted Fever
+[2026-05-12 11:59:49] Entity 12 (Amari) cured from Fever
+[2026-05-12 11:59:50] Entity 34 (Kamila) contracted Fever
+[2026-05-12 11:59:51] Entity 30 (Campbell) cured from Malaria
+[2026-05-12 11:59:51] Entity 14 (Selah) cured from Plague
+[2026-05-12 11:59:52] Entity 11 (Hadley) cured from Fever
+[2026-05-12 11:59:54] Entity 21 (Yahir) cured from Typhus
+[2026-05-12 11:59:55] Entity 1 (Selah) contracted Plague
+[2026-05-12 11:59:55] Entity 23 (Sammy) contracted Fever
+[2026-05-12 11:59:55] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:59:55] Entity 18 (Stella) cured from Fever
+[2026-05-12 11:59:56] Entity 1 (Selah) contracted Plague
+[2026-05-12 11:59:56] Entity 2 (Stella) contracted Plague
+[2026-05-12 11:59:56] Entity 8 (Amari) contracted Malaria
+[2026-05-12 11:59:56] Entity 23 (Sammy) contracted Malaria
+[2026-05-12 11:59:56] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:59:57] Entity 1 (Selah) contracted Fever
+[2026-05-12 11:59:58] Entity 37 (Yahir) contracted Typhus
+[2026-05-12 11:59:58] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 11:59:58] Entity 28 (Fletcher) cured from Fever
+[2026-05-12 11:59:59] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 11:59:59] Entity 32 (Stella) cured from Plague
+[2026-05-12 12:00:00] Entity 25 (Makaila) contracted Fever
+[2026-05-12 12:00:00] Entity 15 (Marques) contracted Typhus
+[2026-05-12 12:00:01] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 12:00:02] Entity 2 (Stella) cured from Plague
+[2026-05-12 12:00:03] Entity 19 (Sammy) contracted Plague
+[2026-05-12 12:00:04] Entity 23 (Sammy) cured from Malaria
+[2026-05-12 12:00:04] Entity 27 (Makaila) cured from Malaria
+[2026-05-12 12:00:05] Entity 34 (Kamila) cured from Fever
+[2026-05-12 12:00:06] Entity 8 (Amari) cured from Malaria
+[2026-05-12 12:00:07] Entity 15 (Marques) cured from Typhus
+[2026-05-12 12:00:07] Entity 37 (Yahir) cured from Typhus
+[2026-05-12 12:00:08] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:00:09] Entity 1 (Selah) cured from Fever
+[2026-05-12 12:00:09] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 12:00:09] Entity 36 (Rayan) cured from Malaria
+[2026-05-12 12:00:10] Entity 25 (Makaila) cured from Fever
+[2026-05-12 12:00:10] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:00:10] Entity 11 (Hadley) contracted Plague
+[2026-05-12 12:00:10] Entity 18 (Stella) contracted Plague
+[2026-05-12 12:00:12] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:00:14] Entity 32 (Stella) contracted Plague
+[2026-05-12 12:00:16] Entity 19 (Sammy) cured from Plague
+[2026-05-12 12:00:18] Entity 18 (Stella) cured from Plague
+[2026-05-12 12:00:20] Entity 30 (Campbell) cured from Typhus
+[2026-05-12 12:00:21] Entity 2 (Stella) contracted Fever
+[2026-05-12 12:00:21] Entity 11 (Hadley) cured from Plague
+[2026-05-12 12:00:21] Entity 23 (Sammy) contracted Malaria
+[2026-05-12 12:00:22] Entity 2 (Stella) contracted Malaria
+[2026-05-12 12:00:22] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:00:23] Entity 2 (Stella) contracted Fever
+[2026-05-12 12:00:24] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:00:24] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:00:24] Entity 27 (Makaila) contracted Malaria
+[2026-05-12 12:00:24] Entity 32 (Stella) cured from Plague
+[2026-05-12 12:00:24] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 12:00:25] Entity 1 (Selah) contracted Plague
+[2026-05-12 12:00:25] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:00:26] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 12:00:28] Entity 23 (Sammy) cured from Malaria
+[2026-05-12 12:00:32] Entity 25 (Makaila) contracted Typhus
+[2026-05-12 12:00:32] Entity 8 (Amari) cured from Typhus
+[2026-05-12 12:00:32] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:00:33] Entity 1 (Selah) cured from Plague
+[2026-05-12 12:00:33] Entity 27 (Makaila) cured from Malaria
+[2026-05-12 12:00:34] Entity 19 (Sammy) contracted Fever
+[2026-05-12 12:00:34] Entity 36 (Rayan) cured from Malaria
+[2026-05-12 12:00:34] Entity 37 (Yahir) cured from Malaria
+[2026-05-12 12:00:35] Entity 2 (Stella) cured from Fever
+[2026-05-12 12:00:35] Entity 25 (Makaila) contracted Malaria
+[2026-05-12 12:00:35] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:00:35] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:00:35] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 12:00:36] Entity 19 (Sammy) contracted Fever
+[2026-05-12 12:00:36] Entity 35 (Mckinley) contracted Typhus
+[2026-05-12 12:00:36] Entity 18 (Stella) contracted Plague
+[2026-05-12 12:00:36] Entity 15 (Marques) cured from Fever
+[2026-05-12 12:00:40] Entity 35 (Mckinley) contracted Plague
+[2026-05-12 12:00:43] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:00:47] Entity 34 (Kamila) contracted Plague
+[2026-05-12 12:00:47] Entity 12 (Amari) cured from Malaria
+[2026-05-12 12:00:49] Entity 35 (Mckinley) cured from Plague
+[2026-05-12 12:00:51] Entity 25 (Makaila) cured from Malaria
+[2026-05-12 12:00:51] Entity 30 (Campbell) cured from Fever
+[2026-05-12 12:00:51] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 12:00:51] Entity 18 (Stella) cured from Plague
+[2026-05-12 12:00:51] Entity 23 (Sammy) contracted Typhus
+[2026-05-12 12:00:56] Entity 19 (Sammy) cured from Fever
+[2026-05-12 12:01:00] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:01:00] Entity 15 (Marques) contracted Typhus
+[2026-05-12 12:01:02] Entity 34 (Kamila) cured from Plague
+[2026-05-12 12:01:02] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:01:04] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 12:01:06] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:01:09] Entity 2 (Stella) contracted Malaria
+[2026-05-12 12:01:13] Entity 1 (Selah) contracted Typhus
+[2026-05-12 12:01:14] Entity 15 (Marques) cured from Malaria
+[2026-05-12 12:01:16] Entity 1 (Selah) contracted Malaria
+[2026-05-12 12:01:18] Entity 25 (Makaila) contracted Malaria
+[2026-05-12 12:01:20] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:01:20] Entity 36 (Rayan) cured from Malaria
+[2026-05-12 12:01:20] Entity 11 (Hadley) contracted Fever
+[2026-05-12 12:01:22] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:01:24] Entity 18 (Stella) contracted Malaria
+[2026-05-12 12:01:27] Entity 34 (Kamila) contracted Fever
+[2026-05-12 12:01:27] Entity 8 (Amari) cured from Typhus
+[2026-05-12 12:01:29] Entity 1 (Selah) cured from Malaria
+[2026-05-12 12:01:32] Entity 2 (Stella) cured from Malaria
+[2026-05-12 12:01:32] Entity 11 (Hadley) cured from Fever
+[2026-05-12 12:01:34] Entity 32 (Stella) contracted Plague
+[2026-05-12 12:01:34] Entity 34 (Kamila) cured from Fever
+[2026-05-12 12:01:37] Entity 35 (Mckinley) contracted Plague
+[2026-05-12 12:01:40] Entity 30 (Campbell) cured from Typhus
+[2026-05-12 12:01:40] Entity 12 (Amari) cured from Malaria
+[2026-05-12 12:01:42] Entity 19 (Sammy) contracted Plague
+[2026-05-12 12:01:47] Entity 19 (Sammy) contracted Fever
+[2026-05-12 12:01:47] Entity 18 (Stella) cured from Malaria
+[2026-05-12 12:01:51] Entity 32 (Stella) cured from Plague
+[2026-05-12 12:01:55] Entity 29 (Jazlynn) contracted Plague
+[2026-05-12 12:01:57] Entity 15 (Marques) contracted Typhus
+[2026-05-12 12:01:59] Entity 35 (Mckinley) cured from Plague
+[2026-05-12 12:02:01] Entity 1 (Selah) contracted Plague
+[2026-05-12 12:02:03] Entity 19 (Sammy) cured from Fever
+[2026-05-12 12:02:05] Entity 2 (Stella) contracted Typhus
+[2026-05-12 12:02:07] Entity 2 (Stella) contracted Malaria
+[2026-05-12 12:02:07] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 12:02:16] Entity 15 (Marques) cured from Typhus
+[2026-05-12 12:02:18] Entity 1 (Selah) cured from Plague
+[2026-05-12 12:02:18] Entity 2 (Stella) cured from Malaria
+[2026-05-12 12:02:20] Entity 8 (Amari) contracted Malaria
+[2026-05-12 12:02:22] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:02:22] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 12:02:24] Entity 29 (Jazlynn) cured from Plague
+[2026-05-12 12:02:30] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:02:32] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:02:34] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:02:36] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:02:38] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:02:40] Entity 19 (Sammy) contracted Malaria
+[2026-05-12 12:02:40] Entity 8 (Amari) cured from Plague
+[2026-05-12 12:02:49] Entity 1 (Selah) contracted Fever
+[2026-05-12 12:02:49] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:02:51] Entity 2 (Stella) contracted Fever
+[2026-05-12 12:02:51] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:02:53] Entity 30 (Campbell) cured from Fever
+[2026-05-12 12:02:55] Entity 19 (Sammy) cured from Malaria
+[2026-05-12 12:02:55] Entity 9 (Kamila) contracted Malaria
+[2026-05-12 12:02:57] Entity 29 (Jazlynn) contracted Malaria
+[2026-05-12 12:02:57] Entity 15 (Marques) contracted Plague
+[2026-05-12 12:02:59] Entity 1 (Selah) cured from Fever
+[2026-05-12 12:02:59] Entity 11 (Hadley) contracted Plague
+[2026-05-12 12:03:08] Entity 9 (Kamila) cured from Malaria
+[2026-05-12 12:03:10] Entity 2 (Stella) cured from Fever
+[2026-05-12 12:03:10] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:03:12] Entity 29 (Jazlynn) cured from Malaria
+[2026-05-12 12:03:14] Entity 15 (Marques) cured from Plague
+[2026-05-12 12:03:16] Entity 11 (Hadley) cured from Plague
+[2026-05-12 12:03:16] Entity 28 (Fletcher) contracted Fever
+[2026-05-12 12:03:18] Entity 32 (Stella) contracted Malaria
+[2026-05-12 12:03:20] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:03:22] Entity 19 (Sammy) contracted Plague
+[2026-05-12 12:03:22] Entity 8 (Amari) cured from Typhus
+[2026-05-12 12:03:27] Entity 12 (Amari) contracted Plague
+[2026-05-12 12:03:29] Entity 12 (Amari) contracted Typhus
+[2026-05-12 12:03:31] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:03:31] Entity 28 (Fletcher) cured from Fever
+[2026-05-12 12:03:40] Entity 2 (Stella) contracted Plague
+[2026-05-12 12:03:42] Entity 2 (Stella) contracted Plague
+[2026-05-12 12:03:42] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 12:03:42] Entity 12 (Amari) cured from Typhus
+[2026-05-12 12:03:44] Entity 34 (Kamila) contracted Plague
+[2026-05-12 12:03:46] Entity 19 (Sammy) cured from Plague
+[2026-05-12 12:03:46] Entity 34 (Kamila) contracted Typhus
+[2026-05-12 12:03:48] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 12:03:48] Entity 11 (Hadley) contracted Fever
+[2026-05-12 12:03:52] Entity 2 (Stella) cured from Plague
+[2026-05-12 12:03:55] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:03:57] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:04:01] Entity 29 (Jazlynn) contracted Plague
+[2026-05-12 12:04:01] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:04:03] Entity 36 (Rayan) cured from Malaria
+[2026-05-12 12:04:07] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:04:10] Entity 34 (Kamila) cured from Malaria
+[2026-05-12 12:04:10] Entity 28 (Fletcher) contracted Plague
+[2026-05-12 12:04:12] Entity 11 (Hadley) cured from Fever
+[2026-05-12 12:04:16] Entity 15 (Marques) cured from Fever
+[2026-05-12 12:04:16] Entity 12 (Amari) contracted Fever
+[2026-05-12 12:04:18] Entity 19 (Sammy) contracted Fever
+[2026-05-12 12:04:20] Entity 29 (Jazlynn) cured from Plague
+[2026-05-12 12:04:22] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:04:26] Entity 8 (Amari) cured from Fever
+[2026-05-12 12:04:28] Entity 35 (Mckinley) contracted Fever
+[2026-05-12 12:04:31] Entity 35 (Mckinley) contracted Plague
+[2026-05-12 12:04:35] Entity 12 (Amari) cured from Fever
+[2026-05-12 12:04:35] Entity 19 (Sammy) cured from Fever
+[2026-05-12 12:04:39] Entity 28 (Fletcher) cured from Plague
+[2026-05-12 12:04:41] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 12:04:41] Entity 18 (Stella) contracted Typhus
+[2026-05-12 12:04:47] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:04:48] Entity 35 (Mckinley) cured from Plague
+[2026-05-12 12:04:49] Entity 2 (Stella) contracted Plague
+[2026-05-12 12:04:49] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:04:53] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 12:04:55] Entity 34 (Kamila) contracted Plague
+[2026-05-12 12:04:55] Entity 32 (Stella) contracted Malaria
+[2026-05-12 12:04:57] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:05:00] Entity 2 (Stella) cured from Plague
+[2026-05-12 12:05:02] Entity 8 (Amari) contracted Malaria
+[2026-05-12 12:05:04] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:05:04] Entity 12 (Amari) contracted Typhus
+[2026-05-12 12:05:04] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 12:05:06] Entity 15 (Marques) cured from Fever
+[2026-05-12 12:05:06] Entity 18 (Stella) cured from Typhus
+[2026-05-12 12:05:08] Entity 34 (Kamila) cured from Plague
+[2026-05-12 12:05:11] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:05:11] Entity 36 (Rayan) contracted Typhus
+[2026-05-12 12:05:17] Entity 12 (Amari) cured from Typhus
+[2026-05-12 12:05:19] Entity 8 (Amari) cured from Typhus
+[2026-05-12 12:05:27] Entity 11 (Hadley) contracted Fever
+[2026-05-12 12:05:29] Entity 36 (Rayan) cured from Typhus
+[2026-05-12 12:05:31] Entity 29 (Jazlynn) contracted Typhus
+[2026-05-12 12:05:33] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:05:39] Entity 32 (Stella) contracted Fever
+[2026-05-12 12:05:39] Entity 11 (Hadley) cured from Fever
+[2026-05-12 12:05:41] Entity 32 (Stella) contracted Malaria
+[2026-05-12 12:05:41] Entity 18 (Stella) contracted Plague
+[2026-05-12 12:05:50] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:05:50] Entity 29 (Jazlynn) cured from Typhus
+[2026-05-12 12:05:52] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:05:54] Entity 15 (Marques) cured from Malaria
+[2026-05-12 12:05:57] Entity 18 (Stella) cured from Plague
+[2026-05-12 12:06:02] Entity 32 (Stella) cured from Malaria
+[2026-05-12 12:06:02] Entity 36 (Rayan) contracted Typhus
+[2026-05-12 12:06:09] Entity 8 (Amari) cured from Plague
+[2026-05-12 12:06:15] Entity 36 (Rayan) cured from Typhus
+[2026-05-12 12:06:17] Entity 11 (Hadley) contracted Plague
+[2026-05-12 12:06:21] Entity 11 (Hadley) contracted Plague
+[2026-05-12 12:06:34] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:06:34] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:06:36] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:06:36] Entity 11 (Hadley) cured from Plague
+[2026-05-12 12:06:36] Entity 15 (Marques) contracted Plague
+[2026-05-12 12:06:40] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:06:48] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:06:50] Entity 15 (Marques) cured from Plague
+[2026-05-12 12:06:52] Entity 29 (Jazlynn) contracted Malaria
+[2026-05-12 12:06:53] Entity 8 (Amari) cured from Fever
+[2026-05-12 12:07:03] Entity 29 (Jazlynn) cured from Malaria
+[2026-05-12 12:07:04] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 12:07:06] Entity 12 (Amari) contracted Fever
+[2026-05-12 12:07:09] Entity 18 (Stella) contracted Malaria
+[2026-05-12 12:07:14] Entity 12 (Amari) cured from Fever
+[2026-05-12 12:07:14] Entity 37 (Yahir) cured from Malaria
+[2026-05-12 12:07:15] Entity 36 (Rayan) contracted Typhus
+[2026-05-12 12:07:16] Entity 18 (Stella) cured from Malaria
+[2026-05-12 12:07:23] Entity 29 (Jazlynn) contracted Malaria
+[2026-05-12 12:07:28] Entity 36 (Rayan) cured from Typhus
+[2026-05-12 12:07:32] Entity 12 (Amari) contracted Plague
+[2026-05-12 12:07:32] Entity 29 (Jazlynn) cured from Malaria
+[2026-05-12 12:07:35] Entity 12 (Amari) contracted Fever
+[2026-05-12 12:07:41] Entity 12 (Amari) cured from Fever
+[2026-05-12 12:07:46] Entity 1 (Selah) contracted Typhus
+[2026-05-12 12:07:48] Entity 29 (Jazlynn) contracted Plague
+[2026-05-12 12:07:50] Entity 19 (Sammy) contracted Plague
+[2026-05-12 12:07:51] Entity 19 (Sammy) contracted Typhus
+[2026-05-12 12:07:51] Entity 36 (Rayan) contracted Plague
+[2026-05-12 12:07:53] Entity 36 (Rayan) contracted Plague
+[2026-05-12 12:07:54] Entity 1 (Selah) cured from Typhus
+[2026-05-12 12:07:54] Entity 1001 (Makaila) contracted Malaria
+[2026-05-12 12:07:55] Entity 36 (Rayan) contracted Malaria
+[2026-05-12 12:07:56] Entity 29 (Jazlynn) cured from Plague
+[2026-05-12 12:07:57] Entity 19 (Sammy) cured from Typhus
+[2026-05-12 12:08:00] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:08:01] Entity 12 (Amari) contracted Typhus
+[2026-05-12 12:08:02] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:08:05] Entity 1001 (Makaila) cured from Malaria
+[2026-05-12 12:08:05] Entity 37 (Yahir) contracted Typhus
+[2026-05-12 12:08:05] Entity 36 (Rayan) cured from Malaria
+[2026-05-12 12:08:06] Entity 34 (Kamila) contracted Fever
+[2026-05-12 12:08:09] Entity 1000 (Casey) contracted Malaria
+[2026-05-12 12:08:10] Entity 1000 (Casey) contracted Typhus
+[2026-05-12 12:08:10] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:08:11] Entity 1 (Selah) contracted Fever
+[2026-05-12 12:08:12] Entity 1 (Selah) contracted Plague
+[2026-05-12 12:08:13] Entity 11 (Hadley) contracted Fever
+[2026-05-12 12:08:14] Entity 19 (Sammy) contracted Typhus
+[2026-05-12 12:08:14] Entity 34 (Kamila) cured from Fever
+[2026-05-12 12:08:14] Entity 32 (Stella) contracted Plague
+[2026-05-12 12:08:14] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 12:08:15] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:08:15] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:08:15] Entity 12 (Amari) cured from Malaria
+[2026-05-12 12:08:16] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:08:16] Entity 37 (Yahir) cured from Typhus
+[2026-05-12 12:08:18] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:08:18] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:08:19] Entity 1002 (Stella) contracted Typhus
+[2026-05-12 12:08:20] Entity 1002 (Stella) contracted Fever
+[2026-05-12 12:08:20] Entity 36 (Rayan) contracted Plague
+[2026-05-12 12:08:21] Entity 1 (Selah) cured from Plague
+[2026-05-12 12:08:21] Entity 19 (Sammy) cured from Typhus
+[2026-05-12 12:08:21] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 12:08:21] Entity 18 (Stella) contracted Typhus
+[2026-05-12 12:08:21] Entity 30 (Campbell) contracted Plague
+[2026-05-12 12:08:22] Entity 1000 (Casey) cured from Typhus
+[2026-05-12 12:08:22] Entity 18 (Stella) contracted Fever
+[2026-05-12 12:08:24] Entity 1003 (Rayan) contracted Typhus
+[2026-05-12 12:08:24] Entity 15 (Marques) cured from Fever
+[2026-05-12 12:08:25] Entity 8 (Amari) cured from Plague
+[2026-05-12 12:08:28] Entity 1001 (Makaila) contracted Malaria
+[2026-05-12 12:08:28] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:08:28] Entity 36 (Rayan) cured from Plague
+[2026-05-12 12:08:28] Entity 21 (Yahir) contracted Fever
+[2026-05-12 12:08:29] Entity 12 (Amari) contracted Plague
+[2026-05-12 12:08:29] Entity 21 (Yahir) contracted Fever
+[2026-05-12 12:08:30] Entity 30 (Campbell) cured from Plague
+[2026-05-12 12:08:31] Entity 18 (Stella) cured from Fever
+[2026-05-12 12:08:33] Entity 1002 (Stella) cured from Fever
+[2026-05-12 12:08:34] Entity 1005 (Mckinley) contracted Malaria
+[2026-05-12 12:08:35] Entity 1 (Selah) contracted Typhus
+[2026-05-12 12:08:35] Entity 19 (Sammy) contracted Malaria
+[2026-05-12 12:08:35] Entity 34 (Kamila) contracted Fever
+[2026-05-12 12:08:35] Entity 12 (Amari) cured from Plague
+[2026-05-12 12:08:35] Entity 21 (Yahir) cured from Fever
+[2026-05-12 12:08:36] Entity 34 (Kamila) contracted Typhus
+[2026-05-12 12:08:36] Entity 1001 (Makaila) cured from Malaria
+[2026-05-12 12:08:36] Entity 1000 (Casey) contracted Fever
+[2026-05-12 12:08:36] Entity 1004 (Rayan) contracted Typhus
+[2026-05-12 12:08:37] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 12:08:37] Entity 1003 (Rayan) cured from Typhus
+[2026-05-12 12:08:37] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:08:40] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 12:08:41] Entity 34 (Kamila) contracted Plague
+[2026-05-12 12:08:42] Entity 32 (Stella) contracted Malaria
+[2026-05-12 12:08:43] Entity 1 (Selah) cured from Typhus
+[2026-05-12 12:08:43] Entity 19 (Sammy) cured from Malaria
+[2026-05-12 12:08:44] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 12:08:44] Entity 35 (Mckinley) contracted Fever
+[2026-05-12 12:08:44] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 12:08:45] Entity 1000 (Casey) cured from Fever
+[2026-05-12 12:08:45] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:08:47] Entity 34 (Kamila) cured from Plague
+[2026-05-12 12:08:47] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:08:47] Entity 1005 (Mckinley) cured from Malaria
+[2026-05-12 12:08:48] Entity 8 (Amari) contracted Malaria
+[2026-05-12 12:08:48] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:08:49] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:08:49] Entity 15 (Marques) contracted Plague
+[2026-05-12 12:08:49] Entity 18 (Stella) contracted Malaria
+[2026-05-12 12:08:49] Entity 35 (Mckinley) cured from Fever
+[2026-05-12 12:08:49] Entity 36 (Rayan) contracted Plague
+[2026-05-12 12:08:49] Entity 1004 (Rayan) cured from Typhus
+[2026-05-12 12:08:50] Entity 36 (Rayan) contracted Plague
+[2026-05-12 12:08:51] Entity 11 (Hadley) cured from Typhus
+[2026-05-12 12:08:51] Entity 36 (Rayan) contracted Typhus
+[2026-05-12 12:08:52] Entity 1001 (Makaila) contracted Malaria
+[2026-05-12 12:08:53] Entity 32 (Stella) cured from Malaria
+[2026-05-12 12:08:54] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:08:54] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 12:08:55] Entity 12 (Amari) contracted Typhus
+[2026-05-12 12:08:55] Entity 30 (Campbell) cured from Typhus
+[2026-05-12 12:08:56] Entity 37 (Yahir) cured from Malaria
+[2026-05-12 12:08:57] Entity 1002 (Stella) contracted Typhus
+[2026-05-12 12:08:57] Entity 15 (Marques) cured from Plague
+[2026-05-12 12:08:59] Entity 1 (Selah) contracted Fever
+[2026-05-12 12:08:59] Entity 1003 (Rayan) contracted Typhus
+[2026-05-12 12:08:59] Entity 8 (Amari) cured from Fever
+[2026-05-12 12:08:59] Entity 36 (Rayan) cured from Typhus
+[2026-05-12 12:09:00] Entity 1003 (Rayan) contracted Malaria
+[2026-05-12 12:09:00] Entity 21 (Yahir) cured from Malaria
+[2026-05-12 12:09:01] Entity 18 (Stella) cured from Malaria
+[2026-05-12 12:09:01] Entity 12 (Amari) cured from Typhus
+[2026-05-12 12:09:05] Entity 19 (Sammy) contracted Typhus
+[2026-05-12 12:09:05] Entity 1003 (Rayan) cured from Malaria
+[2026-05-12 12:09:06] Entity 29 (Jazlynn) contracted Malaria
+[2026-05-12 12:09:06] Entity 35 (Mckinley) contracted Plague
+[2026-05-12 12:09:07] Entity 1000 (Casey) contracted Typhus
+[2026-05-12 12:09:08] Entity 34 (Kamila) contracted Fever
+[2026-05-12 12:09:08] Entity 1002 (Stella) cured from Typhus
+[2026-05-12 12:09:08] Entity 1004 (Rayan) contracted Plague
+[2026-05-12 12:09:09] Entity 1 (Selah) cured from Fever
+[2026-05-12 12:09:11] Entity 37 (Yahir) contracted Typhus
+[2026-05-12 12:09:11] Entity 29 (Jazlynn) cured from Malaria
+[2026-05-12 12:09:11] Entity 30 (Campbell) contracted Plague
+[2026-05-12 12:09:14] Entity 32 (Stella) contracted Plague
+[2026-05-12 12:09:14] Entity 1005 (Mckinley) contracted Fever
+[2026-05-12 12:09:15] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 12:09:15] Entity 1005 (Mckinley) contracted Malaria
+[2026-05-12 12:09:16] Entity 32 (Stella) contracted Fever
+[2026-05-12 12:09:16] Entity 35 (Mckinley) cured from Plague
+[2026-05-12 12:09:17] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:09:17] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 12:09:17] Entity 12 (Amari) contracted Fever
+[2026-05-12 12:09:17] Entity 1005 (Mckinley) contracted Plague
+[2026-05-12 12:09:18] Entity 34 (Kamila) cured from Fever
+[2026-05-12 12:09:18] Entity 21 (Yahir) contracted Fever
+[2026-05-12 12:09:18] Entity 1004 (Rayan) cured from Plague
+[2026-05-12 12:09:19] Entity 37 (Yahir) cured from Typhus
+[2026-05-12 12:09:19] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 12:09:19] Entity 30 (Campbell) cured from Plague
+[2026-05-12 12:09:20] Entity 18 (Stella) contracted Typhus
+[2026-05-12 12:09:20] Entity 36 (Rayan) contracted Plague
+[2026-05-12 12:09:22] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:09:23] Entity 32 (Stella) cured from Fever
+[2026-05-12 12:09:23] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 12:09:23] Entity 15 (Marques) contracted Plague
+[2026-05-12 12:09:25] Entity 12 (Amari) cured from Fever
+[2026-05-12 12:09:27] Entity 8 (Amari) cured from Typhus
+[2026-05-12 12:09:27] Entity 18 (Stella) cured from Typhus
+[2026-05-12 12:09:28] Entity 21 (Yahir) cured from Malaria
+[2026-05-12 12:09:30] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:09:30] Entity 15 (Marques) cured from Plague
+[2026-05-12 12:09:33] Entity 1005 (Mckinley) cured from Plague
+[2026-05-12 12:09:35] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:09:37] Entity 11 (Hadley) contracted Plague
+[2026-05-12 12:09:39] Entity 37 (Yahir) contracted Fever
+[2026-05-12 12:09:40] Entity 1004 (Rayan) contracted Malaria
+[2026-05-12 12:09:41] Entity 1004 (Rayan) contracted Typhus
+[2026-05-12 12:09:42] Entity 37 (Yahir) contracted Plague
+[2026-05-12 12:09:42] Entity 12 (Amari) contracted Plague
+[2026-05-12 12:09:42] Entity 18 (Stella) contracted Fever
+[2026-05-12 12:09:42] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:09:42] Entity 1004 (Rayan) contracted Plague
+[2026-05-12 12:09:43] Entity 37 (Yahir) contracted Plague
+[2026-05-12 12:09:43] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:09:43] Entity 1004 (Rayan) contracted Malaria
+[2026-05-12 12:09:44] Entity 21 (Yahir) contracted Plague
+[2026-05-12 12:09:44] Entity 30 (Campbell) contracted Plague
+[2026-05-12 12:09:45] Entity 32 (Stella) contracted Plague
+[2026-05-12 12:09:45] Entity 11 (Hadley) cured from Plague
+[2026-05-12 12:09:47] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:09:47] Entity 32 (Stella) contracted Plague
+[2026-05-12 12:09:47] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:09:49] Entity 12 (Amari) cured from Plague
+[2026-05-12 12:09:49] Entity 1005 (Mckinley) contracted Typhus
+[2026-05-12 12:09:50] Entity 37 (Yahir) cured from Plague
+[2026-05-12 12:09:50] Entity 21 (Yahir) cured from Plague
+[2026-05-12 12:09:51] Entity 18 (Stella) cured from Fever
+[2026-05-12 12:09:52] Entity 8 (Amari) cured from Typhus
+[2026-05-12 12:09:52] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:09:53] Entity 32 (Stella) cured from Plague
+[2026-05-12 12:09:54] Entity 15 (Marques) cured from Fever
+[2026-05-12 12:09:54] Entity 30 (Campbell) cured from Plague
+[2026-05-12 12:10:00] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:10:03] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:10:03] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 12:10:04] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 12:10:04] Entity 11 (Hadley) contracted Fever
+[2026-05-12 12:10:06] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 12:10:08] Entity 12 (Amari) cured from Malaria
+[2026-05-12 12:10:09] Entity 18 (Stella) contracted Fever
+[2026-05-12 12:10:09] Entity 32 (Stella) contracted Malaria
+[2026-05-12 12:10:11] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:10:12] Entity 37 (Yahir) cured from Malaria
+[2026-05-12 12:10:12] Entity 15 (Marques) contracted Typhus
+[2026-05-12 12:10:14] Entity 32 (Stella) cured from Malaria
+[2026-05-12 12:10:15] Entity 11 (Hadley) cured from Typhus
+[2026-05-12 12:10:18] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:10:19] Entity 15 (Marques) cured from Typhus
+[2026-05-12 12:10:27] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:10:27] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:10:29] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:10:31] Entity 1006 (Selah) contracted Plague
+[2026-05-12 12:10:32] Entity 37 (Yahir) contracted Typhus
+[2026-05-12 12:10:33] Entity 1006 (Selah) contracted Typhus
+[2026-05-12 12:10:33] Entity 12 (Amari) cured from Malaria
+[2026-05-12 12:10:33] Entity 37 (Yahir) contracted Fever
+[2026-05-12 12:10:35] Entity 15 (Marques) contracted Typhus
+[2026-05-12 12:10:35] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:10:36] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:10:37] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 12:10:39] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 12:10:40] Entity 37 (Yahir) cured from Fever
+[2026-05-12 12:10:44] Entity 15 (Marques) cured from Malaria
+[2026-05-12 12:10:47] Entity 29 (Jazlynn) contracted Plague
+[2026-05-12 12:10:48] Entity 29 (Jazlynn) contracted Typhus
+[2026-05-12 12:10:49] Entity 11 (Hadley) cured from Malaria
+[2026-05-12 12:10:50] Entity 1006 (Selah) cured from Typhus
+[2026-05-12 12:10:52] Entity 32 (Stella) contracted Malaria
+[2026-05-12 12:10:53] Entity 12 (Amari) contracted Plague
+[2026-05-12 12:10:54] Entity 37 (Yahir) contracted Typhus
+[2026-05-12 12:10:59] Entity 29 (Jazlynn) cured from Typhus
+[2026-05-12 12:10:59] Entity 37 (Yahir) cured from Typhus
+[2026-05-12 12:11:01] Entity 12 (Amari) cured from Plague
+[2026-05-12 12:11:02] Entity 15 (Marques) contracted Plague
+[2026-05-12 12:11:03] Entity 11 (Hadley) contracted Typhus
+[2026-05-12 12:11:03] Entity 15 (Marques) contracted Plague
+[2026-05-12 12:11:03] Entity 32 (Stella) cured from Malaria
+[2026-05-12 12:11:07] Entity 1006 (Selah) contracted Fever
+[2026-05-12 12:11:13] Entity 11 (Hadley) cured from Typhus
+[2026-05-12 12:11:13] Entity 15 (Marques) cured from Plague
+[2026-05-12 12:11:14] Entity 1006 (Selah) cured from Fever
+[2026-05-12 12:11:16] Entity 29 (Jazlynn) contracted Typhus
+[2026-05-12 12:11:17] Entity 8 (Amari) contracted Typhus
+[2026-05-12 12:11:18] Entity 37 (Yahir) contracted Fever
+[2026-05-12 12:11:19] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:11:20] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:11:20] Entity 32 (Stella) contracted Fever
+[2026-05-12 12:11:22] Entity 29 (Jazlynn) cured from Typhus
+[2026-05-12 12:11:25] Entity 11 (Hadley) contracted Fever
+[2026-05-12 12:11:25] Entity 1006 (Selah) contracted Typhus
+[2026-05-12 12:11:26] Entity 15 (Marques) contracted Plague
+[2026-05-12 12:11:26] Entity 32 (Stella) cured from Fever
+[2026-05-12 12:11:26] Entity 37 (Yahir) cured from Fever
+[2026-05-12 12:11:27] Entity 15 (Marques) contracted Malaria
+[2026-05-12 12:11:31] Entity 8 (Amari) cured from Plague
+[2026-05-12 12:11:33] Entity 15 (Marques) cured from Malaria
+[2026-05-12 12:11:34] Entity 11 (Hadley) cured from Fever
+[2026-05-12 12:11:35] Entity 1006 (Selah) cured from Typhus
+[2026-05-12 12:11:36] Entity 2 (Stella) contracted Typhus
+[2026-05-12 12:11:39] Entity 29 (Jazlynn) contracted Fever
+[2026-05-12 12:11:40] Entity 1 (Selah) contracted Plague
+[2026-05-12 12:11:40] Entity 32 (Stella) contracted Plague
+[2026-05-12 12:11:45] Entity 8 (Amari) contracted Malaria
+[2026-05-12 12:11:46] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 12:11:48] Entity 15 (Marques) contracted Fever
+[2026-05-12 12:11:48] Entity 29 (Jazlynn) cured from Fever
+[2026-05-12 12:11:48] Entity 37 (Yahir) contracted Fever
+[2026-05-12 12:11:50] Entity 1 (Selah) cured from Plague
+[2026-05-12 12:11:50] Entity 1006 (Selah) contracted Malaria
+[2026-05-12 12:11:51] Entity 34 (Kamila) contracted Typhus
+[2026-05-12 12:11:51] Entity 32 (Stella) cured from Plague
+[2026-05-12 12:11:54] Entity 8 (Amari) cured from Malaria
+[2026-05-12 12:11:54] Entity 15 (Marques) cured from Fever
+[2026-05-12 12:11:56] Entity 37 (Yahir) cured from Fever
+[2026-05-12 12:11:58] Entity 11 (Hadley) contracted Malaria
+[2026-05-12 12:12:00] Entity 34 (Kamila) cured from Typhus
+[2026-05-12 12:12:01] Entity 1006 (Selah) cured from Malaria
+[2026-05-12 12:12:04] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:12:06] Entity 29 (Jazlynn) contracted Typhus
+[2026-05-12 12:12:08] Entity 29 (Jazlynn) contracted Typhus
+[2026-05-12 12:12:09] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:12:15] Entity 37 (Yahir) contracted Malaria
+[2026-05-12 12:12:16] Entity 29 (Jazlynn) cured from Typhus
+[2026-05-12 12:12:25] Entity 37 (Yahir) cured from Malaria
+[2026-05-12 12:12:41] Entity 1007 (Fletcher) contracted Fever
+[2026-05-12 12:12:56] Entity 1007 (Fletcher) cured from Fever
+[2026-05-12 12:12:59] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 12:13:00] Entity 12 (Amari) contracted Typhus
+[2026-05-12 12:13:00] Entity 34 (Kamila) contracted Plague
+[2026-05-12 12:13:06] Entity 34 (Kamila) cured from Plague
+[2026-05-12 12:13:09] Entity 12 (Amari) cured from Typhus
+[2026-05-12 12:13:23] Entity 1007 (Fletcher) contracted Typhus
+[2026-05-12 12:13:24] Entity 1007 (Fletcher) contracted Malaria
+[2026-05-12 12:13:25] Entity 1007 (Fletcher) contracted Plague
+[2026-05-12 12:13:32] Entity 12 (Amari) contracted Fever
+[2026-05-12 12:13:33] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:13:34] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:13:36] Entity 1007 (Fletcher) cured from Plague
+[2026-05-12 12:13:38] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:13:38] Entity 12 (Amari) cured from Fever
+[2026-05-12 12:13:49] Entity 8 (Amari) cured from Plague
+[2026-05-12 12:13:51] Entity 1007 (Fletcher) contracted Typhus
+[2026-05-12 12:13:52] Entity 21 (Yahir) contracted Typhus
+[2026-05-12 12:13:53] Entity 12 (Amari) contracted Malaria
+[2026-05-12 12:13:59] Entity 21 (Yahir) cured from Typhus
+[2026-05-12 12:14:00] Entity 1007 (Fletcher) cured from Typhus
+[2026-05-12 12:14:01] Entity 12 (Amari) cured from Malaria
+[2026-05-12 12:14:03] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:14:15] Entity 8 (Amari) cured from Plague
+[2026-05-12 12:14:16] Entity 1007 (Fletcher) contracted Plague
+[2026-05-12 12:14:18] Entity 12 (Amari) contracted Fever
+[2026-05-12 12:14:19] Entity 12 (Amari) contracted Plague
+[2026-05-12 12:14:21] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 12:14:25] Entity 12 (Amari) cured from Plague
+[2026-05-12 12:14:25] Entity 1007 (Fletcher) cured from Plague
+[2026-05-12 12:14:30] Entity 21 (Yahir) cured from Malaria
+[2026-05-12 12:14:35] Entity 8 (Amari) contracted Plague
+[2026-05-12 12:14:36] Entity 8 (Amari) contracted Malaria
+[2026-05-12 12:14:37] Entity 1007 (Fletcher) contracted Fever
+[2026-05-12 12:14:38] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:14:42] Entity 12 (Amari) contracted Plague
+[2026-05-12 12:14:45] Entity 12 (Amari) contracted Typhus
+[2026-05-12 12:14:46] Entity 1007 (Fletcher) cured from Fever
+[2026-05-12 12:14:49] Entity 8 (Amari) cured from Fever
+[2026-05-12 12:17:17] Entity 30 (Campbell) contracted Plague
+[2026-05-12 12:17:18] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:17:18] Entity 34 (Kamila) contracted Fever
+[2026-05-12 12:17:24] Entity 30 (Campbell) cured from Fever
+[2026-05-12 12:17:24] Entity 34 (Kamila) cured from Fever
+[2026-05-12 12:17:27] Entity 1008 (Rayan) contracted Fever
+[2026-05-12 12:17:39] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 12:17:40] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:17:40] Entity 34 (Kamila) contracted Typhus
+[2026-05-12 12:17:41] Entity 1008 (Rayan) cured from Fever
+[2026-05-12 12:17:46] Entity 34 (Kamila) cured from Typhus
+[2026-05-12 12:17:48] Entity 30 (Campbell) cured from Fever
+[2026-05-12 12:18:00] Entity 34 (Kamila) contracted Plague
+[2026-05-12 12:18:01] Entity 1008 (Rayan) contracted Malaria
+[2026-05-12 12:18:03] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 12:18:08] Entity 30 (Campbell) cured from Malaria
+[2026-05-12 12:18:09] Entity 34 (Kamila) cured from Plague
+[2026-05-12 12:18:12] Entity 1008 (Rayan) cured from Malaria
+[2026-05-12 12:18:14] Entity 1009 (Jazlynn) contracted Malaria
+[2026-05-12 12:18:23] Entity 30 (Campbell) contracted Plague
+[2026-05-12 12:18:24] Entity 34 (Kamila) contracted Fever
+[2026-05-12 12:18:26] Entity 1008 (Rayan) contracted Malaria
+[2026-05-12 12:18:27] Entity 1009 (Jazlynn) cured from Malaria
+[2026-05-12 12:18:30] Entity 30 (Campbell) cured from Plague
+[2026-05-12 12:18:34] Entity 34 (Kamila) cured from Fever
+[2026-05-12 12:18:35] Entity 1008 (Rayan) cured from Malaria
+[2026-05-12 12:18:44] Entity 1009 (Jazlynn) contracted Plague
+[2026-05-12 12:18:45] Entity 1009 (Jazlynn) contracted Fever
+[2026-05-12 12:18:46] Entity 1009 (Jazlynn) contracted Plague
+[2026-05-12 12:18:47] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 12:18:48] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:18:48] Entity 1009 (Jazlynn) contracted Malaria
+[2026-05-12 12:18:49] Entity 34 (Kamila) contracted Malaria
+[2026-05-12 12:18:50] Entity 1008 (Rayan) contracted Fever
+[2026-05-12 12:18:51] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:18:56] Entity 34 (Kamila) cured from Malaria
+[2026-05-12 12:19:00] Entity 30 (Campbell) cured from Fever
+[2026-05-12 12:19:37] Entity 21 (Yahir) contracted Plague
+[2026-05-12 12:19:42] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:19:43] Entity 21 (Yahir) cured from Plague
+[2026-05-12 12:19:45] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:19:49] Entity 32 (Stella) cured from Typhus
+[2026-05-12 12:19:52] Entity 8 (Amari) cured from Fever
+[2026-05-12 12:19:59] Entity 21 (Yahir) contracted Typhus
+[2026-05-12 12:20:06] Entity 21 (Yahir) cured from Typhus
+[2026-05-12 12:20:07] Entity 32 (Stella) contracted Fever
+[2026-05-12 12:20:08] Entity 32 (Stella) contracted Fever
+[2026-05-12 12:20:09] Entity 8 (Amari) contracted Fever
+[2026-05-12 12:20:16] Entity 32 (Stella) cured from Fever
+[2026-05-12 12:21:49] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 12:21:56] Entity 21 (Yahir) cured from Malaria
+[2026-05-12 12:21:58] Entity 32 (Stella) contracted Typhus
+[2026-05-12 12:21:59] Entity 32 (Stella) contracted Malaria
+[2026-05-12 12:22:17] Entity 21 (Yahir) contracted Typhus
+[2026-05-12 12:22:18] Entity 1010 (Makaila) contracted Malaria
+[2026-05-12 12:22:24] Entity 21 (Yahir) cured from Typhus
+[2026-05-12 12:22:25] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:22:32] Entity 30 (Campbell) cured from Typhus
+[2026-05-12 12:22:32] Entity 1010 (Makaila) cured from Malaria
+[2026-05-12 12:22:41] Entity 21 (Yahir) contracted Fever
+[2026-05-12 12:22:42] Entity 21 (Yahir) contracted Fever
+[2026-05-12 12:22:47] Entity 30 (Campbell) contracted Fever
+[2026-05-12 12:22:48] Entity 1010 (Makaila) contracted Typhus
+[2026-05-12 12:22:51] Entity 21 (Yahir) cured from Fever
+[2026-05-12 12:22:54] Entity 30 (Campbell) cured from Fever
+[2026-05-12 12:23:03] Entity 1011 (Yahir) contracted Fever
+[2026-05-12 12:23:05] Entity 30 (Campbell) contracted Plague
+[2026-05-12 12:23:06] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 12:23:11] Entity 30 (Campbell) cured from Plague
+[2026-05-12 12:23:13] Entity 21 (Yahir) cured from Malaria
+[2026-05-12 12:23:14] Entity 1011 (Yahir) cured from Fever
+[2026-05-12 12:23:23] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 12:23:25] Entity 21 (Yahir) contracted Plague
+[2026-05-12 12:23:30] Entity 30 (Campbell) cured from Malaria
+[2026-05-12 12:23:30] Entity 1011 (Yahir) contracted Fever
+[2026-05-12 12:23:33] Entity 21 (Yahir) cured from Plague
+[2026-05-12 12:23:39] Entity 1011 (Yahir) cured from Fever
+[2026-05-12 12:23:43] Entity 1012 (Amari) contracted Typhus
+[2026-05-12 12:23:45] Entity 30 (Campbell) contracted Malaria
+[2026-05-12 12:23:45] Entity 1012 (Amari) contracted Malaria
+[2026-05-12 12:23:46] Entity 1012 (Amari) contracted Malaria
+[2026-05-12 12:23:49] Entity 21 (Yahir) contracted Fever
+[2026-05-12 12:23:52] Entity 30 (Campbell) cured from Malaria
+[2026-05-12 12:23:54] Entity 1011 (Yahir) contracted Fever
+[2026-05-12 12:23:55] Entity 21 (Yahir) cured from Fever
+[2026-05-12 12:23:58] Entity 1012 (Amari) cured from Malaria
+[2026-05-12 12:24:01] Entity 1011 (Yahir) cured from Fever
+[2026-05-12 12:24:11] Entity 30 (Campbell) contracted Typhus
+[2026-05-12 12:24:12] Entity 21 (Yahir) contracted Malaria
+[2026-05-12 12:24:14] Entity 21 (Yahir) contracted Plague
+[2026-05-12 12:24:16] Entity 1012 (Amari) contracted Malaria
+[2026-05-12 12:24:18] Entity 1012 (Amari) contracted Malaria
+[2026-05-12 12:24:21] Entity 30 (Campbell) cured from Typhus
+[2026-05-12 12:24:22] Entity 21 (Yahir) cured from Plague
+[2026-05-12 12:24:22] Entity 1011 (Yahir) contracted Plague

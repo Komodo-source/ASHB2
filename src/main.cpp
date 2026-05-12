@@ -604,10 +604,105 @@ void sync_clock_stats(Entity* ent, int neighboors){
     fs.chooseAction(ent);
 }
 
-void initialiseSDL(){
+
+void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, bool isPaused, int width, int height, int& selectedEntityIndex, bool& showEntityWindow) {
+    //Birthday,
+    // une année = 100 jours
+    if((day / 60)  % 100 == 1){
+        for(Entity& ent : entities){
+            ent.IncrementBDay();
+        }
+    }
+
+    // Check for dead entities and remove them
+    for(int i = (int)entities.size() - 1; i >= 0; i--){
+        if(entities[i].entityHealth <= 0.0f){
+            std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
+            entities.erase(entities.begin() + i);
+
+            // Rebuild ent_quad pointer vector
+            ent_quad.clear();
+            for(int j = 0; j < (int)entities.size(); j++){
+                ent_quad.push_back(&entities[j]);
+            }
+
+            // Reset selected entity if it was removed
+            if(selectedEntityIndex == i){
+                showEntityWindow = false;
+                selectedEntityIndex = -1;
+            } else if(selectedEntityIndex > i){
+                selectedEntityIndex--;
+            }
+        }
+    }
+
+    // Update free will system periodically (only when not paused)
+    if (!isPaused) {
+        frameCounter++;
+        if(frameCounter >= UPDATE_FREQUENCY){
+            frameCounter = 0;
+
+            // Recalculate entity groups based on current positions
+            close_entity_together = separationQuad(ent_quad, width, height);
+
+            // Apply free will to all entity groups with current day for context
+            applyFreeWill(close_entity_together, day);
+            std::vector<Entity> new_borns = get_new_borns();
+            for(Entity ent: new_borns){
+                entities.push_back(ent);
+            }
+            FreeWillSystem::clear_new_borns();
+
+            // Rebuild ent_quad so new entities appear on map and pointers are fresh
+            if (!new_borns.empty()) {
+                ent_quad.clear();
+                for(int j = 0; j < (int)entities.size(); j++){
+                    ent_quad.push_back(&entities[j]);
+                }
+                // Repair all pointedEntity pointers
+                for(Entity& e : entities){
+                    for(auto& d : e.list_entityPointedDesire){
+                        if(d.pointedEntity){
+                            int id = d.pointedEntity->entityId;
+                            for(Entity& other : entities)
+                                if(other.entityId == id){ d.pointedEntity = &other; break; }
+                        }
+                    }
+                    for(auto& a : e.list_entityPointedAnger){
+                        if(a.pointedEntity){
+                            int id = a.pointedEntity->entityId;
+                            for(Entity& other : entities)
+                                if(other.entityId == id){ a.pointedEntity = &other; break; }
+                        }
+                    }
+                    for(auto& s : e.list_entityPointedSocial){
+                        if(s.pointedEntity){
+                            int id = s.pointedEntity->entityId;
+                            for(Entity& other : entities)
+                                if(other.entityId == id){ s.pointedEntity = &other; break; }
+                        }
+                    }
+                    for(auto& c : e.list_entityPointedCouple){
+                        if(c.pointedEntity){
+                            int id = c.pointedEntity->entityId;
+                            for(Entity& other : entities)
+                                if(other.entityId == id){ c.pointedEntity = &other; break; }
+                        }
+                    }
+                }
+            }
+
+            // Export current state to JSON lines for HTML viewer
+            exportTickHistory("./src/data/tick_history.jsonl", entities, day);
+        }
+        day++;
+    }
+}
+
+void initialiseSDL(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, int width, int height, int& selectedEntityIndex, bool& showEntityWindow){
     SDLEngine SDLEngine("ASHB2 DEBUG");
     Image obj(SDLEngine, "assets/background.jpg");
-    
+
     bool running = true;
     SDL_Event event;
     while (running)
@@ -618,11 +713,27 @@ void initialiseSDL(){
             }
         }
 
+        // Apply free will and simulation updates
+        updateSimulationStep(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, false, width, height, selectedEntityIndex, showEntityWindow);
+
         SDLEngine.initialiserRendu();
         obj.dessiner(0,0);
+
+        // Draw all entities as dots in SDL mode
+        SDL_SetRenderDrawColor(SDLEngine.getRenderer(), 255, 255, 255, 255);
+        for(Entity* ent : ent_quad){
+            SDL_Rect r;
+            r.x = static_cast<int>(ent->posX);
+            r.y = static_cast<int>(ent->posY);
+            r.w = 5;
+            r.h = 5;
+            SDL_RenderFillRect(SDLEngine.getRenderer(), &r);
+        }
+
         SDLEngine.finaliserRendu();
     }
 }
+
 
 int getRenderingChoice(){
     std::cout << "Choose your rendering method(1 or 2)\n  1-Simple Dots representing entities (=more statistics, less beautiful) \n  2-Graphic rendering with character moving(=less statistics, more beautiful)\n>";
@@ -672,31 +783,9 @@ int main(int argc, char* argv[]) {
     std::cin >> entity_num;
     int renderingType = getRenderingChoice();
 
-    if(renderingType == 1){
-        srand(time(NULL));
-        if (!glfwInit()) return -1;
-
-        const int height = 1050;
-        const int width = 1400;
-
-        GLFWwindow* window = glfwCreateWindow(width, height, "ASHB", NULL, NULL);
-        if (!window) {
-            glfwTerminate();
-            return -1;
-        }
-        glfwMakeContextCurrent(window);
-
-        // Initialize ImGui
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        ImGui::StyleColorsDark();
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 130");
-
-        glfwSwapInterval(1);
-
-        UI instanceUI;
+    srand(time(NULL));
+    const int height = 1050;
+    const int width = 1400;
 
         std::vector<Entity> entities;
         entities.reserve(2048);
@@ -837,8 +926,8 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        static bool showEntityWindow = false;
-        static int selectedEntityIndex = -1;
+        bool showEntityWindow = false;
+        int selectedEntityIndex = -1;
         std::vector<Entity*> ent_quad;
         for(int i=0; i<entities.size(); i++){
             ent_quad.push_back(&entities[i]);
@@ -855,6 +944,28 @@ int main(int argc, char* argv[]) {
         int day = FreeWillSystem::day;
 
         const int UPDATE_FREQUENCY = 60; // Update free will every 60 frames
+    if(renderingType == 1){
+        if (!glfwInit()) return -1;
+
+        GLFWwindow* window = glfwCreateWindow(width, height, "ASHB", NULL, NULL);
+        if (!window) {
+            glfwTerminate();
+            return -1;
+        }
+        glfwMakeContextCurrent(window);
+
+        // Initialize ImGui
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init("#version 130");
+
+        glfwSwapInterval(1);
+
+        UI instanceUI;
+
 
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
@@ -862,101 +973,7 @@ int main(int argc, char* argv[]) {
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            //Birthday,
-            // une année = 100 jours
-            if((day / 60)  % 100 == 1){
-                for(Entity& ent : entities){
-                    ent.IncrementBDay();
-                }
-            }
-
-            // Check for dead entities and remove them
-            for(int i = entities.size() - 1; i >= 0; i--){
-                if(entities[i].entityHealth <= 0.0f){
-                    std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
-                    //globalLogger->logDeath(entities[i].getId(), entities[i].getName(), entities[i].entityAge, "health depletion");
-
-                    entities.erase(entities.begin() + i);
-
-                    // Rebuild ent_quad pointer vector
-                    ent_quad.clear();
-                    for(int j = 0; j < entities.size(); j++){
-                        ent_quad.push_back(&entities[j]);
-                    }
-
-                    // Reset selected entity if it was removed
-                    if(selectedEntityIndex == i){
-                        showEntityWindow = false;
-                        selectedEntityIndex = -1;
-                    } else if(selectedEntityIndex > i){
-                        selectedEntityIndex--;
-                    }
-                }
-            }
-
-            // Update free will system periodically (only when not paused)
-            if (!instanceUI.isSimulationPaused()) {
-                frameCounter++;
-                if(frameCounter >= UPDATE_FREQUENCY){
-                    frameCounter = 0;
-
-                    // Recalculate entity groups based on current positions
-                    close_entity_together = separationQuad(ent_quad, width, height);
-
-                    // Apply free will to all entity groups with current day for context
-                    std::cout << "CHECK SIZE GROUP: " << close_entity_together.size() << std::endl;
-                    applyFreeWill(close_entity_together, day);
-                    std::vector<Entity> new_borns = get_new_borns();
-                    for(Entity ent: new_borns){
-                        entities.push_back(ent);
-                    }
-                    FreeWillSystem::clear_new_borns();
-
-                    // Rebuild ent_quad so new entities appear on map and pointers are fresh
-                    if (!new_borns.empty()) {
-                        ent_quad.clear();
-                        for(int j = 0; j < (int)entities.size(); j++){
-                            ent_quad.push_back(&entities[j]);
-                        }
-                        // Repair all pointedEntity pointers — they point into entities[] which may
-                        // have reallocated. Re-resolve by matching stored entity IDs.
-                        for(Entity& e : entities){
-                            for(auto& d : e.list_entityPointedDesire){
-                                if(d.pointedEntity){
-                                    int id = d.pointedEntity->entityId;
-                                    for(Entity& other : entities)
-                                        if(other.entityId == id){ d.pointedEntity = &other; break; }
-                                }
-                            }
-                            for(auto& a : e.list_entityPointedAnger){
-                                if(a.pointedEntity){
-                                    int id = a.pointedEntity->entityId;
-                                    for(Entity& other : entities)
-                                        if(other.entityId == id){ a.pointedEntity = &other; break; }
-                                }
-                            }
-                            for(auto& s : e.list_entityPointedSocial){
-                                if(s.pointedEntity){
-                                    int id = s.pointedEntity->entityId;
-                                    for(Entity& other : entities)
-                                        if(other.entityId == id){ s.pointedEntity = &other; break; }
-                                }
-                            }
-                            for(auto& c : e.list_entityPointedCouple){
-                                if(c.pointedEntity){
-                                    int id = c.pointedEntity->entityId;
-                                    for(Entity& other : entities)
-                                        if(other.entityId == id){ c.pointedEntity = &other; break; }
-                                }
-                            }
-                        }
-                    }
-
-                    // Export current state to JSON lines for HTML viewer
-                    exportTickHistory("./src/data/tick_history.jsonl", entities, day);
-
-                }
-            }
+            updateSimulationStep(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, instanceUI.isSimulationPaused(), width, height, selectedEntityIndex, showEntityWindow);
 
             std::string saveFilename;
             int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename, day / 60 , entities.size(), UPDATE_FREQUENCY, {});
@@ -995,9 +1012,6 @@ int main(int argc, char* argv[]) {
             glClear(GL_COLOR_BUFFER_BIT);
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             glfwSwapBuffers(window);
-            if (!instanceUI.isSimulationPaused()) {
-                day++;
-            }
         }
 
         ImGui_ImplOpenGL3_Shutdown();
@@ -1005,7 +1019,7 @@ int main(int argc, char* argv[]) {
         ImGui::DestroyContext();
         glfwTerminate();
     }else{// sdl rendering
-        initialiseSDL();
+        initialiseSDL(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, width, height, selectedEntityIndex, showEntityWindow);
     }
     return 0;
 }

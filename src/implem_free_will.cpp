@@ -170,7 +170,7 @@ void FreeWillSystem::applyEnvironmentalEffects(Entity* entity, const Environment
         entity->entityHapiness -= crowdDiscomfort * 1.0f;
     }
 
-    // Clamp all stats 
+    // Clamp all stats
     entity->entityHapiness = std::max(0.0f, std::min(100.0f, entity->entityHapiness));
     entity->entityStress = std::max(0.0f, std::min(100.0f, entity->entityStress));
     entity->entityMentalHealth = std::max(0.0f, std::min(100.0f, entity->entityMentalHealth));
@@ -814,14 +814,14 @@ void FreeWillSystem::initializeActions() {
     // Drink Alcohol (entertainment/health)
     Action drinkAlcohol("DrinkAlcohol", 33, "entertainment");
     drinkAlcohol.requirements = { {"stress", 75.0f, 0.8f} };
-    drinkAlcohol.statChanges = { {"stress", -15.0f}, {"happiness", 12.0f}, {"health", -6.0f}, {"mentalHealth", -6.0f}, {"hygiene", -4.0f} };
+    drinkAlcohol.statChanges = { {"stress", -15.0f}, {"happiness", 12.0f}, {"health", -3.0f}, {"mentalHealth", -6.0f}, {"hygiene", -4.0f} };
     drinkAlcohol.baseSatisfaction = 13.0f;
     availableActions.push_back(drinkAlcohol);
 
     // Smoke/Vape (health)
     Action smoke("Smoke", 34, "health");
     smoke.requirements = { {"stress", 70.0f, 0.8f} };
-    smoke.statChanges = { {"stress", -12.0f}, {"health", -5.0f}, {"hygiene", -2.0f} };
+    smoke.statChanges = { {"stress", -12.0f}, {"health", -3.0f}, {"hygiene", -2.0f} };
     smoke.baseSatisfaction = 10.0f;
     availableActions.push_back(smoke);
 
@@ -1911,7 +1911,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         pointer->lifeMemories.push_back(mem);
         pointer->personality.neuroticism += 3.2f;
         pointer->ValueSystem.collectivism -= 1.2f;
-        std::cout << "MURDER: (" << pointer->getId() << ")" << pointer->getName() << " a tué (" << pointed->getId() << ")" << pointed->getName() << std::endl;
+        std::cout << "--- MURDER: (" << pointer->getId() << ")" << pointer->getName() << " a tué (" << pointed->getId() << ")" << pointed->getName() << std::endl;
         if (pointed->searchConnAng(pointer) > 40.0 || pointed->personality.neuroticism > 50.0 || pointed->entityMentalHealth < 30) {
             pointed->entityHealth = 0.0f;
         }
@@ -1920,13 +1920,13 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
         if (index == -1) {
             float anger = static_cast<float>(BetterRand::genNrInInterval(3, 8));
-            std::cout << "Discrimination: lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()
+            std::cout << " /// Discrimination: lien anger ajouté entre: (" << pointer->getId() << ")" << pointer->getName()
                       << " -> (" << pointed->getId() << ")" << pointed->getName() << " " << anger << std::endl;
             pointer->addAnger({ 1, pointed, anger });
         } else {
             float increment = static_cast<float>(BetterRand::genNrInInterval(2, 6));
             pointer->list_entityPointedAnger[index].anger += increment;
-            std::cout << "Discrimination renforcée entre: (" << pointer->getId() << ")" << pointer->getName()
+            std::cout << "// Discrimination renforcée entre: (" << pointer->getId() << ")" << pointer->getName()
                       << " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
         }
     }
@@ -1935,15 +1935,15 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             int index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
             if (index == -1) {
                 float anger = static_cast<float>(BetterRand::genNrInInterval(2, 7));
-                std::cout << "Gossip découvert! " << pointed->getName() << " ajoute anger envers " << pointer->getName() << " +" << anger << std::endl;
+                std::cout << " ++ Gossip découvert! " << pointed->getName() << " ajoute anger envers " << pointer->getName() << " +" << anger << std::endl;
                 pointed->addAnger({ 1, pointer, anger });
             } else {
                 float increment = static_cast<float>(BetterRand::genNrInInterval(4, 10));
                 pointed->list_entityPointedAnger[index].anger += increment;
-                std::cout << "Gossip découvert! " << pointed->getName() << " augmente anger envers " << pointer->getName() << " +" << increment << std::endl;
+                std::cout << "++ Gossip découvert! " << pointed->getName() << " augmente anger envers " << pointer->getName() << " +" << increment << std::endl;
             }
         } else {
-            std::cout << "Gossip: " << pointer->getName() << " parle de " << pointed->getName() << " (non découvert)\n";
+            std::cout << "++ Gossip: " << pointer->getName() << " parle de " << pointed->getName() << " (non découvert)\n";
         }
         Entity* gossipSubject = pointer;
         if (gossipSubject) {
