@@ -6,6 +6,8 @@
 #include <vector>
 #include "./header/Entity.h"
 #include "./header/UI.h"
+#include "./header/NarrativeEngine.h"
+#include "./header/CivilizationEngine.h"
 #include <iostream>
 #include "./header/Disease.h"
 #include <map>
@@ -14,6 +16,7 @@
 #include <sstream>
 #include <filesystem>
 #include <fstream>
+#include <algorithm>
 
 // ShowEntityWindow implementation
 
@@ -99,6 +102,19 @@ void UI::showSystemInformation(){
 
         ImGui::Text("ID: %d", entity->entityId);
         ImGui::Text("Name: %s", entity->name.c_str());
+
+        // ── Protagonist button ───────────────────────────────────────────────
+        bool isProto = (entity->entityId == protagonistId);
+        if (isProto) {
+            ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "★ PROTAGONIST");
+        } else {
+            if (ImGui::Button("★ Set as Protagonist")) {
+                protagonistId = entity->entityId;
+                protagonistEntityId = entity->entityId;
+                protagonistNarrativeLog.clear();
+            }
+        }
+        ImGui::Separator();
 
         ImGui::Spacing();
         ImGui::Text("Health: %.2f", entity->entityHealth);
@@ -312,102 +328,487 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::End();
     }
 
-// DrawGrid implementation
+// Compute a stable circular layout position for entity at index i out of n total.
+// Used by both DrawGrid and HandlePointMovement so click detection is consistent.
+static ImVec2 socialGraphPos(int i, int n, float cx = 700.0f, float cy = 330.0f) {
+    if (n <= 0) return ImVec2(cx, cy);
+    float radius = std::min(cx, cy) * 0.85f;
+    float angle  = (2.0f * 3.14159265f * i) / n - 3.14159265f / 2.0f;
+    return ImVec2(cx + radius * std::cos(angle), cy + radius * std::sin(angle));
+}
+
+// DrawGrid — social network graph.  No spatial positions: layout is circular,
+// relationship lines reveal who knows / loves / hates whom.
 void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
+    if (entities.empty()) return;
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+    int n = (int)entities.size();
 
-    // Draw lines between entities FIRST so they appear under the circles
-    for (auto& entity : entities) {
-        // Draw couple ties (pink, thick)
-        for (auto& d : entity->list_entityPointedDesire) {
+    // Build id→index map for relationship lines
+    std::map<int, int> idToIdx;
+    for (int i = 0; i < n; ++i)
+        idToIdx[entities[i]->entityId] = i;
+
+    // ── 1. Relationship lines ─────────────────────────────────────────────────
+    for (int i = 0; i < n; ++i) {
+        Entity* ent = entities[i];
+        ImVec2 from = socialGraphPos(i, n);
+
+        for (auto& d : ent->list_entityPointedDesire) {
             if (!d.pointedEntity) continue;
+            auto it = idToIdx.find(d.pointedEntity->entityId);
+            if (it == idToIdx.end()) continue;
+            ImVec2 to = socialGraphPos(it->second, n);
             float alpha = std::min(1.0f, d.desire / 100.0f);
-            ImU32 col = IM_COL32(255, 80, 180, (int)(alpha * 180));
-            float thickness = 1.0f + (d.desire / 100.0f) * 3.0f;
-            draw_list->AddLine(
-                ImVec2(entity->posX, entity->posY),
-                ImVec2(d.pointedEntity->posX, d.pointedEntity->posY),
-                col, thickness);
+            draw_list->AddLine(from, to, IM_COL32(255, 80, 180, (int)(alpha * 160)),
+                               1.0f + (d.desire / 100.0f) * 2.5f);
         }
-
-        // ANGER → red
-        for (auto& a : entity->list_entityPointedAnger) {
+        for (auto& a : ent->list_entityPointedAnger) {
             if (!a.pointedEntity) continue;
+            auto it = idToIdx.find(a.pointedEntity->entityId);
+            if (it == idToIdx.end()) continue;
+            ImVec2 to = socialGraphPos(it->second, n);
             float alpha = std::min(1.0f, a.anger / 100.0f);
-            ImU32 col = IM_COL32(255, 40, 40, (int)(alpha * 180));
-            float thickness = 1.0f + (a.anger / 100.0f) * 3.0f;
-            draw_list->AddLine(
-                ImVec2(entity->posX, entity->posY),
-                ImVec2(a.pointedEntity->posX, a.pointedEntity->posY),
-                col, thickness);
+            draw_list->AddLine(from, to, IM_COL32(255, 40, 40, (int)(alpha * 160)),
+                               1.0f + (a.anger / 100.0f) * 2.5f);
         }
-
-        // SOCIAL → cyan/teal
-        for (auto& s : entity->list_entityPointedSocial) {
+        for (auto& s : ent->list_entityPointedSocial) {
             if (!s.pointedEntity) continue;
+            auto it = idToIdx.find(s.pointedEntity->entityId);
+            if (it == idToIdx.end()) continue;
+            ImVec2 to = socialGraphPos(it->second, n);
             float alpha = std::min(1.0f, s.social / 100.0f);
-            ImU32 col = IM_COL32(60, 220, 220, (int)(alpha * 150));
-            float thickness = 1.0f + (s.social / 100.0f) * 2.5f;
-            draw_list->AddLine(
-                ImVec2(entity->posX, entity->posY),
-                ImVec2(s.pointedEntity->posX, s.pointedEntity->posY),
-                col, thickness);
+            draw_list->AddLine(from, to, IM_COL32(60, 220, 220, (int)(alpha * 130)),
+                               1.0f + (s.social / 100.0f) * 2.0f);
         }
-
-        // COUPLE → gold, always thick
-        for (auto& c : entity->list_entityPointedCouple) {
+        for (auto& c : ent->list_entityPointedCouple) {
             if (!c.pointedEntity) continue;
-            draw_list->AddLine(
-                ImVec2(entity->posX, entity->posY),
-                ImVec2(c.pointedEntity->posX, c.pointedEntity->posY),
-                IM_COL32(255, 215, 0, 220), 3.5f);
+            auto it = idToIdx.find(c.pointedEntity->entityId);
+            if (it == idToIdx.end()) continue;
+            ImVec2 to = socialGraphPos(it->second, n);
+            draw_list->AddLine(from, to, IM_COL32(255, 215, 0, 210), 3.0f);
         }
     }
 
-    for (auto& entity : entities) {
-        ImU32 color = entity->selected ? IM_COL32(255, 100, 100, 255) : IM_COL32(200, 200, 200, 255);
-        draw_list->AddCircleFilled(ImVec2(entity->posX, entity->posY), pointSize, color);
-    }
-    for (auto& entity : entities) {
-        ImU32 color = entity->selected
-            ? IM_COL32(255, 100, 100, 255)
-            : IM_COL32(200, 200, 200, 255);
-        draw_list->AddCircleFilled(ImVec2(entity->posX, entity->posY), pointSize, color);
+    // ── 2. Entity dots ────────────────────────────────────────────────────────
+    for (int i = 0; i < n; ++i) {
+        Entity* entity = entities[i];
+        ImVec2  pos    = socialGraphPos(i, n);
+        bool isProto   = (entity->entityId == protagonistId);
+        bool isSick    = (entity->entityDiseaseType != -1);
+
+        ImU32 color;
+        float size = pointSize;
+
+        if (isProto) {
+            color = IM_COL32(255, 215, 0, 255);
+            size  = pointSize * 1.9f;
+            draw_list->AddCircle(pos, size + 4.0f, IM_COL32(255, 215, 0, 80), 0, 2.0f);
+        } else if (entity->selected) {
+            color = IM_COL32(255, 100, 100, 255);
+        } else if (isSick) {
+            color = IM_COL32(170, 220, 60, 255);
+        } else {
+            float h = std::max(0.0f, std::min(1.0f, entity->entityHapiness / 100.0f));
+            color = IM_COL32((int)(160 + h * 60), (int)(160 + h * 20), (int)(200 - h * 60), 255);
+        }
+
+        draw_list->AddCircleFilled(pos, size, color);
+
+        if (isProto || entity->selected) {
+            std::string label = isProto ? ("\xe2\x98\x85 " + entity->name) : entity->name;
+            draw_list->AddText(ImVec2(pos.x + size + 3.0f, pos.y - 7.0f),
+                               isProto ? IM_COL32(255, 215, 0, 255) : IM_COL32(255, 160, 160, 255),
+                               label.c_str());
+        }
     }
 }
 
-// HandlePointMovement implementation
-// Returns the index of the selected/moved entity, -1 if none
+// HandlePointMovement — click on a node in the social graph to select it.
 int UI::HandlePointMovement(std::vector<Entity*>& entities) {
-    ImVec2 mousePos = ImGui::GetIO().MousePos;
+    ImVec2 mousePos  = ImGui::GetIO().MousePos;
     bool mouseClicked = ImGui::IsMouseClicked(0);
-    bool mouseHeld = ImGui::IsMouseDown(0);
-
     static int selectedIndex = -1;
 
     if (mouseClicked) {
+        int n = (int)entities.size();
         selectedIndex = -1;
-        for (int i = 0; i < entities.size(); i++) {
-            float dx = mousePos.x - entities[i]->posX;
-            float dy = mousePos.y - entities[i]->posY;
-            if (dx * dx + dy * dy < 64.0f) { // radius²
+        for (int i = 0; i < n; ++i) {
+            ImVec2 pos = socialGraphPos(i, n);
+            float dx = mousePos.x - pos.x;
+            float dy = mousePos.y - pos.y;
+            if (dx * dx + dy * dy < 100.0f) {
                 selectedIndex = i;
+                for (auto* e : entities) e->selected = false;
                 entities[i]->selected = true;
                 break;
-            } else {
-                entities[i]->selected = false;
             }
         }
     }
 
-    if (mouseHeld && selectedIndex >= 0) {
-        entities[selectedIndex]->posX = mousePos.x;
-        entities[selectedIndex]->posY = mousePos.y;
-    }
-
-    return selectedIndex; // returns -1 if no entity is selected
+    return selectedIndex;
 }
 
+
+// ── ShowCivilizationPanel ─────────────────────────────────────────────────────
+void UI::ShowCivilizationPanel(int simDay) {
+    if (!globalCivEngine) return;
+    CivilizationEngine& civ = *globalCivEngine;
+
+    ImGui::SetNextWindowSize(ImVec2(460, 680), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(10, 420),   ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowBgAlpha(0.92f);
+
+    if (!ImGui::Begin("CIVILIZATION", nullptr, ImGuiWindowFlags_NoCollapse)) {
+        ImGui::End(); return;
+    }
+
+    // Era header
+    ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", civ.getEraName().c_str());
+    ImGui::SameLine(220);
+    ImGui::TextDisabled("Day %d  |  Tribes: %d  |  Religions: %d  |  Tech: %d",
+                        simDay, (int)civ.tribes.size(),
+                        (int)civ.religions.size(), (int)civ.innovations.size());
+    ImGui::Separator();
+
+    // ── TRIBES ───────────────────────────────────────────────────────────────
+    if (ImGui::CollapsingHeader("TRIBES", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (civ.tribes.empty()) {
+            ImGui::TextDisabled("  No tribes yet — awaiting a leader...");
+        }
+        for (const auto& tribe : civ.tribes) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.75f, 0.35f, 1.0f));
+            ImGui::Text("  %s  [%d members]", tribe.name.c_str(), tribe.population());
+            ImGui::PopStyleColor();
+            ImGui::SameLine(280);
+
+            // Stance summary
+            int atWar = 0, allied = 0;
+            for (auto& p : tribe.stances) {
+                if (p.second == TS_AT_WAR) atWar++;
+                if (p.second == TS_ALLY)   allied++;
+            }
+            if (atWar > 0)
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "WAR x%d", atWar);
+            else if (allied > 0)
+                ImGui::TextColored(ImVec4(0.3f, 1.0f, 0.5f, 1.0f), "Allied x%d", allied);
+            else
+                ImGui::TextDisabled("Neutral");
+
+            // Values mini-bars
+            ImGui::Text("    Mil"); ImGui::SameLine(80);
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.9f,0.3f,0.2f,0.8f));
+            char id1[32]; snprintf(id1,32,"##mil%d",tribe.id);
+            ImGui::ProgressBar(tribe.militarism/100.0f, ImVec2(60,8), id1);
+            ImGui::PopStyleColor();
+            ImGui::SameLine(160); ImGui::Text("Spi"); ImGui::SameLine(190);
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.6f,0.4f,0.9f,0.8f));
+            char id2[32]; snprintf(id2,32,"##spi%d",tribe.id);
+            ImGui::ProgressBar(tribe.spiritualism/100.0f, ImVec2(60,8), id2);
+            ImGui::PopStyleColor();
+            ImGui::SameLine(260); ImGui::Text("Inn"); ImGui::SameLine(290);
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f,0.8f,0.9f,0.8f));
+            char id3[32]; snprintf(id3,32,"##inn%d",tribe.id);
+            ImGui::ProgressBar(tribe.innovation/100.0f, ImVec2(60,8), id3);
+            ImGui::PopStyleColor();
+
+            // Known tech count
+            if (!tribe.knownTechIds.empty())
+                ImGui::TextDisabled("    %d technologies known", (int)tribe.knownTechIds.size());
+            ImGui::Spacing();
+        }
+    }
+
+    ImGui::Separator();
+
+    // ── RELIGIONS ─────────────────────────────────────────────────────────────
+    if (ImGui::CollapsingHeader("RELIGIONS", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (civ.religions.empty()) {
+            ImGui::TextDisabled("  No religion yet — awaiting a prophet...");
+        }
+        for (const auto& rel : civ.religions) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 0.55f, 1.0f, 1.0f));
+            ImGui::Text("  %s", rel.name.c_str());
+            ImGui::PopStyleColor();
+            ImGui::SameLine(260);
+            ImGui::TextDisabled("%d followers", (int)rel.followerIds.size());
+
+            // Principle
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 0.85f, 1.0f));
+            ImGui::TextWrapped("    \"%s\"", rel.holyPrinciple.c_str());
+            ImGui::PopStyleColor();
+
+            // Doctrine tags
+            const char* moralStr[] = {"Strict","Peaceful","Warrior","Flexible"};
+            const char* ritualStr[]= {"Daily Prayer","Weekly Gathering","Meditation","Ceremony","Sacrifice"};
+            ImGui::TextDisabled("    %s  |  %s  |  %s",
+                moralStr[rel.moralCode],
+                ritualStr[rel.ritual],
+                rel.isPolytheistic ? "Polytheistic" : "Monotheistic");
+            ImGui::Spacing();
+        }
+    }
+
+    ImGui::Separator();
+
+    // ── INNOVATIONS ───────────────────────────────────────────────────────────
+    if (ImGui::CollapsingHeader("INNOVATIONS")) {
+        if (civ.innovations.empty()) {
+            ImGui::TextDisabled("  No discoveries yet...");
+        }
+        // Group by category
+        std::map<std::string, std::vector<const Innovation*>> byCategory;
+        for (const auto& inv : civ.innovations)
+            byCategory[inv.category].push_back(&inv);
+
+        static const std::map<std::string, ImVec4> catColor = {
+            {"agriculture", ImVec4(0.4f,0.85f,0.3f,1.0f)},
+            {"tool",        ImVec4(0.8f,0.7f, 0.2f,1.0f)},
+            {"medicine",    ImVec4(0.3f,0.85f,0.85f,1.0f)},
+            {"social",      ImVec4(0.6f,0.8f, 1.0f,1.0f)},
+            {"military",    ImVec4(0.9f,0.35f,0.2f,1.0f)},
+            {"spiritual",   ImVec4(0.75f,0.5f,1.0f,1.0f)},
+        };
+        for (const auto& cat : byCategory) {
+            ImVec4 col = catColor.count(cat.first) ? catColor.at(cat.first)
+                                                    : ImVec4(0.8f,0.8f,0.8f,1.0f);
+            ImGui::PushStyleColor(ImGuiCol_Text, col);
+            ImGui::Text("  [%s]", cat.first.c_str());
+            ImGui::PopStyleColor();
+            for (const Innovation* inv : cat.second) {
+                ImGui::Text("    • %s", inv->name.c_str());
+                ImGui::SameLine(220);
+                ImGui::TextDisabled("Day %d  |  %d know it", inv->discoveredOnDay, inv->knowerCount);
+            }
+        }
+    }
+
+    ImGui::Separator();
+
+    // ── EVENT LOG ─────────────────────────────────────────────────────────────
+    if (ImGui::CollapsingHeader("HISTORY", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::BeginChild("##civlog", ImVec2(0, 160), true);
+        for (const auto& ev : civ.eventLog) {
+            ImVec4 col = ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+            if      (ev.category == "war")       col = ImVec4(1.0f, 0.35f, 0.25f, 1.0f);
+            else if (ev.category == "religion")  col = ImVec4(0.75f,0.5f, 1.0f,  1.0f);
+            else if (ev.category == "innovation")col = ImVec4(0.3f, 0.9f, 0.7f,  1.0f);
+            else if (ev.category == "diplomacy") col = ImVec4(0.3f, 0.8f, 1.0f,  1.0f);
+            else if (ev.category == "tribe")     col = ImVec4(1.0f, 0.78f,0.3f,  1.0f);
+            ImGui::PushStyleColor(ImGuiCol_Text, col);
+            ImGui::TextWrapped("[Day %d] %s", ev.day, ev.description.c_str());
+            ImGui::PopStyleColor();
+        }
+        ImGui::EndChild();
+    }
+
+    ImGui::End();
+}
+
+// ── ShowTrumanPanel ───────────────────────────────────────────────────────────
+void UI::ShowTrumanPanel(Entity* p, const std::deque<std::string>& log,
+                         int hour, int simDay) {
+    ImGui::SetNextWindowSize(ImVec2(440, 660), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(955, 20),   ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowBgAlpha(0.94f);
+
+    if (!ImGui::Begin("THE SHOW", nullptr,
+                      ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar)) {
+        ImGui::End();
+        return;
+    }
+
+    // ── Header: name + time ──────────────────────────────────────────────────
+    ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "\xe2\x98\x85  %s", p->name.c_str());
+    ImGui::SameLine(200);
+    const char* dayNames[] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+    ImGui::TextDisabled("Day %d  |  %s  |  %s",
+                        simDay, dayNames[simDay % 7],
+                        NarrativeEngine::formatHour(hour).c_str());
+
+    // Attachment style + last action chip
+    const char* attachStr[] = {"Secure", "Anxious", "Avoidant", "Disorganized"};
+    ImGui::TextDisabled("%s attachment", attachStr[(int)p->dv.attachmentStyle]);
+    if (!p->lastActionName.empty()) {
+        ImGui::SameLine(180);
+        ImGui::TextColored(ImVec4(0.6f, 0.9f, 0.6f, 1.0f), "[%s]", p->lastActionName.c_str());
+    }
+
+    ImGui::Separator();
+
+    // ── Inner monologue — front and centre ───────────────────────────────────
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "WHAT THEY'RE THINKING");
+    ImGui::Spacing();
+    const std::string& mono = p->innerMonologue.empty()
+        ? NarrativeEngine::innerMonologue(p)
+        : p->innerMonologue;
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.88f, 0.88f, 1.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.12f, 0.12f, 0.22f, 0.9f));
+    ImGui::BeginChild("##mono_box", ImVec2(0, 62), true);
+    ImGui::TextWrapped("\"%s\"", mono.c_str());
+    ImGui::EndChild();
+    ImGui::PopStyleColor(2);
+
+    ImGui::Spacing();
+    ImGui::Separator();
+
+    // ── Emotional state bars ─────────────────────────────────────────────────
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "INNER STATE");
+    ImGui::Spacing();
+
+    auto statBar = [&](const char* label, float val, ImVec4 col) {
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, col);
+        char id[32]; snprintf(id, sizeof(id), "##%s", label);
+        ImGui::Text("%-14s", label);
+        ImGui::SameLine(130);
+        ImGui::ProgressBar(val / 100.0f, ImVec2(175, 12), id);
+        ImGui::SameLine();
+        ImGui::Text("%.0f", val);
+        ImGui::PopStyleColor();
+    };
+
+    statBar("Happiness",     p->entityHapiness,    ImVec4(0.9f, 0.8f, 0.2f, 0.9f));
+    statBar("Stress",        p->entityStress,      ImVec4(0.9f, 0.3f, 0.2f, 0.9f));
+    statBar("Loneliness",    p->entityLoneliness,  ImVec4(0.3f, 0.5f, 0.9f, 0.9f));
+    statBar("Mental Health", p->entityMentalHealth,ImVec4(0.4f, 0.8f, 0.6f, 0.9f));
+    statBar("Health",        p->entityHealth,      ImVec4(0.2f, 0.9f, 0.4f, 0.9f));
+    statBar("Anger",         p->entityGeneralAnger,ImVec4(0.9f, 0.2f, 0.1f, 0.9f));
+
+    ImGui::Separator();
+
+    // ── Active goals ─────────────────────────────────────────────────────────
+    if (!p->m_goals.empty()) {
+        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "GOALS");
+        for (const auto& g : p->m_goals) {
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.7f, 0.6f, 1.0f, 0.8f));
+            char id[48]; snprintf(id, sizeof(id), "##goal_%s", g.type.c_str());
+            // Colour goal label red if frustrated
+            if (g.frustrationLevel > 50.0f)
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.4f, 1.0f));
+            else
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.85f, 0.85f, 1.0f));
+            ImGui::Text("  %-18s", g.type.c_str());
+            ImGui::PopStyleColor();
+            ImGui::SameLine(165);
+            ImGui::ProgressBar(g.progressToward / 100.0f, ImVec2(150, 10), id);
+            ImGui::PopStyleColor();
+        }
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
+
+    // ── Story log ────────────────────────────────────────────────────────────
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "STORY");
+    ImGui::BeginChild("##story_log", ImVec2(0, 145), true,
+                      ImGuiWindowFlags_HorizontalScrollbar);
+    for (auto it = log.rbegin(); it != log.rend(); ++it) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.88f, 0.88f, 0.88f, 1.0f));
+        ImGui::TextWrapped("%s", it->c_str());
+        ImGui::PopStyleColor();
+    }
+    ImGui::EndChild();
+
+    ImGui::End();
+}
+
+// ── ShowMindBoard ─────────────────────────────────────────────────────────────
+// Scrollable card grid showing every entity's inner state at a glance.
+// Returns the index of a clicked entity, -1 otherwise.
+int UI::ShowMindBoard(std::vector<Entity*>& entities) {
+    int selected = -1;
+
+    ImGui::SetNextWindowSize(ImVec2(1395, 340), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(0, 710),     ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowBgAlpha(0.88f);
+
+    if (!ImGui::Begin("MIND BOARD", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar)) {
+        ImGui::End(); return selected;
+    }
+
+    const float cardW   = 210.0f;
+    const float cardH   = 120.0f;
+    const float padX    = 6.0f;
+    float availW        = ImGui::GetContentRegionAvail().x;
+    int   cols          = std::max(1, (int)((availW + padX) / (cardW + padX)));
+    int   col           = 0;
+
+    for (int i = 0; i < (int)entities.size(); ++i) {
+        Entity* ent = entities[i];
+        if (ent->entityHealth <= 0.0f) continue;
+
+        if (col > 0) ImGui::SameLine(0.0f, padX);
+
+        bool isProto = (ent->entityId == protagonistId);
+        float s = ent->entityStress / 100.0f;
+        float h = ent->entityHapiness / 100.0f;
+        ImVec4 bg = isProto
+            ? ImVec4(0.22f, 0.18f, 0.05f, 1.0f)
+            : ImVec4(0.12f + s * 0.08f, 0.12f + h * 0.06f, 0.18f, 1.0f);
+
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, bg);
+        ImGui::PushStyleColor(ImGuiCol_Border,
+            isProto ? ImVec4(1.0f, 0.85f, 0.2f, 0.9f) : ImVec4(0.35f, 0.35f, 0.5f, 0.6f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, isProto ? 2.0f : 1.0f);
+
+        char cid[32]; snprintf(cid, 32, "##mc%d", ent->entityId);
+        ImGui::BeginChild(cid, ImVec2(cardW, cardH), true);
+
+        // Name + age line
+        if (isProto)
+            ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.2f, 1.0f),
+                               "\xe2\x98\x85 %s, %d", ent->name.c_str(), (int)ent->entityAge);
+        else
+            ImGui::Text("%s, %d", ent->name.c_str(), (int)ent->entityAge);
+
+        // Last action
+        if (!ent->lastActionName.empty())
+            ImGui::TextDisabled("[%s]", ent->lastActionName.c_str());
+
+        ImGui::Separator();
+
+        // Inner monologue (truncated to ~90 chars)
+        if (!ent->innerMonologue.empty()) {
+            std::string mono = ent->innerMonologue;
+            if (mono.size() > 88) mono = mono.substr(0, 85) + "...";
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.82f, 0.82f, 0.74f, 1.0f));
+            ImGui::TextWrapped("\"%s\"", mono.c_str());
+            ImGui::PopStyleColor();
+        }
+
+        // Mini stat bars (health / happiness / stress)
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 1));
+        char b1[32], b2[32], b3[32];
+        snprintf(b1, 32, "##h%d",  ent->entityId);
+        snprintf(b2, 32, "##hp%d", ent->entityId);
+        snprintf(b3, 32, "##s%d",  ent->entityId);
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.85f, 0.3f, 0.8f));
+        ImGui::ProgressBar(ent->entityHealth    / 100.0f, ImVec2(56, 5), b1);
+        ImGui::PopStyleColor(); ImGui::SameLine(0.0f, 3.0f);
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.9f, 0.75f, 0.1f, 0.8f));
+        ImGui::ProgressBar(ent->entityHapiness  / 100.0f, ImVec2(56, 5), b2);
+        ImGui::PopStyleColor(); ImGui::SameLine(0.0f, 3.0f);
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.9f, 0.25f, 0.2f, 0.8f));
+        ImGui::ProgressBar(ent->entityStress     / 100.0f, ImVec2(56, 5), b3);
+        ImGui::PopStyleColor();
+        ImGui::PopStyleVar();
+
+        // Click-to-select
+        if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(0)) {
+            selected = i;
+            for (auto* e : entities) e->selected = false;
+            ent->selected = true;
+        }
+
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(2);
+
+        col = (col + 1) % cols;
+    }
+
+    ImGui::End();
+    return selected;
+}
 
 // createPlayer implementation
 void UI::createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText) {

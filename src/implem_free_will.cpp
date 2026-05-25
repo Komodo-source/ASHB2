@@ -1,4 +1,6 @@
 #include "./header/BetterRand.h"
+#include "./header/SemanticMemory.h"
+#include "./header/PlanningSystem.h"
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
 #include "./header/Logging.h"
@@ -305,17 +307,14 @@ void FreeWillSystem::tickChildDevelopment(Entity* child, float deltaTime) {
         return;
     }
 
-    // distance entre parents
-    float dist1 = std::sqrt(std::pow(child->posX - child->parent1->posX, 2) + std::pow(child->posY - child->parent1->posY, 2));
-    float dist2 = std::sqrt(std::pow(child->posX - child->parent2->posX, 2) + std::pow(child->posY - child->parent2->posY, 2));
-    // check si parents ensemble
-    float parentDist = std::sqrt(std::pow(child->parent1->posX - child->parent2->posX, 2) + std::pow(child->parent1->posY - child->parent2->posY, 2));
+    // Parent presence modelled by social bond strength (no spatial positions)
+    float bond1 = child->searchConnSocial(child->parent1);
+    float bond2 = child->searchConnSocial(child->parent2);
+    float parentBond = child->parent1->searchConnSocial(child->parent2);
 
-    const float NEGLECT_THRESHOLD = 80.0f;
-    const float SEPARATION_THRESHOLD = 120.0f;
-    bool parent1Absent = (dist1 > NEGLECT_THRESHOLD);
-    bool parent2Absent = (dist2 > NEGLECT_THRESHOLD);
-    bool parentsApart = (parentDist > SEPARATION_THRESHOLD);
+    bool parent1Absent = (bond1 < 10.0f);
+    bool parent2Absent = (bond2 < 10.0f);
+    bool parentsApart  = (parentBond < 5.0f);
 
     // calcul des traumas
     if (parent1Absent && parent2Absent) {
@@ -915,6 +914,102 @@ void FreeWillSystem::initializeActions() {
     work.statChanges = { {"stress", 17.0f}, {"happiness", 15.0f}, {"boredom", -20.0f}, {"loneliness", 10.0f} };
     work.baseSatisfaction = 25.0f;
     availableActions.push_back(work);
+
+    // ════════════════════════════════════════════════════════════════════════
+    // CIVILISATION-SCALE ACTIONS
+    // These actions, chosen rarely by the right personality types, generate
+    // the emergent phenomena of leadership, religion, and innovation.
+    // ════════════════════════════════════════════════════════════════════════
+
+    // LeadGroup — high-extraversion entities gather followers and assert authority
+    // SELF-DIRECTED: the entity rallies nearby people, raising their own esteem
+    Action leadGroup("LeadGroup", 200, "leadership");
+    leadGroup.requirements = { {"happiness", 55.0f, 0.6f}, {"loneliness", 20.0f, 0.3f} };
+    leadGroup.statChanges  = { {"loneliness", -10.0f}, {"stress", 4.0f},
+                                {"boredom", -14.0f},   {"happiness", 6.0f} };
+    leadGroup.baseSatisfaction = 28.0f;
+    availableActions.push_back(leadGroup);
+
+    // Preach — spiritually-inclined entities share their belief with a target
+    // POINTED: spreads religion / raises follower connection
+    Action preach("Preach", 201, "spiritual");
+    preach.requirements = { {"mentalHealth", 55.0f, 0.6f}, {"boredom", 25.0f, 0.4f} };
+    preach.statChanges  = { {"loneliness", -12.0f}, {"stress", -4.0f},
+                             {"boredom", -10.0f},   {"happiness", 8.0f} };
+    preach.baseSatisfaction = 22.0f;
+    availableActions.push_back(preach);
+
+    // PerformRitual — communal ceremony; reduces stress, builds group identity
+    // SELF-DIRECTED but boosts nearby entity cohesion through contagion
+    Action ritual("PerformRitual", 202, "spiritual");
+    ritual.requirements = { {"stress", 35.0f, 0.5f}, {"mentalHealth", 40.0f, 0.4f} };
+    ritual.statChanges  = { {"stress", -14.0f}, {"loneliness", -10.0f},
+                             {"mentalHealth", 9.0f}, {"happiness", 6.0f} };
+    ritual.baseSatisfaction = 24.0f;
+    availableActions.push_back(ritual);
+
+    // Invent — high-openness/curiosity entities make discoveries
+    // SELF-DIRECTED: triggers the innovation system in CivilizationEngine
+    Action invent("Invent", 203, "achievement");
+    invent.requirements = { {"boredom", 45.0f, 0.7f}, {"mentalHealth", 50.0f, 0.4f} };
+    invent.statChanges  = { {"boredom", -22.0f}, {"happiness", 14.0f},
+                             {"stress", 3.0f},   {"loneliness", 4.0f} };
+    invent.baseSatisfaction = 32.0f;
+    availableActions.push_back(invent);
+
+    // TeachSkill — pass on known techniques to another entity
+    // POINTED: spreads innovations through social bonds
+    Action teach("TeachSkill", 204, "social");
+    teach.requirements = { {"happiness", 50.0f, 0.5f}, {"loneliness", 20.0f, 0.4f} };
+    teach.statChanges  = { {"loneliness", -12.0f}, {"happiness", 9.0f},
+                            {"boredom", -8.0f},    {"stress", -3.0f} };
+    teach.baseSatisfaction = 22.0f;
+    availableActions.push_back(teach);
+
+    // FulfillDuty — act in service of one's tribe or community
+    // SELF-DIRECTED: moderate across-the-board benefit; highest for collectivist entities
+    Action duty("FulfillDuty", 205, "social");
+    duty.requirements = { {"stress", 20.0f, 0.3f}, {"health", 40.0f, 0.4f} };
+    duty.statChanges  = { {"stress", -6.0f}, {"happiness", 6.0f},
+                           {"loneliness", -6.0f}, {"boredom", -5.0f} };
+    duty.baseSatisfaction = 18.0f;
+    availableActions.push_back(duty);
+
+    // ChallengeLeader — ambitious entity contests tribal hierarchy
+    // POINTED: direct challenge to the leader; high anger requirement
+    Action challenge("ChallengeLeader", 206, "leadership");
+    challenge.requirements = { {"anger", 48.0f, 0.7f}, {"happiness", 38.0f, 0.4f} };
+    challenge.statChanges  = { {"anger", -18.0f}, {"stress", 12.0f},
+                                {"happiness", 8.0f}, {"mentalHealth", -5.0f} };
+    challenge.baseSatisfaction = 14.0f;
+    availableActions.push_back(challenge);
+
+    // DeclareWar — very high-anger, high-militarism entity initiates group conflict
+    // POINTED: triggers tribal war stance in CivilizationEngine
+    Action declWar("DeclareWar", 207, "safety");
+    declWar.requirements = { {"anger", 65.0f, 0.8f}, {"stress", 55.0f, 0.4f} };
+    declWar.statChanges  = { {"anger", -12.0f}, {"stress", 16.0f},
+                              {"health", -4.0f}, {"happiness", -3.0f} };
+    declWar.baseSatisfaction = 9.0f;
+    availableActions.push_back(declWar);
+
+    // Negotiate — agreeable entity seeks peaceful resolution between groups
+    // POINTED: reduces anger between entities, improves tribe relations
+    Action negotiate("Negotiate", 208, "social");
+    negotiate.requirements = { {"anger", 30.0f, 0.5f}, {"mentalHealth", 55.0f, 0.5f} };
+    negotiate.statChanges  = { {"anger", -16.0f}, {"stress", -9.0f},
+                                {"loneliness", -6.0f}, {"happiness", 7.0f} };
+    negotiate.baseSatisfaction = 20.0f;
+    availableActions.push_back(negotiate);
+
+    // Specialize — entity commits to a social role (farmer, warrior, priest, etc.)
+    // SELF-DIRECTED: high long-term boredom reduction, purpose boost
+    Action specialize("Specialize", 209, "achievement");
+    specialize.requirements = { {"happiness", 45.0f, 0.5f}, {"boredom", 38.0f, 0.5f} };
+    specialize.statChanges  = { {"boredom", -18.0f}, {"happiness", 12.0f},
+                                 {"stress", -5.0f},  {"loneliness", 2.0f} };
+    specialize.baseSatisfaction = 22.0f;
+    availableActions.push_back(specialize);
 }
 
 void FreeWillSystem::updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess) {
@@ -1197,6 +1292,7 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         float needSatisfaction = calculateNeedSatisfaction(action, entity);
         float memoryBias = calculateMemoryBias(action.actionId);
         float lifeMemoryBiad = calculateLifeMemoryBias(entity, action);
+        float semanticMemoryBias = calculateSemanticMemoryBias(entity, action, neighbors);
         float varietyBonus = calculateVarietyBonus(action.actionId, action);
         float socialInfluence = calculateSocialInfluence(entity, neighbors, action);
         float contextualWeight = calculateContextualWeight(action, context);
@@ -1231,6 +1327,7 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         weight *= griefModifier;
         weight *= envModifier;
         weight *= normModifier;
+        weight *= semanticMemoryBias;
         weight *= pheromoneInfluence;
 
         float selfConceptMultiplier = 1.0f;
@@ -1737,8 +1834,8 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             static int nextBabyId = 1000;
             Entity baby = Entity(nextBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
             if (globalLogger) globalLogger->logBirth(baby.entityId, baby.getName(), pointer->getId(), pointed->getId(), pointer->getName(), pointed->getName());
-            baby.posX = pointer->posX + 3;
-            baby.posY = pointer->posY + 3;
+            baby.posX = pointer->posX + BetterRand::genNrInInterval(-15, 15);
+            baby.posY = pointer->posY + BetterRand::genNrInInterval(-15, 15);
             baby.parent1 = pointed;
             baby.parent2 = pointer;
 
@@ -2621,9 +2718,9 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
     for (Entity* nb : neighbors) {
         PerceivedEntity pe;
         pe.entity = nb;
-        float dx = entity->posX - nb->posX;
-        float dy = entity->posY - nb->posY;
-        pe.distance = std::sqrt(dx * dx + dy * dy);
+        // Social distance: well-known people feel "close", strangers feel "far"
+        float bond = entity->searchConnSocial(nb);
+        pe.distance = 100.0f - std::min(100.0f, bond);
         perception.nearbyEntities.push_back(pe);
         if (nb->entityHealth < 40.0f) {
             PerceivedEvent ev;
@@ -2670,6 +2767,10 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
             }
         }
     }
+    
+    // Determine planned action from Tree of Thoughts planner
+    std::string plannedActionName = getPlannedAction(entity, neighbors, 0.0f);
+    
     for (const Action& act : availableActions) {
         const Action* aPtr = &act;
         bool isSocialCat = (act.needCategory == "social" ||
@@ -2699,6 +2800,12 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         score *= pheromoneInfluence;
         score *= envModifier;
         score *= normModifier;
+        
+        // Planned action bias: boost if this matches the planned action
+        if (!plannedActionName.empty() && act.name == plannedActionName) {
+            score *= 1.5f;
+        }
+        
 
         float rarityMult = 1.0f;
         const std::string& an = act.name;
@@ -2816,4 +2923,63 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
     if (delib.chosenAction != nullptr) return const_cast<Action*>(delib.chosenAction);
     return nullptr;
+}
+
+// ============================================================================
+// Semantic Memory Integration
+// ============================================================================
+
+float FreeWillSystem::calculateSemanticMemoryBias(Entity* entity, const Action& action, const std::vector<Entity*>& neighbors) {
+    if (!entity) return 1.0f;
+    
+    // Query semantic memory for relevant context
+    MemoryQuery query;
+    query.contextType = "action_type";
+    query.actionType = action.name;
+    
+    // If there are neighbors, check memory about them
+    if (!neighbors.empty()) {
+        // Pick the most socially connected neighbor to query about
+        Entity* nearest = nullptr;
+        float maxBond = -1.0f;
+        for (auto* n : neighbors) {
+            if (n) {
+                float bond = entity->searchConnSocial(n);
+                if (bond > maxBond) { maxBond = bond; nearest = n; }
+            }
+        }
+        if (!nearest && !neighbors.empty()) nearest = neighbors[0];
+        if (nearest) {
+            query.targetEntityId = nearest->entityId;
+            query.contextType = "encounter_entity";
+        }
+    }
+    
+    // Calculate memory bias for this action
+    float memoryBias = entity->semanticMemory.calculateMemoryActionBias(action.name, query);
+    
+    // Return as multiplicative modifier (1.0 = neutral)
+    return 1.0f + memoryBias;
+}
+
+// ============================================================================
+// Plan-Aware Action Selection
+// ============================================================================
+
+std::string FreeWillSystem::getPlannedAction(Entity* entity, const std::vector<Entity*>& neighbors, float emergencyUrgency) {
+    if (!entity) return "";
+    
+    // Check if there's an active plan
+    if (!entity->planner.hasActivePlan()) {
+        // Generate a new plan
+        entity->planner.generateDailyPlan(entity);
+    }
+    
+    // Get the next planned action
+    return entity->planner.getNextPlannedAction(entity, neighbors, emergencyUrgency);
+}
+
+void FreeWillSystem::reportActionResult(Entity* entity, const std::string& actionName, float successScore, bool wasEmergency) {
+    if (!entity) return;
+    entity->planner.reportActionResult(entity, actionName, successScore, wasEmergency);
 }

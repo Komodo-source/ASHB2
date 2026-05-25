@@ -272,6 +272,78 @@ libs/imgui/imgui_widgets.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.s
 .PHONY : libs/imgui/imgui_widgets.cpp.s
 
+src/Action.obj: src/Action.cpp.obj
+.PHONY : src/Action.obj
+
+# target to build an object file
+src/Action.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Action.cpp.obj
+.PHONY : src/Action.cpp.obj
+
+src/Action.i: src/Action.cpp.i
+.PHONY : src/Action.i
+
+# target to preprocess a source file
+src/Action.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Action.cpp.i
+.PHONY : src/Action.cpp.i
+
+src/Action.s: src/Action.cpp.s
+.PHONY : src/Action.s
+
+# target to generate assembly for a file
+src/Action.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Action.cpp.s
+.PHONY : src/Action.cpp.s
+
+src/CivilizationEngine.obj: src/CivilizationEngine.cpp.obj
+.PHONY : src/CivilizationEngine.obj
+
+# target to build an object file
+src/CivilizationEngine.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj
+.PHONY : src/CivilizationEngine.cpp.obj
+
+src/CivilizationEngine.i: src/CivilizationEngine.cpp.i
+.PHONY : src/CivilizationEngine.i
+
+# target to preprocess a source file
+src/CivilizationEngine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/CivilizationEngine.cpp.i
+.PHONY : src/CivilizationEngine.cpp.i
+
+src/CivilizationEngine.s: src/CivilizationEngine.cpp.s
+.PHONY : src/CivilizationEngine.s
+
+# target to generate assembly for a file
+src/CivilizationEngine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/CivilizationEngine.cpp.s
+.PHONY : src/CivilizationEngine.cpp.s
+
+src/CognitiveArchitecture.obj: src/CognitiveArchitecture.cpp.obj
+.PHONY : src/CognitiveArchitecture.obj
+
+# target to build an object file
+src/CognitiveArchitecture.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj
+.PHONY : src/CognitiveArchitecture.cpp.obj
+
+src/CognitiveArchitecture.i: src/CognitiveArchitecture.cpp.i
+.PHONY : src/CognitiveArchitecture.i
+
+# target to preprocess a source file
+src/CognitiveArchitecture.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.i
+.PHONY : src/CognitiveArchitecture.cpp.i
+
+src/CognitiveArchitecture.s: src/CognitiveArchitecture.cpp.s
+.PHONY : src/CognitiveArchitecture.s
+
+# target to generate assembly for a file
+src/CognitiveArchitecture.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.s
+.PHONY : src/CognitiveArchitecture.cpp.s
+
 src/Disease.obj: src/Disease.cpp.obj
 .PHONY : src/Disease.obj
 
@@ -296,6 +368,30 @@ src/Disease.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Disease.cpp.s
 .PHONY : src/Disease.cpp.s
 
+src/EmotionalComplexity.obj: src/EmotionalComplexity.cpp.obj
+.PHONY : src/EmotionalComplexity.obj
+
+# target to build an object file
+src/EmotionalComplexity.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj
+.PHONY : src/EmotionalComplexity.cpp.obj
+
+src/EmotionalComplexity.i: src/EmotionalComplexity.cpp.i
+.PHONY : src/EmotionalComplexity.i
+
+# target to preprocess a source file
+src/EmotionalComplexity.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/EmotionalComplexity.cpp.i
+.PHONY : src/EmotionalComplexity.cpp.i
+
+src/EmotionalComplexity.s: src/EmotionalComplexity.cpp.s
+.PHONY : src/EmotionalComplexity.s
+
+# target to generate assembly for a file
+src/EmotionalComplexity.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/EmotionalComplexity.cpp.s
+.PHONY : src/EmotionalComplexity.cpp.s
+
 src/Entity.obj: src/Entity.cpp.obj
 .PHONY : src/Entity.obj
 
@@ -319,6 +415,30 @@ src/Entity.s: src/Entity.cpp.s
 src/Entity.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Entity.cpp.s
 .PHONY : src/Entity.cpp.s
+
+src/EnvironmentalInteraction.obj: src/EnvironmentalInteraction.cpp.obj
+.PHONY : src/EnvironmentalInteraction.obj
+
+# target to build an object file
+src/EnvironmentalInteraction.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj
+.PHONY : src/EnvironmentalInteraction.cpp.obj
+
+src/EnvironmentalInteraction.i: src/EnvironmentalInteraction.cpp.i
+.PHONY : src/EnvironmentalInteraction.i
+
+# target to preprocess a source file
+src/EnvironmentalInteraction.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.i
+.PHONY : src/EnvironmentalInteraction.cpp.i
+
+src/EnvironmentalInteraction.s: src/EnvironmentalInteraction.cpp.s
+.PHONY : src/EnvironmentalInteraction.s
+
+# target to generate assembly for a file
+src/EnvironmentalInteraction.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.s
+.PHONY : src/EnvironmentalInteraction.cpp.s
 
 src/Graph.obj: src/Graph.cpp.obj
 .PHONY : src/Graph.obj
@@ -392,6 +512,54 @@ src/Image.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.s
 .PHONY : src/Image.cpp.s
 
+src/LearningAdaptation.obj: src/LearningAdaptation.cpp.obj
+.PHONY : src/LearningAdaptation.obj
+
+# target to build an object file
+src/LearningAdaptation.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj
+.PHONY : src/LearningAdaptation.cpp.obj
+
+src/LearningAdaptation.i: src/LearningAdaptation.cpp.i
+.PHONY : src/LearningAdaptation.i
+
+# target to preprocess a source file
+src/LearningAdaptation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/LearningAdaptation.cpp.i
+.PHONY : src/LearningAdaptation.cpp.i
+
+src/LearningAdaptation.s: src/LearningAdaptation.cpp.s
+.PHONY : src/LearningAdaptation.s
+
+# target to generate assembly for a file
+src/LearningAdaptation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/LearningAdaptation.cpp.s
+.PHONY : src/LearningAdaptation.cpp.s
+
+src/LifeCourse.obj: src/LifeCourse.cpp.obj
+.PHONY : src/LifeCourse.obj
+
+# target to build an object file
+src/LifeCourse.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/LifeCourse.cpp.obj
+.PHONY : src/LifeCourse.cpp.obj
+
+src/LifeCourse.i: src/LifeCourse.cpp.i
+.PHONY : src/LifeCourse.i
+
+# target to preprocess a source file
+src/LifeCourse.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/LifeCourse.cpp.i
+.PHONY : src/LifeCourse.cpp.i
+
+src/LifeCourse.s: src/LifeCourse.cpp.s
+.PHONY : src/LifeCourse.s
+
+# target to generate assembly for a file
+src/LifeCourse.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/LifeCourse.cpp.s
+.PHONY : src/LifeCourse.cpp.s
+
 src/Logging.obj: src/Logging.cpp.obj
 .PHONY : src/Logging.obj
 
@@ -415,6 +583,54 @@ src/Logging.s: src/Logging.cpp.s
 src/Logging.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Logging.cpp.s
 .PHONY : src/Logging.cpp.s
+
+src/NarrativeEngine.obj: src/NarrativeEngine.cpp.obj
+.PHONY : src/NarrativeEngine.obj
+
+# target to build an object file
+src/NarrativeEngine.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/NarrativeEngine.cpp.obj
+.PHONY : src/NarrativeEngine.cpp.obj
+
+src/NarrativeEngine.i: src/NarrativeEngine.cpp.i
+.PHONY : src/NarrativeEngine.i
+
+# target to preprocess a source file
+src/NarrativeEngine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/NarrativeEngine.cpp.i
+.PHONY : src/NarrativeEngine.cpp.i
+
+src/NarrativeEngine.s: src/NarrativeEngine.cpp.s
+.PHONY : src/NarrativeEngine.s
+
+# target to generate assembly for a file
+src/NarrativeEngine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/NarrativeEngine.cpp.s
+.PHONY : src/NarrativeEngine.cpp.s
+
+src/PlanningSystem.obj: src/PlanningSystem.cpp.obj
+.PHONY : src/PlanningSystem.obj
+
+# target to build an object file
+src/PlanningSystem.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/PlanningSystem.cpp.obj
+.PHONY : src/PlanningSystem.cpp.obj
+
+src/PlanningSystem.i: src/PlanningSystem.cpp.i
+.PHONY : src/PlanningSystem.i
+
+# target to preprocess a source file
+src/PlanningSystem.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/PlanningSystem.cpp.i
+.PHONY : src/PlanningSystem.cpp.i
+
+src/PlanningSystem.s: src/PlanningSystem.cpp.s
+.PHONY : src/PlanningSystem.s
+
+# target to generate assembly for a file
+src/PlanningSystem.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/PlanningSystem.cpp.s
+.PHONY : src/PlanningSystem.cpp.s
 
 src/SDLEngine.obj: src/SDLEngine.cpp.obj
 .PHONY : src/SDLEngine.obj
@@ -464,29 +680,53 @@ src/SaveLoad.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SaveLoad.cpp.s
 .PHONY : src/SaveLoad.cpp.s
 
-src/SpatialMesh.obj: src/SpatialMesh.cpp.obj
-.PHONY : src/SpatialMesh.obj
+src/SemanticMemory.obj: src/SemanticMemory.cpp.obj
+.PHONY : src/SemanticMemory.obj
 
 # target to build an object file
-src/SpatialMesh.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SpatialMesh.cpp.obj
-.PHONY : src/SpatialMesh.cpp.obj
+src/SemanticMemory.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SemanticMemory.cpp.obj
+.PHONY : src/SemanticMemory.cpp.obj
 
-src/SpatialMesh.i: src/SpatialMesh.cpp.i
-.PHONY : src/SpatialMesh.i
+src/SemanticMemory.i: src/SemanticMemory.cpp.i
+.PHONY : src/SemanticMemory.i
 
 # target to preprocess a source file
-src/SpatialMesh.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SpatialMesh.cpp.i
-.PHONY : src/SpatialMesh.cpp.i
+src/SemanticMemory.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SemanticMemory.cpp.i
+.PHONY : src/SemanticMemory.cpp.i
 
-src/SpatialMesh.s: src/SpatialMesh.cpp.s
-.PHONY : src/SpatialMesh.s
+src/SemanticMemory.s: src/SemanticMemory.cpp.s
+.PHONY : src/SemanticMemory.s
 
 # target to generate assembly for a file
-src/SpatialMesh.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SpatialMesh.cpp.s
-.PHONY : src/SpatialMesh.cpp.s
+src/SemanticMemory.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SemanticMemory.cpp.s
+.PHONY : src/SemanticMemory.cpp.s
+
+src/SocialDynamics.obj: src/SocialDynamics.cpp.obj
+.PHONY : src/SocialDynamics.obj
+
+# target to build an object file
+src/SocialDynamics.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialDynamics.cpp.obj
+.PHONY : src/SocialDynamics.cpp.obj
+
+src/SocialDynamics.i: src/SocialDynamics.cpp.i
+.PHONY : src/SocialDynamics.i
+
+# target to preprocess a source file
+src/SocialDynamics.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialDynamics.cpp.i
+.PHONY : src/SocialDynamics.cpp.i
+
+src/SocialDynamics.s: src/SocialDynamics.cpp.s
+.PHONY : src/SocialDynamics.s
+
+# target to generate assembly for a file
+src/SocialDynamics.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialDynamics.cpp.s
+.PHONY : src/SocialDynamics.cpp.s
 
 src/UI.obj: src/UI.cpp.obj
 .PHONY : src/UI.obj
@@ -656,30 +896,6 @@ src/modules/BehavioralModule.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.s
 .PHONY : src/modules/BehavioralModule.cpp.s
 
-src/movement.obj: src/movement.cpp.obj
-.PHONY : src/movement.obj
-
-# target to build an object file
-src/movement.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/movement.cpp.obj
-.PHONY : src/movement.cpp.obj
-
-src/movement.i: src/movement.cpp.i
-.PHONY : src/movement.i
-
-# target to preprocess a source file
-src/movement.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/movement.cpp.i
-.PHONY : src/movement.cpp.i
-
-src/movement.s: src/movement.cpp.s
-.PHONY : src/movement.s
-
-# target to generate assembly for a file
-src/movement.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/movement.cpp.s
-.PHONY : src/movement.cpp.s
-
 src/observability/Observability.obj: src/observability/Observability.cpp.obj
 .PHONY : src/observability/Observability.obj
 
@@ -779,12 +995,27 @@ help:
 	@echo ... libs/imgui/imgui_widgets.obj
 	@echo ... libs/imgui/imgui_widgets.i
 	@echo ... libs/imgui/imgui_widgets.s
+	@echo ... src/Action.obj
+	@echo ... src/Action.i
+	@echo ... src/Action.s
+	@echo ... src/CivilizationEngine.obj
+	@echo ... src/CivilizationEngine.i
+	@echo ... src/CivilizationEngine.s
+	@echo ... src/CognitiveArchitecture.obj
+	@echo ... src/CognitiveArchitecture.i
+	@echo ... src/CognitiveArchitecture.s
 	@echo ... src/Disease.obj
 	@echo ... src/Disease.i
 	@echo ... src/Disease.s
+	@echo ... src/EmotionalComplexity.obj
+	@echo ... src/EmotionalComplexity.i
+	@echo ... src/EmotionalComplexity.s
 	@echo ... src/Entity.obj
 	@echo ... src/Entity.i
 	@echo ... src/Entity.s
+	@echo ... src/EnvironmentalInteraction.obj
+	@echo ... src/EnvironmentalInteraction.i
+	@echo ... src/EnvironmentalInteraction.s
 	@echo ... src/Graph.obj
 	@echo ... src/Graph.i
 	@echo ... src/Graph.s
@@ -794,18 +1025,33 @@ help:
 	@echo ... src/Image.obj
 	@echo ... src/Image.i
 	@echo ... src/Image.s
+	@echo ... src/LearningAdaptation.obj
+	@echo ... src/LearningAdaptation.i
+	@echo ... src/LearningAdaptation.s
+	@echo ... src/LifeCourse.obj
+	@echo ... src/LifeCourse.i
+	@echo ... src/LifeCourse.s
 	@echo ... src/Logging.obj
 	@echo ... src/Logging.i
 	@echo ... src/Logging.s
+	@echo ... src/NarrativeEngine.obj
+	@echo ... src/NarrativeEngine.i
+	@echo ... src/NarrativeEngine.s
+	@echo ... src/PlanningSystem.obj
+	@echo ... src/PlanningSystem.i
+	@echo ... src/PlanningSystem.s
 	@echo ... src/SDLEngine.obj
 	@echo ... src/SDLEngine.i
 	@echo ... src/SDLEngine.s
 	@echo ... src/SaveLoad.obj
 	@echo ... src/SaveLoad.i
 	@echo ... src/SaveLoad.s
-	@echo ... src/SpatialMesh.obj
-	@echo ... src/SpatialMesh.i
-	@echo ... src/SpatialMesh.s
+	@echo ... src/SemanticMemory.obj
+	@echo ... src/SemanticMemory.i
+	@echo ... src/SemanticMemory.s
+	@echo ... src/SocialDynamics.obj
+	@echo ... src/SocialDynamics.i
+	@echo ... src/SocialDynamics.s
 	@echo ... src/UI.obj
 	@echo ... src/UI.i
 	@echo ... src/UI.s
@@ -827,9 +1073,6 @@ help:
 	@echo ... src/modules/BehavioralModule.obj
 	@echo ... src/modules/BehavioralModule.i
 	@echo ... src/modules/BehavioralModule.s
-	@echo ... src/movement.obj
-	@echo ... src/movement.i
-	@echo ... src/movement.s
 	@echo ... src/observability/Observability.obj
 	@echo ... src/observability/Observability.i
 	@echo ... src/observability/Observability.s

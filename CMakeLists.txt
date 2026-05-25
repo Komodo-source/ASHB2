@@ -84,13 +84,24 @@ src/Disease.cpp
 src/Logging.cpp
 ${IMGUI_SOURCES}
 src/implem_free_will.cpp
-src/SpatialMesh.cpp
-src/movement.cpp
 src/SaveLoad.cpp
 src/Heritage.cpp
 src/Graph.cpp
 src/SDLEngine.cpp
 src/Image.cpp
+src/SemanticMemory.cpp
+src/PlanningSystem.cpp
+src/NarrativeEngine.cpp
+src/CivilizationEngine.cpp
+
+# New AI / cognitive simulation source files
+src/Action.cpp
+src/CognitiveArchitecture.cpp
+src/EmotionalComplexity.cpp
+src/EnvironmentalInteraction.cpp
+src/LearningAdaptation.cpp
+src/LifeCourse.cpp
+src/SocialDynamics.cpp
 
 # Modular components
 ${VALIDATION_SOURCES}

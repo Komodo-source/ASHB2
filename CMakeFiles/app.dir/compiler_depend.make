@@ -1334,6 +1334,494 @@ CMakeFiles/app.dir/libs/imgui/imgui_widgets.cpp.obj: libs/imgui/imgui_widgets.cp
   libs/imgui/imgui_internal.h \
   libs/imgui/imstb_textedit.h
 
+CMakeFiles/app.dir/src/Action.cpp.obj: src/Action.cpp
+
+CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj: src/CivilizationEngine.cpp \
+  src/header/ExternalData.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
+  src/header/CivilizationEngine.h \
+  src/header/Entity.h \
+  src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h
+
+CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj: src/CognitiveArchitecture.cpp \
+  src/header/CognitiveArchitecture.h \
+  src/header/Entity.h \
+  src/header/ExternalData.h \
+  src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
+
 CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   src/header/BetterRand.h \
   src/header/Disease.h \
@@ -1341,8 +1829,11 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Logging.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -1379,6 +1870,8 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
@@ -1414,6 +1907,7 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
   C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -1426,9 +1920,11 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -1439,6 +1935,7 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -1450,6 +1947,7 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
   C:/mingw64/include/c++/14.2.0/codecvt \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
@@ -1471,6 +1969,7 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/filesystem \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
   C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
@@ -1492,6 +1991,7 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
   C:/mingw64/include/c++/14.2.0/ratio \
+  C:/mingw64/include/c++/14.2.0/set \
   C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
@@ -1514,6 +2014,250 @@ CMakeFiles/app.dir/src/Disease.cpp.obj: src/Disease.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
+
+CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj: src/EmotionalComplexity.cpp \
+  src/header/EmotionalComplexity.h \
+  src/header/Entity.h \
+  src/header/ExternalData.h \
+  src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -1581,9 +2325,12 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   src/header/Entity.h \
   src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
   src/header/random.hpp \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -1616,14 +2363,19 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/list.tcc \
   C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
   C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
   C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
   C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
@@ -1637,6 +2389,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/bits/postypes.h \
   C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
   C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
   C:/mingw64/include/c++/14.2.0/bits/random.h \
   C:/mingw64/include/c++/14.2.0/bits/random.tcc \
   C:/mingw64/include/c++/14.2.0/bits/range_access.h \
@@ -1646,7 +2399,9 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -1660,10 +2415,12 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_list.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_relops.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -1675,6 +2432,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -1686,6 +2444,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/chrono \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
@@ -1706,7 +2465,9 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
   C:/mingw64/include/c++/14.2.0/iosfwd \
   C:/mingw64/include/c++/14.2.0/iostream \
@@ -1714,6 +2475,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/iterator \
   C:/mingw64/include/c++/14.2.0/limits \
   C:/mingw64/include/c++/14.2.0/list \
+  C:/mingw64/include/c++/14.2.0/locale \
   C:/mingw64/include/c++/14.2.0/map \
   C:/mingw64/include/c++/14.2.0/memory \
   C:/mingw64/include/c++/14.2.0/new \
@@ -1727,6 +2489,8 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
   C:/mingw64/include/c++/14.2.0/ratio \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
   C:/mingw64/include/c++/14.2.0/streambuf \
@@ -1748,6 +2512,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/utility \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
@@ -1762,8 +2527,10 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
@@ -1812,6 +2579,249 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: src/Entity.cpp \
   C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
   src/header/BetterRand.h
 
+CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj: src/EnvironmentalInteraction.cpp \
+  src/header/Entity.h \
+  src/header/EnvironmentalInteraction.h \
+  src/header/ExternalData.h \
+  src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
+
 CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   libs/glfw/include/GLFW/glfw3.h \
   libs/imgui/backends/imgui_impl_glfw.h \
@@ -1823,9 +2833,12 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
   src/header/UI.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -1862,6 +2875,8 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
@@ -1897,6 +2912,7 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
   C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -1909,9 +2925,11 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -1922,6 +2940,7 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -1932,6 +2951,7 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
   C:/mingw64/include/c++/14.2.0/codecvt \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
@@ -1953,6 +2973,7 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/filesystem \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
   C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
@@ -1974,6 +2995,7 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
   C:/mingw64/include/c++/14.2.0/ratio \
+  C:/mingw64/include/c++/14.2.0/set \
   C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
@@ -1996,6 +3018,7 @@ CMakeFiles/app.dir/src/Graph.cpp.obj: src/Graph.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -2074,9 +3097,12 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
   src/header/heritage.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -2108,13 +3134,18 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
   C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
   C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
   C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
@@ -2127,6 +3158,7 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/bits/postypes.h \
   C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
   C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
   C:/mingw64/include/c++/14.2.0/bits/random.h \
   C:/mingw64/include/c++/14.2.0/bits/random.tcc \
   C:/mingw64/include/c++/14.2.0/bits/range_access.h \
@@ -2136,7 +3168,9 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -2149,9 +3183,11 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -2162,6 +3198,7 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -2171,11 +3208,13 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/cerrno \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
   C:/mingw64/include/c++/14.2.0/cstdio \
   C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
   C:/mingw64/include/c++/14.2.0/cwchar \
   C:/mingw64/include/c++/14.2.0/cwctype \
   C:/mingw64/include/c++/14.2.0/debug/assertions.h \
@@ -2190,12 +3229,15 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
   C:/mingw64/include/c++/14.2.0/iosfwd \
   C:/mingw64/include/c++/14.2.0/iostream \
   C:/mingw64/include/c++/14.2.0/istream \
   C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
   C:/mingw64/include/c++/14.2.0/map \
   C:/mingw64/include/c++/14.2.0/memory \
   C:/mingw64/include/c++/14.2.0/new \
@@ -2208,6 +3250,8 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
   C:/mingw64/include/c++/14.2.0/streambuf \
@@ -2229,6 +3273,7 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -2242,8 +3287,10 @@ CMakeFiles/app.dir/src/Heritage.cpp.obj: src/Heritage.cpp \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
@@ -2622,6 +3669,492 @@ CMakeFiles/app.dir/src/Image.cpp.obj: src/Image.cpp \
   src/header/Image.h \
   src/header/SDLEngine.h
 
+CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj: src/LearningAdaptation.cpp \
+  src/header/Entity.h \
+  src/header/ExternalData.h \
+  src/header/FreeWillSystem.h \
+  src/header/LearningAdaptation.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
+
+CMakeFiles/app.dir/src/LifeCourse.cpp.obj: src/LifeCourse.cpp \
+  src/header/Entity.h \
+  src/header/ExternalData.h \
+  src/header/FreeWillSystem.h \
+  src/header/LifeCourse.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
+
 CMakeFiles/app.dir/src/Logging.cpp.obj: src/Logging.cpp \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -2804,6 +4337,493 @@ CMakeFiles/app.dir/src/Logging.cpp.obj: src/Logging.cpp \
   C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
   C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
   src/header/Logging.h
+
+CMakeFiles/app.dir/src/NarrativeEngine.cpp.obj: src/NarrativeEngine.cpp \
+  src/header/ExternalData.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
+  src/header/Entity.h \
+  src/header/FreeWillSystem.h \
+  src/header/NarrativeEngine.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h
+
+CMakeFiles/app.dir/src/PlanningSystem.cpp.obj: src/PlanningSystem.cpp \
+  src/header/Entity.h \
+  src/header/ExternalData.h \
+  src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h \
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_queue.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/queue \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
 
 CMakeFiles/app.dir/src/SDLEngine.cpp.obj: src/SDLEngine.cpp \
   libs/SDL2/include/SDL2/SDL.h \
@@ -3123,9 +5143,12 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   src/header/Entity.h \
   src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
   src/header/SaveLoad.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -3157,13 +5180,18 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
   C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
   C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
   C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
   C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
@@ -3176,6 +5204,7 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/bits/postypes.h \
   C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
   C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
   C:/mingw64/include/c++/14.2.0/bits/random.h \
   C:/mingw64/include/c++/14.2.0/bits/random.tcc \
   C:/mingw64/include/c++/14.2.0/bits/range_access.h \
@@ -3185,7 +5214,9 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
   C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -3198,9 +5229,11 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -3211,6 +5244,7 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -3220,11 +5254,13 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/cerrno \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
   C:/mingw64/include/c++/14.2.0/cstdio \
   C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
   C:/mingw64/include/c++/14.2.0/cwchar \
   C:/mingw64/include/c++/14.2.0/cwctype \
   C:/mingw64/include/c++/14.2.0/debug/assertions.h \
@@ -3239,12 +5275,15 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
   C:/mingw64/include/c++/14.2.0/iosfwd \
   C:/mingw64/include/c++/14.2.0/iostream \
   C:/mingw64/include/c++/14.2.0/istream \
   C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
   C:/mingw64/include/c++/14.2.0/map \
   C:/mingw64/include/c++/14.2.0/memory \
   C:/mingw64/include/c++/14.2.0/new \
@@ -3257,6 +5296,8 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
   C:/mingw64/include/c++/14.2.0/streambuf \
@@ -3278,6 +5319,7 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -3291,8 +5333,10 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
@@ -3339,14 +5383,15 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: src/SaveLoad.cpp \
   C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
   C:/mingw64/x86_64-w64-mingw32/include/wctype.h
 
-CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
-  libs/glfw/include/GLFW/glfw3.h \
-  libs/imgui/backends/imgui_impl_glfw.h \
-  libs/imgui/backends/imgui_impl_opengl3.h \
-  libs/imgui/imconfig.h \
-  libs/imgui/imgui.h \
+CMakeFiles/app.dir/src/SemanticMemory.cpp.obj: src/SemanticMemory.cpp \
+  src/header/Entity.h \
   src/header/ExternalData.h \
+  src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialNormSystem.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -3363,7 +5408,6 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
   C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
   C:/mingw64/include/c++/14.2.0/bits/charconv.h \
-  C:/mingw64/include/c++/14.2.0/bits/chrono.h \
   C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
   C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
   C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
@@ -3375,14 +5419,12 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/exception.h \
   C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
   C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_dir.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_fwd.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_ops.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_path.h \
   C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
@@ -3402,7 +5444,6 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
   C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
-  C:/mingw64/include/c++/14.2.0/bits/parse_numbers.h \
   C:/mingw64/include/c++/14.2.0/bits/postypes.h \
   C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
   C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
@@ -3418,6 +5459,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
   C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -3430,9 +5472,12 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_queue.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -3443,6 +5488,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -3452,7 +5498,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/cerrno \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
-  C:/mingw64/include/c++/14.2.0/codecvt \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
@@ -3472,8 +5518,8 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
   C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
-  C:/mingw64/include/c++/14.2.0/filesystem \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
   C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
@@ -3492,8 +5538,9 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
   C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/queue \
   C:/mingw64/include/c++/14.2.0/random \
-  C:/mingw64/include/c++/14.2.0/ratio \
+  C:/mingw64/include/c++/14.2.0/set \
   C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
@@ -3516,6 +5563,7 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -3533,22 +5581,17 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/float.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
   C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
-  C:/mingw64/x86_64-w64-mingw32/include/GL/gl.h \
   C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
   C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
   C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
   C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
   C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stdarg.h \
   C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
-  C:/mingw64/x86_64-w64-mingw32/include/assert.h \
   C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
   C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
   C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
@@ -3556,7 +5599,6 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
   C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
   C:/mingw64/x86_64-w64-mingw32/include/errno.h \
-  C:/mingw64/x86_64-w64-mingw32/include/float.h \
   C:/mingw64/x86_64-w64-mingw32/include/limits.h \
   C:/mingw64/x86_64-w64-mingw32/include/locale.h \
   C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
@@ -3570,28 +5612,263 @@ CMakeFiles/app.dir/src/SpatialMesh.cpp.obj: src/SpatialMesh.cpp \
   C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
   C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
   C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sec_api/string_s.h \
   C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
   C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
   C:/mingw64/x86_64-w64-mingw32/include/signal.h \
-  C:/mingw64/x86_64-w64-mingw32/include/stdarg.h \
   C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
   C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
   C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
   C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
-  C:/mingw64/x86_64-w64-mingw32/include/string.h \
   C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
   C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
   C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
   C:/mingw64/x86_64-w64-mingw32/include/time.h \
   C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
   C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
-  C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
+
+CMakeFiles/app.dir/src/SocialDynamics.cpp.obj: src/SocialDynamics.cpp \
   src/header/Entity.h \
+  src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
+  src/header/SocialDynamics.h \
   src/header/SocialNormSystem.h \
-  src/header/SpatialMesh.h \
-  src/header/UI.h
+  C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
+  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
+  C:/mingw64/include/c++/14.2.0/backward/binders.h \
+  C:/mingw64/include/c++/14.2.0/bit \
+  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/align.h \
+  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
+  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
+  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
+  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
+  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
+  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
+  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
+  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
+  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
+  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
+  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
+  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/move.h \
+  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
+  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
+  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
+  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
+  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
+  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
+  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.h \
+  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
+  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
+  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
+  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
+  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
+  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
+  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
+  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
+  C:/mingw64/include/c++/14.2.0/bits/utility.h \
+  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
+  C:/mingw64/include/c++/14.2.0/bits/version.h \
+  C:/mingw64/include/c++/14.2.0/cctype \
+  C:/mingw64/include/c++/14.2.0/cerrno \
+  C:/mingw64/include/c++/14.2.0/clocale \
+  C:/mingw64/include/c++/14.2.0/cmath \
+  C:/mingw64/include/c++/14.2.0/compare \
+  C:/mingw64/include/c++/14.2.0/concepts \
+  C:/mingw64/include/c++/14.2.0/cstddef \
+  C:/mingw64/include/c++/14.2.0/cstdint \
+  C:/mingw64/include/c++/14.2.0/cstdio \
+  C:/mingw64/include/c++/14.2.0/cstdlib \
+  C:/mingw64/include/c++/14.2.0/ctime \
+  C:/mingw64/include/c++/14.2.0/cwchar \
+  C:/mingw64/include/c++/14.2.0/cwctype \
+  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
+  C:/mingw64/include/c++/14.2.0/debug/debug.h \
+  C:/mingw64/include/c++/14.2.0/deque \
+  C:/mingw64/include/c++/14.2.0/exception \
+  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
+  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
+  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
+  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
+  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
+  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
+  C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
+  C:/mingw64/include/c++/14.2.0/initializer_list \
+  C:/mingw64/include/c++/14.2.0/iomanip \
+  C:/mingw64/include/c++/14.2.0/ios \
+  C:/mingw64/include/c++/14.2.0/iosfwd \
+  C:/mingw64/include/c++/14.2.0/istream \
+  C:/mingw64/include/c++/14.2.0/limits \
+  C:/mingw64/include/c++/14.2.0/locale \
+  C:/mingw64/include/c++/14.2.0/map \
+  C:/mingw64/include/c++/14.2.0/memory \
+  C:/mingw64/include/c++/14.2.0/new \
+  C:/mingw64/include/c++/14.2.0/numeric \
+  C:/mingw64/include/c++/14.2.0/optional \
+  C:/mingw64/include/c++/14.2.0/ostream \
+  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
+  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
+  C:/mingw64/include/c++/14.2.0/random \
+  C:/mingw64/include/c++/14.2.0/set \
+  C:/mingw64/include/c++/14.2.0/sstream \
+  C:/mingw64/include/c++/14.2.0/stdexcept \
+  C:/mingw64/include/c++/14.2.0/stdlib.h \
+  C:/mingw64/include/c++/14.2.0/streambuf \
+  C:/mingw64/include/c++/14.2.0/string \
+  C:/mingw64/include/c++/14.2.0/string_view \
+  C:/mingw64/include/c++/14.2.0/system_error \
+  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+  C:/mingw64/include/c++/14.2.0/tuple \
+  C:/mingw64/include/c++/14.2.0/type_traits \
+  C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
+  C:/mingw64/include/c++/14.2.0/vector \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
+  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
+  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
+  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
+  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
+  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
+  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
+  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
+  C:/mingw64/x86_64-w64-mingw32/include/math.h \
+  C:/mingw64/x86_64-w64-mingw32/include/process.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
+  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
+  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
+  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+  C:/mingw64/x86_64-w64-mingw32/include/time.h \
+  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
+  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
 
 CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   libs/glfw/include/GLFW/glfw3.h \
@@ -3601,15 +5878,20 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   libs/imgui/imgui.h \
   libs/imgui/imgui_internal.h \
   src/header/BetterRand.h \
+  src/header/CivilizationEngine.h \
   src/header/Disease.h \
   src/header/Entity.h \
   src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
+  src/header/NarrativeEngine.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
   src/header/UI.h \
   src/header/implot.h \
   src/header/implot_internal.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -3646,6 +5928,8 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
@@ -3681,6 +5965,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
   C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -3693,9 +5978,11 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -3706,6 +5993,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -3716,6 +6004,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
   C:/mingw64/include/c++/14.2.0/codecvt \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
@@ -3737,6 +6026,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/filesystem \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
   C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
@@ -3759,6 +6049,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
   C:/mingw64/include/c++/14.2.0/ratio \
+  C:/mingw64/include/c++/14.2.0/set \
   C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
@@ -3781,6 +6072,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: src/UI.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -4552,9 +6844,12 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
   src/header/Logging.h \
+  src/header/PlanningSystem.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
   src/header/heritage.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -4591,6 +6886,8 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
@@ -4626,6 +6923,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
   C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
@@ -4638,9 +6936,11 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -4651,6 +6951,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -4662,6 +6963,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
   C:/mingw64/include/c++/14.2.0/codecvt \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
@@ -4683,6 +6985,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/filesystem \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
   C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
@@ -4704,6 +7007,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
   C:/mingw64/include/c++/14.2.0/ratio \
+  C:/mingw64/include/c++/14.2.0/set \
   C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
@@ -4726,6 +7030,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: src/implem_free_will.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -4847,22 +7152,25 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   libs/imgui/imgui.h \
   libs/imgui/imgui_internal.h \
   src/header/BetterRand.h \
+  src/header/CivilizationEngine.h \
   src/header/Disease.h \
   src/header/Entity.h \
   src/header/ExternalData.h \
   src/header/FreeWillSystem.h \
   src/header/Graph.h \
   src/header/Logging.h \
-  src/header/Movement.h \
+  src/header/NarrativeEngine.h \
+  src/header/PlanningSystem.h \
   src/header/SaveLoad.h \
+  src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
-  src/header/SpatialMesh.h \
   src/header/UI.h \
   src/header/heritage.h \
   src/header/implot.h \
   src/header/implot_internal.h \
   src/util/clear.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
+  C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
   C:/mingw64/include/c++/14.2.0/backward/binders.h \
   C:/mingw64/include/c++/14.2.0/bit \
@@ -4899,6 +7207,8 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
   C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
   C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable.h \
+  C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h \
   C:/mingw64/include/c++/14.2.0/bits/invoke.h \
   C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
   C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
@@ -4934,6 +7244,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/bits/specfun.h \
   C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
   C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
+  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
   C:/mingw64/include/c++/14.2.0/bits/std_thread.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
@@ -4947,9 +7258,11 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
+  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
   C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
@@ -4961,6 +7274,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/bits/this_thread_sleep.h \
   C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
   C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
+  C:/mingw64/include/c++/14.2.0/bits/unordered_map.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
   C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
   C:/mingw64/include/c++/14.2.0/bits/utility.h \
@@ -4972,6 +7286,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/clocale \
   C:/mingw64/include/c++/14.2.0/cmath \
   C:/mingw64/include/c++/14.2.0/codecvt \
+  C:/mingw64/include/c++/14.2.0/compare \
   C:/mingw64/include/c++/14.2.0/concepts \
   C:/mingw64/include/c++/14.2.0/cstddef \
   C:/mingw64/include/c++/14.2.0/cstdint \
@@ -4993,6 +7308,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
   C:/mingw64/include/c++/14.2.0/filesystem \
   C:/mingw64/include/c++/14.2.0/fstream \
+  C:/mingw64/include/c++/14.2.0/functional \
   C:/mingw64/include/c++/14.2.0/initializer_list \
   C:/mingw64/include/c++/14.2.0/iomanip \
   C:/mingw64/include/c++/14.2.0/ios \
@@ -5015,6 +7331,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
   C:/mingw64/include/c++/14.2.0/random \
   C:/mingw64/include/c++/14.2.0/ratio \
+  C:/mingw64/include/c++/14.2.0/set \
   C:/mingw64/include/c++/14.2.0/sstream \
   C:/mingw64/include/c++/14.2.0/stdexcept \
   C:/mingw64/include/c++/14.2.0/stdlib.h \
@@ -5038,6 +7355,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/include/c++/14.2.0/tuple \
   C:/mingw64/include/c++/14.2.0/type_traits \
   C:/mingw64/include/c++/14.2.0/typeinfo \
+  C:/mingw64/include/c++/14.2.0/unordered_map \
   C:/mingw64/include/c++/14.2.0/vector \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
@@ -5433,262 +7751,6 @@ CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj: src/modules/BehavioralM
   C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
   C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
   src/modules/BehavioralModule.h
-
-CMakeFiles/app.dir/src/movement.cpp.obj: src/movement.cpp \
-  libs/glfw/include/GLFW/glfw3.h \
-  libs/imgui/backends/imgui_impl_glfw.h \
-  libs/imgui/backends/imgui_impl_opengl3.h \
-  libs/imgui/imconfig.h \
-  libs/imgui/imgui.h \
-  src/header/BetterRand.h \
-  src/header/Entity.h \
-  src/header/ExternalData.h \
-  src/header/FreeWillSystem.h \
-  src/header/Movement.h \
-  src/header/SocialNormSystem.h \
-  src/header/UI.h \
-  C:/mingw64/include/c++/14.2.0/algorithm \
-  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
-  C:/mingw64/include/c++/14.2.0/backward/binders.h \
-  C:/mingw64/include/c++/14.2.0/bit \
-  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
-  C:/mingw64/include/c++/14.2.0/bits/align.h \
-  C:/mingw64/include/c++/14.2.0/bits/alloc_traits.h \
-  C:/mingw64/include/c++/14.2.0/bits/allocated_ptr.h \
-  C:/mingw64/include/c++/14.2.0/bits/allocator.h \
-  C:/mingw64/include/c++/14.2.0/bits/atomic_base.h \
-  C:/mingw64/include/c++/14.2.0/bits/atomic_lockfree_defines.h \
-  C:/mingw64/include/c++/14.2.0/bits/basic_ios.h \
-  C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/basic_string.h \
-  C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/char_traits.h \
-  C:/mingw64/include/c++/14.2.0/bits/charconv.h \
-  C:/mingw64/include/c++/14.2.0/bits/chrono.h \
-  C:/mingw64/include/c++/14.2.0/bits/codecvt.h \
-  C:/mingw64/include/c++/14.2.0/bits/concept_check.h \
-  C:/mingw64/include/c++/14.2.0/bits/cpp_type_traits.h \
-  C:/mingw64/include/c++/14.2.0/bits/cxxabi_forced.h \
-  C:/mingw64/include/c++/14.2.0/bits/cxxabi_init_exception.h \
-  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
-  C:/mingw64/include/c++/14.2.0/bits/erase_if.h \
-  C:/mingw64/include/c++/14.2.0/bits/exception.h \
-  C:/mingw64/include/c++/14.2.0/bits/exception_defines.h \
-  C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_dir.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_fwd.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_ops.h \
-  C:/mingw64/include/c++/14.2.0/bits/fs_path.h \
-  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/functexcept.h \
-  C:/mingw64/include/c++/14.2.0/bits/functional_hash.h \
-  C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h \
-  C:/mingw64/include/c++/14.2.0/bits/invoke.h \
-  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
-  C:/mingw64/include/c++/14.2.0/bits/istream.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/locale_classes.h \
-  C:/mingw64/include/c++/14.2.0/bits/locale_classes.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/locale_conv.h \
-  C:/mingw64/include/c++/14.2.0/bits/locale_facets.h \
-  C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.h \
-  C:/mingw64/include/c++/14.2.0/bits/locale_facets_nonio.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/localefwd.h \
-  C:/mingw64/include/c++/14.2.0/bits/memory_resource.h \
-  C:/mingw64/include/c++/14.2.0/bits/memoryfwd.h \
-  C:/mingw64/include/c++/14.2.0/bits/move.h \
-  C:/mingw64/include/c++/14.2.0/bits/nested_exception.h \
-  C:/mingw64/include/c++/14.2.0/bits/new_allocator.h \
-  C:/mingw64/include/c++/14.2.0/bits/node_handle.h \
-  C:/mingw64/include/c++/14.2.0/bits/ostream.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h \
-  C:/mingw64/include/c++/14.2.0/bits/parse_numbers.h \
-  C:/mingw64/include/c++/14.2.0/bits/postypes.h \
-  C:/mingw64/include/c++/14.2.0/bits/predefined_ops.h \
-  C:/mingw64/include/c++/14.2.0/bits/ptr_traits.h \
-  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
-  C:/mingw64/include/c++/14.2.0/bits/random.h \
-  C:/mingw64/include/c++/14.2.0/bits/random.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/range_access.h \
-  C:/mingw64/include/c++/14.2.0/bits/refwrap.h \
-  C:/mingw64/include/c++/14.2.0/bits/requires_hosted.h \
-  C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h \
-  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_atomic.h \
-  C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h \
-  C:/mingw64/include/c++/14.2.0/bits/specfun.h \
-  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/std_abs.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_algobase.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_construct.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_function.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_iterator.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_funcs.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_iterator_base_types.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_map.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_multimap.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_pair.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_raw_storage_iter.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_tempbuf.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h \
-  C:/mingw64/include/c++/14.2.0/bits/stl_vector.h \
-  C:/mingw64/include/c++/14.2.0/bits/streambuf.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/streambuf_iterator.h \
-  C:/mingw64/include/c++/14.2.0/bits/string_view.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/stringfwd.h \
-  C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
-  C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h \
-  C:/mingw64/include/c++/14.2.0/bits/uses_allocator.h \
-  C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h \
-  C:/mingw64/include/c++/14.2.0/bits/utility.h \
-  C:/mingw64/include/c++/14.2.0/bits/vector.tcc \
-  C:/mingw64/include/c++/14.2.0/bits/version.h \
-  C:/mingw64/include/c++/14.2.0/cctype \
-  C:/mingw64/include/c++/14.2.0/cerrno \
-  C:/mingw64/include/c++/14.2.0/clocale \
-  C:/mingw64/include/c++/14.2.0/cmath \
-  C:/mingw64/include/c++/14.2.0/codecvt \
-  C:/mingw64/include/c++/14.2.0/concepts \
-  C:/mingw64/include/c++/14.2.0/cstddef \
-  C:/mingw64/include/c++/14.2.0/cstdint \
-  C:/mingw64/include/c++/14.2.0/cstdio \
-  C:/mingw64/include/c++/14.2.0/cstdlib \
-  C:/mingw64/include/c++/14.2.0/ctime \
-  C:/mingw64/include/c++/14.2.0/cwchar \
-  C:/mingw64/include/c++/14.2.0/cwctype \
-  C:/mingw64/include/c++/14.2.0/debug/assertions.h \
-  C:/mingw64/include/c++/14.2.0/debug/debug.h \
-  C:/mingw64/include/c++/14.2.0/deque \
-  C:/mingw64/include/c++/14.2.0/exception \
-  C:/mingw64/include/c++/14.2.0/ext/aligned_buffer.h \
-  C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h \
-  C:/mingw64/include/c++/14.2.0/ext/atomicity.h \
-  C:/mingw64/include/c++/14.2.0/ext/concurrence.h \
-  C:/mingw64/include/c++/14.2.0/ext/numeric_traits.h \
-  C:/mingw64/include/c++/14.2.0/ext/string_conversions.h \
-  C:/mingw64/include/c++/14.2.0/ext/type_traits.h \
-  C:/mingw64/include/c++/14.2.0/filesystem \
-  C:/mingw64/include/c++/14.2.0/fstream \
-  C:/mingw64/include/c++/14.2.0/initializer_list \
-  C:/mingw64/include/c++/14.2.0/iomanip \
-  C:/mingw64/include/c++/14.2.0/ios \
-  C:/mingw64/include/c++/14.2.0/iosfwd \
-  C:/mingw64/include/c++/14.2.0/iostream \
-  C:/mingw64/include/c++/14.2.0/istream \
-  C:/mingw64/include/c++/14.2.0/limits \
-  C:/mingw64/include/c++/14.2.0/locale \
-  C:/mingw64/include/c++/14.2.0/map \
-  C:/mingw64/include/c++/14.2.0/memory \
-  C:/mingw64/include/c++/14.2.0/new \
-  C:/mingw64/include/c++/14.2.0/numeric \
-  C:/mingw64/include/c++/14.2.0/optional \
-  C:/mingw64/include/c++/14.2.0/ostream \
-  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
-  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
-  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
-  C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
-  C:/mingw64/include/c++/14.2.0/pstl/pstl_config.h \
-  C:/mingw64/include/c++/14.2.0/random \
-  C:/mingw64/include/c++/14.2.0/ratio \
-  C:/mingw64/include/c++/14.2.0/sstream \
-  C:/mingw64/include/c++/14.2.0/stdexcept \
-  C:/mingw64/include/c++/14.2.0/stdlib.h \
-  C:/mingw64/include/c++/14.2.0/streambuf \
-  C:/mingw64/include/c++/14.2.0/string \
-  C:/mingw64/include/c++/14.2.0/string_view \
-  C:/mingw64/include/c++/14.2.0/system_error \
-  C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
-  C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
-  C:/mingw64/include/c++/14.2.0/tuple \
-  C:/mingw64/include/c++/14.2.0/type_traits \
-  C:/mingw64/include/c++/14.2.0/typeinfo \
-  C:/mingw64/include/c++/14.2.0/vector \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/basic_file.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/error_constants.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/gthr.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/messages_members.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/os_defines.h \
-  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/time_members.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/float.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/limits.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mm_malloc.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdarg.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stddef.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
-  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h \
-  C:/mingw64/x86_64-w64-mingw32/include/GL/gl.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_mingw.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_mingw_stdarg.h \
-  C:/mingw64/x86_64-w64-mingw32/include/_timeval.h \
-  C:/mingw64/x86_64-w64-mingw32/include/assert.h \
-  C:/mingw64/x86_64-w64-mingw32/include/corecrt.h \
-  C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
-  C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
-  C:/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
-  C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
-  C:/mingw64/x86_64-w64-mingw32/include/ctype.h \
-  C:/mingw64/x86_64-w64-mingw32/include/errno.h \
-  C:/mingw64/x86_64-w64-mingw32/include/float.h \
-  C:/mingw64/x86_64-w64-mingw32/include/limits.h \
-  C:/mingw64/x86_64-w64-mingw32/include/locale.h \
-  C:/mingw64/x86_64-w64-mingw32/include/malloc.h \
-  C:/mingw64/x86_64-w64-mingw32/include/math.h \
-  C:/mingw64/x86_64-w64-mingw32/include/process.h \
-  C:/mingw64/x86_64-w64-mingw32/include/pthread.h \
-  C:/mingw64/x86_64-w64-mingw32/include/pthread_compat.h \
-  C:/mingw64/x86_64-w64-mingw32/include/pthread_signal.h \
-  C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h \
-  C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sec_api/string_s.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h \
-  C:/mingw64/x86_64-w64-mingw32/include/signal.h \
-  C:/mingw64/x86_64-w64-mingw32/include/stdarg.h \
-  C:/mingw64/x86_64-w64-mingw32/include/stddef.h \
-  C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
-  C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
-  C:/mingw64/x86_64-w64-mingw32/include/stdlib.h \
-  C:/mingw64/x86_64-w64-mingw32/include/string.h \
-  C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
-  C:/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
-  C:/mingw64/x86_64-w64-mingw32/include/sys/types.h \
-  C:/mingw64/x86_64-w64-mingw32/include/time.h \
-  C:/mingw64/x86_64-w64-mingw32/include/vadefs.h \
-  C:/mingw64/x86_64-w64-mingw32/include/wchar.h \
-  C:/mingw64/x86_64-w64-mingw32/include/wctype.h
 
 CMakeFiles/app.dir/src/observability/Observability.cpp.obj: src/observability/Observability.cpp \
   C:/mingw64/include/c++/14.2.0/algorithm \
@@ -6377,8 +8439,6 @@ src/validation/ValidationFramework.h:
 
 src/validation/ValidationFramework.cpp:
 
-C:/mingw64/include/c++/14.2.0/queue:
-
 C:/mingw64/include/c++/14.2.0/future:
 
 C:/mingw64/include/c++/14.2.0/condition_variable:
@@ -6399,27 +8459,11 @@ src/util/Debbug.h:
 
 C:/mingw64/include/c++/14.2.0/bits/std_thread.h:
 
-src/header/Movement.h:
-
 src/implem_free_will.cpp:
 
 src/header/implot_items.cpp:
 
 src/environment/EnvironmentModel.h:
-
-C:/mingw64/include/c++/14.2.0/unordered_map:
-
-C:/mingw64/include/c++/14.2.0/compare:
-
-C:/mingw64/include/c++/14.2.0/bits/unordered_map.h:
-
-C:/mingw64/include/c++/14.2.0/bits/std_function.h:
-
-C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h:
-
-C:/mingw64/include/c++/14.2.0/bits/hashtable.h:
-
-C:/mingw64/include/c++/14.2.0/array:
 
 src/environment/EnvironmentModel.cpp:
 
@@ -6427,11 +8471,19 @@ src/header/implot_internal.h:
 
 src/UI.cpp:
 
-src/header/SpatialMesh.h:
-
-src/SpatialMesh.cpp:
+src/header/SocialDynamics.h:
 
 src/SaveLoad.cpp:
+
+C:/mingw64/include/c++/14.2.0/queue:
+
+src/PlanningSystem.cpp:
+
+src/header/NarrativeEngine.h:
+
+src/NarrativeEngine.cpp:
+
+src/LifeCourse.cpp:
 
 src/header/SDLEngine.h:
 
@@ -6489,6 +8541,36 @@ libs/SDL2/include/SDL2/SDL_haptic.h:
 
 libs/SDL2/include/SDL2/SDL_guid.h:
 
+libs/SDL2/include/SDL2/SDL_gesture.h:
+
+libs/SDL2/include/SDL2/SDL_gamecontroller.h:
+
+libs/SDL2/include/SDL2/SDL_filesystem.h:
+
+libs/SDL2/include/SDL2/SDL_endian.h:
+
+libs/SDL2/include/SDL2/SDL_config.h:
+
+libs/SDL2/include/SDL2/SDL_clipboard.h:
+
+libs/SDL2/include/SDL2/SDL_blendmode.h:
+
+libs/SDL2/include/SDL2/SDL_atomic.h:
+
+libs/SDL2/include/SDL2/SDL_assert.h:
+
+src/Image.cpp:
+
+src/Heritage.cpp:
+
+src/header/UI.h:
+
+src/header/Graph.h:
+
+src/Graph.cpp:
+
+src/header/EnvironmentalInteraction.h:
+
 C:/mingw64/x86_64-w64-mingw32/include/timezoneapi.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/rpcnsi.h:
@@ -6504,10 +8586,6 @@ libs/SDL2/include/SDL2/SDL_rect.h:
 libs/imgui/imgui.h:
 
 C:/mingw64/include/c++/14.2.0/bits/fs_ops.h:
-
-C:/mingw64/include/c++/14.2.0/bits/stl_set.h:
-
-C:/mingw64/x86_64-w64-mingw32/include/stdarg.h:
 
 C:/mingw64/include/c++/14.2.0/bits/shared_ptr_base.h:
 
@@ -6669,7 +8747,7 @@ C:/mingw64/x86_64-w64-mingw32/include/heapapi.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/debugapi.h:
 
-C:/mingw64/x86_64-w64-mingw32/include/stddef.h:
+src/LearningAdaptation.cpp:
 
 C:/mingw64/x86_64-w64-mingw32/include/psdk_inc/_xmitfile.h:
 
@@ -6678,6 +8756,10 @@ C:/mingw64/x86_64-w64-mingw32/include/guiddef.h:
 libs/imgui/imstb_truetype.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/float.h:
+
+C:/mingw64/x86_64-w64-mingw32/include/stdarg.h:
+
+C:/mingw64/include/c++/14.2.0/bits/stl_set.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/fileapi.h:
 
@@ -6703,13 +8785,15 @@ C:/mingw64/x86_64-w64-mingw32/include/datetimeapi.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/crtdefs.h:
 
-libs/SDL2/include/SDL2/SDL_atomic.h:
-
 C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h:
 
 C:/mingw64/include/c++/14.2.0/ratio:
 
 C:/mingw64/x86_64-w64-mingw32/include/concurrencysal.h:
+
+libs/SDL2/include/SDL2/SDL_events.h:
+
+C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/assert.h:
 
@@ -6722,6 +8806,8 @@ libs/SDL2/include/SDL2/SDL_render.h:
 C:/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/_timeval.h:
+
+src/header/LifeCourse.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/cguid.h:
 
@@ -6801,11 +8887,17 @@ C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/avx512vbmi2vlintrin.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/apiset.h:
 
+src/SocialDynamics.cpp:
+
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/avx512fintrin.h:
 
 src/Logging.cpp:
 
 C:/mingw64/include/c++/14.2.0/cstdio:
+
+libs/SDL2/include/SDL2/SDL_audio.h:
+
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/avx5124fmapsintrin.h:
 
@@ -6889,8 +8981,6 @@ C:/mingw64/x86_64-w64-mingw32/include/combaseapi.h:
 
 C:/mingw64/include/c++/14.2.0/debug/debug.h:
 
-libs/SDL2/include/SDL2/SDL_endian.h:
-
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/keylockerintrin.h:
 
 src/SDLEngine.cpp:
@@ -6918,10 +9008,6 @@ C:/mingw64/x86_64-w64-mingw32/include/oleauto.h:
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/lzcntintrin.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/cderr.h:
-
-C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/sm4intrin.h:
-
-C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/pthread_time.h:
 
@@ -7019,6 +9105,8 @@ C:/mingw64/include/c++/14.2.0/bits/stl_bvector.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/ia32intrin.h:
 
+src/SemanticMemory.cpp:
+
 C:/mingw64/x86_64-w64-mingw32/include/joystickapi.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/pthread_unistd.h:
@@ -7042,6 +9130,8 @@ C:/mingw64/x86_64-w64-mingw32/include/vadefs.h:
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/avx512vbmi2intrin.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/xtestintrin.h:
+
+C:/mingw64/include/c++/14.2.0/bits/hashtable_policy.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/rtmintrin.h:
 
@@ -7079,10 +9169,6 @@ C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/prfchwintrin.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/sm3intrin.h:
 
-libs/SDL2/include/SDL2/SDL_assert.h:
-
-src/movement.cpp:
-
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/smmintrin.h:
 
 C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc:
@@ -7092,6 +9178,10 @@ C:/mingw64/x86_64-w64-mingw32/include/threadpoolapiset.h:
 C:/mingw64/include/c++/14.2.0/cerrno:
 
 C:/mingw64/include/c++/14.2.0/cstdlib:
+
+libs/SDL2/include/SDL2/SDL_error.h:
+
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/uintrintrin.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/float.h:
 
@@ -7169,8 +9259,6 @@ C:/mingw64/x86_64-w64-mingw32/include/psdk_inc/_socket_types.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/winefs.h:
 
-libs/SDL2/include/SDL2/SDL_gesture.h:
-
 C:/mingw64/x86_64-w64-mingw32/include/winerror.h:
 
 C:/mingw64/include/c++/14.2.0/bits/stl_algo.h:
@@ -7178,6 +9266,8 @@ C:/mingw64/include/c++/14.2.0/bits/stl_algo.h:
 C:/mingw64/include/c++/14.2.0/cctype:
 
 C:/mingw64/x86_64-w64-mingw32/include/winnls.h:
+
+src/EnvironmentalInteraction.cpp:
 
 C:/mingw64/x86_64-w64-mingw32/include/winnt.h:
 
@@ -7201,7 +9291,7 @@ C:/mingw64/x86_64-w64-mingw32/include/winuser.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/wow64apiset.h:
 
-libs/SDL2/include/SDL2/SDL_clipboard.h:
+src/header/PlanningSystem.h:
 
 libs/imgui/backends/imgui_impl_glfw.h:
 
@@ -7297,17 +9387,13 @@ libs/imgui/imgui_widgets.cpp:
 
 C:/mingw64/include/c++/14.2.0/system_error:
 
-src/header/BetterRand.h:
+C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/sm4intrin.h:
 
-C:/mingw64/include/c++/14.2.0/optional:
+C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_base.h:
 
-src/header/Disease.h:
+src/CivilizationEngine.cpp:
 
-C:/mingw64/x86_64-w64-mingw32/include/winnetwk.h:
-
-src/header/Entity.h:
-
-C:/mingw64/include/c++/14.2.0/bits/exception.h:
+C:/mingw64/x86_64-w64-mingw32/include/pthread.h:
 
 C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h:
 
@@ -7315,23 +9401,17 @@ C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/wmmintrin.h:
 
 src/header/ExternalData.h:
 
-src/util/clear.h:
-
-src/header/FreeWillSystem.h:
-
-src/header/SocialNormSystem.h:
-
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/mwaitintrin.h:
 
 C:/mingw64/include/c++/14.2.0/algorithm:
+
+C:/mingw64/include/c++/14.2.0/array:
 
 C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h:
 
 C:/mingw64/include/c++/14.2.0/backward/binders.h:
 
 C:/mingw64/include/c++/14.2.0/bits/stl_list.h:
-
-src/Heritage.cpp:
 
 C:/mingw64/x86_64-w64-mingw32/include/stdlib.h:
 
@@ -7365,6 +9445,10 @@ libs/SDL2/include/SDL2/SDL_loadso.h:
 
 C:/mingw64/include/c++/14.2.0/bits/basic_ios.tcc:
 
+libs/SDL2/include/SDL2/SDL_cpuinfo.h:
+
+src/EmotionalComplexity.cpp:
+
 C:/mingw64/include/c++/14.2.0/bits/basic_string.tcc:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/wbnoinvdintrin.h:
@@ -7387,21 +9471,19 @@ C:/mingw64/include/c++/14.2.0/sstream:
 
 C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h:
 
+C:/mingw64/include/c++/14.2.0/bits/exception.h:
+
+C:/mingw64/x86_64-w64-mingw32/include/winnetwk.h:
+
+src/header/Entity.h:
+
 C:/mingw64/include/c++/14.2.0/bits/exception_ptr.h:
-
-C:/mingw64/x86_64-w64-mingw32/include/stralign.h:
-
-C:/mingw64/include/c++/14.2.0/bits/fs_dir.h:
-
-C:/mingw64/include/c++/14.2.0/bits/fs_fwd.h:
-
-src/Image.cpp:
-
-C:/mingw64/include/c++/14.2.0/bits/fs_path.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/waitpkgintrin.h:
 
 C:/mingw64/include/c++/14.2.0/bits/hash_bytes.h:
+
+C:/mingw64/include/c++/14.2.0/bits/hashtable.h:
 
 C:/mingw64/include/c++/14.2.0/bits/invoke.h:
 
@@ -7421,11 +9503,11 @@ C:/mingw64/include/c++/14.2.0/bits/locale_facets.h:
 
 C:/mingw64/include/c++/14.2.0/bits/locale_facets.tcc:
 
+src/header/heritage.h:
+
 C:/mingw64/x86_64-w64-mingw32/include/mmiscapi2.h:
 
 C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/avx512bwintrin.h:
-
-src/header/heritage.h:
 
 C:/mingw64/include/c++/14.2.0/bits/memory_resource.h:
 
@@ -7449,12 +9531,6 @@ C:/mingw64/include/c++/14.2.0/ext/alloc_traits.h:
 
 C:/mingw64/include/c++/14.2.0/bits/ostream_insert.h:
 
-C:/mingw64/include/c++/14.2.0/bits/stl_deque.h:
-
-C:/mingw64/x86_64-w64-mingw32/include/wingdi.h:
-
-C:/mingw64/include/c++/14.2.0/bits/parse_numbers.h:
-
 libs/imgui/imstb_rectpack.h:
 
 C:/mingw64/include/c++/14.2.0/bits/quoted_string.h:
@@ -7466,6 +9542,8 @@ C:/mingw64/include/c++/14.2.0/bits/random.tcc:
 C:/mingw64/include/c++/14.2.0/bits/range_access.h:
 
 C:/mingw64/include/c++/14.2.0/bits/shared_ptr.h:
+
+C:/mingw64/include/c++/14.2.0/bits/std_function.h:
 
 C:/mingw64/include/c++/14.2.0/bits/stl_function.h:
 
@@ -7487,11 +9565,9 @@ C:/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h:
 
 C:/mingw64/include/c++/14.2.0/bits/postypes.h:
 
+src/Action.cpp:
+
 C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h:
-
-C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/syslimits.h:
-
-libs/SDL2/include/SDL2/SDL_audio.h:
 
 C:/mingw64/include/c++/14.2.0/bits/stl_uninitialized.h:
 
@@ -7501,15 +9577,15 @@ C:/mingw64/include/c++/14.2.0/bits/stringfwd.h:
 
 C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h:
 
+C:/mingw64/include/c++/14.2.0/bits/unordered_map.h:
+
 C:/mingw64/include/c++/14.2.0/bits/unique_lock.h:
 
 C:/mingw64/include/c++/14.2.0/bits/uses_allocator_args.h:
 
-C:/mingw64/include/c++/14.2.0/chrono:
+C:/mingw64/include/c++/14.2.0/compare:
 
-C:/mingw64/x86_64-w64-mingw32/include/wtypes.h:
-
-C:/mingw64/include/c++/14.2.0/codecvt:
+src/header/CognitiveArchitecture.h:
 
 C:/mingw64/include/c++/14.2.0/cstdint:
 
@@ -7565,11 +9641,11 @@ libs/SDL2/include/SDL2/SDL_stdinc.h:
 
 C:/mingw64/include/c++/14.2.0/memory:
 
+C:/mingw64/include/c++/14.2.0/optional:
+
+src/header/BetterRand.h:
+
 C:/mingw64/include/c++/14.2.0/ostream:
-
-C:/mingw64/include/c++/14.2.0/bits/unique_ptr.h:
-
-libs/SDL2/include/SDL2/SDL_events.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/mmsystem.h:
 
@@ -7587,6 +9663,8 @@ C:/mingw64/include/c++/14.2.0/tuple:
 
 C:/mingw64/include/c++/14.2.0/typeinfo:
 
+C:/mingw64/include/c++/14.2.0/unordered_map:
+
 C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++locale.h:
 
 C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/ctype_inline.h:
@@ -7603,7 +9681,43 @@ src/observability/Observability.h:
 
 C:/mingw64/x86_64-w64-mingw32/include/locale.h:
 
-C:/mingw64/x86_64-w64-mingw32/include/pthread.h:
+src/util/clear.h:
+
+src/header/FreeWillSystem.h:
+
+C:/mingw64/x86_64-w64-mingw32/include/stddef.h:
+
+src/header/SemanticMemory.h:
+
+src/header/CivilizationEngine.h:
+
+src/header/SocialNormSystem.h:
+
+src/CognitiveArchitecture.cpp:
+
+src/header/Disease.h:
+
+C:/mingw64/x86_64-w64-mingw32/include/stralign.h:
+
+C:/mingw64/include/c++/14.2.0/bits/fs_dir.h:
+
+C:/mingw64/include/c++/14.2.0/bits/fs_fwd.h:
+
+C:/mingw64/include/c++/14.2.0/bits/fs_path.h:
+
+C:/mingw64/include/c++/14.2.0/bits/stl_deque.h:
+
+C:/mingw64/x86_64-w64-mingw32/include/wingdi.h:
+
+C:/mingw64/include/c++/14.2.0/bits/parse_numbers.h:
+
+C:/mingw64/include/c++/14.2.0/chrono:
+
+C:/mingw64/x86_64-w64-mingw32/include/wtypes.h:
+
+C:/mingw64/include/c++/14.2.0/codecvt:
+
+src/header/EmotionalComplexity.h:
 
 src/header/random.hpp:
 
@@ -7615,6 +9729,8 @@ C:/mingw64/include/c++/14.2.0/bits/list.tcc:
 
 C:/mingw64/include/c++/14.2.0/cassert:
 
+src/header/LearningAdaptation.h:
+
 C:/mingw64/x86_64-w64-mingw32/include/ole2.h:
 
 C:/mingw64/include/c++/14.2.0/random:
@@ -7624,23 +9740,3 @@ C:/mingw64/include/c++/14.2.0/iterator:
 C:/mingw64/include/c++/14.2.0/list:
 
 C:/mingw64/include/c++/14.2.0/utility:
-
-src/Graph.cpp:
-
-src/header/Graph.h:
-
-src/header/UI.h:
-
-libs/SDL2/include/SDL2/SDL_blendmode.h:
-
-libs/SDL2/include/SDL2/SDL_config.h:
-
-libs/SDL2/include/SDL2/SDL_cpuinfo.h:
-
-C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/uintrintrin.h:
-
-libs/SDL2/include/SDL2/SDL_error.h:
-
-libs/SDL2/include/SDL2/SDL_filesystem.h:
-
-libs/SDL2/include/SDL2/SDL_gamecontroller.h:

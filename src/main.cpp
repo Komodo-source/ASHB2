@@ -13,7 +13,6 @@
 #include <time.h>
 #include <random>
 #include "./header/FreeWillSystem.h"
-#include "./header/SpatialMesh.h"
 #include "./header/BetterRand.h"
 #include <iostream>
 #include <sstream>
@@ -22,13 +21,14 @@
 #include "util/Debbug.h"
 #include "./header/implot.h"
 #include "./header/implot_internal.h"
-#include "./header/Movement.h"
 #include "./util/clear.h"
 #include "./header/SaveLoad.h"
 #include "./header/heritage.h"
 #include "./header/Logging.h"
 #include "header/SDLEngine.h"
 #include "header/Image.h"
+#include "./header/NarrativeEngine.h"
+#include "./header/CivilizationEngine.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -75,13 +75,6 @@ int getNBSickClose(std::vector<Entity*> grp){
         }
     }
     return c;
-}
-
-void applyMovement(Entity* ent, std::vector<Entity*> grp,
-                   const EnvironmentalFactors& env = EnvironmentalFactors(),
-                   float windowWidth = 1400.0f, float windowHeight = 1050.0f){
-    Movement m;
-    m.applyMovement(ent, getNBSickClose(grp), (int)grp.size(), env, windowWidth, windowHeight);
 }
 
 // Generate simple pseudo-random EnvironmentalFactors that shift slowly over time
@@ -173,6 +166,7 @@ Personality generateRandomPersonality() {
                 // Mémoire formative
                 LifeMemory mem;
                 mem.eventType = "loss_death";
+                ent->rebuildSemanticMemory();
                 mem.entityInvolvedId = dead->entityId;
                 mem.emotionalIntensity = griefIntensity;
                 mem.isFormative = (griefIntensity > 0.6f);
@@ -182,6 +176,167 @@ Personality generateRandomPersonality() {
         }
     }
 
+
+// Social-graph grouping: replaces spatial proximity grouping.
+// Each entity forms a group with the people they know + 1-2 chance strangers.
+std::vector<std::vector<Entity*>> getSocialGroups(std::vector<Entity*>& entities) {
+    if (entities.empty()) return {};
+
+    std::vector<bool> inGroup(entities.size(), false);
+    std::vector<std::vector<Entity*>> groups;
+
+    for (size_t i = 0; i < entities.size(); ++i) {
+        if (inGroup[i] || entities[i]->entityHealth <= 0.0f) continue;
+
+        std::vector<Entity*> group;
+        group.push_back(entities[i]);
+        inGroup[i] = true;
+
+        // Add people this entity has a social bond with
+        for (size_t j = 0; j < entities.size(); ++j) {
+            if (j == i || inGroup[j] || entities[j]->entityHealth <= 0.0f) continue;
+            if (entities[i]->searchConnSocial(entities[j]) > 5.0f && group.size() < 10) {
+                group.push_back(entities[j]);
+                inGroup[j] = true;
+            }
+        }
+
+        // Add 1-2 random strangers (chance encounters)
+        for (int s = 0; s < 2 && group.size() < 12; ++s) {
+            int attempts = 0;
+            while (attempts++ < 30) {
+                int ri = BetterRand::genNrInInterval(0, (int)entities.size() - 1);
+                if (!inGroup[ri] && entities[ri]->entityHealth > 0.0f) {
+                    group.push_back(entities[ri]);
+                    inGroup[ri] = true;
+                    break;
+                }
+            }
+        }
+
+        groups.push_back(group);
+    }
+    return groups;
+}
+
+// Generates a psychologically specific first-person inner thought for this entity.
+// Weighted by emotional salience so the most pressing state surfaces.
+std::string generateDeepMonologue(Entity* ent) {
+    struct Thought { std::string text; float weight; };
+    std::vector<Thought> pool;
+
+    // Grief (highest salience)
+    for (const auto& g : ent->griefStates)
+        if (g.intensity > 0.25f)
+            pool.push_back({"The absence still haunts me. I keep expecting them to just... show up.", g.intensity * 3.0f});
+
+    // Romantic bond
+    if (!ent->list_entityPointedCouple.empty()) {
+        Entity* partner = ent->list_entityPointedCouple[0].pointedEntity;
+        if (partner) {
+            float bond = ent->searchConnSocial(partner);
+            if (bond > 50.0f)
+                pool.push_back({"Thinking about " + partner->getName() + " makes everything feel worth it.", bond * 0.02f});
+            else
+                pool.push_back({"Things with " + partner->getName() + " feel off. I don't know how to fix it.", 1.8f});
+        }
+    } else if (ent->isGoalType("find_partner") && ent->entityLoneliness > 50.0f) {
+        pool.push_back({"I wonder if I'll ever find someone who actually sees me.", 1.5f});
+    }
+
+    // Desire
+    {
+        float maxD = 0.0f; Entity* desired = nullptr;
+        for (auto& d : ent->list_entityPointedDesire)
+            if (d.desire > maxD) { maxD = d.desire; desired = d.pointedEntity; }
+        if (desired && maxD > 35.0f)
+            pool.push_back({"My mind keeps drifting to " + desired->getName() + ". I can't help it.", maxD * 0.025f});
+    }
+
+    // Anger at specific person
+    if (ent->entityGeneralAnger > 55.0f) {
+        Entity* target = ent->mostAngryConn();
+        if (target)
+            pool.push_back({"What " + target->getName() + " did wasn't right. I can't just let that go.", ent->entityGeneralAnger * 0.03f});
+        else
+            pool.push_back({"Everything is setting me off today. I need to step back before I say something I regret.", ent->entityGeneralAnger * 0.025f});
+    }
+
+    // Stress / overwhelm
+    if (ent->entityStress > 75.0f)
+        pool.push_back({"I feel stretched too thin. Like something inside is about to snap.", ent->entityStress * 0.025f});
+
+    // Mental health collapse
+    if (ent->entityMentalHealth < 30.0f)
+        pool.push_back({"I go through the motions but nothing feels real anymore. I'm just... running out.", (100.0f - ent->entityMentalHealth) * 0.025f});
+
+    // Loneliness with named target
+    if (ent->entityLoneliness > 70.0f) {
+        Entity* closest = ent->mostSocialConn();
+        if (closest)
+            pool.push_back({"I miss " + closest->getName() + ". I should reach out but I don't know how to start.", ent->entityLoneliness * 0.03f});
+        else
+            pool.push_back({"Nobody really knows me. I'm starting to think that's entirely my fault.", ent->entityLoneliness * 0.03f});
+    }
+
+    // Goal frustration
+    for (const auto& g : ent->m_goals) {
+        if (g.frustrationLevel > 60.0f) {
+            if (g.type == "build_career")
+                pool.push_back({"I put everything into this and it never seems to be enough. When does it change?", g.frustrationLevel * 0.02f});
+            else if (g.type == "make_friends")
+                pool.push_back({"I keep putting myself out there but real connection stays just out of reach.", g.frustrationLevel * 0.02f});
+            else if (g.type == "happiness")
+                pool.push_back({"I keep chasing something I can't name. Would I even recognize happiness if it arrived?", g.frustrationLevel * 0.02f});
+            else if (g.type == "self")
+                pool.push_back({"I don't know who I am anymore. The person I wanted to become feels like a stranger.", g.frustrationLevel * 0.02f});
+            else if (g.type == "build_family")
+                pool.push_back({"I thought I'd have this figured out by now. The gap between where I am and where I wanted to be is hard to look at.", g.frustrationLevel * 0.02f});
+        }
+    }
+
+    // Attachment style inner voice
+    switch (ent->dv.attachmentStyle) {
+        case ANXIOUS:
+            if (!ent->list_entityPointedSocial.empty())
+                pool.push_back({"What if they're only around out of obligation? I need to stop second-guessing — but I can't.", 1.3f});
+            break;
+        case AVOIDANT:
+            if (ent->socialDeficit > 20.0f)
+                pool.push_back({"I tell myself I need people less than others do. Most days I believe it.", 1.2f});
+            break;
+        case DISORGANIZED:
+            pool.push_back({"I want closeness and it terrifies me — both at once. I don't know how to be around people without losing myself.", 1.6f});
+            break;
+        default: break;
+    }
+
+    // Contentment
+    if (ent->entityHapiness > 70.0f && ent->entityStress < 35.0f)
+        pool.push_back({"Things genuinely feel okay right now. I'm trying to hold onto that feeling instead of waiting for it to break.", ent->entityHapiness * 0.015f});
+
+    // Boredom
+    if (ent->entityBoredom > 65.0f)
+        pool.push_back({"This routine is slowly eating me alive. Something has to change.", ent->entityBoredom * 0.02f});
+
+    // Trauma echo
+    if (ent->dv.childhoodTraumaScore > 50.0f && ent->entityMentalHealth < 60.0f)
+        pool.push_back({"Sometimes I react to things and then wonder where that even came from. The past is never really past.", 1.4f});
+
+    if (pool.empty())
+        pool.push_back({"Just getting through the day, one moment at a time.", 1.0f});
+
+    // Weighted random selection
+    float total = 0.0f;
+    for (auto& t : pool) total += t.weight;
+    float roll = (float)rand() / (float)RAND_MAX * total;
+    float cum = 0.0f;
+    for (auto& t : pool) {
+        cum += t.weight;
+        if (roll <= cum) return t.text;
+    }
+    return pool.back().text;
+}
 
     Entity* weightedRandomSelect(std::vector<std::pair<Entity*, float>> scores);
 
@@ -212,10 +367,9 @@ Personality generateRandomPersonality() {
             score += self->searchConnAng(neighbor) * 2.0f;  // apologize to those angry at us
         }
 
-        // Proximity bonus — closer entities more likely targets
-        float dist = std::sqrt(std::pow(self->posX - neighbor->posX, 2) +
-                              std::pow(self->posY - neighbor->posY, 2));
-        score *= (1.0f / (1.0f + dist * 0.01f));
+        // Familiarity bonus — people you know are easier to reach
+        float familiarity = self->searchConnSocial(neighbor) / 100.0f;
+        score *= (0.4f + familiarity * 0.6f);
 
         scores.push_back({neighbor, std::max(0.01f, score)});
     }
@@ -353,14 +507,6 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             }
 
 
-            //apply movement (now env-aware)
-            float oldX = entity->posX;
-            float oldY = entity->posY;
-            applyMovement(entity, group, env, 1400.0f, 1050.0f);
-            if(oldX != entity->posX || oldY != entity->posY){
-                globalLogger->logMovement(entity->entityId, entity->name, oldX, oldY, entity->posX, entity->posY, "environmental factors");
-            }
-
             if(entity->entityHealth <= 0.0f){
                 handleDeath(entity, group);
             }
@@ -457,7 +603,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosenAction = sys.chooseAction(entity, neighbors, context);
 
-
+            // Tick the Tree of Thoughts planning system
+            entity->planner.tick(entity, neighbors, 1.0f);
 
             //social deficit
             if (chosenAction && chosenAction->needCategory == "social" &&
@@ -520,7 +667,13 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                                    chosenAction->name == "Date" ||
                                    chosenAction->name == "BreakUp" ||
                                    chosenAction->name == "Reconcile" ||
-                                   chosenAction->name == "SetBoundaries");
+                                   chosenAction->name == "SetBoundaries" ||
+                                   // Civilization actions (pointed)
+                                   chosenAction->name == "Preach" ||
+                                   chosenAction->name == "TeachSkill" ||
+                                   chosenAction->name == "ChallengeLeader" ||
+                                   chosenAction->name == "DeclareWar" ||
+                                   chosenAction->name == "Negotiate");
 
             Entity* target = nullptr;
             if(isPointedAction && !neighbors.empty()){
@@ -543,6 +696,22 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 //saving data
                 entity->saveEntityStats(chosenAction);
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, target->name, "targeted action");
+
+                // ── Narrative + inner monologue ───────────────────────────────
+                {
+                    int hour = (currentDay % 60) * 24 / 60;
+                    entity->lastActionName = chosenAction->name;
+                    entity->lastNarrative  = NarrativeEngine::actionToSentence(
+                        entity, chosenAction->name, target, hour, "");
+                    entity->innerMonologue = generateDeepMonologue(entity);
+                    std::string entry = "[" + NarrativeEngine::formatHour(hour) + "] " + entity->lastNarrative;
+                    globalNarrativeLog.push_back(entry);
+                    if (globalNarrativeLog.size() > 200) globalNarrativeLog.pop_front();
+                    if (entity->entityId == protagonistEntityId) {
+                        protagonistNarrativeLog.push_back(entry);
+                        if (protagonistNarrativeLog.size() > 100) protagonistNarrativeLog.pop_front();
+                    }
+                }
 
                 // Update relationship based on action
                 sys.pointedAssimilation(entity, target, chosenAction);
@@ -572,9 +741,24 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             } else {
                 // Execute self-directed action
                 sys.executeAction(entity, chosenAction, context);
-                //saving data
                 entity->saveEntityStats(chosenAction);
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, "", "self-directed action");
+
+                // ── Narrative + inner monologue ───────────────────────────────
+                {
+                    int hour = (currentDay % 60) * 24 / 60;
+                    entity->lastActionName = chosenAction->name;
+                    entity->lastNarrative  = NarrativeEngine::actionToSentence(
+                        entity, chosenAction->name, nullptr, hour, "");
+                    entity->innerMonologue = generateDeepMonologue(entity);
+                    std::string entry = "[" + NarrativeEngine::formatHour(hour) + "] " + entity->lastNarrative;
+                    globalNarrativeLog.push_back(entry);
+                    if (globalNarrativeLog.size() > 200) globalNarrativeLog.pop_front();
+                    if (entity->entityId == protagonistEntityId) {
+                        protagonistNarrativeLog.push_back(entry);
+                        if (protagonistNarrativeLog.size() > 100) protagonistNarrativeLog.pop_front();
+                    }
+                }
             }
 
             sys.applyEmotionalContagion(entity, group);
@@ -582,21 +766,6 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
     }
 }
 
-std::vector<std::vector<Entity*>> separationQuad(std::vector<Entity*> entities, float width, float height, float radius=250){
-    std::cout << "== Patial Mesh Separation ==\n";
-    auto groups = getCloseEntityGroups(entities, width, height, radius);
-    std::cout << "Found " << groups.size() << " groups of close entities:\n\n";
-
-    for (size_t i = 0; i < groups.size(); ++i) {
-        std::cout << "Group " << i + 1 << " (" << groups[i].size() << " entities):\n";
-        for (Entity* entity : groups[i]) {
-            std::cout << "  Entity " << entity->getId() << "\n";  // Assuming getId() method
-        }
-        std::cout << "\n";
-    }
-    std::cout << "== end of separation ==\n";
-    return groups;
-}
 
 
 void sync_clock_stats(Entity* ent, int neighboors){
@@ -643,10 +812,15 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             frameCounter = 0;
 
             // Recalculate entity groups based on current positions
-            close_entity_together = separationQuad(ent_quad, width, height);
+            close_entity_together = getSocialGroups(ent_quad);
 
             // Apply free will to all entity groups with current day for context
             applyFreeWill(close_entity_together, day);
+
+            // ── Civilization tick (every 5 FreeWill updates = ~1 in-game day) ──
+            if (globalCivEngine && (day / UPDATE_FREQUENCY) % 5 == 0)
+                globalCivEngine->tick(entities, day / UPDATE_FREQUENCY);
+
             std::vector<Entity> new_borns = get_new_borns();
             for(Entity ent: new_borns){
                 entities.push_back(ent);
@@ -719,16 +893,8 @@ void initialiseSDL(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad
         SDLEngine.initialiserRendu();
         obj.dessiner(0,0);
 
-        // Draw all entities as dots in SDL mode
+        // SDL mode: no spatial positions — entity count indicator only
         SDL_SetRenderDrawColor(SDLEngine.getRenderer(), 255, 255, 255, 255);
-        for(Entity* ent : ent_quad){
-            SDL_Rect r;
-            r.x = static_cast<int>(ent->posX);
-            r.y = static_cast<int>(ent->posY);
-            r.w = 5;
-            r.h = 5;
-            SDL_RenderFillRect(SDLEngine.getRenderer(), &r);
-        }
 
         SDLEngine.finaliserRendu();
     }
@@ -797,8 +963,6 @@ int main(int argc, char* argv[]) {
                     , BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 20.0f),
                     BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness");
 
-                entity.posX = BetterRand::genNrInInterval(10, width - 10);
-                entity.posY = BetterRand::genNrInInterval(10, height - 10);;
                 entity.selected = false;
                 Heritage::UnlinkedNode(&entity);
 
@@ -926,6 +1090,9 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // ── CivilizationEngine initialisation ────────────────────────────────
+        globalCivEngine = new CivilizationEngine();
+
         bool showEntityWindow = false;
         int selectedEntityIndex = -1;
         std::vector<Entity*> ent_quad;
@@ -933,7 +1100,7 @@ int main(int argc, char* argv[]) {
             ent_quad.push_back(&entities[i]);
         }
 
-        std::vector<std::vector<Entity*>> close_entity_together = separationQuad(ent_quad, width, height);
+        std::vector<std::vector<Entity*>> close_entity_together = getSocialGroups(ent_quad);
 
         // ici on applique l'algorithme pour modification stats
         // Note: For now, we'll run this in the main loop instead of a separate thread
@@ -986,20 +1153,38 @@ int main(int argc, char* argv[]) {
                     for (int j = 0; j < (int)entities.size(); j++) {
                         ent_quad.push_back(&entities[j]);
                     }
-                    close_entity_together = separationQuad(ent_quad, width, height);
+                    close_entity_together = getSocialGroups(ent_quad);
                     showEntityWindow = false;
                     selectedEntityIndex = -1;
                 }
             }
 
-            int moved_entity = instanceUI.HandlePointMovement(ent_quad);
-            if (moved_entity != -1) {
-                selectedEntityIndex = moved_entity;
+            // Entity selection: click graph node OR mind board card
+            int graph_sel = instanceUI.HandlePointMovement(ent_quad);
+            int board_sel = instanceUI.ShowMindBoard(ent_quad);
+            int sel = (board_sel != -1) ? board_sel : graph_sel;
+            if (sel != -1) {
+                selectedEntityIndex = sel;
                 showEntityWindow = true;
             }
 
             if (showEntityWindow && selectedEntityIndex >= 0 && selectedEntityIndex < entities.size()) {
                 instanceUI.ShowEntityWindow(&entities.at(selectedEntityIndex), &showEntityWindow, ent_quad);
+            }
+
+            // ── Civilization panel ────────────────────────────────────────────
+            instanceUI.ShowCivilizationPanel(day / 60);
+
+            // ── Truman Show panel ────────────────────────────────────────────
+            if (instanceUI.protagonistId >= 0) {
+                Entity* proto = nullptr;
+                for (Entity& e : entities)
+                    if (e.entityId == instanceUI.protagonistId) { proto = &e; break; }
+                if (proto) {
+                    int hour   = (day % 60) * 24 / 60;
+                    int simDay = day / 60;
+                    instanceUI.ShowTrumanPanel(proto, protagonistNarrativeLog, hour, simDay);
+                }
             }
 
             instanceUI.DrawGrid(ent_quad);
@@ -1013,6 +1198,7 @@ int main(int argc, char* argv[]) {
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             glfwSwapBuffers(window);
         }
+        std::cout << "s";
 
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();

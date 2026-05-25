@@ -4,7 +4,8 @@
 #include <list>
 #include <string>
 #include "./header/FreeWillSystem.h"
-
+#include "./header/SemanticMemory.h"
+#include "./header/PlanningSystem.h"
 
 #include <iostream>
 //#include "../libs/BetterRand/BetterRand.h"
@@ -40,7 +41,8 @@ Entity::Entity(int id)
       pointedAnger({}),
       pointedCouple({})
 {
-
+    // Rebuild semantic memory index from any existing life memories
+    semanticMemory.rebuildFromLifeMemories(this);
 }
 
 Entity::Entity(int id,
@@ -122,6 +124,9 @@ Entity::Entity(int id,
     initialGoal.frustrationLevel = 0.0f;
     initialGoal.ticksSinceProgress = 0;
     m_goals.push_back(initialGoal);
+    
+    // Rebuild semantic memory index from any existing life memories
+    semanticMemory.rebuildFromLifeMemories(this);
 }
 
 // Getter for name
@@ -358,6 +363,12 @@ void Entity::saveTo(std::ofstream& file) const {
 
     // Save FreeWillSystem
     fws.saveTo(file);
+    
+    // Save SemanticMemorySystem
+    semanticMemory.saveTo(file);
+    
+    // Save PlanningSystem
+    planner.saveTo(file);
 
     file << "--- END ENTITY ---\n";
 }
@@ -385,7 +396,6 @@ void Entity::loadFrom(std::ifstream& file) {
     std::getline(file, line); entityDiseaseType = std::stoi(line.substr(8));
     std::getline(file, line); posX = std::stof(line.substr(5));
     std::getline(file, line); posY = std::stof(line.substr(5));
-
     // Personality
     std::getline(file, line);
     std::string pdata = line.substr(12);
@@ -477,9 +487,18 @@ void Entity::loadFrom(std::ifstream& file) {
 
     // Load FreeWillSystem
     fws.loadFrom(file);
+    
+    // Load SemanticMemorySystem
+    semanticMemory.loadFrom(file);
+    
+    // Load PlanningSystem
+    planner.loadFrom(file);
 
     // Read end marker
     std::getline(file, line); // "--- END ENTITY ---"
+    
+    // Rebuild semantic memory index from loaded life memories
+    semanticMemory.rebuildFromLifeMemories(this);
 
     selected = false;
 }

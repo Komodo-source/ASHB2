@@ -288,6 +288,13 @@ public:
     static void clear_new_borns();
     float calculateLifeMemoryBias(Entity* entity, const Action& action);
     SocialTier getSocialTier(Entity* from, Entity* to) const;
+    
+    // New: Semantic memory-enhanced action scoring
+    float calculateSemanticMemoryBias(Entity* entity, const Action& action, const std::vector<Entity*>& neighbors);
+    
+    // New: Plan-aware action selection
+    std::string getPlannedAction(Entity* entity, const std::vector<Entity*>& neighbors, float emergencyUrgency = 0.0f);
+    void reportActionResult(Entity* entity, const std::string& actionName, float successScore, bool wasEmergency = false);
 };
 
 #endif

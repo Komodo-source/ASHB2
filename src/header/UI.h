@@ -7,6 +7,7 @@
 #include <imgui_impl_opengl3.h>
 #include <string>
 #include <vector>
+#include <deque>
 #include <map>
 #include <filesystem>
 
@@ -18,6 +19,9 @@ private:
     bool showDetailedInfo = false;
     bool showActionInfo = false;
 public:
+    // ID of the entity designated as protagonist (-1 = none)
+    int protagonistId = -1;
+
     struct GridPoint {
         int id;
         ImVec2 pos;
@@ -28,11 +32,21 @@ public:
     void DrawGrid(std::vector<Entity*>& entities, float pointSize = 8.0f);
     int HandlePointMovement(std::vector<Entity*>& entities);
     void createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText);
-    //void showSimulationInformation(int day, int num_entity, int tick, std::map<std::string, int> complementary_information);
+
+    // "The Show" — cinematic protagonist viewer (no location — pure mind window)
+    void ShowTrumanPanel(Entity* protagonist,
+                         const std::deque<std::string>& log,
+                         int hour, int simDay);
+
+    // Social network board replacing the spatial dot grid
+    int ShowMindBoard(std::vector<Entity*>& entities);
+
+    // Civilization overview panel
+    void ShowCivilizationPanel(int simDay);
+
     bool isSimulationPaused() const { return simulationPaused; }
     GridPoint getGridPoint();
     // Returns: 0=nothing, 1=save pressed, 2=load pressed
-    // filename is set to the user-entered filename
     int showSaveLoadButtons(std::string& filename, int day, int num_entity, int tick, std::map<std::string, int> complementary_information);
 private:
     char saveLoadFilename[256] = "savegame.txt";

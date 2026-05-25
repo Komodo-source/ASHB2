@@ -9,6 +9,8 @@
 #include <string>
 #include "FreeWillSystem.h"
 #include "SocialNormSystem.h"
+#include "SemanticMemory.h"
+#include "PlanningSystem.h"
 
 class Entity;
 class Action;
@@ -237,9 +239,10 @@ public:
     int entityAntiBody; // pourcentage
     int entityDiseaseType; //-1 if no disease
     LifeStage entityLifeStage;
-    float posX;
-    float posY;
+    float posX = 0.0f;
+    float posY = 0.0f;
     bool selected = false;
+    std::string innerMonologue = "";
     std::vector<entityPointedDesire> list_entityPointedDesire;
     std::vector<entityPointedAnger> list_entityPointedAnger;
     std::vector<entityPointedCouple> list_entityPointedCouple;
@@ -248,6 +251,8 @@ public:
     Personality personality;
     DevelopmentalHistory dv;
     FreeWillSystem fws;
+    SemanticMemorySystem semanticMemory;
+    PlanningSystem planner;
     std::vector<GriefState> griefStates;
     ValueSystem ValueSystem;
     SocialNorm socialNorm;
@@ -366,7 +371,23 @@ public:
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
     void resolvePointers(std::vector<Entity>& allEntities);
+    
+    // New: Initialize semantic memory from life memories
+    void rebuildSemanticMemory() { semanticMemory.rebuildFromLifeMemories(this); }
+    
+    // New: Plan management
+    void generateDailyPlan() { planner.generateDailyPlan(this); }
 
+
+    std::string lastActionName = "";
+    std::string lastNarrative  = "";
+
+    // ── Civilization ─────────────────────────────────────────────────────────
+    int   tribeId       = -1;    // which tribe this entity belongs to (-1 = none)
+    int   religionId    = -1;    // which religion they follow (-1 = none)
+    float dominanceRank = 0.0f;  // emergent social hierarchy position (0-100)
+    std::string specialization = ""; // "scholar"|"craftsman"|"trader"|"healer"|"warrior"
+    std::vector<int> knownTechIds;   // IDs of discovered/learned innovations
 
     // Temporary storage for IDs during loading (before pointer resolution)
     std::vector<std::pair<int, float>> tempDesireIds;
