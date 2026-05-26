@@ -19,9 +19,6 @@ private:
     bool showDetailedInfo = false;
     bool showActionInfo = false;
 public:
-    // ID of the entity designated as protagonist (-1 = none)
-    int protagonistId = -1;
-
     struct GridPoint {
         int id;
         ImVec2 pos;
@@ -32,11 +29,6 @@ public:
     void DrawGrid(std::vector<Entity*>& entities, float pointSize = 8.0f);
     int HandlePointMovement(std::vector<Entity*>& entities);
     void createPlayer(int& health, float& attackPower, char* playerName, char* message, std::string& displayText);
-
-    // "The Show" — cinematic protagonist viewer (no location — pure mind window)
-    void ShowTrumanPanel(Entity* protagonist,
-                         const std::deque<std::string>& log,
-                         int hour, int simDay);
 
     // Social network board replacing the spatial dot grid
     int ShowMindBoard(std::vector<Entity*>& entities);

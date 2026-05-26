@@ -6,8 +6,6 @@
 
 // ── Global definitions ───────────────────────────────────────────────────────
 std::deque<std::string> globalNarrativeLog;
-std::deque<std::string> protagonistNarrativeLog;
-int protagonistEntityId = -1;
 
 static const int MAX_LOG_SIZE = 200;
 

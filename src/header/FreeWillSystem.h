@@ -140,6 +140,7 @@ struct ActionContext {
     bool isInPublic;
     int numPeopleNearby;
     EnvironmentalFactors env;
+    std::string situationHint = ""; // proximity-based hint: "couple_nearby", "enemy_nearby", etc.
     //std::map<std::string, SocialNorm> activeNorms; // Extracted societal norms
 
     ActionContext()

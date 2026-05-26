@@ -34,9 +34,8 @@ int Disease::region;
 
 
   void Disease::reduceAntiBody(Entity* ent){
-    // Estimate that antibody disapear in 50 days -> reduce by 2 every day after a disease
-    // where antibody = 100
-    int reducedAntiBody = BetterRand::genNrInInterval(1,4);
+    // Slow decay — antibodies should persist for many in-game days, not vanish in seconds
+    int reducedAntiBody = BetterRand::genNrInInterval(0,1);
     if(ent->entityAntiBody - reducedAntiBody >= 0 ){
       ent->entityAntiBody -= reducedAntiBody;
     }else{
@@ -60,8 +59,9 @@ int Disease::region;
 
   void Disease::manageSickness(Entity* ent){
     // guerison
-    ent->entityHealth -= ent->entityDiseaseType * 1.09;
-    ent->entityHygiene -= ent->entityDiseaseType * 1.3;
+    // Reduced from *1.09/*1.3 — diseases should last days, not kill in seconds
+    ent->entityHealth -= ent->entityDiseaseType * 0.30;
+    ent->entityHygiene -= ent->entityDiseaseType * 0.35;
     ent->entityAntiBody += BetterRand::genNrInInterval(3, 14);
     if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 10) > 90){
       std::string dName = Disease::getDiseaseName(ent->entityDiseaseType);

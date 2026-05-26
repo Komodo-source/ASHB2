@@ -21,9 +21,7 @@ public:
 };
 
 // ── Global narrative state ───────────────────────────────────────────────────
-// Populated every tick by applyFreeWill; read by the UI Truman panel.
+// Populated every tick by applyFreeWill; read by the UI log panel.
 extern std::deque<std::string> globalNarrativeLog;      // all entities
-extern std::deque<std::string> protagonistNarrativeLog; // protagonist only
-extern int protagonistEntityId;                         // -1 = none selected
 
 #endif

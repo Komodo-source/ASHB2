@@ -295,6 +295,26 @@ float FreeWillSystem::calculateContextualWeight(const Action& action, const Acti
     // Professional actions more likely at work
     if (action.name == "LearnSkill" && context.isAtWork) modifier *= 1.4f;
 
+    // Situational proximity bonuses
+    if (context.situationHint == "couple_nearby") {
+        if (action.name == "Date" || action.name == "Flirt" || action.name == "Reconcile" ||
+            action.name == "GoodConnection" || action.name == "couple") modifier *= 2.5f;
+        if (action.name == "BreakUp") modifier *= 0.3f;
+    }
+    if (context.situationHint == "enemy_nearby") {
+        if (action.name == "AngerConnection" || action.name == "Insult" ||
+            action.name == "Discrimination") modifier *= 2.2f;
+        if (action.name == "Apologize" || action.name == "SetBoundaries") modifier *= 1.8f;
+        if (action.name == "Socialize" || action.name == "GoodConnection") modifier *= 0.4f;
+    }
+    if (context.situationHint == "family_nearby") {
+        if (action.name == "HelpSupport" || action.name == "GoodConnection" ||
+            action.name == "Socialize") modifier *= 2.0f;
+    }
+    if (context.situationHint == "desire_nearby") {
+        if (action.name == "Flirt" || action.name == "Date" || action.name == "Desire") modifier *= 2.2f;
+    }
+
     return modifier;
 }
 
@@ -719,16 +739,16 @@ void FreeWillSystem::initializeActions() {
     availableActions.push_back(ignoreAvoid);
 
     // ==================== SELF-CARE ACTIONS ====================
-    // Eat Meal (health)
+    // Eat Meal (health) — proactive: fires when health < 80, not just in crisis
     Action eatMeal("EatMeal", 22, "health");
-    eatMeal.requirements = { {"health", 50.0f, 0.8f} };
-    eatMeal.statChanges = { {"health", 6.0f}, {"happiness", 4.0f}, {"hygiene", -1.0f}, {"boredom", 2.0f} };
+    eatMeal.requirements = { {"health", 80.0f, 0.5f} };
+    eatMeal.statChanges = { {"health", 9.0f}, {"happiness", 4.0f}, {"hygiene", -1.0f}, {"boredom", 2.0f} };
     eatMeal.baseSatisfaction = 12.0f;
     availableActions.push_back(eatMeal);
 
-    // Sleep
+    // Sleep — proactive: fires when stress > 50 or health < 78
     Action sleep("Sleep", 23, "health");
-    sleep.requirements = { {"stress", 70.0f, 0.7f}, {"health", 60.0f, 0.6f} };
+    sleep.requirements = { {"stress", 50.0f, 0.6f}, {"health", 78.0f, 0.5f} };
     sleep.statChanges = { {"stress", -12.0f}, {"health", 8.0f}, {"mentalHealth", 7.0f}, {"hygiene", -4.0f}, {"boredom", 4.0f} };
     sleep.baseSatisfaction = 13.0f;
     availableActions.push_back(sleep);
@@ -901,9 +921,9 @@ void FreeWillSystem::initializeActions() {
     shower.baseSatisfaction = 4.0f;
     availableActions.push_back(shower);
 
-    // Rest action
+    // Rest action — proactive: fires when stress > 58 or health < 68
     Action rest("Rest", 12, "health");
-    rest.requirements = { {"stress", 80.0f, 0.7f}, {"health", 40.0f, 0.5f} };
+    rest.requirements = { {"stress", 58.0f, 0.6f}, {"health", 68.0f, 0.4f} };
     rest.statChanges = { {"stress", -20.0f}, {"health", 15.0f}, {"mentalHealth", 10.0f}, {"boredom", 10.0f} };
     rest.baseSatisfaction = 20.0f;
     availableActions.push_back(rest);
@@ -1645,7 +1665,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                                (pointed->entityHealth / 100.0f) * 0.3f;
 
         if (index == -1) {
-            float desire = static_cast<float>(BetterRand::genNrInInterval(4, 15)) * std::max(0.4f, attractiveness);
+            float desire = static_cast<float>(BetterRand::genNrInInterval(10, 25)) * std::max(0.7f, attractiveness);
             pointer->addDesire({ 1, pointed, desire });
             pointed->addSocial({ 1, pointer, desire * 0.5f });
             std::cout << "Desire: new link " << pointer->getName() << " -> " << pointed->getName() << " (" << desire << ")\n";
@@ -1685,7 +1705,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         SocialTier tier = getSocialTier(pointer, pointed);
         int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
         if (index == -1) {
-            float seed = 5.0f + BetterRand::genNrInInterval(3, 10);
+            float seed = 12.0f + BetterRand::genNrInInterval(5, 15);
             pointer->addSocial({ 1, pointed, seed });
             pointed->addSocial({ 1, pointer, seed * 0.80f });
             std::cout << "Socialize: first link formed " << pointer->getName() << " -> " << pointed->getName() << " (" << seed << ")\n";
@@ -1702,7 +1722,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         int index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
         float currentSocial = (index != -1) ? pointer->list_entityPointedSocial[index].social : 0.0f;
         if (tier == STRANGER && pointed->meetingCount < 3) {
-            float seed = 3.0f + BetterRand::genNrInInterval(3, 8);
+            float seed = 8.0f + BetterRand::genNrInInterval(5, 12);
             pointer->addSocial({ 1, pointed, seed });
             pointed->addSocial({ 1, pointer, seed * 0.75f });
             std::cout << "GoodConnection (stranger): chance encounter " << pointer->getName() << " <-> " << pointed->getName() << " (" << seed << ")\n";
@@ -1711,13 +1731,13 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             return;
         }
         if (index == -1) {
-            float seed = 4.0f + BetterRand::genNrInInterval(4, 9);
+            float seed = 12.0f + BetterRand::genNrInInterval(6, 14);
             pointer->addSocial({ 1, pointed, seed });
             pointed->addSocial({ 1, pointer, seed * 0.70f });
             std::cout << "GoodConnection: new bond " << pointer->getName() << " -> " << pointed->getName() << " (" << seed << ")\n";
         } else {
             float baseIncrement = socialLinkIncrement(tier, rng);
-            float qualityMult = 1.6f;
+            float qualityMult = 2.8f;
             float increment = baseIncrement * qualityMult;
             pointer->list_entityPointedSocial[index].social = std::min(100.0f, pointer->list_entityPointedSocial[index].social + increment);
             int pidx = pointed->contains(pointed->list_entityPointedSocial, pointer, 4);

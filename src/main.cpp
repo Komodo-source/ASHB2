@@ -177,8 +177,8 @@ Personality generateRandomPersonality() {
     }
 
 
-// Social-graph grouping: replaces spatial proximity grouping.
-// Each entity forms a group with the people they know + 1-2 chance strangers.
+// Social-graph grouping: hybrid proximity + social bonds.
+// Each entity groups with bonded contacts AND anyone within 120px (chance encounters).
 std::vector<std::vector<Entity*>> getSocialGroups(std::vector<Entity*>& entities) {
     if (entities.empty()) return {};
 
@@ -196,6 +196,19 @@ std::vector<std::vector<Entity*>> getSocialGroups(std::vector<Entity*>& entities
         for (size_t j = 0; j < entities.size(); ++j) {
             if (j == i || inGroup[j] || entities[j]->entityHealth <= 0.0f) continue;
             if (entities[i]->searchConnSocial(entities[j]) > 5.0f && group.size() < 10) {
+                group.push_back(entities[j]);
+                inGroup[j] = true;
+            }
+        }
+
+        // Add entities within 120px (proximity encounters — no bond needed)
+        for (size_t j = 0; j < entities.size(); ++j) {
+            if (j == i || inGroup[j] || entities[j]->entityHealth <= 0.0f) continue;
+            if (group.size() >= 12) break;
+            float dx = entities[i]->posX - entities[j]->posX;
+            float dy = entities[i]->posY - entities[j]->posY;
+            float dist2 = dx * dx + dy * dy;
+            if (dist2 <= 120.0f * 120.0f) {
                 group.push_back(entities[j]);
                 inGroup[j] = true;
             }
@@ -371,6 +384,13 @@ std::string generateDeepMonologue(Entity* ent) {
         float familiarity = self->searchConnSocial(neighbor) / 100.0f;
         score *= (0.4f + familiarity * 0.6f);
 
+        // Proximity bonus — closer entities are more likely targets
+        float dx = self->posX - neighbor->posX;
+        float dy = self->posY - neighbor->posY;
+        float dist2 = dx * dx + dy * dy;
+        float proximityBonus = std::max(0.0f, (180.0f - std::sqrt(dist2)) / 180.0f) * 2.5f;
+        score += proximityBonus;
+
         scores.push_back({neighbor, std::max(0.01f, score)});
     }
 
@@ -392,7 +412,9 @@ void implementRegion(){
         std::cout << "This feature is principally implemented for disease spreading, it barely affects the simulation links or its global functionning\n";
         implementRegion();
     }else{
-        Disease::region = (int)choice;
+        // Multiply by 10 so region values are 10/20/30/40 — the formula was designed
+        // for single-digit multipliers, not raw ASCII values (49–52).
+        Disease::region = (choice - '0') * 10;
     }
 }
 
@@ -459,6 +481,184 @@ void tickRelationshipDecay(Entity* ent, float deltaTime) {
         ent->list_entityPointedSocial.end());
 }
 
+
+// ── Force-based movement system ──────────────────────────────────────────────
+// Runs every frame (outside the UPDATE_FREQUENCY throttle).
+void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, int simDay) {
+    const float MAX_FORCE    = 0.9f;
+    const float PERSONAL_R   = 38.0f;
+    const float PROX_REPEL_R = 130.0f;
+
+    for (Entity* ent : entities) {
+        if (ent->entityHealth <= 0.0f) continue;
+
+        float fx = 0.0f, fy = 0.0f;
+
+        // ── Couple attraction ─────────────────────────────────────────────────
+        for (auto& cp : ent->list_entityPointedCouple) {
+            if (!cp.pointedEntity || cp.pointedEntity->entityHealth <= 0.0f) continue;
+            Entity* partner = cp.pointedEntity;
+            float dx = partner->posX - ent->posX;
+            float dy = partner->posY - ent->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            float target = 22.0f;
+            if (dist > target && dist > 0.01f) {
+                float mag = (dist - target) / dist * 0.9f;
+                fx += dx * mag;
+                fy += dy * mag;
+            }
+        }
+
+        // ── Parent/child attraction ───────────────────────────────────────────
+        auto familyPull = [&](Entity* other) {
+            if (!other || other->entityHealth <= 0.0f) return;
+            float dx = other->posX - ent->posX;
+            float dy = other->posY - ent->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            float target = 65.0f;
+            if (dist > target && dist > 0.01f) {
+                float mag = (dist - target) / dist * 0.6f;
+                fx += dx * mag;
+                fy += dy * mag;
+            }
+        };
+        familyPull(ent->parent1);
+        familyPull(ent->parent2);
+        // Pull toward children (entities whose parent1 or parent2 is this entity)
+        for (Entity* other : entities) {
+            if (other == ent || other->entityHealth <= 0.0f) continue;
+            if (other->parent1 == ent || other->parent2 == ent) {
+                familyPull(other);
+            }
+        }
+
+        // ── Social bonds ──────────────────────────────────────────────────────
+        for (auto& s : ent->list_entityPointedSocial) {
+            if (!s.pointedEntity || s.pointedEntity->entityHealth <= 0.0f) continue;
+            Entity* other = s.pointedEntity;
+            float dx = other->posX - ent->posX;
+            float dy = other->posY - ent->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            float target = (s.social > 80.0f) ? 45.0f : 130.0f;
+            float weight = std::min(0.5f, s.social / 100.0f * 0.5f);
+            if (dist > target && dist > 0.01f) {
+                float mag = (dist - target) / dist * weight;
+                fx += dx * mag;
+                fy += dy * mag;
+            }
+        }
+
+        // ── Desire targets — pull toward ──────────────────────────────────────
+        bool hasCouple = !ent->list_entityPointedCouple.empty();
+        if (ent->entityLoneliness > 30.0f || ent->isGoalType("find_partner")) {
+            for (auto& d : ent->list_entityPointedDesire) {
+                if (!d.pointedEntity || d.pointedEntity->entityHealth <= 0.0f) continue;
+                Entity* other = d.pointedEntity;
+                float dx = other->posX - ent->posX;
+                float dy = other->posY - ent->posY;
+                float dist = std::sqrt(dx * dx + dy * dy);
+                if (dist > 0.01f) {
+                    float pull = (ent->entityLoneliness / 100.0f) * (d.desire / 100.0f) * 1.8f;
+                    fx += (dx / dist) * pull;
+                    fy += (dy / dist) * pull;
+                }
+            }
+        }
+
+        // ── Anger targets — flee if agreeable, approach if aggressive ─────────
+        for (auto& a : ent->list_entityPointedAnger) {
+            if (!a.pointedEntity || a.pointedEntity->entityHealth <= 0.0f) continue;
+            Entity* other = a.pointedEntity;
+            float dx = other->posX - ent->posX;
+            float dy = other->posY - ent->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < 0.01f) continue;
+            bool flee     = (ent->personality.agreeableness > 40.0f);
+            bool approach = (ent->entityGeneralAnger > 60.0f && ent->personality.agreeableness < 40.0f);
+            float mag = (a.anger / 100.0f) * 0.5f;
+            if (flee) {
+                fx -= (dx / dist) * mag;
+                fy -= (dy / dist) * mag;
+            } else if (approach) {
+                fx += (dx / dist) * mag;
+                fy += (dy / dist) * mag;
+            }
+        }
+
+        // ── Sick entity avoidance ─────────────────────────────────────────────
+        if (ent->entityDiseaseType == -1) { // only healthy entities flee sick ones
+            for (Entity* other : entities) {
+                if (other == ent || other->entityDiseaseType == -1) continue;
+                float dx = ent->posX - other->posX;
+                float dy = ent->posY - other->posY;
+                float dist = std::sqrt(dx * dx + dy * dy);
+                if (dist < PROX_REPEL_R && dist > 0.01f) {
+                    float mag = (PROX_REPEL_R - dist) / PROX_REPEL_R * 0.6f;
+                    fx += (dx / dist) * mag;
+                    fy += (dy / dist) * mag;
+                }
+            }
+        }
+
+        // ── Personal space repulsion ──────────────────────────────────────────
+        for (Entity* other : entities) {
+            if (other == ent || other->entityHealth <= 0.0f) continue;
+            float dx = ent->posX - other->posX;
+            float dy = ent->posY - other->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < PERSONAL_R && dist > 0.01f) {
+                float mag = (PERSONAL_R - dist) / PERSONAL_R * 1.2f;
+                fx += (dx / dist) * mag;
+                fy += (dy / dist) * mag;
+            }
+        }
+
+        // ── Personality drift (sinusoidal wander) ────────────────────────────
+        float phase  = (float)(ent->entityId) * 1.3f;
+        float amp    = 0.15f * (ent->entityBoredom / 100.0f) * (ent->personality.openness / 100.0f + 0.3f);
+        fx += amp * std::sin((float)simDay * 0.05f + phase);
+        fy += amp * std::cos((float)simDay * 0.07f + phase + 1.0f);
+
+        // ── Clamp total force ─────────────────────────────────────────────────
+        float fmag = std::sqrt(fx * fx + fy * fy);
+        if (fmag > MAX_FORCE) {
+            fx = fx / fmag * MAX_FORCE;
+            fy = fy / fmag * MAX_FORCE;
+        }
+
+        // ── Attachment style multiplier ───────────────────────────────────────
+        switch (ent->dv.attachmentStyle) {
+            case AVOIDANT:
+                fx *= 0.55f; fy *= 0.55f;
+                break;
+            case ANXIOUS:
+                fx *= 1.25f; fy *= 1.25f;
+                break;
+            case DISORGANIZED:
+                if ((simDay / 4) % 2 == 0) { fx = -fx; fy = -fy; }
+                break;
+            default: break;
+        }
+
+        // ── Speed multiplier ──────────────────────────────────────────────────
+        float speed = 0.55f + (ent->personality.extraversion / 100.0f) * 0.9f;
+        if (ent->entityMentalHealth < 30.0f) speed *= 0.45f;
+        if (ent->entityDiseaseType != -1)     speed *= 0.28f;
+        if (ent->getGriefIntensity() > 0.3f)  speed *= 0.55f;
+
+        ent->velX = fx * speed;
+        ent->velY = fy * speed;
+
+        ent->posX += ent->velX;
+        ent->posY += ent->velY;
+
+        // ── Clamp to world bounds (above Mind Board) ──────────────────────────
+        float minX = 40.0f, maxX = worldW - 40.0f;
+        float minY = 40.0f, maxY = worldH * 0.64f - 40.0f;
+        ent->posX = std::max(minX, std::min(maxX, ent->posX));
+        ent->posY = std::max(minY, std::min(maxY, ent->posY));
+    }
+}
 
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
     EnvironmentalFactors env = generateEnvFactors(currentDay);
@@ -587,6 +787,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.1f, 0.0f, 100.0f);
             }
 
+            // Passive recovery: not sick + low stress = slow heal
+            if (entity->entityDiseaseType == -1 && entity->entityHealth < 97.0f && entity->entityStress < 60.0f)
+                entity->entityHealth = std::min(100.0f, entity->entityHealth + 0.008f);
+
             //apply tick relationship
             tickRelationshipDecay(entity, 1.0f);
 
@@ -599,6 +803,59 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Create context based on current simulation time (includes env and norms)
             ActionContext context = createContextFromTime(currentDay, neighbors.size());
+
+            // ── Situation-aware AI: detect nearby relationships and set hint ──
+            {
+                bool hasCouple = false;
+                // couple_nearby: partner within 70px
+                for (auto& cp : entity->list_entityPointedCouple) {
+                    if (!cp.pointedEntity || cp.pointedEntity->entityHealth <= 0.0f) continue;
+                    float dx = entity->posX - cp.pointedEntity->posX;
+                    float dy = entity->posY - cp.pointedEntity->posY;
+                    if (dx*dx + dy*dy <= 70.0f * 70.0f) {
+                        context.situationHint = "couple_nearby";
+                        hasCouple = true;
+                        break;
+                    }
+                }
+                // enemy_nearby: anger target (anger>40) within 90px
+                if (context.situationHint.empty()) {
+                    for (auto& a : entity->list_entityPointedAnger) {
+                        if (!a.pointedEntity || a.pointedEntity->entityHealth <= 0.0f) continue;
+                        if (a.anger <= 40.0f) continue;
+                        float dx = entity->posX - a.pointedEntity->posX;
+                        float dy = entity->posY - a.pointedEntity->posY;
+                        if (dx*dx + dy*dy <= 90.0f * 90.0f) {
+                            context.situationHint = "enemy_nearby";
+                            break;
+                        }
+                    }
+                }
+                // family_nearby: parent within 90px
+                if (context.situationHint.empty()) {
+                    auto checkParent = [&](Entity* parent) {
+                        if (!parent || parent->entityHealth <= 0.0f) return;
+                        float dx = entity->posX - parent->posX;
+                        float dy = entity->posY - parent->posY;
+                        if (dx*dx + dy*dy <= 90.0f * 90.0f)
+                            context.situationHint = "family_nearby";
+                    };
+                    checkParent(entity->parent1);
+                    if (context.situationHint.empty()) checkParent(entity->parent2);
+                }
+                // desire_nearby: desire target within 80px (only if no couple)
+                if (context.situationHint.empty() && !hasCouple) {
+                    for (auto& d : entity->list_entityPointedDesire) {
+                        if (!d.pointedEntity || d.pointedEntity->entityHealth <= 0.0f) continue;
+                        float dx = entity->posX - d.pointedEntity->posX;
+                        float dy = entity->posY - d.pointedEntity->posY;
+                        if (dx*dx + dy*dy <= 80.0f * 80.0f) {
+                            context.situationHint = "desire_nearby";
+                            break;
+                        }
+                    }
+                }
+            }
 
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosenAction = sys.chooseAction(entity, neighbors, context);
@@ -707,10 +964,6 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     std::string entry = "[" + NarrativeEngine::formatHour(hour) + "] " + entity->lastNarrative;
                     globalNarrativeLog.push_back(entry);
                     if (globalNarrativeLog.size() > 200) globalNarrativeLog.pop_front();
-                    if (entity->entityId == protagonistEntityId) {
-                        protagonistNarrativeLog.push_back(entry);
-                        if (protagonistNarrativeLog.size() > 100) protagonistNarrativeLog.pop_front();
-                    }
                 }
 
                 // Update relationship based on action
@@ -754,10 +1007,6 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     std::string entry = "[" + NarrativeEngine::formatHour(hour) + "] " + entity->lastNarrative;
                     globalNarrativeLog.push_back(entry);
                     if (globalNarrativeLog.size() > 200) globalNarrativeLog.pop_front();
-                    if (entity->entityId == protagonistEntityId) {
-                        protagonistNarrativeLog.push_back(entry);
-                        if (protagonistNarrativeLog.size() > 100) protagonistNarrativeLog.pop_front();
-                    }
                 }
             }
 
@@ -775,9 +1024,8 @@ void sync_clock_stats(Entity* ent, int neighboors){
 
 
 void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, bool isPaused, int width, int height, int& selectedEntityIndex, bool& showEntityWindow) {
-    //Birthday,
-    // une année = 100 jours
-    if((day / 60)  % 100 == 1){
+    // Birthday: one year = 8 sim-ticks (visibly ages over time)
+    if((day / 60) % 8 == 0 && day > 0){
         for(Entity& ent : entities){
             ent.IncrementBDay();
         }
@@ -964,6 +1212,9 @@ int main(int argc, char* argv[]) {
                     BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness");
 
                 entity.selected = false;
+                // Random initial position within play area (above Mind Board)
+                entity.posX = BetterRand::genNrInInterval(80.0f, (float)(width - 80));
+                entity.posY = BetterRand::genNrInInterval(60.0f, (float)(height) * 0.60f - 60.0f);
                 Heritage::UnlinkedNode(&entity);
 
                 // --- Personality (Big Five, already randomized) ---
@@ -1174,18 +1425,6 @@ int main(int argc, char* argv[]) {
 
             // ── Civilization panel ────────────────────────────────────────────
             instanceUI.ShowCivilizationPanel(day / 60);
-
-            // ── Truman Show panel ────────────────────────────────────────────
-            if (instanceUI.protagonistId >= 0) {
-                Entity* proto = nullptr;
-                for (Entity& e : entities)
-                    if (e.entityId == instanceUI.protagonistId) { proto = &e; break; }
-                if (proto) {
-                    int hour   = (day % 60) * 24 / 60;
-                    int simDay = day / 60;
-                    instanceUI.ShowTrumanPanel(proto, protagonistNarrativeLog, hour, simDay);
-                }
-            }
 
             instanceUI.DrawGrid(ent_quad);
 

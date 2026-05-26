@@ -116,7 +116,7 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
             float valDiff = std::abs(ent.ValueSystem.collectivism   - tribe.collectivism)  * 0.4f +
                             std::abs(ent.ValueSystem.spiritualNeed  - tribe.spiritualism)  * 0.3f +
                             std::abs(ent.ValueSystem.achievementDrive - tribe.innovation)  * 0.3f;
-            if (valDiff < 40.0f) {
+            if (valDiff < 55.0f) {
                 absorbEntityIntoTribe(tribe, &ent);
                 logEvent(day, ent.name + " joined " + tribe.name, "tribe");
             }
@@ -141,13 +141,13 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
                           + std::abs(tribeless[i]->ValueSystem.spiritualNeed - tribeless[j]->ValueSystem.spiritualNeed)  * 0.3f
                           + std::abs(tribeless[i]->ValueSystem.achievementDrive - tribeless[j]->ValueSystem.achievementDrive) * 0.3f;
             float bond = tribeless[i]->searchConnSocial(tribeless[j]);
-            if (valDiff < 40.0f || bond > 15.0f) {
+            if (valDiff < 50.0f || bond > 10.0f) {
                 cluster.push_back(tribeless[j]);
                 used[j] = true;
             }
         }
         used[i] = true;
-        if (cluster.size() >= 4) {
+        if (cluster.size() >= 3) {
             formTribe(cluster, day);
         }
     }
@@ -164,7 +164,7 @@ bool CivilizationEngine::formTribe(std::vector<Entity*>& cluster, int day) {
         float ch = computeCharisma(ent);
         if (ch > bestCharisma) { bestCharisma = ch; bestLeader = ent; }
     }
-    if (!bestLeader || bestCharisma < 55.0f) return false;
+    if (!bestLeader || bestCharisma < 35.0f) return false;
 
     Tribe tribe;
     tribe.id          = nextTribeId++;
@@ -313,7 +313,7 @@ void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day)
         prophetScore = std::min(1.0f, prophetScore);
 
         std::uniform_real_distribution<float> roll(0.0f, 1.0f);
-        if (roll(rng) < prophetScore * 0.0015f)
+        if (roll(rng) < prophetScore * 0.004f)
             foundReligion(&ent, day);
     }
 
@@ -395,7 +395,7 @@ void CivilizationEngine::spreadReligions(std::vector<Entity>& entities, int day)
                 // Conversion probability: bond strength × charisma × inverse spiritual demand
                 float convProb = (bond.social / 100.0f) *
                                  (computeCharisma(follower) / 100.0f) *
-                                 0.002f;
+                                 0.005f;
                 // More likely if target already has spiritual need
                 convProb *= (0.5f + target->ValueSystem.spiritualNeed / 200.0f);
 
@@ -688,12 +688,26 @@ void CivilizationEngine::applyEffectsToEntities(std::vector<Entity>& entities, i
             ent.entityHapiness = clamp(ent.entityHapiness + 0.3f, 0.0f, 100.0f);
         }
 
-        // Medicine knowledge reduces disease impact
+        // Tech-specific entity benefits
+        bool hasAgriculture = false, hasMedicine = false, hasQuarantine = false;
         for (int tid : ent.knownTechIds) {
             Innovation* inv = findInnovation(tid);
-            if (inv && inv->category == "medicine" && ent.entityDiseaseType != -1)
-                ent.entityHealth = clamp(ent.entityHealth + 0.5f, 0.0f, 100.0f);
+            if (!inv) continue;
+            if (inv->category == "agriculture") hasAgriculture = true;
+            if (inv->category == "medicine")    hasMedicine    = true;
+            if (inv->name    == "Quarantine")   hasQuarantine  = true;
         }
+        // Agriculture: steady passive health recovery from better nutrition
+        if (hasAgriculture && ent.entityDiseaseType == -1)
+            ent.entityHealth = clamp(ent.entityHealth + 0.15f, 0.0f, 100.0f);
+        // Medicine: partially counteract disease damage each tick
+        if (hasMedicine && ent.entityDiseaseType != -1) {
+            ent.entityHealth  = clamp(ent.entityHealth  + 0.6f, 0.0f, 100.0f);
+            ent.entityAntiBody = clamp(ent.entityAntiBody + 1.5f, 0.0f, 100.0f);
+        }
+        // Quarantine knowledge: reduces chance of catching new diseases (antibody buffer)
+        if (hasQuarantine && ent.entityAntiBody < 40.0f)
+            ent.entityAntiBody = clamp(ent.entityAntiBody + 0.5f, 0.0f, 100.0f);
     }
 }
 

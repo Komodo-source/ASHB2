@@ -49,6 +49,24 @@ int UI::showSaveLoadButtons(std::string& filename, int day, int num_entity, int 
     }
 
 
+    ImGui::Separator();
+    if (ImGui::CollapsingHeader("LEGEND")) {
+        ImGui::TextDisabled("--- Social Graph Dots ---");
+        ImGui::ColorButton("##sel",    ImVec4(1.0f,0.39f,0.39f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Selected");
+        ImGui::ColorButton("##sick",   ImVec4(0.67f,0.86f,0.24f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Sick entity");
+        ImGui::ColorButton("##norm",   ImVec4(0.67f,0.64f,0.75f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Normal (blue-purple = happy)");
+        ImGui::TextDisabled("--- Relationship Lines ---");
+        ImGui::ColorButton("##des",    ImVec4(1.0f,0.31f,0.71f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Desire");
+        ImGui::ColorButton("##ang",    ImVec4(1.0f,0.16f,0.16f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Anger");
+        ImGui::ColorButton("##soc",    ImVec4(0.24f,0.86f,0.86f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Social bond");
+        ImGui::ColorButton("##coup",   ImVec4(1.0f,0.84f,0.0f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Couple (thick)");
+        ImGui::TextDisabled("--- Mind Board Bars ---");
+        ImGui::ColorButton("##bh",     ImVec4(0.2f,0.85f,0.3f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Health");
+        ImGui::ColorButton("##bhp",    ImVec4(0.9f,0.75f,0.1f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Happiness");
+        ImGui::ColorButton("##bst",    ImVec4(0.9f,0.25f,0.2f,1.0f), 0, ImVec2(12,12)); ImGui::SameLine(); ImGui::Text("Stress");
+    }
+    ImGui::Separator();
+
     ImGui::InputText("File", saveLoadFilename, sizeof(saveLoadFilename));
     if (ImGui::Button("Save Game")) {
         result = 1;
@@ -103,17 +121,6 @@ void UI::showSystemInformation(){
         ImGui::Text("ID: %d", entity->entityId);
         ImGui::Text("Name: %s", entity->name.c_str());
 
-        // ── Protagonist button ───────────────────────────────────────────────
-        bool isProto = (entity->entityId == protagonistId);
-        if (isProto) {
-            ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "★ PROTAGONIST");
-        } else {
-            if (ImGui::Button("★ Set as Protagonist")) {
-                protagonistId = entity->entityId;
-                protagonistEntityId = entity->entityId;
-                protagonistNarrativeLog.clear();
-            }
-        }
         ImGui::Separator();
 
         ImGui::Spacing();
@@ -394,17 +401,12 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
     for (int i = 0; i < n; ++i) {
         Entity* entity = entities[i];
         ImVec2  pos    = socialGraphPos(i, n);
-        bool isProto   = (entity->entityId == protagonistId);
         bool isSick    = (entity->entityDiseaseType != -1);
 
         ImU32 color;
         float size = pointSize;
 
-        if (isProto) {
-            color = IM_COL32(255, 215, 0, 255);
-            size  = pointSize * 1.9f;
-            draw_list->AddCircle(pos, size + 4.0f, IM_COL32(255, 215, 0, 80), 0, 2.0f);
-        } else if (entity->selected) {
+        if (entity->selected) {
             color = IM_COL32(255, 100, 100, 255);
         } else if (isSick) {
             color = IM_COL32(170, 220, 60, 255);
@@ -415,11 +417,10 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
 
         draw_list->AddCircleFilled(pos, size, color);
 
-        if (isProto || entity->selected) {
-            std::string label = isProto ? ("\xe2\x98\x85 " + entity->name) : entity->name;
+        if (entity->selected) {
             draw_list->AddText(ImVec2(pos.x + size + 3.0f, pos.y - 7.0f),
-                               isProto ? IM_COL32(255, 215, 0, 255) : IM_COL32(255, 160, 160, 255),
-                               label.c_str());
+                               IM_COL32(255, 160, 160, 255),
+                               entity->name.c_str());
         }
     }
 }
@@ -605,111 +606,6 @@ void UI::ShowCivilizationPanel(int simDay) {
     ImGui::End();
 }
 
-// ── ShowTrumanPanel ───────────────────────────────────────────────────────────
-void UI::ShowTrumanPanel(Entity* p, const std::deque<std::string>& log,
-                         int hour, int simDay) {
-    ImGui::SetNextWindowSize(ImVec2(440, 660), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowPos(ImVec2(955, 20),   ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowBgAlpha(0.94f);
-
-    if (!ImGui::Begin("THE SHOW", nullptr,
-                      ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar)) {
-        ImGui::End();
-        return;
-    }
-
-    // ── Header: name + time ──────────────────────────────────────────────────
-    ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.0f, 1.0f), "\xe2\x98\x85  %s", p->name.c_str());
-    ImGui::SameLine(200);
-    const char* dayNames[] = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
-    ImGui::TextDisabled("Day %d  |  %s  |  %s",
-                        simDay, dayNames[simDay % 7],
-                        NarrativeEngine::formatHour(hour).c_str());
-
-    // Attachment style + last action chip
-    const char* attachStr[] = {"Secure", "Anxious", "Avoidant", "Disorganized"};
-    ImGui::TextDisabled("%s attachment", attachStr[(int)p->dv.attachmentStyle]);
-    if (!p->lastActionName.empty()) {
-        ImGui::SameLine(180);
-        ImGui::TextColored(ImVec4(0.6f, 0.9f, 0.6f, 1.0f), "[%s]", p->lastActionName.c_str());
-    }
-
-    ImGui::Separator();
-
-    // ── Inner monologue — front and centre ───────────────────────────────────
-    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "WHAT THEY'RE THINKING");
-    ImGui::Spacing();
-    const std::string& mono = p->innerMonologue.empty()
-        ? NarrativeEngine::innerMonologue(p)
-        : p->innerMonologue;
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.88f, 0.88f, 1.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.12f, 0.12f, 0.22f, 0.9f));
-    ImGui::BeginChild("##mono_box", ImVec2(0, 62), true);
-    ImGui::TextWrapped("\"%s\"", mono.c_str());
-    ImGui::EndChild();
-    ImGui::PopStyleColor(2);
-
-    ImGui::Spacing();
-    ImGui::Separator();
-
-    // ── Emotional state bars ─────────────────────────────────────────────────
-    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "INNER STATE");
-    ImGui::Spacing();
-
-    auto statBar = [&](const char* label, float val, ImVec4 col) {
-        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, col);
-        char id[32]; snprintf(id, sizeof(id), "##%s", label);
-        ImGui::Text("%-14s", label);
-        ImGui::SameLine(130);
-        ImGui::ProgressBar(val / 100.0f, ImVec2(175, 12), id);
-        ImGui::SameLine();
-        ImGui::Text("%.0f", val);
-        ImGui::PopStyleColor();
-    };
-
-    statBar("Happiness",     p->entityHapiness,    ImVec4(0.9f, 0.8f, 0.2f, 0.9f));
-    statBar("Stress",        p->entityStress,      ImVec4(0.9f, 0.3f, 0.2f, 0.9f));
-    statBar("Loneliness",    p->entityLoneliness,  ImVec4(0.3f, 0.5f, 0.9f, 0.9f));
-    statBar("Mental Health", p->entityMentalHealth,ImVec4(0.4f, 0.8f, 0.6f, 0.9f));
-    statBar("Health",        p->entityHealth,      ImVec4(0.2f, 0.9f, 0.4f, 0.9f));
-    statBar("Anger",         p->entityGeneralAnger,ImVec4(0.9f, 0.2f, 0.1f, 0.9f));
-
-    ImGui::Separator();
-
-    // ── Active goals ─────────────────────────────────────────────────────────
-    if (!p->m_goals.empty()) {
-        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "GOALS");
-        for (const auto& g : p->m_goals) {
-            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.7f, 0.6f, 1.0f, 0.8f));
-            char id[48]; snprintf(id, sizeof(id), "##goal_%s", g.type.c_str());
-            // Colour goal label red if frustrated
-            if (g.frustrationLevel > 50.0f)
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.4f, 1.0f));
-            else
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.85f, 0.85f, 0.85f, 1.0f));
-            ImGui::Text("  %-18s", g.type.c_str());
-            ImGui::PopStyleColor();
-            ImGui::SameLine(165);
-            ImGui::ProgressBar(g.progressToward / 100.0f, ImVec2(150, 10), id);
-            ImGui::PopStyleColor();
-        }
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
-
-    // ── Story log ────────────────────────────────────────────────────────────
-    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.95f, 1.0f), "STORY");
-    ImGui::BeginChild("##story_log", ImVec2(0, 145), true,
-                      ImGuiWindowFlags_HorizontalScrollbar);
-    for (auto it = log.rbegin(); it != log.rend(); ++it) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.88f, 0.88f, 0.88f, 1.0f));
-        ImGui::TextWrapped("%s", it->c_str());
-        ImGui::PopStyleColor();
-    }
-    ImGui::EndChild();
-
-    ImGui::End();
-}
 
 // ── ShowMindBoard ─────────────────────────────────────────────────────────────
 // Scrollable card grid showing every entity's inner state at a glance.
@@ -738,27 +634,19 @@ int UI::ShowMindBoard(std::vector<Entity*>& entities) {
 
         if (col > 0) ImGui::SameLine(0.0f, padX);
 
-        bool isProto = (ent->entityId == protagonistId);
         float s = ent->entityStress / 100.0f;
         float h = ent->entityHapiness / 100.0f;
-        ImVec4 bg = isProto
-            ? ImVec4(0.22f, 0.18f, 0.05f, 1.0f)
-            : ImVec4(0.12f + s * 0.08f, 0.12f + h * 0.06f, 0.18f, 1.0f);
+        ImVec4 bg = ImVec4(0.12f + s * 0.08f, 0.12f + h * 0.06f, 0.18f, 1.0f);
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, bg);
-        ImGui::PushStyleColor(ImGuiCol_Border,
-            isProto ? ImVec4(1.0f, 0.85f, 0.2f, 0.9f) : ImVec4(0.35f, 0.35f, 0.5f, 0.6f));
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, isProto ? 2.0f : 1.0f);
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.35f, 0.35f, 0.5f, 0.6f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
 
         char cid[32]; snprintf(cid, 32, "##mc%d", ent->entityId);
         ImGui::BeginChild(cid, ImVec2(cardW, cardH), true);
 
         // Name + age line
-        if (isProto)
-            ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.2f, 1.0f),
-                               "\xe2\x98\x85 %s, %d", ent->name.c_str(), (int)ent->entityAge);
-        else
-            ImGui::Text("%s, %d", ent->name.c_str(), (int)ent->entityAge);
+        ImGui::Text("%s, %d", ent->name.c_str(), (int)ent->entityAge);
 
         // Last action
         if (!ent->lastActionName.empty())

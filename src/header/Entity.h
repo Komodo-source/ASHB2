@@ -241,6 +241,8 @@ public:
     LifeStage entityLifeStage;
     float posX = 0.0f;
     float posY = 0.0f;
+    float velX = 0.0f;
+    float velY = 0.0f;
     bool selected = false;
     std::string innerMonologue = "";
     std::vector<entityPointedDesire> list_entityPointedDesire;
