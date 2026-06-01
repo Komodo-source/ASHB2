@@ -108,15 +108,16 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
         updateTribeTech(tribe, entities);
         electLeader(tribe, entities);
 
-        // Absorb tribeless entities with compatible values (no spatial check)
+        // Absorb tribeless entities with very compatible values — strict threshold so
+        // dissimilar entities can form their own tribe instead
         for (Entity& ent : entities) {
             if (ent.entityHealth <= 0.0f) continue;
             if (ent.tribeId != -1) continue;
-            if (tribe.population() >= 30) continue;
+            if (tribe.population() >= 10) continue; // keep tribes small so others can form
             float valDiff = std::abs(ent.ValueSystem.collectivism   - tribe.collectivism)  * 0.4f +
                             std::abs(ent.ValueSystem.spiritualNeed  - tribe.spiritualism)  * 0.3f +
                             std::abs(ent.ValueSystem.achievementDrive - tribe.innovation)  * 0.3f;
-            if (valDiff < 55.0f) {
+            if (valDiff < 22.0f) { // only very similar entities absorbed; others form new tribes
                 absorbEntityIntoTribe(tribe, &ent);
                 logEvent(day, ent.name + " joined " + tribe.name, "tribe");
             }
@@ -129,30 +130,38 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
         if (ent.entityHealth > 0.0f && ent.tribeId == -1 && ent.entityAge > 16.0f)
             tribeless.push_back(&ent);
 
-    // Cluster tribeless entities by value affinity + social bonds
+    // Cluster tribeless entities by value affinity + social bonds.
+    // Cap cluster size at 5 so leftover entities can form separate tribes next tick.
     std::vector<bool> used(tribeless.size(), false);
+    bool formedThisTick = false;
     for (size_t i = 0; i < tribeless.size(); ++i) {
         if (used[i]) continue;
         std::vector<Entity*> cluster;
         cluster.push_back(tribeless[i]);
-        for (size_t j = i + 1; j < tribeless.size(); ++j) {
+        for (size_t j = i + 1; j < tribeless.size() && cluster.size() < 5; ++j) {
             if (used[j]) continue;
             float valDiff = std::abs(tribeless[i]->ValueSystem.collectivism  - tribeless[j]->ValueSystem.collectivism)  * 0.4f
                           + std::abs(tribeless[i]->ValueSystem.spiritualNeed - tribeless[j]->ValueSystem.spiritualNeed)  * 0.3f
                           + std::abs(tribeless[i]->ValueSystem.achievementDrive - tribeless[j]->ValueSystem.achievementDrive) * 0.3f;
             float bond = tribeless[i]->searchConnSocial(tribeless[j]);
-            if (valDiff < 50.0f || bond > 10.0f) {
+            if (valDiff < 32.0f || bond > 12.0f) {
                 cluster.push_back(tribeless[j]);
                 used[j] = true;
             }
         }
         used[i] = true;
         if (cluster.size() >= 3) {
-            formTribe(cluster, day);
+            if (formTribe(cluster, day)) {
+                formedThisTick = true;
+                break; // one new tribe per tick — others form on subsequent ticks
+            }
         }
     }
 
-    // 3. Dissolve tiny tribes
+    // 3. Split large tribes (>15 members) into two
+    splitLargeTribes(entities, day);
+
+    // 4. Dissolve tiny tribes
     dissolveSmallTribes(entities, day);
 }
 
@@ -164,7 +173,7 @@ bool CivilizationEngine::formTribe(std::vector<Entity*>& cluster, int day) {
         float ch = computeCharisma(ent);
         if (ch > bestCharisma) { bestCharisma = ch; bestLeader = ent; }
     }
-    if (!bestLeader || bestCharisma < 35.0f) return false;
+    if (!bestLeader || bestCharisma < 20.0f) return false;
 
     Tribe tribe;
     tribe.id          = nextTribeId++;
@@ -297,6 +306,58 @@ void CivilizationEngine::dissolveSmallTribes(std::vector<Entity>& entities, int 
     }
 }
 
+void CivilizationEngine::splitLargeTribes(std::vector<Entity>& entities, int day) {
+    // Use index loop: formTribe() push_backs to tribes, invalidating iterators.
+    for (size_t idx = 0; idx < tribes.size(); ++idx) {
+        if (tribes[idx].population() <= 8) continue;
+
+        std::vector<Entity*> members;
+        for (int mid : tribes[idx].memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (e && e->entityHealth > 0.0f) members.push_back(e);
+        }
+        if (members.size() < 5) continue;
+
+        // Two farthest-apart members as seeds
+        float maxDist = -1.0f; int seedA = 0, seedB = 1;
+        for (size_t i = 0; i < members.size(); ++i) {
+            for (size_t j = i + 1; j < members.size(); ++j) {
+                float d = std::abs(members[i]->ValueSystem.collectivism  - members[j]->ValueSystem.collectivism ) * 0.4f
+                        + std::abs(members[i]->ValueSystem.spiritualNeed - members[j]->ValueSystem.spiritualNeed) * 0.3f
+                        + std::abs(members[i]->personality.openness      - members[j]->personality.openness     ) * 0.3f;
+                if (d > maxDist) { maxDist = d; seedA = i; seedB = j; }
+            }
+        }
+        if (maxDist < 10.0f) continue;
+
+        std::vector<Entity*> groupA, groupB;
+        for (Entity* e : members) {
+            float dA = std::abs(e->ValueSystem.collectivism     - members[seedA]->ValueSystem.collectivism    ) * 0.4f
+                      + std::abs(e->ValueSystem.spiritualNeed   - members[seedA]->ValueSystem.spiritualNeed   ) * 0.3f
+                      + std::abs(e->ValueSystem.achievementDrive- members[seedA]->ValueSystem.achievementDrive) * 0.3f;
+            float dB = std::abs(e->ValueSystem.collectivism     - members[seedB]->ValueSystem.collectivism    ) * 0.4f
+                      + std::abs(e->ValueSystem.spiritualNeed   - members[seedB]->ValueSystem.spiritualNeed   ) * 0.3f
+                      + std::abs(e->ValueSystem.achievementDrive- members[seedB]->ValueSystem.achievementDrive) * 0.3f;
+            if (dA <= dB) groupA.push_back(e);
+            else          groupB.push_back(e);
+        }
+        if (groupA.size() < 3 || groupB.size() < 3) continue;
+
+        // Save name before formTribe \u2014 it push_backs to tribes, shifting indices
+        std::string splitName = tribes[idx].name;
+
+        for (Entity* e : groupB) {
+            e->tribeId = -1;
+            tribes[idx].memberIds.erase(
+                std::remove(tribes[idx].memberIds.begin(), tribes[idx].memberIds.end(), e->entityId),
+                tribes[idx].memberIds.end());
+        }
+
+        formTribe(groupB, day); // may push_back to tribes; idx still valid (no erase)
+        logEvent(day, "The " + splitName + " has split -- a faction broke away", "tribe");
+    }
+}
+
 // ── Religion management ────────────────────────────────────────────────────────
 void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day) {
     // Check for prophets among unaffiliated entities
@@ -313,12 +374,44 @@ void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day)
         prophetScore = std::min(1.0f, prophetScore);
 
         std::uniform_real_distribution<float> roll(0.0f, 1.0f);
-        if (roll(rng) < prophetScore * 0.004f)
+        if (roll(rng) < prophetScore * 0.030f)
             foundReligion(&ent, day);
     }
 
     // Spread existing religions
     spreadReligions(entities, day);
+
+    // Tribal conversion pressure: dominant religion pulls uncommitted tribe members in
+    {
+        std::uniform_real_distribution<float> rollT(0.0f, 1.0f);
+        for (auto& tribe : tribes) {
+            if (tribe.memberIds.size() < 3) continue;
+            std::map<int, int> relCounts;
+            for (int mid : tribe.memberIds) {
+                Entity* e = entityById(entities, mid);
+                if (e && e->entityHealth > 0.0f && e->religionId >= 0)
+                    relCounts[e->religionId]++;
+            }
+            if (relCounts.empty()) continue;
+            int domRel = -1, domCount = 0;
+            for (auto& p : relCounts) if (p.second > domCount) { domCount = p.second; domRel = p.first; }
+            float ratio = (float)domCount / (float)tribe.memberIds.size();
+            if (ratio < 0.30f) continue;
+            Religion* r = findReligion(domRel);
+            if (!r) continue;
+            for (int mid : tribe.memberIds) {
+                Entity* e = entityById(entities, mid);
+                if (!e || e->entityHealth <= 0.0f || e->religionId != -1) continue;
+                float pressure = ratio * (e->ValueSystem.collectivism / 100.0f) * 0.12f;
+                pressure *= (0.5f + e->ValueSystem.spiritualNeed / 150.0f);
+                if (rollT(rng) < pressure) {
+                    e->religionId = domRel;
+                    r->followerIds.push_back(e->entityId);
+                    logEvent(day, e->name + " joined " + r->name + " (tribal community)", "religion");
+                }
+            }
+        }
+    }
 
     // Update influence
     for (auto& rel : religions) {
@@ -381,28 +474,67 @@ bool CivilizationEngine::foundReligion(Entity* prophet, int day) {
 void CivilizationEngine::spreadReligions(std::vector<Entity>& entities, int day) {
     std::uniform_real_distribution<float> roll(0.0f, 1.0f);
     for (auto& rel : religions) {
-        for (int fid : rel.followerIds) {
+        // Clean up dead followers
+        rel.followerIds.erase(
+            std::remove_if(rel.followerIds.begin(), rel.followerIds.end(),
+                [&](int fid) {
+                    Entity* e = entityById(entities, fid);
+                    return !e || e->entityHealth <= 0.0f;
+                }),
+            rel.followerIds.end());
+
+        std::vector<int> snapshot = rel.followerIds; // avoid modifying list while iterating
+        for (int fid : snapshot) {
             Entity* follower = entityById(entities, fid);
             if (!follower || follower->entityHealth <= 0.0f) continue;
+
+            float preacherCharisma = computeCharisma(follower) / 100.0f;
+            float zealotry = 0.4f + follower->ValueSystem.spiritualNeed / 150.0f;
 
             // Spread through social bonds
             for (const auto& bond : follower->list_entityPointedSocial) {
                 if (!bond.pointedEntity) continue;
                 Entity* target = bond.pointedEntity;
                 if (target->religionId != -1) continue;
-                if (target->entityAge < 12.0f) continue;
+                if (target->entityAge < 10.0f || target->entityHealth <= 0.0f) continue;
 
-                // Conversion probability: bond strength × charisma × inverse spiritual demand
-                float convProb = (bond.social / 100.0f) *
-                                 (computeCharisma(follower) / 100.0f) *
-                                 0.005f;
-                // More likely if target already has spiritual need
-                convProb *= (0.5f + target->ValueSystem.spiritualNeed / 200.0f);
+                float convProb = (bond.social / 100.0f) * preacherCharisma * 0.08f;
+                convProb *= (0.5f + target->ValueSystem.spiritualNeed / 100.0f);
+                convProb *= zealotry;
+                // Same tribe = much stronger conversion pressure
+                if (follower->tribeId != -1 && follower->tribeId == target->tribeId)
+                    convProb *= 2.5f;
 
                 if (roll(rng) < convProb) {
                     target->religionId = rel.id;
                     rel.followerIds.push_back(target->entityId);
-                    logEvent(day, target->name + " converted to " + rel.name, "religion");
+                    // Shared faith strengthens the bond
+                    for (auto& b : follower->list_entityPointedSocial) {
+                        if (b.pointedEntity == target) { b.social = std::min(100.0f, b.social + 6.0f); break; }
+                    }
+                    logEvent(day, target->name + " converted to " + rel.name
+                             + " (through " + follower->name + ")", "religion");
+                }
+            }
+
+            // Also spread to tribe members directly (weaker, no bond needed)
+            if (follower->tribeId != -1) {
+                Tribe* tribe = findTribe(follower->tribeId);
+                if (tribe) {
+                    for (int mid : tribe->memberIds) {
+                        if (mid == fid) continue;
+                        Entity* member = entityById(entities, mid);
+                        if (!member || member->religionId != -1) continue;
+                        if (member->entityHealth <= 0.0f || member->entityAge < 10.0f) continue;
+                        float tribeProb = preacherCharisma * zealotry *
+                                         (member->ValueSystem.spiritualNeed / 100.0f) * 0.05f;
+                        if (roll(rng) < tribeProb) {
+                            member->religionId = rel.id;
+                            rel.followerIds.push_back(member->entityId);
+                            logEvent(day, member->name + " joined " + rel.name
+                                     + " (tribal influence)", "religion");
+                        }
+                    }
                 }
             }
         }
@@ -559,28 +691,33 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
             Tribe& A = tribes[i];
             Tribe& B = tribes[j];
 
-            // Value alignment (0 = identical, 200 = maximally different)
             float valDiff = std::abs(A.militarism   - B.militarism)   * 0.3f
                           + std::abs(A.spiritualism  - B.spiritualism) * 0.2f
                           + std::abs(A.collectivism  - B.collectivism) * 0.25f
                           + std::abs(A.innovation    - B.innovation)   * 0.25f;
 
+            // Shared religion = diplomatic warmth; rival religions with high spiritualism = friction
+            if (A.dominantReligionId != -1 && A.dominantReligionId == B.dominantReligionId)
+                valDiff *= 0.55f;
+            else if (A.dominantReligionId != -1 && B.dominantReligionId != -1
+                     && A.dominantReligionId != B.dominantReligionId
+                     && A.spiritualism > 55.0f && B.spiritualism > 55.0f)
+                valDiff *= 1.35f;
+
             float& rel = A.relations[B.id];
             B.relations[A.id] = rel;
 
-            // Tribe relations driven purely by value alignment (no spatial proximity)
             if (valDiff < 25.0f)
-                rel = std::min(100.0f, rel + 0.8f);
-            else if (valDiff > 55.0f)
-                rel = std::max(-100.0f, rel - 0.5f);
+                rel = std::min(100.0f, rel + 1.2f);
+            else if (valDiff > 50.0f)
+                rel = std::max(-100.0f, rel - 0.9f);
             else
                 rel = rel * 0.98f;
 
-            // Classify stance
             TribeStance stance;
-            if      (rel >  50.0f) stance = TS_ALLY;
+            if      (rel >  55.0f) stance = TS_ALLY;
             else if (rel > -20.0f) stance = TS_NEUTRAL;
-            else if (rel > -60.0f) stance = TS_RIVAL;
+            else if (rel > -55.0f) stance = TS_RIVAL;
             else                   stance = TS_AT_WAR;
 
             TribeStance prev = A.stances.count(B.id) ? A.stances[B.id] : TS_NEUTRAL;
@@ -588,18 +725,63 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                 A.stances[B.id] = stance;
                 B.stances[A.id] = stance;
                 if (stance == TS_AT_WAR) {
-                    logEvent(day, "The " + A.name + " has declared war on the " + B.name, "war");
-                    // Boost anger of members
-                    for (int mid : A.memberIds) {
-                        Entity* e = entityById(entities, mid);
-                        if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 15.0f);
-                    }
-                    for (int mid : B.memberIds) {
-                        Entity* e = entityById(entities, mid);
-                        if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 15.0f);
-                    }
+                    logEvent(day, "The " + A.name + " declared war on the " + B.name, "war");
+                    for (int mid : A.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 18.0f); }
+                    for (int mid : B.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 18.0f); }
                 } else if (stance == TS_ALLY) {
                     logEvent(day, "The " + A.name + " and the " + B.name + " formed an alliance", "diplomacy");
+                } else if (stance == TS_RIVAL) {
+                    logEvent(day, "Tensions rise between the " + A.name + " and the " + B.name, "diplomacy");
+                }
+            }
+
+            // ── Propagate inter-tribe emotions to individual members each tick ──
+            if (stance == TS_ALLY || rel > 40.0f) {
+                // Alliance love: individuals across tribes build social bonds
+                for (int aidx : A.memberIds) {
+                    if (roll(rng) > 0.12f) continue;
+                    Entity* ea = entityById(entities, aidx);
+                    if (!ea || ea->entityHealth <= 0.0f) continue;
+                    for (int bidx : B.memberIds) {
+                        if (roll(rng) > 0.12f) continue;
+                        Entity* eb = entityById(entities, bidx);
+                        if (!eb || eb->entityHealth <= 0.0f) continue;
+                        int sidx = ea->contains(ea->list_entityPointedSocial, eb, 4);
+                        if (sidx == -1) {
+                            if (roll(rng) < 0.20f) {
+                                entityPointedSocial ns; ns.Id = eb->entityId; ns.pointedEntity = eb; ns.social = 6.0f;
+                                ea->list_entityPointedSocial.push_back(ns);
+                            }
+                        } else {
+                            ea->list_entityPointedSocial[sidx].social = std::min(100.0f, ea->list_entityPointedSocial[sidx].social + 0.8f);
+                        }
+                    }
+                }
+            } else if (stance == TS_RIVAL || stance == TS_AT_WAR) {
+                // Rivalry/War: members grow anger and discrimination toward enemy tribe
+                float angerRate = (stance == TS_AT_WAR) ? 0.18f : 0.07f;
+                float angerInc  = (stance == TS_AT_WAR) ? 3.0f  : 0.9f;
+                for (int aidx : A.memberIds) {
+                    if (roll(rng) > angerRate) continue;
+                    Entity* ea = entityById(entities, aidx);
+                    if (!ea || ea->entityHealth <= 0.0f) continue;
+                    for (int bidx : B.memberIds) {
+                        if (roll(rng) > angerRate) continue;
+                        Entity* eb = entityById(entities, bidx);
+                        if (!eb || eb->entityHealth <= 0.0f) continue;
+                        int angIdx = ea->contains(ea->list_entityPointedAnger, eb, 2);
+                        if (angIdx == -1) {
+                            entityPointedAnger na; na.Id = eb->entityId; na.pointedEntity = eb; na.anger = angerInc;
+                            ea->list_entityPointedAnger.push_back(na);
+                        } else {
+                            ea->list_entityPointedAnger[angIdx].anger = std::min(100.0f, ea->list_entityPointedAnger[angIdx].anger + angerInc * 0.4f);
+                        }
+                        // War also directly damages social bonds (hatred erodes connection)
+                        if (stance == TS_AT_WAR) {
+                            int sIdx = ea->contains(ea->list_entityPointedSocial, eb, 4);
+                            if (sIdx != -1) ea->list_entityPointedSocial[sIdx].social = std::max(0.0f, ea->list_entityPointedSocial[sIdx].social - 0.5f);
+                        }
+                    }
                 }
             }
         }

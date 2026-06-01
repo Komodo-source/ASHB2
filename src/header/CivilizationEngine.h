@@ -146,6 +146,7 @@ private:
     void absorbEntityIntoTribe(Tribe& tribe, Entity* ent);
     void removeDeadFromTribes(std::vector<Entity>& entities);
     void dissolveSmallTribes(std::vector<Entity>& entities, int day);
+    void splitLargeTribes(std::vector<Entity>& entities, int day);
 
     // ── Religion operations ───────────────────────────────────────────────────
     bool foundReligion(Entity* prophet, int day);

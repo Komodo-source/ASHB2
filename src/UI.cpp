@@ -8,6 +8,7 @@
 #include "./header/UI.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
+#include "./header/PersonaSystem.h"
 #include <iostream>
 #include "./header/Disease.h"
 #include <map>
@@ -331,6 +332,64 @@ if (!entity->list_entityPointedAnger.empty()) {
 
 
         //MyFile.close();
+
+        // ── PersonaSystem ──────────────────────────────────────────────────────
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.7f, 0.5f, 1.0f, 1.0f), "== Inner State ==");
+        ImGui::Spacing();
+
+        // Body language
+        ImGui::Text("Presence: %s", bodyLanguageCueLabel(entity->bodyLanguage));
+        ImGui::SameLine(160);
+        ImGui::TextDisabled("(%s)", bodyLanguageCueDesc(entity->bodyLanguage));
+
+        // PAD bars
+        ImGui::Spacing();
+        ImGui::TextDisabled("PAD Emotional Model");
+
+        auto padBar = [](const char* label, float val, ImVec4 col) {
+            ImGui::Text("%-12s", label);
+            ImGui::SameLine(110);
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, col);
+            char id[32]; snprintf(id, sizeof(id), "##pad_%s", label);
+            float norm = (val + 100.0f) / 200.0f;
+            ImGui::ProgressBar(norm, ImVec2(120.0f, 10.0f), id);
+            ImGui::PopStyleColor();
+            ImGui::SameLine(); ImGui::Text("%.0f", val);
+        };
+        padBar("Pleasure",  entity->pad.pleasure,  ImVec4(0.3f, 0.9f, 0.4f, 0.85f));
+        padBar("Arousal",   entity->pad.arousal,   ImVec4(0.9f, 0.6f, 0.1f, 0.85f));
+        padBar("Dominance", entity->pad.dominance, ImVec4(0.4f, 0.5f, 1.0f, 0.85f));
+
+        // Self-grounding sentence
+        if (!entity->selfGrounding.empty()) {
+            ImGui::Spacing();
+            ImGui::TextDisabled("Self:");
+            ImGui::TextWrapped("%s", entity->selfGrounding.c_str());
+        }
+
+        // Core beliefs
+        if (!entity->coreBeliefs.empty()) {
+            ImGui::Spacing();
+            ImGui::TextDisabled("Core Beliefs (%d)", (int)entity->coreBeliefs.size());
+            for (const auto& b : entity->coreBeliefs) {
+                ImVec4 col = b.valence >= 0
+                    ? ImVec4(0.4f, 0.9f, 0.4f, 1.0f)
+                    : ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+                ImGui::TextColored(col, "  [%.0f] %s", b.strength, b.belief.c_str());
+            }
+        }
+
+        // Last Chain-of-Thought
+        if (!entity->lastCoT.steps.empty()) {
+            ImGui::Spacing();
+            ImGui::TextDisabled("Last Decision Trace:");
+            for (const auto& step : entity->lastCoT.steps) {
+                ImGui::TextWrapped("  [%s] %s", step.phase.c_str(), step.content.c_str());
+            }
+            if (entity->lastCoT.isImpulsive)
+                ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.1f, 1.0f), "  * Impulsive choice");
+        }
 
         ImGui::End();
     }

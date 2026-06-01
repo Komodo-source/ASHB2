@@ -11,6 +11,7 @@
 #include "SocialNormSystem.h"
 #include "SemanticMemory.h"
 #include "PlanningSystem.h"
+#include "PersonaSystem.h"
 
 class Entity;
 class Action;
@@ -384,6 +385,15 @@ public:
     std::string lastActionName = "";
     std::string lastNarrative  = "";
 
+    // ── Phases 1-5: AI Enhancement ────────────────────────────────────────────
+    PADState         pad;
+    BodyLanguageCue  bodyLanguage = BodyLanguageCue::CONTENT;
+    std::vector<CoreBelief>        coreBeliefs;
+    std::deque<WorkingMemoryEntry> workingMemory;
+    ChainOfThought   lastCoT;
+    HesitationState  hesitation;
+    std::string      selfGrounding = "";
+
     // ── Civilization ─────────────────────────────────────────────────────────
     int   tribeId       = -1;    // which tribe this entity belongs to (-1 = none)
     int   religionId    = -1;    // which religion they follow (-1 = none)
@@ -401,8 +411,16 @@ public:
     void recalculatePriority();
     void addOrBoostGoal(const std::string& goal_name, float value);
     void onMajorEventAddOrBoostGoal(const std::string& eventType);
-    //SocialNorm getSocialNorm();
-    //bool isActive(const std::map<NeedLevel, float>& levelSatisfaction) const;
+
+    // Phase 3: PAD model update
+    void updatePAD();
+    // Phase 4: contextual self-grounding string
+    void updateSelfGrounding(int simDay);
+    // Phase 2: distil repeated life memories into core beliefs
+    void consolidateMemories(int simDay);
+    // Phase 2: push a new significant event into working memory
+    void addToWorkingMemory(const std::string& eventType,
+                            const std::string& desc, float weight);
 };
 
 // Removed duplicate extern globals for pointed relationships

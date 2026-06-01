@@ -8,6 +8,7 @@
 #include "./header/PlanningSystem.h"
 
 #include <iostream>
+#include <sstream>
 //#include "../libs/BetterRand/BetterRand.h"
 #include <time.h>
 #include <random>
@@ -708,4 +709,105 @@ void Entity::upgradeSocial(Entity* pointed, float value){
         }
 
     }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 3 – PAD Emotional Model
+// ─────────────────────────────────────────────────────────────────────────────
+void Entity::updatePAD() {
+    pad = computePAD(
+        entityHapiness, entityStress, entityMentalHealth,
+        entityGeneralAnger, entityLoneliness,
+        personality.extraversion, personality.agreeableness, personality.neuroticism,
+        SelfConcept.selfEsteem
+    );
+    bodyLanguage = deriveBodyLanguage(pad, getGriefIntensity());
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 4 – Contextual self-grounding
+// ─────────────────────────────────────────────────────────────────────────────
+void Entity::updateSelfGrounding(int simDay) {
+    std::ostringstream ss;
+    ss << "I am " << name << ". Day " << simDay << ". ";
+    ss << "Primary goal: " << (m_goals.empty() ? "none" : m_goals[0].type) << ". ";
+    ss << "Health: " << (int)entityHealth
+       << "  Stress: " << (int)entityStress
+       << "  Mood: " << bodyLanguageCueLabel(bodyLanguage) << ".";
+    if (tribeId >= 0)    ss << "  Tribe: #" << tribeId << ".";
+    if (religionId >= 0) ss << "  Faith: #" << religionId << ".";
+    selfGrounding = ss.str();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 2 – Memory consolidation into core beliefs
+// ─────────────────────────────────────────────────────────────────────────────
+void Entity::consolidateMemories(int simDay) {
+    std::map<std::string, int>   eventCounts;
+    std::map<std::string, float> eventIntensities;
+
+    for (const auto& mem : lifeMemories) {
+        eventCounts[mem.eventType]++;
+        eventIntensities[mem.eventType] += mem.emotionalIntensity;
+    }
+
+    for (auto& [type, count] : eventCounts) {
+        if (count < 3) continue;
+        float avgIntensity = eventIntensities[type] / count;
+
+        // Reinforce existing belief
+        bool found = false;
+        for (auto& belief : coreBeliefs) {
+            if (belief.category == type) {
+                belief.reinforcementCount++;
+                belief.strength = std::min(100.0f, belief.strength + 5.0f);
+                found = true;
+                break;
+            }
+        }
+        if (found) continue;
+
+        // Form new core belief
+        CoreBelief b;
+        b.category           = type;
+        b.formedOnDay        = simDay;
+        b.reinforcementCount = count;
+        b.strength           = std::min(100.0f, (float)count * 8.0f);
+
+        if      (type == "loss_death")       { b.belief = "Loss is inevitable. I must not get too attached."; b.valence = -60.0f; }
+        else if (type == "romantic_success") { b.belief = "I am capable of being loved.";                     b.valence =  70.0f; }
+        else if (type == "conflict")         { b.belief = "People cannot be fully trusted.";                  b.valence = -35.0f; }
+        else if (type == "trauma")           { b.belief = "The world is not safe. I must protect myself.";    b.valence = -50.0f; }
+        else if (type == "positive_bond")    { b.belief = "Connection with others gives my life meaning.";    b.valence =  55.0f; }
+        else {
+            b.belief  = "Experiences like '" + type + "' have shaped who I am.";
+            b.valence = avgIntensity > 0.5f ? -20.0f : 30.0f;
+        }
+        coreBeliefs.push_back(b);
+    }
+
+    // Prune to 5 strongest beliefs
+    if (coreBeliefs.size() > 5) {
+        std::sort(coreBeliefs.begin(), coreBeliefs.end(),
+            [](const CoreBelief& a, const CoreBelief& b){ return a.strength > b.strength; });
+        coreBeliefs.resize(5);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 2 – Working memory push
+// ─────────────────────────────────────────────────────────────────────────────
+void Entity::addToWorkingMemory(const std::string& eventType,
+                                const std::string& desc, float weight) {
+    for (auto& e : workingMemory) e.ticksAgo++;
+
+    WorkingMemoryEntry entry;
+    entry.eventType     = eventType;
+    entry.description   = desc;
+    entry.emotionalWeight = weight;
+    entry.ticksAgo      = 0;
+    workingMemory.push_front(entry);
+
+    if (workingMemory.size() > 5)
+        workingMemory.resize(5);
 }

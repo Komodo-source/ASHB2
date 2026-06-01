@@ -3,6 +3,7 @@
 #include "./header/PlanningSystem.h"
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
+#include "./header/PersonaSystem.h"
 #include "./header/Logging.h"
 #include "./header/ExternalData.h"
 #include "./header/SocialNormSystem.h"
@@ -276,7 +277,7 @@ float FreeWillSystem::calculateContextualWeight(const Action& action, const Acti
     if ((action.name == "CreativeActivity" || action.name == "LearnSkill") && !context.isAtWork && context.isWeekend) modifier *= 1.3f;
 
     // Flirting and dating more likely in public social settings
-    if ((action.name == "Flirt" || action.name == "Date") && context.isInPublic && context.numPeopleNearby > 0) modifier *= 2.4f;
+    if ((action.name == "Flirt" || action.name == "Date") && context.isInPublic && context.numPeopleNearby > 0) modifier *= 3.5f;
 
     // Hygiene actions more likely at home (not in public/at work)
     if (action.name == "Take Shower" && (context.isInPublic || context.isAtWork)) modifier *= 0.01f;
@@ -298,12 +299,13 @@ float FreeWillSystem::calculateContextualWeight(const Action& action, const Acti
     // Situational proximity bonuses
     if (context.situationHint == "couple_nearby") {
         if (action.name == "Date" || action.name == "Flirt" || action.name == "Reconcile" ||
-            action.name == "GoodConnection" || action.name == "couple") modifier *= 2.5f;
+            action.name == "GoodConnection" || action.name == "couple") modifier *= 4.0f;
+        if (action.name == "breeding" || action.name == "Desire") modifier *= 3.5f;
         if (action.name == "BreakUp") modifier *= 0.3f;
     }
     if (context.situationHint == "enemy_nearby") {
         if (action.name == "AngerConnection" || action.name == "Insult" ||
-            action.name == "Discrimination") modifier *= 2.2f;
+            action.name == "Discrimination") modifier *= 4.0f;
         if (action.name == "Apologize" || action.name == "SetBoundaries") modifier *= 1.8f;
         if (action.name == "Socialize" || action.name == "GoodConnection") modifier *= 0.4f;
     }
@@ -312,7 +314,8 @@ float FreeWillSystem::calculateContextualWeight(const Action& action, const Acti
             action.name == "Socialize") modifier *= 2.0f;
     }
     if (context.situationHint == "desire_nearby") {
-        if (action.name == "Flirt" || action.name == "Date" || action.name == "Desire") modifier *= 2.2f;
+        if (action.name == "Flirt" || action.name == "Date" || action.name == "Desire" ||
+            action.name == "couple" || action.name == "breeding") modifier *= 4.5f;
     }
 
     return modifier;
@@ -640,9 +643,9 @@ void FreeWillSystem::initializeActions() {
     availableActions.push_back(socialize);
 
     Action desire("Desire", 2, "social");
-    desire.requirements = { {"loneliness", 25.0f, 0.8f}, {"happiness", 35.0f, 0.5f} };
+    desire.requirements = { {"loneliness", 20.0f, 0.7f}, {"happiness", 20.0f, 0.3f} };
     desire.statChanges = { {"loneliness", -12.0f}, {"happiness", 13.0f}, {"stress", -6.0f} };
-    desire.baseSatisfaction = 30.0f;
+    desire.baseSatisfaction = 55.0f;
     availableActions.push_back(desire);
 
     Action goodconn("GoodConnection", 3, "social");
@@ -652,7 +655,7 @@ void FreeWillSystem::initializeActions() {
     availableActions.push_back(goodconn);
 
     Action angconn("AngerConnection", 4, "social");
-    angconn.requirements = { {"anger", 40.0f, 0.8f}, {"stress", 50.0f, 0.4f} };
+    angconn.requirements = { {"anger", 25.0f, 0.8f}, {"stress", 30.0f, 0.3f} };
     angconn.statChanges = { {"anger", 13.0f}, {"stress", 17.0f}, {"happiness", -12.0f}, {"mentalHealth", -7.0f} };
     angconn.baseSatisfaction = 15.0f;
     availableActions.push_back(angconn);
@@ -783,7 +786,7 @@ void FreeWillSystem::initializeActions() {
     // ==================== NEGATIVE SOCIAL ACTIONS ====================
     // Insult/Verbal Attack (social)
     Action insult("Insult", 27, "social");
-    insult.requirements = { {"anger", 50.0f, 0.9f}, {"stress", 60.0f, 0.7f} };
+    insult.requirements = { {"anger", 35.0f, 0.8f}, {"stress", 40.0f, 0.5f} };
     insult.statChanges = { {"anger", -10.0f}, {"stress", 10.0f}, {"happiness", -5.0f} };
     insult.baseSatisfaction = 12.0f;
     availableActions.push_back(insult);
@@ -852,18 +855,18 @@ void FreeWillSystem::initializeActions() {
     availableActions.push_back(scrolling);
 
     // ==================== INTIMATE/ROMANTIC ACTIONS ====================
-    // Flirt: fires when lonely, hygiene decent — accessible early-game
+    // Flirt: fires when lonely — accessible early-game
     Action flirt("Flirt", 35, "social");
-    flirt.requirements = { {"loneliness", 30.0f, 0.7f}, {"hygiene", 40.0f, 0.5f} };
+    flirt.requirements = { {"loneliness", 20.0f, 0.6f} };
     flirt.statChanges = { {"loneliness", -5.0f}, {"happiness", 8.0f} };
-    flirt.baseSatisfaction = 15.0f;
+    flirt.baseSatisfaction = 38.0f;
     availableActions.push_back(flirt);
 
-    // Date: requires existing desire built up via Flirt/Desire actions
+    // Date: deeper romantic engagement
     Action date("Date", 36, "social");
-    date.requirements = { {"loneliness", 35.0f, 0.6f}, {"hygiene", 35.0f, 0.6f} };
+    date.requirements = { {"loneliness", 25.0f, 0.5f} };
     date.statChanges = { {"loneliness", -15.0f}, {"happiness", 15.0f}, {"stress", -8.0f} };
-    date.baseSatisfaction = 25.0f;
+    date.baseSatisfaction = 50.0f;
     availableActions.push_back(date);
 
     // Break Up (social)
@@ -896,15 +899,15 @@ void FreeWillSystem::initializeActions() {
     availableActions.push_back(seekTherapy);
 
     Action couple("couple", 41, "social");
-    couple.requirements = { {"loneliness", 15.0f, 0.5f},  };
+    couple.requirements = { {"loneliness", 15.0f, 0.4f} };
     couple.statChanges = { {"happiness", 45.0f}, {"loneliness", -25.0f}, {"stress", 20.0f} };
-    couple.baseSatisfaction = 50.0f;
+    couple.baseSatisfaction = 75.0f;
     availableActions.push_back(couple);
 
-    Action breeding("breeding", 41, "social");
-    breeding.requirements = { {"loneliness", 20.0f, 0.4f},  };
+    Action breeding("breeding", 42, "social");
+    breeding.requirements = { {"loneliness", 15.0f, 0.3f} };
     breeding.statChanges = { {"happiness", 45.0f}, {"loneliness", -25.0f}, {"stress", 20.0f} };
-    breeding.baseSatisfaction = 50.0f;
+    breeding.baseSatisfaction = 75.0f;
     availableActions.push_back(breeding);
 
     // Health actions
@@ -1013,8 +1016,6 @@ void FreeWillSystem::initializeActions() {
     declWar.baseSatisfaction = 9.0f;
     availableActions.push_back(declWar);
 
-    // Negotiate — agreeable entity seeks peaceful resolution between groups
-    // POINTED: reduces anger between entities, improves tribe relations
     Action negotiate("Negotiate", 208, "social");
     negotiate.requirements = { {"anger", 30.0f, 0.5f}, {"mentalHealth", 55.0f, 0.5f} };
     negotiate.statChanges  = { {"anger", -16.0f}, {"stress", -9.0f},
@@ -1083,11 +1084,11 @@ static float socialLinkIncrement(SocialTier tier, std::mt19937& rng) {
     // Raw ranges per tier
     float lo, hi;
     switch (tier) {
-    case STRANGER:      lo = 1.5f; hi = 3.5f; break;
-    case ACQUAINTANCE:  lo = 1.0f; hi = 2.5f; break;
-    case FAMILIAR:      lo = 0.5f; hi = 1.5f; break;
-    case FRIEND:        lo = 0.2f; hi = 0.8f; break;
-    case CLOSE_FRIEND:  lo = 0.1f; hi = 0.4f; break;
+    case STRANGER:      lo = 2.5f; hi = 5.0f; break;
+    case ACQUAINTANCE:  lo = 2.0f; hi = 4.0f; break;
+    case FAMILIAR:      lo = 1.2f; hi = 2.8f; break;
+    case FRIEND:        lo = 0.6f; hi = 1.6f; break;
+    case CLOSE_FRIEND:  lo = 0.3f; hi = 0.8f; break;
     default:            lo = 0.5f; hi = 1.5f; break;
     }
     std::uniform_real_distribution<float> dist(lo, hi);
@@ -1406,7 +1407,11 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
                 rarityMultiplier *= neighborBonus;
 
                 if (an == "Socialize" || an == "GoodConnection" || an == "HelpSupport") rarityMultiplier *= 1.4f;
-                if (an == "Flirt" || an == "Date" || an == "couple") rarityMultiplier *= 1.2f;
+                if (an == "Flirt" || an == "Date") rarityMultiplier *= 2.2f;
+                if (an == "Desire") rarityMultiplier *= 2.0f;
+                if (an == "couple" || an == "breeding") rarityMultiplier *= 2.8f;
+                if (an == "AngerConnection") rarityMultiplier *= 2.0f;
+                if (an == "Insult") rarityMultiplier *= 1.6f;
                 if (an == "Gossip") rarityMultiplier *= 0.7f;
             }
         }
@@ -1441,6 +1446,21 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
             }
         }
 
+        // Desire urgency: loneliness drives romantic actions more strongly
+        if (entity->entityLoneliness > 35.0f && !neighbors.empty() &&
+            (an == "Flirt" || an == "Date" || an == "Desire" || an == "couple" || an == "breeding")) {
+            float desireBoost = 1.0f + (entity->entityLoneliness / 100.0f) * 3.0f;
+            weight *= desireBoost;
+        }
+
+        // Anger urgency: accumulated anger strongly drives venting actions
+        if (entity->entityGeneralAnger > 35.0f && !neighbors.empty() &&
+            (an == "AngerConnection" || an == "Insult" || an == "Discrimination" ||
+             an == "Betray" || an == "IgnoreAvoid")) {
+            float angerBoost = 1.0f + (entity->entityGeneralAnger / 100.0f) * 3.5f;
+            weight *= angerBoost;
+        }
+
         std::cout << "  Combined Weight (pre-sort): " << weight << " (RandomFactor: " << randomFactor << ")\n";
         actionWeights.push_back({ &action, weight });
     }
@@ -1464,6 +1484,17 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         std::cout << "  " << aw.first->name << ": " << aw.second << "\n";
     }
 
+    // Phase 4: capture top candidates for Chain-of-Thought
+    std::vector<std::string> cotCandidates;
+    std::vector<float>       cotScores;
+    {
+        int show = std::min(3, (int)actionWeights.size());
+        for (int i = 0; i < show; ++i) {
+            cotCandidates.push_back(actionWeights[i].first->name);
+            cotScores.push_back(actionWeights[i].second);
+        }
+    }
+
     float totalWeight = 0.0f;
     for (const auto& aw : actionWeights) totalWeight += aw.second;
 
@@ -1478,6 +1509,33 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         if (selection <= cumulative) {
             socialNormInstance.update(neighbors);
             entity->socialNorm = socialNormInstance.norms[aw.first->name];
+
+            // Phase 4: build Chain-of-Thought for this decision
+            {
+                std::string goal = entity->m_goals.empty() ? "none" : entity->m_goals[0].type;
+                entity->lastCoT = buildChainOfThought(
+                    entity->entityLoneliness, entity->entityStress,
+                    entity->entityGeneralAnger, entity->entityHapiness,
+                    entity->entityMentalHealth, entity->entityBoredom,
+                    goal, cotCandidates, cotScores,
+                    aw.first->name, lastDeliberation.isImpulsive,
+                    context.situationHint);
+            }
+
+            // Phase 5: set hesitation state for high-stakes decisions
+            {
+                float complexity = getActionComplexity(aw.first->name);
+                if (complexity > 0.45f) {
+                    entity->hesitation.decisionComplexity = complexity;
+                    entity->hesitation.fillerExpression   = generateHesitationFiller(
+                        complexity, entity->entityStress, entity->personality.neuroticism);
+                    entity->hesitation.ticksRemaining = complexity * 2.0f;
+                } else {
+                    entity->hesitation.decisionComplexity = complexity;
+                    entity->hesitation.fillerExpression   = "";
+                }
+            }
+
             std::cout << ">>> Chosen Action: " << aw.first->name << " <<<\n";
             return aw.first;
         }
@@ -1602,6 +1660,9 @@ Action* FreeWillSystem::ChooseSpecificSocialAction(Entity* ent){
             }
         }
     }
+    if (action_lst.empty()) {
+        return nullptr;
+    }
     Action* bestSocialAction = nullptr;
     float bestScore = 0.0;
     for (auto const& x : action_lst){
@@ -1610,7 +1671,9 @@ Action* FreeWillSystem::ChooseSpecificSocialAction(Entity* ent){
             bestScore = x.second;
         }
     }
-    std::cout << "======> side action chosen: " << bestSocialAction->name << " with a score of " << bestScore;
+    if (bestSocialAction) {
+        std::cout << "======> side action chosen: " << bestSocialAction->name << " with a score of " << bestScore;
+    }
     return bestSocialAction;
 }
 
@@ -1645,15 +1708,15 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         SocialTier tier = getSocialTier(pointer, pointed);
         if (tier == STRANGER) {
             std::uniform_real_distribution<float> roll(0.0f, 1.0f);
-            if (roll(rng) > 0.08f) {
+            if (roll(rng) > 0.40f) {  // 40% instant-attraction chance for strangers
                 std::cout << "Desire blocked: " << pointer->getName() << " hasn't had enough interaction with " << pointed->getName() << "\n";
                 return;
             }
-            std::cout << "Desire: rare instant attraction!\n";
+            std::cout << "Desire: instant attraction!\n";
         }
 
         int anger_index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
-        if (anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 25) {
+        if (anger_index != -1 && pointer->list_entityPointedAnger[anger_index].anger > 50) {
             pointer->list_entityPointedAnger[anger_index].anger -= BetterRand::genNrInInterval(3, 5);
             std::cout << "Desire blocked: too much anger\n";
             return;
@@ -1671,10 +1734,10 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             std::cout << "Desire: new link " << pointer->getName() << " -> " << pointed->getName() << " (" << desire << ")\n";
         } else {
             float currentDesire = pointer->list_entityPointedDesire[index].desire;
-            float lo, hi;
-            if (currentDesire < 20.0f) { lo = 6.0f; hi = 5.5f; }
-            else if (currentDesire < 45.0f) { lo = 0.5f; hi += 7.9f; }
-            else if (currentDesire < 70.0f) { lo = 0.3f; hi += 4.0f; }
+            float lo = 0.3f, hi = 4.0f;
+            if (currentDesire < 20.0f) { lo = 5.5f; hi = 7.0f; }
+            else if (currentDesire < 45.0f) { lo = 2.0f; hi = 7.9f; }
+            else if (currentDesire < 70.0f) { lo = 0.3f; hi = 4.0f; }
             std::uniform_real_distribution<float> incDist(lo, hi);
             float increment = incDist(rng) * std::max(0.5f, attractiveness);
             pointer->list_entityPointedDesire[index].desire = std::min(100.0f, pointer->list_entityPointedDesire[index].desire + increment);
@@ -1711,6 +1774,9 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             std::cout << "Socialize: first link formed " << pointer->getName() << " -> " << pointed->getName() << " (" << seed << ")\n";
         } else {
             float increment = socialLinkIncrement(tier, rng);
+            // Personality multiplier: extraverts build bonds faster
+            float personalityMult = 0.6f + (pointer->personality.extraversion / 100.0f) * 0.8f;
+            increment *= personalityMult;
             if (pointed->entityDiseaseType != -1) increment *= 0.4f;
             pointer->list_entityPointedSocial[index].social = std::min(100.0f, pointer->list_entityPointedSocial[index].social + increment);
             std::cout << "Socialize: link deepened " << pointer->getName() << " -> " << pointed->getName()
@@ -1738,6 +1804,9 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         } else {
             float baseIncrement = socialLinkIncrement(tier, rng);
             float qualityMult = 2.8f;
+            // Personality multiplier: extraverts build bonds faster
+            float personalityMult = 0.6f + (pointer->personality.extraversion / 100.0f) * 0.8f;
+            qualityMult *= personalityMult;
             float increment = baseIncrement * qualityMult;
             pointer->list_entityPointedSocial[index].social = std::min(100.0f, pointer->list_entityPointedSocial[index].social + increment);
             int pidx = pointed->contains(pointed->list_entityPointedSocial, pointer, 4);
@@ -2219,6 +2288,9 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
     else if (action->name == "Date") {
         int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
         if (desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 15) {
+            if (!pointed || !pointer){
+                return ; 
+            }
             std::cout << "Date bloqué: pas assez de désir entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
             return;
         }
@@ -2353,6 +2425,33 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     float outcomeSuccess = calculateOutcomeSuccess(statsBefore, statsAfter);
     action->outcomeSuccess = outcomeSuccess;
     std::cout << "Outcome Success: " << outcomeSuccess << "\n";
+
+    // Phase 3: sentiment-modulated emotional impact on pointed target
+    if (pointed != nullptr) {
+        int   sentiment = getActionSentiment(action->name);
+        float intensity = std::abs((float)sentiment) * (0.3f + outcomeSuccess * 0.4f);
+        if (sentiment > 0) {
+            pointed->entityHapiness = std::min(100.0f, pointed->entityHapiness + intensity * 4.0f);
+            pointed->entityStress   = std::max(0.0f,   pointed->entityStress   - intensity * 2.5f);
+            pointed->addToWorkingMemory("positive_interaction",
+                entity->name + " showed genuine kindness", intensity);
+        } else if (sentiment < 0) {
+            pointed->entityStress       = std::min(100.0f, pointed->entityStress       + intensity * 5.0f);
+            pointed->entityGeneralAnger = std::min(100.0f, pointed->entityGeneralAnger + intensity * 4.0f);
+            pointed->entityHapiness     = std::max(0.0f,   pointed->entityHapiness     - intensity * 3.0f);
+            pointed->addToWorkingMemory("negative_interaction",
+                entity->name + " was hostile", intensity);
+        }
+        pointed->updatePAD();
+    }
+
+    // Phase 4: self-correction — poor outcomes recalibrate self-efficacy
+    if (outcomeSuccess < 0.3f) {
+        entity->SelfConcept.selfEfficacy = std::max(0.0f,
+            entity->SelfConcept.selfEfficacy - 2.0f);
+        entity->addToWorkingMemory("action_failed",
+            "Tried '" + action->name + "' — it didn't work out.", 0.45f);
+    }
 
     updateValuesFromExperiences(entity, action, outcomeSuccess);
 
@@ -2787,10 +2886,10 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
             }
         }
     }
-    
+
     // Determine planned action from Tree of Thoughts planner
     std::string plannedActionName = getPlannedAction(entity, neighbors, 0.0f);
-    
+
     for (const Action& act : availableActions) {
         const Action* aPtr = &act;
         bool isSocialCat = (act.needCategory == "social" ||
@@ -2820,12 +2919,12 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         score *= pheromoneInfluence;
         score *= envModifier;
         score *= normModifier;
-        
+
         // Planned action bias: boost if this matches the planned action
         if (!plannedActionName.empty() && act.name == plannedActionName) {
             score *= 1.5f;
         }
-        
+
 
         float rarityMult = 1.0f;
         const std::string& an = act.name;
@@ -2951,12 +3050,12 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
 float FreeWillSystem::calculateSemanticMemoryBias(Entity* entity, const Action& action, const std::vector<Entity*>& neighbors) {
     if (!entity) return 1.0f;
-    
+
     // Query semantic memory for relevant context
     MemoryQuery query;
     query.contextType = "action_type";
     query.actionType = action.name;
-    
+
     // If there are neighbors, check memory about them
     if (!neighbors.empty()) {
         // Pick the most socially connected neighbor to query about
@@ -2974,10 +3073,10 @@ float FreeWillSystem::calculateSemanticMemoryBias(Entity* entity, const Action& 
             query.contextType = "encounter_entity";
         }
     }
-    
+
     // Calculate memory bias for this action
     float memoryBias = entity->semanticMemory.calculateMemoryActionBias(action.name, query);
-    
+
     // Return as multiplicative modifier (1.0 = neutral)
     return 1.0f + memoryBias;
 }
@@ -2988,13 +3087,13 @@ float FreeWillSystem::calculateSemanticMemoryBias(Entity* entity, const Action& 
 
 std::string FreeWillSystem::getPlannedAction(Entity* entity, const std::vector<Entity*>& neighbors, float emergencyUrgency) {
     if (!entity) return "";
-    
+
     // Check if there's an active plan
     if (!entity->planner.hasActivePlan()) {
         // Generate a new plan
         entity->planner.generateDailyPlan(entity);
     }
-    
+
     // Get the next planned action
     return entity->planner.getNextPlannedAction(entity, neighbors, emergencyUrgency);
 }

@@ -29,6 +29,8 @@
 #include "header/Image.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
+#include <unordered_map>
+#include <unordered_set>
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -436,38 +438,59 @@ std::vector<Entity> get_new_borns(){
 
 
 void tickRelationshipDecay(Entity* ent, float deltaTime) {
-    // FIX: Relationship decay now depends on relationship strength
-    // Strong relationships decay much slower than weak ones
+    // ── SOCIAL BOND EVOLUTION: bonds GROW from proximity AND decay from distance ──
     for (auto& social : ent->list_entityPointedSocial) {
-        // Decay formula: base_decay / (1 + strength_factor)
-        // Strong bonds (80+) decay at 20% of normal rate
-        // Medium bonds (40-80) decay at 50% of normal rate
-        // Weak bonds (<40) decay at full rate
-        float decayRate = 0.01f;
+        // Proximity growth: bonds grow naturally when entities are nearby
+        if (social.pointedEntity && social.pointedEntity->entityHealth > 0.0f) {
+            float dx = ent->posX - social.pointedEntity->posX;
+            float dy = ent->posY - social.pointedEntity->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < 180.0f) {
+                // Closer proximity = more growth; extraverts benefit more
+                float proximityFactor = (180.0f - dist) / 180.0f;
+                float extraversionBoost = 0.7f + (ent->personality.extraversion / 100.0f) * 0.6f;
+                float growth = proximityFactor * 0.012f * extraversionBoost * deltaTime;
+                social.social = std::min(100.0f, social.social + growth);
+            }
+        }
+
+        // Decay: strong bonds decay very slowly, weak bonds decay faster
+        float decayRate = 0.008f;
         if (social.social > 80.0f) {
-            decayRate = 0.002f; // Very slow decay for strong bonds
+            decayRate = 0.001f; // Strong bonds barely decay
         } else if (social.social > 50.0f) {
-            decayRate = 0.005f; // Moderate decay for medium bonds
+            decayRate = 0.003f; // Moderate decay for medium bonds
         } else if (social.social > 20.0f) {
-            decayRate = 0.008f; // Light decay for forming bonds
+            decayRate = 0.005f; // Light decay for forming bonds
         }
         social.social -= decayRate * deltaTime;
         if (social.social < 0.5f) social.social = 0.0f;
     }
 
-    // FIX: Desire decay also slowed for established attractions
+    // ── DESIRE also grows from proximity ──
     for (auto& desire : ent->list_entityPointedDesire) {
-        float decayRate = 0.015f;
+        if (desire.pointedEntity && desire.pointedEntity->entityHealth > 0.0f) {
+            float dx = ent->posX - desire.pointedEntity->posX;
+            float dy = ent->posY - desire.pointedEntity->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < 140.0f) {
+                float proximityFactor = (140.0f - dist) / 140.0f;
+                float growth = proximityFactor * 0.006f * deltaTime;
+                desire.desire = std::min(100.0f, desire.desire + growth);
+            }
+        }
+
+        float decayRate = 0.012f;
         if (desire.desire > 60.0f) {
-            decayRate = 0.003f; // Strong attraction persists
+            decayRate = 0.002f; // Strong attraction persists
         } else if (desire.desire > 30.0f) {
-            decayRate = 0.008f;
+            decayRate = 0.006f;
         }
         desire.desire -= decayRate * deltaTime;
         desire.desire = std::max(0.0f, desire.desire);
     }
 
-    // Anger fades based on agreeableness — already fine, keep small rate
+    // Anger fades based on agreeableness
     float forgivenessRate = 0.02f * (ent->personality.agreeableness / 100.0f) * deltaTime;
     for (auto& anger : ent->list_entityPointedAnger) {
         anger.anger -= forgivenessRate;
@@ -946,9 +969,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 sys.executeAction(entity, chosenAction, context, target);
 
                 //choosing side social action
-                if(entity->dayWithoutSocialAction > 5){
+                if(entity->dayWithoutSocialAction > 3){
                     Action* side_social_act = sys.ChooseSpecificSocialAction(entity);
-                    sys.executeAction(entity, side_social_act, context, target);
+                    if (side_social_act) {
+                        sys.executeAction(entity, side_social_act, context, target);
+                    }
                 }
                 //saving data
                 entity->saveEntityStats(chosenAction);
@@ -1031,24 +1056,76 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
         }
     }
 
-    // Check for dead entities and remove them
-    for(int i = (int)entities.size() - 1; i >= 0; i--){
-        if(entities[i].entityHealth <= 0.0f){
-            std::cout << "Entity " << entities[i].getId() << " has died and is being removed from the scene." << std::endl;
-            entities.erase(entities.begin() + i);
+    // ── Safe dead-entity removal ──────────────────────────────────────────────
+    // Raw Entity* pointers become dangling after erase() shifts the vector.
+    // Strategy: snapshot old addresses, null pointers to dead entities, batch
+    // erase, rebuild ent_quad, then repair surviving pointers via id lookup.
+    {
+        // 1. Snapshot: old address → entity ID (all pointers still valid here)
+        std::unordered_map<const Entity*, int> ptrToId;
+        ptrToId.reserve(entities.size());
+        for (const Entity& e : entities) ptrToId[&e] = e.entityId;
 
-            // Rebuild ent_quad pointer vector
-            ent_quad.clear();
-            for(int j = 0; j < (int)entities.size(); j++){
-                ent_quad.push_back(&entities[j]);
+        // 2. Collect dead IDs and log
+        std::unordered_set<int> deadIds;
+        int selectedId = (selectedEntityIndex >= 0 && selectedEntityIndex < (int)entities.size())
+                         ? entities[selectedEntityIndex].entityId : -1;
+        for (Entity& e : entities) {
+            if (e.entityHealth <= 0.0f) {
+                std::cout << "Entity " << e.entityId << " has died.\n";
+                deadIds.insert(e.entityId);
+            }
+        }
+
+        if (!deadIds.empty()) {
+            // 3. Null out pointers to dead entities (pointers still valid)
+            for (Entity& e : entities) {
+                auto nullIfDead = [&](Entity*& p) {
+                    if (!p) return;
+                    auto it = ptrToId.find(p);
+                    if (it != ptrToId.end() && deadIds.count(it->second)) p = nullptr;
+                };
+                for (auto& d : e.list_entityPointedDesire)  nullIfDead(d.pointedEntity);
+                for (auto& a : e.list_entityPointedAnger)   nullIfDead(a.pointedEntity);
+                for (auto& s : e.list_entityPointedSocial)  nullIfDead(s.pointedEntity);
+                for (auto& c : e.list_entityPointedCouple)  nullIfDead(c.pointedEntity);
             }
 
-            // Reset selected entity if it was removed
-            if(selectedEntityIndex == i){
+            // 4. Batch erase — shifts surviving elements; pointers now stale
+            entities.erase(
+                std::remove_if(entities.begin(), entities.end(),
+                    [](const Entity& e){ return e.entityHealth <= 0.0f; }),
+                entities.end());
+
+            // 5. Rebuild ent_quad
+            ent_quad.clear();
+            for (Entity& e : entities) ent_quad.push_back(&e);
+
+            // 6. Repair surviving pointedEntity pointers (old addr → id → new addr)
+            std::unordered_map<int, Entity*> idToNewPtr;
+            for (Entity* e : ent_quad) idToNewPtr[e->entityId] = e;
+            for (Entity& e : entities) {
+                auto repairPtr = [&](Entity*& p) {
+                    if (!p) return;
+                    auto oldIt = ptrToId.find(p);
+                    if (oldIt == ptrToId.end()) { p = nullptr; return; }
+                    auto newIt = idToNewPtr.find(oldIt->second);
+                    p = (newIt != idToNewPtr.end()) ? newIt->second : nullptr;
+                };
+                for (auto& d : e.list_entityPointedDesire)  repairPtr(d.pointedEntity);
+                for (auto& a : e.list_entityPointedAnger)   repairPtr(a.pointedEntity);
+                for (auto& s : e.list_entityPointedSocial)  repairPtr(s.pointedEntity);
+                for (auto& c : e.list_entityPointedCouple)  repairPtr(c.pointedEntity);
+            }
+
+            // 7. Fix selected entity index
+            if (deadIds.count(selectedId)) {
                 showEntityWindow = false;
                 selectedEntityIndex = -1;
-            } else if(selectedEntityIndex > i){
-                selectedEntityIndex--;
+            } else if (selectedId >= 0) {
+                selectedEntityIndex = -1;
+                for (int j = 0; j < (int)entities.size(); ++j)
+                    if (entities[j].entityId == selectedId) { selectedEntityIndex = j; break; }
             }
         }
     }
@@ -1065,13 +1142,24 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             // Apply free will to all entity groups with current day for context
             applyFreeWill(close_entity_together, day);
 
+            // PersonaSystem: update self-grounding every tick; consolidate memories every 10 ticks
+            for (Entity& ent : entities) {
+                if (ent.entityHealth <= 0.0f) continue;
+                ent.updateSelfGrounding(day);
+                if (day % 10 == 0)
+                    ent.consolidateMemories(day);
+            }
+
             // ── Civilization tick (every 5 FreeWill updates = ~1 in-game day) ──
             if (globalCivEngine && (day / UPDATE_FREQUENCY) % 5 == 0)
                 globalCivEngine->tick(entities, day / UPDATE_FREQUENCY);
 
             std::vector<Entity> new_borns = get_new_borns();
-            for(Entity ent: new_borns){
-                entities.push_back(ent);
+            if (!new_borns.empty()) {
+                // Reserve before push_back so the vector never reallocates —
+                // existing Entity* pointedEntity pointers stay valid.
+                entities.reserve(entities.size() + new_borns.size());
+                for (Entity& ent : new_borns) entities.push_back(ent);
             }
             FreeWillSystem::clear_new_borns();
 

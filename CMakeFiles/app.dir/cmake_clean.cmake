@@ -39,6 +39,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/Logging.cpp.obj.d"
   "CMakeFiles/app.dir/src/NarrativeEngine.cpp.obj"
   "CMakeFiles/app.dir/src/NarrativeEngine.cpp.obj.d"
+  "CMakeFiles/app.dir/src/PersonaSystem.cpp.obj"
+  "CMakeFiles/app.dir/src/PersonaSystem.cpp.obj.d"
   "CMakeFiles/app.dir/src/PlanningSystem.cpp.obj"
   "CMakeFiles/app.dir/src/PlanningSystem.cpp.obj.d"
   "CMakeFiles/app.dir/src/SDLEngine.cpp.obj"

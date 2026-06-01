@@ -91,6 +91,7 @@ src/SDLEngine.cpp
 src/Image.cpp
 src/SemanticMemory.cpp
 src/PlanningSystem.cpp
+src/PersonaSystem.cpp
 src/NarrativeEngine.cpp
 src/CivilizationEngine.cpp
 

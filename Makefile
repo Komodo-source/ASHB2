@@ -608,6 +608,30 @@ src/NarrativeEngine.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/NarrativeEngine.cpp.s
 .PHONY : src/NarrativeEngine.cpp.s
 
+src/PersonaSystem.obj: src/PersonaSystem.cpp.obj
+.PHONY : src/PersonaSystem.obj
+
+# target to build an object file
+src/PersonaSystem.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/PersonaSystem.cpp.obj
+.PHONY : src/PersonaSystem.cpp.obj
+
+src/PersonaSystem.i: src/PersonaSystem.cpp.i
+.PHONY : src/PersonaSystem.i
+
+# target to preprocess a source file
+src/PersonaSystem.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/PersonaSystem.cpp.i
+.PHONY : src/PersonaSystem.cpp.i
+
+src/PersonaSystem.s: src/PersonaSystem.cpp.s
+.PHONY : src/PersonaSystem.s
+
+# target to generate assembly for a file
+src/PersonaSystem.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/PersonaSystem.cpp.s
+.PHONY : src/PersonaSystem.cpp.s
+
 src/PlanningSystem.obj: src/PlanningSystem.cpp.obj
 .PHONY : src/PlanningSystem.obj
 
@@ -1037,6 +1061,9 @@ help:
 	@echo ... src/NarrativeEngine.obj
 	@echo ... src/NarrativeEngine.i
 	@echo ... src/NarrativeEngine.s
+	@echo ... src/PersonaSystem.obj
+	@echo ... src/PersonaSystem.i
+	@echo ... src/PersonaSystem.s
 	@echo ... src/PlanningSystem.obj
 	@echo ... src/PlanningSystem.i
 	@echo ... src/PlanningSystem.s
