@@ -111,3 +111,28 @@
 [2026-06-01 12:51:59] Entity 33 (Alexander) contracted Malaria
 [2026-06-01 12:52:04] Entity 37 (Mckinley) contracted Typhus
 [2026-06-01 12:52:09] Entity 9 (Marques) contracted Fever
+[2026-06-01 12:52:10] Entity 9 (Marques) contracted Typhus
+[2026-06-01 12:52:12] Entity 12 (Marques) cured from Malaria
+[2026-06-01 12:52:12] Entity 5 (Sammy) contracted Malaria
+[2026-06-01 12:52:12] Entity 32 (Isiah) cured from Malaria
+[2026-06-01 12:52:13] Entity 33 (Alexander) cured from Malaria
+[2026-06-01 12:52:17] Entity 37 (Mckinley) cured from Typhus
+[2026-06-01 12:52:17] Entity 20 (Selah) contracted Malaria
+[2026-06-01 12:52:20] Entity 19 (Campbell) contracted Malaria
+[2026-06-01 12:52:21] Entity 25 (Sammy) contracted Typhus
+[2026-06-01 12:52:23] Entity 9 (Marques) cured from Typhus
+[2026-06-01 12:52:24] Entity 5 (Sammy) cured from Malaria
+[2026-06-01 12:52:26] Entity 1 (Alexander) contracted Typhus
+[2026-06-01 12:52:29] Entity 20 (Selah) cured from Malaria
+[2026-06-01 12:52:34] Entity 0 (Stella) contracted Plague
+[2026-06-01 12:52:34] Entity 19 (Campbell) cured from Malaria
+[2026-06-01 12:52:37] Entity 25 (Sammy) cured from Typhus
+[2026-06-01 12:52:38] Entity 26 (Stella) contracted Plague
+[2026-06-01 12:52:40] Entity 1 (Alexander) cured from Typhus
+[2026-06-01 12:52:45] Entity 39 (Amari) contracted Fever
+[2026-06-01 12:52:46] Entity 0 (Stella) cured from Plague
+[2026-06-01 12:52:48] Entity 11 (Bethany) contracted Typhus
+[2026-06-01 12:52:49] Entity 23 (Mckinley) contracted Fever
+[2026-06-01 12:52:52] Entity 15 (Fletcher) contracted Malaria
+[2026-06-01 12:52:54] Entity 26 (Stella) cured from Plague
+[2026-06-01 12:52:57] Entity 39 (Amari) cured from Fever

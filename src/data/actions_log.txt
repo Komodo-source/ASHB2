@@ -17102,3 +17102,1641 @@
 [2026-06-01 12:52:09] Entity 32 (Isiah) performed: Preach targeting Makaila - targeted action
 [2026-06-01 12:52:09] Entity 36 (Makaila) performed: Preach targeting Isiah - targeted action
 [2026-06-01 12:52:09] Entity 37 (Mckinley) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:10] Entity 0 (Stella) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:10] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 11 (Bethany) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:10] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 26 (Stella) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:10] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 1 (Alexander) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:10] Entity 9 (Marques) performed: Prayer - self-directed action
+[2026-06-01 12:52:10] Entity 12 (Marques) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:10] Entity 33 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:10] Entity 34 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 2 (Alexander) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:10] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 20 (Selah) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:10] Entity 35 (Griffin) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:10] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:10] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 23 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:10] Entity 30 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 29 (Bethany) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:10] Entity 5 (Sammy) performed: Scrolling - self-directed action
+[2026-06-01 12:52:10] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 38 (Julien) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:10] Entity 14 (Stella) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:10] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 16 (Fletcher) performed: ChallengeLeader targeting Kamila - targeted action
+[2026-06-01 12:52:10] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 32 (Isiah) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:10] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:10] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:10] Entity 36 (Makaila) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:10] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:11] Entity 0 (Stella) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:11] Entity 8 (Campbell) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:11] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:11] Entity 39 (Amari) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:11] Entity 3 (Amari) performed: EatMeal - self-directed action
+[2026-06-01 12:52:12] Entity 14 (Stella) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:12] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 9 (Marques) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:12] Entity 12 (Marques) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:12] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 34 (Isiah) performed: Prayer - self-directed action
+[2026-06-01 12:52:12] Entity 6 (Kamila) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:12] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:12] Entity 2 (Alexander) performed: Prayer - self-directed action
+[2026-06-01 12:52:12] Entity 16 (Fletcher) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:12] Entity 20 (Selah) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:12] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:12] Entity 10 (Fletcher) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:12] Entity 13 (Casey) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:12] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 35 (Griffin) performed: Scrolling - self-directed action
+[2026-06-01 12:52:12] Entity 37 (Mckinley) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:12] Entity 5 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:12] Entity 7 (Casey) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:12] Entity 17 (Jazlynn) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:12] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:12] Entity 15 (Fletcher) performed: ChallengeLeader targeting Julien - targeted action
+[2026-06-01 12:52:12] Entity 29 (Bethany) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:12] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 38 (Julien) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:12] Entity 18 (Amari) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:12] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:12] Entity 26 (Stella) performed: ChallengeLeader targeting Makaila - targeted action
+[2026-06-01 12:52:12] Entity 36 (Makaila) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:12] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:12] Entity 30 (Campbell) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:13] Entity 0 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 11 (Bethany) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:13] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:13] Entity 19 (Campbell) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:13] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:13] Entity 1 (Alexander) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:13] Entity 9 (Marques) performed: Prayer - self-directed action
+[2026-06-01 12:52:13] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:13] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 34 (Isiah) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:13] Entity 35 (Griffin) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:13] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 2 (Alexander) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:13] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:13] Entity 14 (Stella) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:13] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 20 (Selah) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:13] Entity 23 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:13] Entity 26 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 30 (Campbell) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:13] Entity 32 (Isiah) performed: ChallengeLeader targeting Makaila - targeted action
+[2026-06-01 12:52:13] Entity 36 (Makaila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 5 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:13] Entity 25 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:13] Entity 29 (Bethany) performed: Preach targeting Jazlynn - targeted action
+[2026-06-01 12:52:13] Entity 37 (Mckinley) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:13] Entity 6 (Kamila) performed: Prayer - self-directed action
+[2026-06-01 12:52:13] Entity 17 (Jazlynn) performed: EatMeal - self-directed action
+[2026-06-01 12:52:13] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:13] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:13] Entity 31 (Mckinley) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:13] Entity 22 (Mckinley) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:13] Entity 10 (Fletcher) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:13] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:13] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:13] Entity 38 (Julien) performed: Preach - self-directed action
+[2026-06-01 12:52:14] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 8 (Campbell) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:14] Entity 11 (Bethany) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:14] Entity 39 (Amari) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:14] Entity 3 (Amari) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:14] Entity 18 (Amari) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:14] Entity 1 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:14] Entity 9 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:14] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 35 (Griffin) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:14] Entity 5 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:14] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 29 (Bethany) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:14] Entity 37 (Mckinley) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:14] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 6 (Kamila) performed: ChallengeLeader targeting Makaila - targeted action
+[2026-06-01 12:52:14] Entity 16 (Fletcher) performed: Scrolling - self-directed action
+[2026-06-01 12:52:14] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 36 (Makaila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 7 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 17 (Jazlynn) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:14] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 27 (Campbell) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:14] Entity 19 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 30 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 26 (Stella) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:14] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:14] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:14] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:15] Entity 8 (Campbell) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:15] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 39 (Amari) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:15] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 15 (Fletcher) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:15] Entity 1 (Alexander) performed: EatMeal - self-directed action
+[2026-06-01 12:52:15] Entity 9 (Marques) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:15] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:15] Entity 34 (Isiah) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:15] Entity 19 (Campbell) performed: Scrolling - self-directed action
+[2026-06-01 12:52:15] Entity 32 (Isiah) performed: Prayer - self-directed action
+[2026-06-01 12:52:15] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 24 (Mckinley) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:15] Entity 23 (Mckinley) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:15] Entity 27 (Campbell) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:15] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:15] Entity 20 (Selah) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:15] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:15] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:15] Entity 30 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:15] Entity 18 (Amari) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:15] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:15] Entity 13 (Casey) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:15] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:15] Entity 22 (Mckinley) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:15] Entity 25 (Sammy) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:15] Entity 5 (Sammy) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:15] Entity 29 (Bethany) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:15] Entity 37 (Mckinley) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:15] Entity 7 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 14 (Stella) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:15] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:15] Entity 16 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 31 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:15] Entity 38 (Julien) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:16] Entity 0 (Stella) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:16] Entity 8 (Campbell) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:16] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 22 (Mckinley) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:16] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 1 (Alexander) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:16] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 2 (Alexander) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:16] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 5 (Sammy) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:16] Entity 3 (Amari) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:16] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 20 (Selah) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:16] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 23 (Mckinley) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:16] Entity 26 (Stella) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:16] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 10 (Fletcher) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:16] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 13 (Casey) performed: Scrolling - self-directed action
+[2026-06-01 12:52:16] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 35 (Griffin) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:16] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 14 (Stella) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:16] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 16 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 29 (Bethany) performed: Preach targeting Julien - targeted action
+[2026-06-01 12:52:16] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:16] Entity 38 (Julien) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:16] Entity 15 (Fletcher) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:16] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:16] Entity 31 (Mckinley) performed: EatMeal - self-directed action
+[2026-06-01 12:52:16] Entity 18 (Amari) performed: Take Shower - self-directed action
+[2026-06-01 12:52:17] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:17] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:17] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:17] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:17] Entity 16 (Fletcher) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:17] Entity 12 (Marques) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:17] Entity 1 (Alexander) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:17] Entity 9 (Marques) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:17] Entity 33 (Alexander) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:17] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:17] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:17] Entity 37 (Mckinley) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:17] Entity 2 (Alexander) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:17] Entity 24 (Mckinley) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:17] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:17] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:17] Entity 3 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:17] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:17] Entity 20 (Selah) performed: Prayer - self-directed action
+[2026-06-01 12:52:17] Entity 21 (Campbell) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:17] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:17] Entity 26 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:18] Entity 36 (Makaila) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:18] Entity 5 (Sammy) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:18] Entity 7 (Casey) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:18] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:18] Entity 17 (Jazlynn) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:18] Entity 29 (Bethany) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:18] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:18] Entity 10 (Fletcher) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:18] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:18] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:18] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:18] Entity 14 (Stella) performed: Scrolling - self-directed action
+[2026-06-01 12:52:18] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:18] Entity 22 (Mckinley) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:18] Entity 38 (Julien) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:18] Entity 30 (Campbell) performed: Preach - self-directed action
+[2026-06-01 12:52:18] Entity 32 (Isiah) performed: WatchEntertainment - self-directed action
+[2026-06-01 12:52:19] Entity 0 (Stella) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:19] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 39 (Amari) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:19] Entity 33 (Alexander) performed: EatMeal - self-directed action
+[2026-06-01 12:52:19] Entity 35 (Griffin) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:19] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 9 (Marques) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:19] Entity 12 (Marques) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:19] Entity 34 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 2 (Alexander) performed: Prayer - self-directed action
+[2026-06-01 12:52:19] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 15 (Fletcher) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:19] Entity 30 (Campbell) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:19] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:19] Entity 20 (Selah) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:19] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 26 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 36 (Makaila) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:19] Entity 4 (Yahir) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:19] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 27 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:19] Entity 16 (Fletcher) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:19] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:19] Entity 5 (Sammy) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:19] Entity 29 (Bethany) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:19] Entity 37 (Mckinley) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:19] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:19] Entity 17 (Jazlynn) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:19] Entity 6 (Kamila) performed: Prayer - self-directed action
+[2026-06-01 12:52:19] Entity 31 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:19] Entity 22 (Mckinley) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:19] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 27 (Campbell) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:20] Entity 12 (Marques) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:20] Entity 1 (Alexander) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:20] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 16 (Fletcher) performed: Prayer - self-directed action
+[2026-06-01 12:52:20] Entity 14 (Stella) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:20] Entity 2 (Alexander) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:20] Entity 24 (Mckinley) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:20] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 3 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:20] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 20 (Selah) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:20] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 23 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:20] Entity 26 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 29 (Bethany) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:20] Entity 36 (Makaila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 10 (Fletcher) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:20] Entity 13 (Casey) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:20] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 17 (Jazlynn) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 7 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 37 (Mckinley) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:20] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 31 (Mckinley) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:20] Entity 32 (Isiah) performed: Prayer - self-directed action
+[2026-06-01 12:52:20] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:20] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:20] Entity 30 (Campbell) performed: ChallengeLeader - self-directed action
+[2026-06-01 12:52:21] Entity 0 (Stella) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:21] Entity 8 (Campbell) performed: Scrolling - self-directed action
+[2026-06-01 12:52:21] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 39 (Amari) performed: Prayer - self-directed action
+[2026-06-01 12:52:21] Entity 18 (Amari) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:21] Entity 2 (Alexander) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:21] Entity 1 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 9 (Marques) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:21] Entity 12 (Marques) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:21] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 20 (Selah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:21] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:21] Entity 21 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:21] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 26 (Stella) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:21] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 24 (Mckinley) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:21] Entity 4 (Yahir) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:21] Entity 10 (Fletcher) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:21] Entity 27 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:21] Entity 35 (Griffin) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:21] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:21] Entity 25 (Sammy) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:21] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:21] Entity 14 (Stella) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:21] Entity 31 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 16 (Fletcher) performed: EatMeal - self-directed action
+[2026-06-01 12:52:21] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:21] Entity 7 (Casey) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:21] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 30 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:21] Entity 36 (Makaila) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:22] Entity 0 (Stella) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:22] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:22] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 34 (Isiah) performed: EatMeal - self-directed action
+[2026-06-01 12:52:22] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 1 (Alexander) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:22] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 12 (Marques) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:22] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 3 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:22] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:22] Entity 20 (Selah) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:22] Entity 21 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:22] Entity 23 (Mckinley) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:22] Entity 26 (Stella) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:22] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 5 (Sammy) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:22] Entity 4 (Yahir) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:22] Entity 10 (Fletcher) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:22] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 27 (Campbell) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:22] Entity 35 (Griffin) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:22] Entity 15 (Fletcher) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:22] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:22] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 16 (Fletcher) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:22] Entity 29 (Bethany) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:22] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:22] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:22] Entity 18 (Amari) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:22] Entity 25 (Sammy) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:22] Entity 36 (Makaila) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:22] Entity 30 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:22] Entity 32 (Isiah) performed: Gaming - self-directed action
+[2026-06-01 12:52:22] Entity 38 (Julien) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:22] Entity 37 (Mckinley) performed: ChallengeLeader - self-directed action
+[2026-06-01 12:52:23] Entity 0 (Stella) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:23] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 11 (Bethany) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:23] Entity 39 (Amari) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:23] Entity 20 (Selah) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:23] Entity 15 (Fletcher) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:23] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 9 (Marques) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:23] Entity 12 (Marques) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:23] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 34 (Isiah) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:23] Entity 35 (Griffin) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:23] Entity 24 (Mckinley) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:23] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 4 (Yahir) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:23] Entity 3 (Amari) performed: EatMeal - self-directed action
+[2026-06-01 12:52:23] Entity 19 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 21 (Campbell) performed: EatMeal - self-directed action
+[2026-06-01 12:52:23] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 29 (Bethany) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:23] Entity 37 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 16 (Fletcher) performed: Sleep - self-directed action
+[2026-06-01 12:52:23] Entity 7 (Casey) performed: Preach targeting Julien - targeted action
+[2026-06-01 12:52:23] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:23] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 38 (Julien) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:23] Entity 22 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:23] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:23] Entity 32 (Isiah) performed: ChallengeLeader targeting Makaila - targeted action
+[2026-06-01 12:52:23] Entity 36 (Makaila) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:23] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:23] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:24] Entity 11 (Bethany) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:24] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:24] Entity 15 (Fletcher) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:24] Entity 23 (Mckinley) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:24] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 9 (Marques) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:24] Entity 12 (Marques) performed: EatMeal - self-directed action
+[2026-06-01 12:52:24] Entity 33 (Alexander) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:24] Entity 34 (Isiah) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:24] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:24] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 24 (Mckinley) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:24] Entity 16 (Fletcher) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:24] Entity 26 (Stella) performed: EatMeal - self-directed action
+[2026-06-01 12:52:24] Entity 3 (Amari) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:24] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:24] Entity 20 (Selah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:24] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:24] Entity 32 (Isiah) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:24] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:24] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 27 (Campbell) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:24] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 7 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:24] Entity 37 (Mckinley) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:24] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 31 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:24] Entity 14 (Stella) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:24] Entity 6 (Kamila) performed: Preach targeting Julien - targeted action
+[2026-06-01 12:52:24] Entity 22 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:24] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:24] Entity 17 (Jazlynn) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:24] Entity 36 (Makaila) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:24] Entity 30 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:26] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:26] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 12 (Marques) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:26] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:26] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 9 (Marques) performed: Scrolling - self-directed action
+[2026-06-01 12:52:26] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:26] Entity 34 (Isiah) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:26] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:26] Entity 32 (Isiah) performed: Gaming - self-directed action
+[2026-06-01 12:52:26] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:26] Entity 36 (Makaila) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:26] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:26] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 21 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:26] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 30 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:26] Entity 27 (Campbell) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:26] Entity 4 (Yahir) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:26] Entity 10 (Fletcher) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:26] Entity 13 (Casey) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:26] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:26] Entity 5 (Sammy) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:26] Entity 31 (Mckinley) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:26] Entity 6 (Kamila) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:26] Entity 16 (Fletcher) performed: ChallengeLeader targeting Julien - targeted action
+[2026-06-01 12:52:26] Entity 29 (Bethany) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:26] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 37 (Mckinley) performed: ChallengeLeader targeting Julien - targeted action
+[2026-06-01 12:52:26] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 25 (Sammy) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:26] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:26] Entity 15 (Fletcher) performed: Prayer - self-directed action
+[2026-06-01 12:52:26] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:27] Entity 0 (Stella) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:27] Entity 8 (Campbell) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:27] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:27] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:27] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:27] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 12 (Marques) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:27] Entity 33 (Alexander) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:27] Entity 34 (Isiah) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:27] Entity 6 (Kamila) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:27] Entity 30 (Campbell) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:27] Entity 2 (Alexander) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:27] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 13 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:27] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 3 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:27] Entity 19 (Campbell) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:27] Entity 20 (Selah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:27] Entity 23 (Mckinley) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:27] Entity 26 (Stella) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:27] Entity 14 (Stella) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:27] Entity 4 (Yahir) performed: Scrolling - self-directed action
+[2026-06-01 12:52:27] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 29 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:27] Entity 37 (Mckinley) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:27] Entity 38 (Julien) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:27] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 7 (Casey) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:27] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:27] Entity 35 (Griffin) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:27] Entity 15 (Fletcher) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:27] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:27] Entity 18 (Amari) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:27] Entity 31 (Mckinley) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:27] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:27] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:28] Entity 0 (Stella) performed: Prayer - self-directed action
+[2026-06-01 12:52:28] Entity 8 (Campbell) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:28] Entity 11 (Bethany) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:28] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:28] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:28] Entity 5 (Sammy) performed: EatMeal - self-directed action
+[2026-06-01 12:52:28] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:28] Entity 9 (Marques) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:28] Entity 12 (Marques) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:28] Entity 33 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:28] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:28] Entity 32 (Isiah) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:28] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:28] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 14 (Stella) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:28] Entity 3 (Amari) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:28] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 10 (Fletcher) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:28] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 38 (Julien) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:28] Entity 35 (Griffin) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:28] Entity 31 (Mckinley) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:28] Entity 29 (Bethany) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:28] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 16 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 23 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:28] Entity 15 (Fletcher) performed: EatMeal - self-directed action
+[2026-06-01 12:52:28] Entity 37 (Mckinley) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:28] Entity 7 (Casey) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:28] Entity 17 (Jazlynn) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:28] Entity 20 (Selah) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:28] Entity 36 (Makaila) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:28] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 19 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:28] Entity 26 (Stella) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:28] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:29] Entity 0 (Stella) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:29] Entity 8 (Campbell) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:29] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:29] Entity 14 (Stella) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:29] Entity 1 (Alexander) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:29] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:29] Entity 12 (Marques) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 33 (Alexander) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:29] Entity 34 (Isiah) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:29] Entity 31 (Mckinley) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:29] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 2 (Alexander) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:29] Entity 24 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:29] Entity 13 (Casey) performed: Prayer - self-directed action
+[2026-06-01 12:52:29] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:29] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:29] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:29] Entity 20 (Selah) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:29] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 23 (Mckinley) performed: EatMeal - self-directed action
+[2026-06-01 12:52:29] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 4 (Yahir) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:29] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 27 (Campbell) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:29] Entity 38 (Julien) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:29] Entity 35 (Griffin) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:29] Entity 30 (Campbell) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:29] Entity 5 (Sammy) performed: Scrolling - self-directed action
+[2026-06-01 12:52:29] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:29] Entity 16 (Fletcher) performed: Prayer - self-directed action
+[2026-06-01 12:52:29] Entity 25 (Sammy) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:29] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:29] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:29] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:29] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:30] Entity 0 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:30] Entity 8 (Campbell) performed: Scrolling - self-directed action
+[2026-06-01 12:52:30] Entity 11 (Bethany) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:30] Entity 39 (Amari) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:30] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:30] Entity 27 (Campbell) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:30] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:30] Entity 9 (Marques) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:30] Entity 12 (Marques) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:30] Entity 33 (Alexander) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:30] Entity 34 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:30] Entity 37 (Mckinley) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:30] Entity 26 (Stella) performed: EatMeal - self-directed action
+[2026-06-01 12:52:30] Entity 2 (Alexander) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:30] Entity 24 (Mckinley) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:31] Entity 7 (Casey) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:31] Entity 38 (Julien) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:31] Entity 3 (Amari) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:31] Entity 19 (Campbell) performed: EatMeal - self-directed action
+[2026-06-01 12:52:31] Entity 20 (Selah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:31] Entity 21 (Campbell) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:31] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:31] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:31] Entity 29 (Bethany) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:31] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:31] Entity 10 (Fletcher) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:31] Entity 13 (Casey) performed: Scrolling - self-directed action
+[2026-06-01 12:52:31] Entity 35 (Griffin) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:31] Entity 31 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:31] Entity 17 (Jazlynn) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:31] Entity 5 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:31] Entity 25 (Sammy) performed: Scrolling - self-directed action
+[2026-06-01 12:52:31] Entity 30 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:31] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:31] Entity 6 (Kamila) performed: Scrolling - self-directed action
+[2026-06-01 12:52:31] Entity 16 (Fletcher) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:31] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:31] Entity 36 (Makaila) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:31] Entity 22 (Mckinley) performed: Preach - self-directed action
+[2026-06-01 12:52:32] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 8 (Campbell) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:32] Entity 11 (Bethany) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:32] Entity 39 (Amari) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:32] Entity 17 (Jazlynn) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 25 (Sammy) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:32] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 9 (Marques) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:32] Entity 33 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:32] Entity 34 (Isiah) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:32] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 2 (Alexander) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:32] Entity 24 (Mckinley) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:32] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 5 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:32] Entity 20 (Selah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 21 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:32] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 26 (Stella) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:32] Entity 7 (Casey) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:32] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 4 (Yahir) performed: Prayer - self-directed action
+[2026-06-01 12:52:32] Entity 10 (Fletcher) performed: Prayer - self-directed action
+[2026-06-01 12:52:32] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 35 (Griffin) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:32] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 31 (Mckinley) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:32] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:32] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:32] Entity 22 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:32] Entity 14 (Stella) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:32] Entity 37 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:32] Entity 18 (Amari) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:32] Entity 30 (Campbell) performed: Preach - self-directed action
+[2026-06-01 12:52:33] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 8 (Campbell) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:33] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:33] Entity 39 (Amari) performed: Scrolling - self-directed action
+[2026-06-01 12:52:33] Entity 34 (Isiah) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:33] Entity 35 (Griffin) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:33] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 33 (Alexander) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:33] Entity 5 (Sammy) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:33] Entity 22 (Mckinley) performed: EatMeal - self-directed action
+[2026-06-01 12:52:33] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 24 (Mckinley) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:33] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:33] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 20 (Selah) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:33] Entity 23 (Mckinley) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:33] Entity 26 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:33] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:33] Entity 4 (Yahir) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:33] Entity 10 (Fletcher) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:33] Entity 13 (Casey) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:33] Entity 27 (Campbell) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:33] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:33] Entity 17 (Jazlynn) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:33] Entity 7 (Casey) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:33] Entity 16 (Fletcher) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:33] Entity 31 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:33] Entity 36 (Makaila) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:33] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:33] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:33] Entity 30 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:33] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:33] Entity 25 (Sammy) performed: Prayer - self-directed action
+[2026-06-01 12:52:33] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 0 (Stella) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:34] Entity 8 (Campbell) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:34] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 37 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:34] Entity 1 (Alexander) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:34] Entity 9 (Marques) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:34] Entity 12 (Marques) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:34] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 34 (Isiah) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:34] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 20 (Selah) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:34] Entity 3 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:34] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 26 (Stella) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:34] Entity 13 (Casey) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:34] Entity 29 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 27 (Campbell) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:34] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 25 (Sammy) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:34] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 16 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:34] Entity 17 (Jazlynn) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:34] Entity 32 (Isiah) performed: Prayer - self-directed action
+[2026-06-01 12:52:34] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 18 (Amari) performed: ChallengeLeader targeting Makaila - targeted action
+[2026-06-01 12:52:34] Entity 36 (Makaila) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:34] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:34] Entity 31 (Mckinley) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:35] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 8 (Campbell) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:35] Entity 11 (Bethany) performed: Scrolling - self-directed action
+[2026-06-01 12:52:35] Entity 39 (Amari) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:35] Entity 21 (Campbell) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:35] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 1 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 9 (Marques) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:35] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 19 (Campbell) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:35] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 23 (Mckinley) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:35] Entity 5 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 26 (Stella) performed: Preach targeting Jazlynn - targeted action
+[2026-06-01 12:52:35] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:35] Entity 35 (Griffin) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:35] Entity 4 (Yahir) performed: EatMeal - self-directed action
+[2026-06-01 12:52:35] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 13 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:35] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 22 (Mckinley) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:35] Entity 29 (Bethany) performed: Scrolling - self-directed action
+[2026-06-01 12:52:35] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:35] Entity 14 (Stella) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:35] Entity 15 (Fletcher) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:35] Entity 7 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:35] Entity 32 (Isiah) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:35] Entity 30 (Campbell) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:35] Entity 18 (Amari) performed: Scrolling - self-directed action
+[2026-06-01 12:52:35] Entity 25 (Sammy) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:35] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 36 (Makaila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:35] Entity 31 (Mckinley) performed: Preach - self-directed action
+[2026-06-01 12:52:36] Entity 0 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:36] Entity 8 (Campbell) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:36] Entity 11 (Bethany) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:36] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:36] Entity 4 (Yahir) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:36] Entity 31 (Mckinley) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:36] Entity 1 (Alexander) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:36] Entity 9 (Marques) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:36] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:36] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:36] Entity 34 (Isiah) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:36] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:36] Entity 36 (Makaila) performed: Prayer - self-directed action
+[2026-06-01 12:52:36] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:36] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:36] Entity 23 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:36] Entity 7 (Casey) performed: Scrolling - self-directed action
+[2026-06-01 12:52:36] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:36] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:36] Entity 20 (Selah) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:36] Entity 21 (Campbell) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:37] Entity 26 (Stella) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:37] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:37] Entity 15 (Fletcher) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:37] Entity 5 (Sammy) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:37] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:37] Entity 29 (Bethany) performed: Preach targeting Jazlynn - targeted action
+[2026-06-01 12:52:37] Entity 37 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:37] Entity 38 (Julien) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:37] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:37] Entity 6 (Kamila) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:37] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:37] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:37] Entity 32 (Isiah) performed: ChallengeLeader targeting Kamila - targeted action
+[2026-06-01 12:52:37] Entity 10 (Fletcher) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:37] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:37] Entity 22 (Mckinley) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:37] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:37] Entity 30 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:38] Entity 0 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:38] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:38] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:38] Entity 39 (Amari) performed: EatMeal - self-directed action
+[2026-06-01 12:52:38] Entity 16 (Fletcher) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:38] Entity 5 (Sammy) performed: Scrolling - self-directed action
+[2026-06-01 12:52:38] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:38] Entity 9 (Marques) performed: Prayer - self-directed action
+[2026-06-01 12:52:38] Entity 12 (Marques) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:38] Entity 33 (Alexander) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:38] Entity 34 (Isiah) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:38] Entity 23 (Mckinley) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:38] Entity 15 (Fletcher) performed: Prayer - self-directed action
+[2026-06-01 12:52:38] Entity 2 (Alexander) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:38] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:38] Entity 22 (Mckinley) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:38] Entity 37 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:38] Entity 3 (Amari) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:38] Entity 19 (Campbell) performed: EatMeal - self-directed action
+[2026-06-01 12:52:38] Entity 20 (Selah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:38] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:38] Entity 26 (Stella) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:38] Entity 36 (Makaila) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:38] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:38] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:38] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:38] Entity 13 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:38] Entity 27 (Campbell) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:38] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:38] Entity 35 (Griffin) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:38] Entity 31 (Mckinley) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:39] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:39] Entity 7 (Casey) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:39] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:39] Entity 14 (Stella) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:39] Entity 18 (Amari) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:39] Entity 32 (Isiah) performed: Smoke - self-directed action
+[2026-06-01 12:52:39] Entity 30 (Campbell) performed: Scrolling - self-directed action
+[2026-06-01 12:52:39] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 0 (Stella) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:40] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 11 (Bethany) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:40] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 18 (Amari) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:40] Entity 14 (Stella) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:40] Entity 1 (Alexander) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:40] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 12 (Marques) performed: EatMeal - self-directed action
+[2026-06-01 12:52:40] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:40] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:40] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 2 (Alexander) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:40] Entity 24 (Mckinley) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:40] Entity 4 (Yahir) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:40] Entity 23 (Mckinley) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:40] Entity 3 (Amari) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:40] Entity 19 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:40] Entity 20 (Selah) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:40] Entity 21 (Campbell) performed: Scrolling - self-directed action
+[2026-06-01 12:52:40] Entity 26 (Stella) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:40] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 30 (Campbell) performed: Negotiate targeting Campbell - targeted action
+[2026-06-01 12:52:40] Entity 5 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:40] Entity 25 (Sammy) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:40] Entity 37 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:40] Entity 6 (Kamila) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:40] Entity 16 (Fletcher) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:40] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:40] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 15 (Fletcher) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:40] Entity 17 (Jazlynn) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 27 (Campbell) performed: Preach targeting Jazlynn - targeted action
+[2026-06-01 12:52:40] Entity 36 (Makaila) performed: Scrolling - self-directed action
+[2026-06-01 12:52:40] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:40] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 0 (Stella) performed: Scrolling - self-directed action
+[2026-06-01 12:52:41] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:41] Entity 11 (Bethany) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:41] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 30 (Campbell) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:41] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:41] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 9 (Marques) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:41] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:41] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:41] Entity 34 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 10 (Fletcher) performed: Scrolling - self-directed action
+[2026-06-01 12:52:41] Entity 29 (Bethany) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:41] Entity 2 (Alexander) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:41] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 38 (Julien) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:41] Entity 3 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:41] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 21 (Campbell) performed: Scrolling - self-directed action
+[2026-06-01 12:52:41] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:41] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 13 (Casey) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:52:41] Entity 4 (Yahir) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:41] Entity 27 (Campbell) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:41] Entity 35 (Griffin) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:41] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 37 (Mckinley) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:41] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:41] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 6 (Kamila) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:41] Entity 22 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:41] Entity 14 (Stella) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:41] Entity 7 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:41] Entity 36 (Makaila) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:41] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:41] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 0 (Stella) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:42] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 11 (Bethany) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:42] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 10 (Fletcher) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:42] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 1 (Alexander) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:42] Entity 9 (Marques) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:42] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 34 (Isiah) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:42] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 25 (Sammy) performed: EatMeal - self-directed action
+[2026-06-01 12:52:42] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 19 (Campbell) performed: Scrolling - self-directed action
+[2026-06-01 12:52:42] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 23 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:42] Entity 26 (Stella) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:42] Entity 15 (Fletcher) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:42] Entity 17 (Jazlynn) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:42] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 27 (Campbell) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:42] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 29 (Bethany) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:42] Entity 5 (Sammy) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:42] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 37 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:42] Entity 7 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:42] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 30 (Campbell) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:42] Entity 22 (Mckinley) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:42] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:42] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:43] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:43] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:43] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:43] Entity 39 (Amari) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:43] Entity 35 (Griffin) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:43] Entity 19 (Campbell) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:43] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:43] Entity 9 (Marques) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:43] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:43] Entity 33 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:43] Entity 34 (Isiah) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:43] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:43] Entity 23 (Mckinley) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:43] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:43] Entity 24 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:43] Entity 7 (Casey) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:43] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:43] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:43] Entity 20 (Selah) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:44] Entity 21 (Campbell) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:44] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:44] Entity 10 (Fletcher) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:44] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:44] Entity 5 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:44] Entity 25 (Sammy) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:44] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:44] Entity 37 (Mckinley) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:44] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:44] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:44] Entity 13 (Casey) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:44] Entity 14 (Stella) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:44] Entity 15 (Fletcher) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:44] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:44] Entity 36 (Makaila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:44] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:44] Entity 22 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:44] Entity 30 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:44] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:44] Entity 38 (Julien) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:45] Entity 0 (Stella) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:45] Entity 8 (Campbell) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:45] Entity 11 (Bethany) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:45] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 37 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 9 (Marques) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:45] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:45] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 21 (Campbell) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:45] Entity 23 (Mckinley) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:45] Entity 2 (Alexander) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:45] Entity 24 (Mckinley) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:45] Entity 14 (Stella) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:45] Entity 4 (Yahir) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:45] Entity 3 (Amari) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:45] Entity 19 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 20 (Selah) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:45] Entity 26 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 5 (Sammy) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:45] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:45] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 16 (Fletcher) performed: ChallengeLeader targeting Kamila - targeted action
+[2026-06-01 12:52:45] Entity 29 (Bethany) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:45] Entity 35 (Griffin) performed: ChallengeLeader targeting Kamila - targeted action
+[2026-06-01 12:52:45] Entity 31 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 22 (Mckinley) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:45] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 13 (Casey) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:45] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 15 (Fletcher) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:45] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:45] Entity 36 (Makaila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:45] Entity 32 (Isiah) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:46] Entity 0 (Stella) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:46] Entity 8 (Campbell) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:46] Entity 11 (Bethany) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:46] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 32 (Isiah) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:46] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 1 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 9 (Marques) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:46] Entity 12 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 33 (Alexander) performed: Prayer - self-directed action
+[2026-06-01 12:52:46] Entity 34 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 7 (Casey) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:46] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 2 (Alexander) performed: Scrolling - self-directed action
+[2026-06-01 12:52:46] Entity 24 (Mckinley) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:46] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 3 (Amari) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:46] Entity 20 (Selah) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:46] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 22 (Mckinley) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:46] Entity 4 (Yahir) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:46] Entity 27 (Campbell) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:46] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 18 (Amari) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:46] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:46] Entity 5 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 29 (Bethany) performed: Preach targeting Jazlynn - targeted action
+[2026-06-01 12:52:46] Entity 37 (Mckinley) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:46] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:46] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:46] Entity 14 (Stella) performed: Scrolling - self-directed action
+[2026-06-01 12:52:46] Entity 15 (Fletcher) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:46] Entity 36 (Makaila) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:46] Entity 31 (Mckinley) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:46] Entity 16 (Fletcher) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:47] Entity 0 (Stella) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:47] Entity 8 (Campbell) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:47] Entity 11 (Bethany) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:47] Entity 39 (Amari) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:47] Entity 20 (Selah) performed: Prayer - self-directed action
+[2026-06-01 12:52:47] Entity 4 (Yahir) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:47] Entity 1 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:47] Entity 12 (Marques) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:47] Entity 33 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:47] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:47] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:47] Entity 2 (Alexander) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:47] Entity 24 (Mckinley) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:47] Entity 36 (Makaila) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:47] Entity 30 (Campbell) performed: EatMeal - self-directed action
+[2026-06-01 12:52:47] Entity 3 (Amari) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:47] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:47] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 23 (Mckinley) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:47] Entity 26 (Stella) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:47] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 17 (Jazlynn) performed: Prayer - self-directed action
+[2026-06-01 12:52:47] Entity 5 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 29 (Bethany) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:47] Entity 37 (Mckinley) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:47] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:47] Entity 6 (Kamila) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:47] Entity 16 (Fletcher) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:47] Entity 35 (Griffin) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:47] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:47] Entity 32 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:47] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:47] Entity 31 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:47] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:48] Entity 11 (Bethany) performed: EatMeal - self-directed action
+[2026-06-01 12:52:48] Entity 39 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:48] Entity 37 (Mckinley) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:48] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:48] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 9 (Marques) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:48] Entity 12 (Marques) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:48] Entity 33 (Alexander) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:48] Entity 38 (Julien) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:48] Entity 22 (Mckinley) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:48] Entity 2 (Alexander) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:48] Entity 24 (Mckinley) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:48] Entity 13 (Casey) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:48] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 3 (Amari) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:48] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:48] Entity 20 (Selah) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:48] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:48] Entity 23 (Mckinley) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:48] Entity 26 (Stella) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:48] Entity 17 (Jazlynn) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:48] Entity 4 (Yahir) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:48] Entity 5 (Sammy) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:48] Entity 25 (Sammy) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:48] Entity 31 (Mckinley) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:48] Entity 10 (Fletcher) performed: EatMeal - self-directed action
+[2026-06-01 12:52:48] Entity 6 (Kamila) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:48] Entity 16 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:48] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 27 (Campbell) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:48] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 7 (Casey) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:48] Entity 14 (Stella) performed: FulfillDuty - self-directed action
+[2026-06-01 12:52:48] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 15 (Fletcher) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:48] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:48] Entity 30 (Campbell) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:49] Entity 0 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:49] Entity 8 (Campbell) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:49] Entity 11 (Bethany) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:49] Entity 39 (Amari) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:49] Entity 9 (Marques) performed: Prayer - self-directed action
+[2026-06-01 12:52:49] Entity 37 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 1 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:49] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:49] Entity 33 (Alexander) performed: Scrolling - self-directed action
+[2026-06-01 12:52:49] Entity 34 (Isiah) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:49] Entity 10 (Fletcher) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:49] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:49] Entity 24 (Mckinley) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:49] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 18 (Amari) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:49] Entity 3 (Amari) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:49] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 21 (Campbell) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:49] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:49] Entity 7 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 27 (Campbell) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:49] Entity 38 (Julien) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:49] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 14 (Stella) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:49] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 29 (Bethany) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:49] Entity 22 (Mckinley) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:49] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 6 (Kamila) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:49] Entity 31 (Mckinley) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:49] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:49] Entity 17 (Jazlynn) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:49] Entity 36 (Makaila) performed: EatMeal - self-directed action
+[2026-06-01 12:52:50] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 8 (Campbell) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:50] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:50] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:50] Entity 36 (Makaila) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:50] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 9 (Marques) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:50] Entity 12 (Marques) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:50] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 34 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 29 (Bethany) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:50] Entity 32 (Isiah) performed: Prayer - self-directed action
+[2026-06-01 12:52:50] Entity 2 (Alexander) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:50] Entity 24 (Mckinley) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:50] Entity 31 (Mckinley) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:50] Entity 10 (Fletcher) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:50] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:50] Entity 20 (Selah) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:50] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:50] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:50] Entity 27 (Campbell) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:50] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:51] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:51] Entity 7 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:51] Entity 5 (Sammy) performed: Scrolling - self-directed action
+[2026-06-01 12:52:51] Entity 37 (Mckinley) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:51] Entity 30 (Campbell) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:51] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:51] Entity 15 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:51] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:51] Entity 22 (Mckinley) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:51] Entity 18 (Amari) performed: EatMeal - self-directed action
+[2026-06-01 12:52:52] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 8 (Campbell) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:52] Entity 11 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 39 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 5 (Sammy) performed: FulfillDuty - self-directed action
+[2026-06-01 12:52:52] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 9 (Marques) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:52] Entity 12 (Marques) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:52] Entity 33 (Alexander) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:52] Entity 34 (Isiah) performed: Scrolling - self-directed action
+[2026-06-01 12:52:52] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 7 (Casey) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:52] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 24 (Mckinley) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:52] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 32 (Isiah) performed: ChallengeLeader targeting Julien - targeted action
+[2026-06-01 12:52:52] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 19 (Campbell) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:52] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 23 (Mckinley) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:52] Entity 26 (Stella) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:52] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 4 (Yahir) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:52] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 35 (Griffin) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:52] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 29 (Bethany) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:52] Entity 31 (Mckinley) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:52] Entity 17 (Jazlynn) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:52] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:52] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:52] Entity 22 (Mckinley) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:52] Entity 30 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:53] Entity 0 (Stella) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:53] Entity 8 (Campbell) performed: ChallengeLeader targeting Makaila - targeted action
+[2026-06-01 12:52:53] Entity 11 (Bethany) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:53] Entity 39 (Amari) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:53] Entity 36 (Makaila) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:53] Entity 7 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 1 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 9 (Marques) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:53] Entity 12 (Marques) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:53] Entity 33 (Alexander) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:53] Entity 34 (Isiah) performed: Negotiate targeting Stella - targeted action
+[2026-06-01 12:52:53] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 23 (Mckinley) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:53] Entity 2 (Alexander) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:53] Entity 24 (Mckinley) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:53] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 4 (Yahir) performed: EatMeal - self-directed action
+[2026-06-01 12:52:53] Entity 3 (Amari) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:53] Entity 19 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 20 (Selah) performed: Prayer - self-directed action
+[2026-06-01 12:52:53] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 26 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 22 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:53] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 5 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:53] Entity 25 (Sammy) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 29 (Bethany) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:53] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:53] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 10 (Fletcher) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:53] Entity 15 (Fletcher) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:53] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:53] Entity 31 (Mckinley) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:52:53] Entity 32 (Isiah) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:54] Entity 0 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:54] Entity 39 (Amari) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:54] Entity 7 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:54] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:54] Entity 1 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:54] Entity 9 (Marques) performed: EatMeal - self-directed action
+[2026-06-01 12:52:54] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:54] Entity 33 (Alexander) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:54] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 23 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 16 (Fletcher) performed: Scrolling - self-directed action
+[2026-06-01 12:52:54] Entity 2 (Alexander) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:54] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:54] Entity 18 (Amari) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:54] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 19 (Campbell) performed: ChallengeLeader targeting Jazlynn - targeted action
+[2026-06-01 12:52:54] Entity 20 (Selah) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:54] Entity 26 (Stella) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:54] Entity 4 (Yahir) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:54] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 5 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:54] Entity 25 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:54] Entity 29 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:54] Entity 37 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:54] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:54] Entity 32 (Isiah) performed: Preach targeting Julien - targeted action
+[2026-06-01 12:52:54] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:54] Entity 14 (Stella) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:54] Entity 22 (Mckinley) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:52:54] Entity 13 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:54] Entity 31 (Mckinley) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:54] Entity 27 (Campbell) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:54] Entity 15 (Fletcher) performed: ChallengeLeader targeting Makaila - targeted action
+[2026-06-01 12:52:54] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:54] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 0 (Stella) performed: Preach targeting Amari - targeted action
+[2026-06-01 12:52:55] Entity 8 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 39 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 21 (Campbell) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:55] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 1 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 9 (Marques) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:55] Entity 12 (Marques) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:52:55] Entity 33 (Alexander) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:52:55] Entity 34 (Isiah) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:55] Entity 27 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 4 (Yahir) performed: SeekTherapy - self-directed action
+[2026-06-01 12:52:55] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 24 (Mckinley) performed: Scrolling - self-directed action
+[2026-06-01 12:52:55] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 19 (Campbell) performed: Preach targeting Selah - targeted action
+[2026-06-01 12:52:55] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 23 (Mckinley) performed: Prayer - self-directed action
+[2026-06-01 12:52:55] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 36 (Makaila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 5 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:55] Entity 25 (Sammy) performed: EatMeal - self-directed action
+[2026-06-01 12:52:55] Entity 29 (Bethany) performed: ChallengeLeader targeting Fletcher - targeted action
+[2026-06-01 12:52:55] Entity 37 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 10 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 16 (Fletcher) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:55] Entity 7 (Casey) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:52:55] Entity 13 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 32 (Isiah) performed: Smoke - self-directed action
+[2026-06-01 12:52:55] Entity 30 (Campbell) performed: Preach targeting Griffin - targeted action
+[2026-06-01 12:52:55] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:55] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:55] Entity 31 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 0 (Stella) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:56] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 11 (Bethany) performed: Preach targeting Stella - targeted action
+[2026-06-01 12:52:56] Entity 39 (Amari) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:56] Entity 26 (Stella) performed: Prayer - self-directed action
+[2026-06-01 12:52:56] Entity 30 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:56] Entity 1 (Alexander) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:56] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 12 (Marques) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 33 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 34 (Isiah) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:56] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 31 (Mckinley) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:56] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 24 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:56] Entity 21 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 20 (Selah) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:56] Entity 3 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 19 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 13 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:56] Entity 16 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 4 (Yahir) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 10 (Fletcher) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:52:56] Entity 27 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 38 (Julien) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 37 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:56] Entity 36 (Makaila) performed: Preach targeting Mckinley - targeted action
+[2026-06-01 12:52:56] Entity 5 (Sammy) performed: Sleep - self-directed action
+[2026-06-01 12:52:56] Entity 25 (Sammy) performed: ChallengeLeader targeting Bethany - targeted action
+[2026-06-01 12:52:56] Entity 29 (Bethany) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:56] Entity 15 (Fletcher) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:56] Entity 32 (Isiah) performed: Prayer - self-directed action
+[2026-06-01 12:52:56] Entity 6 (Kamila) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 14 (Stella) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:56] Entity 7 (Casey) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:56] Entity 17 (Jazlynn) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:52:56] Entity 18 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:57] Entity 0 (Stella) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:57] Entity 8 (Campbell) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:57] Entity 11 (Bethany) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:57] Entity 39 (Amari) performed: Preach targeting Bethany - targeted action
+[2026-06-01 12:52:58] Entity 5 (Sammy) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:58] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 1 (Alexander) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:58] Entity 9 (Marques) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:58] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:52:58] Entity 33 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 34 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 29 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:58] Entity 3 (Amari) performed: EatMeal - self-directed action
+[2026-06-01 12:52:58] Entity 19 (Campbell) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:58] Entity 20 (Selah) performed: Preach targeting Campbell - targeted action
+[2026-06-01 12:52:58] Entity 21 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 26 (Stella) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:58] Entity 18 (Amari) performed: Prayer - self-directed action
+[2026-06-01 12:52:58] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 4 (Yahir) performed: Scrolling - self-directed action
+[2026-06-01 12:52:58] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:58] Entity 13 (Casey) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 27 (Campbell) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:58] Entity 35 (Griffin) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:58] Entity 37 (Mckinley) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:52:58] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 6 (Kamila) performed: ChallengeLeader targeting Sammy - targeted action
+[2026-06-01 12:52:58] Entity 16 (Fletcher) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:52:58] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 25 (Sammy) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 7 (Casey) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:58] Entity 17 (Jazlynn) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 31 (Mckinley) performed: Preach targeting Jazlynn - targeted action
+[2026-06-01 12:52:58] Entity 36 (Makaila) performed: ChallengeLeader targeting Casey - targeted action
+[2026-06-01 12:52:58] Entity 22 (Mckinley) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:58] Entity 32 (Isiah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:58] Entity 24 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 8 (Campbell) performed: Preach targeting Makaila - targeted action
+[2026-06-01 12:52:59] Entity 11 (Bethany) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 39 (Amari) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:52:59] Entity 36 (Makaila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 7 (Casey) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:59] Entity 1 (Alexander) performed: ChallengeLeader targeting Alexander - targeted action
+[2026-06-01 12:52:59] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 12 (Marques) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:59] Entity 33 (Alexander) performed: Preach targeting Alexander - targeted action
+[2026-06-01 12:52:59] Entity 34 (Isiah) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:59] Entity 3 (Amari) performed: Preach targeting Marques - targeted action
+[2026-06-01 12:52:59] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 2 (Alexander) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:59] Entity 24 (Mckinley) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:59] Entity 15 (Fletcher) performed: Preach targeting Jazlynn - targeted action
+[2026-06-01 12:52:59] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:59] Entity 4 (Yahir) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 10 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:59] Entity 13 (Casey) performed: Prayer - self-directed action
+[2026-06-01 12:52:59] Entity 27 (Campbell) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:59] Entity 38 (Julien) performed: Scrolling - self-directed action
+[2026-06-01 12:52:59] Entity 35 (Griffin) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 22 (Mckinley) performed: Procrastinate - self-directed action
+[2026-06-01 12:52:59] Entity 26 (Stella) performed: EatMeal - self-directed action
+[2026-06-01 12:52:59] Entity 5 (Sammy) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:59] Entity 25 (Sammy) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:59] Entity 29 (Bethany) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:59] Entity 37 (Mckinley) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:52:59] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 21 (Campbell) performed: Prayer - self-directed action
+[2026-06-01 12:52:59] Entity 14 (Stella) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:52:59] Entity 20 (Selah) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 16 (Fletcher) performed: EatMeal - self-directed action
+[2026-06-01 12:52:59] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:52:59] Entity 19 (Campbell) performed: PerformRitual - self-directed action
+[2026-06-01 12:52:59] Entity 32 (Isiah) performed: ChallengeLeader targeting Mckinley - targeted action
+[2026-06-01 12:52:59] Entity 31 (Mckinley) performed: Preach targeting Isiah - targeted action
+[2026-06-01 12:53:00] Entity 0 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 8 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 11 (Bethany) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:53:00] Entity 39 (Amari) performed: ChallengeLeader targeting Stella - targeted action
+[2026-06-01 12:53:00] Entity 33 (Alexander) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:53:00] Entity 18 (Amari) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 1 (Alexander) performed: Preach targeting Sammy - targeted action
+[2026-06-01 12:53:00] Entity 9 (Marques) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 12 (Marques) performed: ChallengeLeader targeting Isiah - targeted action
+[2026-06-01 12:53:00] Entity 34 (Isiah) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:53:00] Entity 30 (Campbell) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 5 (Sammy) performed: ChallengeLeader targeting Marques - targeted action
+[2026-06-01 12:53:00] Entity 2 (Alexander) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 24 (Mckinley) performed: ChallengeLeader targeting Amari - targeted action
+[2026-06-01 12:53:00] Entity 3 (Amari) performed: PerformRitual - self-directed action
+[2026-06-01 12:53:00] Entity 16 (Fletcher) performed: PerformRitual - self-directed action
+[2026-06-01 12:53:00] Entity 4 (Yahir) performed: SeekTherapy - self-directed action
+[2026-06-01 12:53:00] Entity 10 (Fletcher) performed: ChallengeLeader targeting Griffin - targeted action
+[2026-06-01 12:53:00] Entity 13 (Casey) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:53:00] Entity 27 (Campbell) performed: Preach targeting Yahir - targeted action
+[2026-06-01 12:53:00] Entity 38 (Julien) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 35 (Griffin) performed: ChallengeLeader targeting Yahir - targeted action
+[2026-06-01 12:53:00] Entity 22 (Mckinley) performed: Scrolling - self-directed action
+[2026-06-01 12:53:00] Entity 25 (Sammy) performed: Preach targeting Fletcher - targeted action
+[2026-06-01 12:53:00] Entity 6 (Kamila) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 23 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 29 (Bethany) performed: PerformRitual - self-directed action
+[2026-06-01 12:53:00] Entity 32 (Isiah) performed: Preach targeting Kamila - targeted action
+[2026-06-01 12:53:00] Entity 15 (Fletcher) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 7 (Casey) performed: ChallengeLeader targeting Selah - targeted action
+[2026-06-01 12:53:00] Entity 17 (Jazlynn) performed: PerformRitual - self-directed action
+[2026-06-01 12:53:00] Entity 20 (Selah) performed: Preach targeting Casey - targeted action
+[2026-06-01 12:53:00] Entity 21 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:53:00] Entity 19 (Campbell) performed: ChallengeLeader targeting Campbell - targeted action
+[2026-06-01 12:53:00] Entity 14 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 26 (Stella) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:00] Entity 36 (Makaila) performed: Prayer - self-directed action
+[2026-06-01 12:53:00] Entity 31 (Mckinley) performed: LeadGroup - self-directed action
+[2026-06-01 12:53:01] Entity 37 (Mckinley) performed: Preach targeting Makaila - targeted action

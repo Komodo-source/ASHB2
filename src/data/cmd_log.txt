@@ -99,3 +99,15 @@
 [2026-06-01 12:51:59] Entity contaminated: 33 Alexander => Malaria
 [2026-06-01 12:52:04] Entity contaminated: 37 Mckinley => Typhus
 [2026-06-01 12:52:09] Entity contaminated: 9 Marques => Fever
+[2026-06-01 12:52:10] Entity contaminated: 9 Marques => Typhus
+[2026-06-01 12:52:12] Entity contaminated: 5 Sammy => Malaria
+[2026-06-01 12:52:17] Entity contaminated: 20 Selah => Malaria
+[2026-06-01 12:52:20] Entity contaminated: 19 Campbell => Malaria
+[2026-06-01 12:52:21] Entity contaminated: 25 Sammy => Typhus
+[2026-06-01 12:52:26] Entity contaminated: 1 Alexander => Typhus
+[2026-06-01 12:52:34] Entity contaminated: 0 Stella => Plague
+[2026-06-01 12:52:38] Entity contaminated: 26 Stella => Plague
+[2026-06-01 12:52:45] Entity contaminated: 39 Amari => Fever
+[2026-06-01 12:52:48] Entity contaminated: 11 Bethany => Typhus
+[2026-06-01 12:52:49] Entity contaminated: 23 Mckinley => Fever
+[2026-06-01 12:52:52] Entity contaminated: 15 Fletcher => Malaria
