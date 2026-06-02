@@ -260,7 +260,7 @@ float FreeWillSystem::calculateContextualWeight(const Action& action, const Acti
         if (context.numPeopleNearby == 0) modifier *= 0.75f;
         if (context.numPeopleNearby > 0 && context.numPeopleNearby <= 2) modifier *= 1.2f;
     }
-    if (action.name == "Socialize" && context.numPeopleNearby > 3) modifier *= 1.5f;
+    if (action.name == "Socialize" && context.numPeopleNearby > 3) modifier *= 2.5f;
 
     // Extreme negative actions drastically reduced in public
     if (action.name == "Murder" && context.isInPublic) modifier *= 0.05f;
@@ -439,7 +439,7 @@ float FreeWillSystem::calculateGriefModifier(Entity* entity, const Action& actio
 // Basing in only neighboorhood pheromones try to calculate how much impact does it have on anyone
 //
 float FreeWillSystem::calculateEnvironningPheromones(const std::vector<Entity*>& neighbors, const Action* action) {
-    float modifier = 1.0f;
+    float modifier = 2.5f;
     if(season == "spring"){
         modifier = 1.2f;
     }else if(season == "summer"){
@@ -455,18 +455,20 @@ float FreeWillSystem::calculateEnvironningPheromones(const std::vector<Entity*>&
         if (an == "Socialize" || an == "GoodConnection" || an == "AngerConnection" ||
         an == "Gossip" || an == "HelpSupport" || an == "Apologize" || an == "Insult" ||  an == "Discrimination" || an == "IgnoreAvoid" ){
             if(neighboor->pheromone.type == "social"){
-                modifier += ((neighboor->pheromone.releasing_level) / 100) * 1.0;
+                modifier += ((neighboor->pheromone.releasing_level) / 100) * 2.5;
             }
         }else if(an == "Breeding"){
             if(neighboor->pheromone.type == "breeding"){
-                modifier += ((neighboor->pheromone.releasing_level) / 100) * 1.0;
+                modifier += ((neighboor->pheromone.releasing_level) / 100) * 2.5;
             }
 
         }else if  (an == "Desire" || an == "Flirt" || an == "Date" || an == "Reconcile" ||
                                       an == "couple" || an == "breeding" || an == "Jealousy" || an == "SetBoundaries"){
             if(neighboor->pheromone.type == "procreation_simulation" || neighboor->pheromone.type == "sex"){
-                modifier += ((neighboor->pheromone.releasing_level) / 100) * 1.0;
+                modifier += ((neighboor->pheromone.releasing_level) / 100) * 2.5;
             }
+        }else{
+            modifier = 4.0f;
         }
     }
     return modifier;
@@ -555,7 +557,7 @@ float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action&
     const Personality& p = entity->personality;
 
     if (action.needCategory == "social") {
-        modifier *= 0.5f + (p.extraversion / 100.0f); // 0.5x to 1.5x
+        modifier *= 0.8f + (p.extraversion / 100.0f) * 1.4f; // 0.8x to 2.2x
     }
     if (action.name == "Murder" || action.name == "Discrimination" || action.name == "Insult" || action.name == "Betray" || action.name == "AngerConnection" || action.name == "Manipulate") {
         modifier *= 1.5f - (p.agreeableness / 100.0f); // 1.5x to 0.5x
@@ -574,6 +576,9 @@ float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action&
     }
     if (action.name == "DrinkAlcohol" || action.name == "Smoke") {
         modifier *= 0.7f + (p.neuroticism / 150.0f); // 0.7x to ~1.37x
+    }
+    if (action.name == "AngerConnection" || action.name == "Insult" || action.name == "Discrimination" ) {
+        modifier *= 2.0f - (p.agreeableness / 100.0f); // 2.0x to 1.0x instead of 1.5x to 0.5x
     }
    //if (action.name == "Prayer" || action.name == "SeekTherapy" || action.name == "Exercise") {
    //    modifier *= 1.0f + ((100.0f - p.neuroticism) / 200.0f);
@@ -950,7 +955,7 @@ void FreeWillSystem::initializeActions() {
     leadGroup.requirements = { {"happiness", 55.0f, 0.6f}, {"loneliness", 20.0f, 0.3f} };
     leadGroup.statChanges  = { {"loneliness", -10.0f}, {"stress", 4.0f},
                                 {"boredom", -14.0f},   {"happiness", 6.0f} };
-    leadGroup.baseSatisfaction = 28.0f;
+    leadGroup.baseSatisfaction = 12.0f;
     availableActions.push_back(leadGroup);
 
     // Preach — spiritually-inclined entities share their belief with a target
@@ -959,7 +964,7 @@ void FreeWillSystem::initializeActions() {
     preach.requirements = { {"mentalHealth", 55.0f, 0.6f}, {"boredom", 25.0f, 0.4f} };
     preach.statChanges  = { {"loneliness", -12.0f}, {"stress", -4.0f},
                              {"boredom", -10.0f},   {"happiness", 8.0f} };
-    preach.baseSatisfaction = 22.0f;
+    preach.baseSatisfaction = 10.0f;
     availableActions.push_back(preach);
 
     // PerformRitual — communal ceremony; reduces stress, builds group identity
@@ -968,7 +973,7 @@ void FreeWillSystem::initializeActions() {
     ritual.requirements = { {"stress", 35.0f, 0.5f}, {"mentalHealth", 40.0f, 0.4f} };
     ritual.statChanges  = { {"stress", -14.0f}, {"loneliness", -10.0f},
                              {"mentalHealth", 9.0f}, {"happiness", 6.0f} };
-    ritual.baseSatisfaction = 24.0f;
+    ritual.baseSatisfaction = 10.0f;
     availableActions.push_back(ritual);
 
     // Invent — high-openness/curiosity entities make discoveries
@@ -977,7 +982,7 @@ void FreeWillSystem::initializeActions() {
     invent.requirements = { {"boredom", 45.0f, 0.7f}, {"mentalHealth", 50.0f, 0.4f} };
     invent.statChanges  = { {"boredom", -22.0f}, {"happiness", 14.0f},
                              {"stress", 3.0f},   {"loneliness", 4.0f} };
-    invent.baseSatisfaction = 32.0f;
+    invent.baseSatisfaction = 10.0f;
     availableActions.push_back(invent);
 
     // TeachSkill — pass on known techniques to another entity
@@ -986,7 +991,7 @@ void FreeWillSystem::initializeActions() {
     teach.requirements = { {"happiness", 50.0f, 0.5f}, {"loneliness", 20.0f, 0.4f} };
     teach.statChanges  = { {"loneliness", -12.0f}, {"happiness", 9.0f},
                             {"boredom", -8.0f},    {"stress", -3.0f} };
-    teach.baseSatisfaction = 22.0f;
+    teach.baseSatisfaction = 10.0f;
     availableActions.push_back(teach);
 
     // FulfillDuty — act in service of one's tribe or community
@@ -995,7 +1000,7 @@ void FreeWillSystem::initializeActions() {
     duty.requirements = { {"stress", 20.0f, 0.3f}, {"health", 40.0f, 0.4f} };
     duty.statChanges  = { {"stress", -6.0f}, {"happiness", 6.0f},
                            {"loneliness", -6.0f}, {"boredom", -5.0f} };
-    duty.baseSatisfaction = 18.0f;
+    duty.baseSatisfaction = 8.0f;
     availableActions.push_back(duty);
 
     // ChallengeLeader — ambitious entity contests tribal hierarchy
@@ -1004,7 +1009,7 @@ void FreeWillSystem::initializeActions() {
     challenge.requirements = { {"anger", 48.0f, 0.7f}, {"happiness", 38.0f, 0.4f} };
     challenge.statChanges  = { {"anger", -18.0f}, {"stress", 12.0f},
                                 {"happiness", 8.0f}, {"mentalHealth", -5.0f} };
-    challenge.baseSatisfaction = 14.0f;
+    challenge.baseSatisfaction = 8.0f;
     availableActions.push_back(challenge);
 
     // DeclareWar — very high-anger, high-militarism entity initiates group conflict
@@ -1020,7 +1025,7 @@ void FreeWillSystem::initializeActions() {
     negotiate.requirements = { {"anger", 30.0f, 0.5f}, {"mentalHealth", 55.0f, 0.5f} };
     negotiate.statChanges  = { {"anger", -16.0f}, {"stress", -9.0f},
                                 {"loneliness", -6.0f}, {"happiness", 7.0f} };
-    negotiate.baseSatisfaction = 20.0f;
+    negotiate.baseSatisfaction = 10.0f;
     availableActions.push_back(negotiate);
 
     // Specialize — entity commits to a social role (farmer, warrior, priest, etc.)
@@ -1029,7 +1034,7 @@ void FreeWillSystem::initializeActions() {
     specialize.requirements = { {"happiness", 45.0f, 0.5f}, {"boredom", 38.0f, 0.5f} };
     specialize.statChanges  = { {"boredom", -18.0f}, {"happiness", 12.0f},
                                  {"stress", -5.0f},  {"loneliness", 2.0f} };
-    specialize.baseSatisfaction = 22.0f;
+    specialize.baseSatisfaction = 11.0f;
     availableActions.push_back(specialize);
 }
 
@@ -1384,6 +1389,25 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         else if (an == "Sleep") rarityMultiplier = 0.2f;
         else if (an == "Take Shower") rarityMultiplier = 0.05f;
 
+        else if (an == "LeadGroup")        rarityMultiplier = 0.15f;
+        else if (an == "Preach")           rarityMultiplier = 0.12f;
+        else if (an == "PerformRitual")    rarityMultiplier = 0.15f;
+        else if (an == "ChallengeLeader")  rarityMultiplier = 0.18f;
+        else if (an == "EatMeal")          rarityMultiplier = 0.25f;
+        else if (an == "Work on Project")  rarityMultiplier = 0.20f;
+        else if (an == "LearnSkill")       rarityMultiplier = 0.20f;
+        else if (an == "CreativeActivity") rarityMultiplier = 0.25f;
+        else if (an == "Read")             rarityMultiplier = 0.20f;
+        else if (an == "Rest")             rarityMultiplier = 0.25f;
+        else if (an == "Sleep")            rarityMultiplier = 0.15f;
+        else if (an == "Take Shower")      rarityMultiplier = 0.05f;
+        else if (an == "Invent")           rarityMultiplier = 0.10f;
+        else if (an == "TeachSkill")       rarityMultiplier = 0.15f;
+        else if (an == "FulfillDuty")      rarityMultiplier = 0.20f;
+        else if (an == "DeclareWar")       rarityMultiplier = 0.08f;
+        else if (an == "Negotiate")        rarityMultiplier = 0.25f;
+        else if (an == "Specialize")       rarityMultiplier = 0.15f;
+
         // self concept
         if (entity->SelfConcept.selfEfficacy < 40.0f && an == "Procrastinate") selfConceptMultiplier = 1.22f;
         else if (entity->SelfConcept.selfEfficacy < 40.0f && an == "WatchEntertainment") selfConceptMultiplier = 1.15f;
@@ -1406,13 +1430,21 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
                 float neighborBonus = std::min(1.5f, 0.8f + neighbors.size() * 0.15f);
                 rarityMultiplier *= neighborBonus;
 
-                if (an == "Socialize" || an == "GoodConnection" || an == "HelpSupport") rarityMultiplier *= 1.4f;
-                if (an == "Flirt" || an == "Date") rarityMultiplier *= 2.2f;
-                if (an == "Desire") rarityMultiplier *= 2.0f;
-                if (an == "couple" || an == "breeding") rarityMultiplier *= 2.8f;
-                if (an == "AngerConnection") rarityMultiplier *= 2.0f;
-                if (an == "Insult") rarityMultiplier *= 1.6f;
-                if (an == "Gossip") rarityMultiplier *= 0.7f;
+                if (an == "Socialize" || an == "GoodConnection" || an == "HelpSupport") rarityMultiplier *= 2.0f;  // was 1.4f
+                if (an == "Flirt" || an == "Date") rarityMultiplier *= 3.5f;            // was 2.2f
+                if (an == "Desire") rarityMultiplier *= 3.0f;                           // was 2.0f
+                if (an == "couple" || an == "breeding") rarityMultiplier *= 4.0f;     // was 2.8f
+                if (an == "AngerConnection") rarityMultiplier *= 3.0f;                // was 2.0f
+                if (an == "Insult") rarityMultiplier *= 2.5f;                          // was 1.6f
+                if (an == "Gossip") rarityMultiplier *= 1.5f;                        // was 0.7f (stop nerfing it)
+                if (an == "Apologize") rarityMultiplier *= 1.8f;
+                if (an == "Reconcile") rarityMultiplier *= 2.0f;
+                if (an == "Betray") rarityMultiplier *= 1.5f;
+                if (an == "Jealousy") rarityMultiplier *= 2.0f;
+                if (an == "Manipulate") rarityMultiplier *= 1.8f;
+                if (an == "IgnoreAvoid") rarityMultiplier *= 1.5f;
+                if (an == "SetBoundaries") rarityMultiplier *= 1.8f;
+                if (an == "DigitalSocial") rarityMultiplier *= 2.0f;
             }
         }
 
@@ -2289,7 +2321,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
         if (desire_index == -1 || pointer->list_entityPointedDesire[desire_index].desire < 15) {
             if (!pointed || !pointer){
-                return ; 
+                return ;
             }
             std::cout << "Date bloqué: pas assez de désir entre " << pointer->getName() << " et " << pointed->getName() << std::endl;
             return;

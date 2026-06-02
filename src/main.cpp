@@ -969,12 +969,12 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 sys.executeAction(entity, chosenAction, context, target);
 
                 //choosing side social action
-                if(entity->dayWithoutSocialAction > 3){
-                    Action* side_social_act = sys.ChooseSpecificSocialAction(entity);
-                    if (side_social_act) {
-                        sys.executeAction(entity, side_social_act, context, target);
-                    }
+                // if(entity->dayWithoutSocialAction >= 2){
+                Action* side_social_act = sys.ChooseSpecificSocialAction(entity);
+                if (side_social_act) {
+                    sys.executeAction(entity, side_social_act, context, target);
                 }
+                // }
                 //saving data
                 entity->saveEntityStats(chosenAction);
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, target->name, "targeted action");
