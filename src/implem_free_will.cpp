@@ -8,6 +8,8 @@
 #include "./header/ExternalData.h"
 #include "./header/SocialNormSystem.h"
 #include "./header/heritage.h"
+#include "./header/CivilizationEngine.h"
+#include "world/Lexicon.h"
 
 #include <algorithm>
 #include <cerrno>
@@ -299,23 +301,23 @@ float FreeWillSystem::calculateContextualWeight(const Action& action, const Acti
     // Situational proximity bonuses
     if (context.situationHint == "couple_nearby") {
         if (action.name == "Date" || action.name == "Flirt" || action.name == "Reconcile" ||
-            action.name == "GoodConnection" || action.name == "couple") modifier *= 4.0f;
+            action.name == "GoodConnection" || action.name == "couple" || action.name == "Marry") modifier *= 4.0f;
         if (action.name == "breeding" || action.name == "Desire") modifier *= 3.5f;
         if (action.name == "BreakUp") modifier *= 0.3f;
     }
     if (context.situationHint == "enemy_nearby") {
         if (action.name == "AngerConnection" || action.name == "Insult" ||
-            action.name == "Discrimination") modifier *= 4.0f;
-        if (action.name == "Apologize" || action.name == "SetBoundaries") modifier *= 1.8f;
+            action.name == "Discrimination" || action.name == "Duel" || action.name == "Raid") modifier *= 4.0f;
+        if (action.name == "Apologize" || action.name == "SetBoundaries" || action.name == "DefendTribe") modifier *= 1.8f;
         if (action.name == "Socialize" || action.name == "GoodConnection") modifier *= 0.4f;
     }
     if (context.situationHint == "family_nearby") {
         if (action.name == "HelpSupport" || action.name == "GoodConnection" ||
-            action.name == "Socialize") modifier *= 2.0f;
+            action.name == "Socialize" || action.name == "TellStory" || action.name == "Celebrate") modifier *= 2.0f;
     }
     if (context.situationHint == "desire_nearby") {
         if (action.name == "Flirt" || action.name == "Date" || action.name == "Desire" ||
-            action.name == "couple" || action.name == "breeding") modifier *= 4.5f;
+            action.name == "couple" || action.name == "breeding" || action.name == "Marry") modifier *= 4.5f;
     }
 
     return modifier;
@@ -596,8 +598,25 @@ float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action&
         modifier *= 1.3f - (p.extraversion / 200.0f); // 1.3x to 0.8x
     }
     // High extraversion increases flirting and dating
-    if (action.name == "Flirt" || action.name == "Date" || action.name == "couple") {
+    if (action.name == "Flirt" || action.name == "Date" || action.name == "couple"
+        || action.name == "Marry" || action.name == "Celebrate") {
         modifier *= 0.6f + (p.extraversion / 125.0f); // 0.6x to 1.4x
+    }
+    // Era-aware actions tied to personality
+    if (action.name == "Hunt" || action.name == "Raid" || action.name == "Duel") {
+        modifier *= 1.3f - (p.agreeableness / 200.0f); // warriors are less agreeable
+    }
+    if (action.name == "Farm" || action.name == "Gather") {
+        modifier *= 0.5f + (p.conscientiousness / 100.0f);
+    }
+    if (action.name == "Explore" || action.name == "TellStory") {
+        modifier *= 0.5f + (p.openness / 100.0f);
+    }
+    if (action.name == "Build" || action.name == "DefendTribe") {
+        modifier *= 0.5f + (p.conscientiousness / 100.0f);
+    }
+    if (action.name == "Mourn") {
+        modifier *= 0.3f + (p.neuroticism / 100.0f);
     }
 
     AttachmentStyle att = entity->dv.attachmentStyle;
@@ -1036,6 +1055,101 @@ void FreeWillSystem::initializeActions() {
                                  {"stress", -5.0f},  {"loneliness", 2.0f} };
     specialize.baseSatisfaction = 11.0f;
     availableActions.push_back(specialize);
+
+    // ════════════════════════════════════════════════════════════════════════
+    // ERA-AWARE SURVIVAL & CRAFT ACTIONS (Stone through Modern age)
+    // ════════════════════════════════════════════════════════════════════════
+    Action hunt("Hunt", 210, "survival");
+    hunt.requirements = { {"health", 70.0f, 0.5f}, {"boredom", 30.0f, 0.3f} };
+    hunt.statChanges  = { {"boredom", -12.0f}, {"happiness", 7.0f},
+                           {"health", 5.0f},    {"stress", 4.0f} };
+    hunt.baseSatisfaction = 14.0f;
+    availableActions.push_back(hunt);
+
+    Action gather("Gather", 211, "survival");
+    gather.requirements = { {"health", 60.0f, 0.4f}, {"stress", 50.0f, 0.3f} };
+    gather.statChanges  = { {"boredom", -10.0f}, {"happiness", 5.0f},
+                             {"health", 3.0f},    {"stress", -3.0f} };
+    gather.baseSatisfaction = 10.0f;
+    availableActions.push_back(gather);
+
+    Action farm("Farm", 212, "survival");
+    farm.requirements = { {"health", 65.0f, 0.5f}, {"stress", 45.0f, 0.4f} };
+    farm.statChanges  = { {"boredom", -14.0f}, {"happiness", 6.0f},
+                           {"health", 4.0f},    {"stress", 5.0f} };
+    farm.baseSatisfaction = 12.0f;
+    availableActions.push_back(farm);
+
+    Action build("Build", 213, "achievement");
+    build.requirements = { {"health", 70.0f, 0.6f}, {"stress", 55.0f, 0.4f} };
+    build.statChanges  = { {"boredom", -16.0f}, {"happiness", 10.0f},
+                            {"stress", 6.0f},    {"health", -2.0f} };
+    build.baseSatisfaction = 16.0f;
+    availableActions.push_back(build);
+
+    Action trade("Trade", 214, "social");
+    trade.requirements = { {"happiness", 45.0f, 0.5f}, {"loneliness", 25.0f, 0.4f} };
+    trade.statChanges  = { {"loneliness", -10.0f}, {"happiness", 9.0f},
+                            {"boredom", -8.0f},    {"stress", -4.0f} };
+    trade.baseSatisfaction = 14.0f;
+    availableActions.push_back(trade);
+
+    Action explore("Explore", 215, "achievement");
+    explore.requirements = { {"boredom", 45.0f, 0.7f}, {"health", 65.0f, 0.3f} };
+    explore.statChanges  = { {"boredom", -20.0f}, {"happiness", 12.0f},
+                              {"stress", 3.0f},    {"loneliness", 3.0f} };
+    explore.baseSatisfaction = 18.0f;
+    availableActions.push_back(explore);
+
+    Action duel("Duel", 216, "safety");
+    duel.requirements = { {"anger", 55.0f, 0.7f}, {"health", 60.0f, 0.5f} };
+    duel.statChanges  = { {"anger", -20.0f}, {"stress", -8.0f},
+                           {"health", -8.0f}, {"happiness", 5.0f} };
+    duel.baseSatisfaction = 12.0f;
+    availableActions.push_back(duel);
+
+    Action raid("Raid", 217, "safety");
+    raid.requirements = { {"anger", 50.0f, 0.6f}, {"health", 65.0f, 0.5f},
+                           {"stress", 45.0f, 0.4f} };
+    raid.statChanges  = { {"anger", -15.0f}, {"stress", -6.0f},
+                           {"health", -4.0f}, {"happiness", 4.0f} };
+    raid.baseSatisfaction = 10.0f;
+    availableActions.push_back(raid);
+
+    Action defendTribe("DefendTribe", 218, "safety");
+    defendTribe.requirements = { {"health", 55.0f, 0.5f}, {"anger", 35.0f, 0.4f} };
+    defendTribe.statChanges  = { {"stress", -8.0f}, {"happiness", 6.0f},
+                                  {"loneliness", -5.0f}, {"boredom", -8.0f} };
+    defendTribe.baseSatisfaction = 14.0f;
+    availableActions.push_back(defendTribe);
+
+    Action marry("Marry", 219, "social");
+    marry.requirements = { {"loneliness", 20.0f, 0.5f}, {"happiness", 50.0f, 0.6f} };
+    marry.statChanges  = { {"happiness", 30.0f}, {"loneliness", -20.0f},
+                            {"mentalHealth", 12.0f}, {"stress", -10.0f} };
+    marry.baseSatisfaction = 60.0f;
+    availableActions.push_back(marry);
+
+    Action mourn("Mourn", 220, "health");
+    mourn.requirements = { {"mentalHealth", 30.0f, 0.6f}, {"loneliness", 50.0f, 0.5f} };
+    mourn.statChanges  = { {"stress", -12.0f}, {"mentalHealth", 8.0f},
+                            {"happiness", -5.0f}, {"loneliness", -8.0f} };
+    mourn.baseSatisfaction = 8.0f;
+    availableActions.push_back(mourn);
+
+    Action celebrate("Celebrate", 221, "social");
+    celebrate.requirements = { {"happiness", 55.0f, 0.5f}, {"loneliness", 20.0f, 0.4f} };
+    celebrate.statChanges  = { {"happiness", 15.0f}, {"loneliness", -12.0f},
+                                {"stress", -8.0f},   {"boredom", -10.0f} };
+    celebrate.baseSatisfaction = 22.0f;
+    availableActions.push_back(celebrate);
+
+    Action storytell("TellStory", 222, "social");
+    storytell.requirements = { {"boredom", 30.0f, 0.5f}, {"loneliness", 20.0f, 0.3f} };
+    storytell.statChanges  = { {"boredom", -14.0f}, {"loneliness", -8.0f},
+                                {"happiness", 8.0f}, {"mentalHealth", 4.0f} };
+    storytell.baseSatisfaction = 16.0f;
+    availableActions.push_back(storytell);
 }
 
 void FreeWillSystem::updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess) {
@@ -1408,6 +1522,21 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         else if (an == "Negotiate")        rarityMultiplier = 0.25f;
         else if (an == "Specialize")       rarityMultiplier = 0.15f;
 
+        // New era-aware survival actions
+        else if (an == "Hunt")             rarityMultiplier = 0.22f;
+        else if (an == "Gather")           rarityMultiplier = 0.22f;
+        else if (an == "Farm")             rarityMultiplier = 0.18f;
+        else if (an == "Build")            rarityMultiplier = 0.18f;
+        else if (an == "Trade")            rarityMultiplier = 0.20f;
+        else if (an == "Explore")          rarityMultiplier = 0.15f;
+        else if (an == "Duel")             rarityMultiplier = 0.12f;
+        else if (an == "Raid")             rarityMultiplier = 0.10f;
+        else if (an == "DefendTribe")      rarityMultiplier = 0.16f;
+        else if (an == "Marry")            rarityMultiplier = 0.12f;
+        else if (an == "Mourn")            rarityMultiplier = 0.18f;
+        else if (an == "Celebrate")        rarityMultiplier = 0.20f;
+        else if (an == "TellStory")        rarityMultiplier = 0.22f;
+
         // self concept
         if (entity->SelfConcept.selfEfficacy < 40.0f && an == "Procrastinate") selfConceptMultiplier = 1.22f;
         else if (entity->SelfConcept.selfEfficacy < 40.0f && an == "WatchEntertainment") selfConceptMultiplier = 1.15f;
@@ -1422,7 +1551,9 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         bool isSocialAction = (an == "Socialize" || an == "GoodConnection" || an == "Desire" || an == "AngerConnection" ||
                                an == "Gossip" || an == "HelpSupport" || an == "Flirt" || an == "Date" || an == "Reconcile" ||
                                an == "couple" || an == "breeding" || an == "Apologize" || an == "Insult" || an == "Manipulate" ||
-                               an == "Jealousy" || an == "Betray" || an == "Discrimination" || an == "IgnoreAvoid" || an == "SetBoundaries");
+                               an == "Jealousy" || an == "Betray" || an == "Discrimination" || an == "IgnoreAvoid" || an == "SetBoundaries" ||
+                               an == "Trade" || an == "Marry" || an == "Celebrate" || an == "TellStory" || an == "Duel" ||
+                               an == "Preach" || an == "TeachSkill" || an == "ChallengeLeader" || an == "Negotiate" || an == "Raid");
         if (isSocialAction) {
             if (neighbors.empty()) {
                 rarityMultiplier = 0.0f;
@@ -1445,6 +1576,12 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
                 if (an == "IgnoreAvoid") rarityMultiplier *= 1.5f;
                 if (an == "SetBoundaries") rarityMultiplier *= 1.8f;
                 if (an == "DigitalSocial") rarityMultiplier *= 2.0f;
+                if (an == "Trade") rarityMultiplier *= 1.8f;
+                if (an == "Marry") rarityMultiplier *= 3.5f;
+                if (an == "Celebrate") rarityMultiplier *= 2.0f;
+                if (an == "TellStory") rarityMultiplier *= 1.8f;
+                if (an == "Duel") rarityMultiplier *= 2.5f;
+                if (an == "Raid") rarityMultiplier *= 2.0f;
             }
         }
 
@@ -1959,6 +2096,11 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             baby.posY = pointer->posY + BetterRand::genNrInInterval(-15, 15);
             baby.parent1 = pointed;
             baby.parent2 = pointer;
+            // Inherit homeland so lineages stay tied to their cradle.
+            baby.originRegionId = (pointer->originRegionId >= 0) ? pointer->originRegionId
+                                                                 : pointed->originRegionId;
+            // Name the child in the family's language.
+            if (g_lexicon) baby.name = g_lexicon->genName(baby.originRegionId, baby.entitySex);
 
             //add pheromone to eahcentity
             pointer->pheromone.type = "breeding";
@@ -2805,6 +2947,65 @@ bool FreeWillSystem::isKnown(Entity* entity, Entity* target) {
 Entity* FreeWillSystem::selectSocialTarget(Entity* entity, const std::vector<Entity*>& neighbors, const Action* action) {
     if (neighbors.empty()) return nullptr;
 
+    // ── Action-aware targeting ────────────────────────────────────────────────
+    // Romantic and hostile actions must CONCENTRATE on a consistent target,
+    // otherwise desire/anger scatter randomly across neighbors every tick and
+    // never accumulate past the thresholds needed to form a couple or a real
+    // rivalry. So we deepen the strongest existing bond most of the time, and
+    // otherwise seed a new one on the most fitting candidate.
+    const std::string an = action ? action->name : "";
+    bool romantic = (an == "Desire" || an == "Flirt" || an == "Date" ||
+                     an == "couple" || an == "breeding");
+    bool hostile  = (an == "AngerConnection" || an == "Insult" || an == "Jealousy" ||
+                     an == "Betray" || an == "Discrimination");
+    std::uniform_real_distribution<float> concentrate(0.0f, 1.0f);
+
+    if (romantic) {
+        // 75%: reinforce whoever is already most desired and still nearby.
+        if (concentrate(rng) < 0.75f) {
+            Entity* best = nullptr; float bestDesire = 0.0f;
+            for (Entity* n : neighbors) {
+                if (n == entity || n->entityHealth <= 0.0f) continue;
+                float d = entity->searchConnDesire(n);
+                if (d > bestDesire) { bestDesire = d; best = n; }
+            }
+            if (best) return best;
+        }
+        // Otherwise fall for the most attractive nearby entity.
+        Entity* best = nullptr; float bestScore = -1.0f;
+        for (Entity* n : neighbors) {
+            if (n == entity || n->entityHealth <= 0.0f) continue;
+            float attractiveness = (n->entityHygiene  / 100.0f) * 0.3f +
+                                   (n->entityHapiness / 100.0f) * 0.4f +
+                                   (n->entityHealth   / 100.0f) * 0.3f;
+            if (entity->entitySex != n->entitySex) attractiveness += 0.25f;
+            if (attractiveness > bestScore) { bestScore = attractiveness; best = n; }
+        }
+        if (best) return best;
+    } else if (hostile) {
+        // 75%: escalate against whoever is already most resented and still nearby.
+        if (concentrate(rng) < 0.75f) {
+            Entity* worst = nullptr; float worstAnger = 0.0f;
+            for (Entity* n : neighbors) {
+                if (n == entity || n->entityHealth <= 0.0f) continue;
+                float a = entity->searchConnAng(n);
+                if (a > worstAnger) { worstAnger = a; worst = n; }
+            }
+            if (worst) return worst;
+        }
+        // Otherwise pick a fresh grievance: reciprocate someone's hostility, else
+        // resent the least-bonded neighbour (a stranger or distant acquaintance).
+        Entity* worst = nullptr; float worstBond = 1e9f;
+        for (Entity* n : neighbors) {
+            if (n == entity || n->entityHealth <= 0.0f) continue;
+            if (n->searchConnAng(entity) > 20.0f) return n; // they already hate us
+            float bond = entity->searchConnSocial(n);
+            if (bond < 0.0f) bond = 0.0f;                   // -1 => stranger
+            if (bond < worstBond) { worstBond = bond; worst = n; }
+        }
+        if (worst) return worst;
+    }
+
     std::vector<Entity*> strangers;
     std::vector<Entity*> acquaintances;
 
@@ -2986,6 +3187,12 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
             if (an == "Socialize" || an == "GoodConnection" || an == "HelpSupport") rarityMult *= 3.4f;
             if (an == "Flirt" || an == "Date" || an == "couple") rarityMult *= 3.2f;
             if (an == "Gossip") rarityMult *= 3.7f;
+            // Romance and rivalry were starved here: only social/friendship actions
+            // were boosted, so desire/anger/couple links almost never formed. Give
+            // them comparable weight so the social graph isn't friendship-only.
+            if (an == "Desire") rarityMult *= 3.3f;
+            if (an == "AngerConnection") rarityMult *= 3.3f;
+            if (an == "breeding") rarityMult *= 3.2f;
         }
 
         if (an == "Murder") rarityMult = 0.02f;

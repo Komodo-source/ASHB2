@@ -154,6 +154,17 @@ struct ValueSystem {
 
 enum LifeStage { INFANT, CHILD, ADOLESCENT, ADULT, ELDER };
 
+// Life expectancy based on era
+inline float getLifeExpectancy(int currentYear) {
+    if (currentYear < -2000)  return 45.0f;   // Stone/Tribal age: short lives
+    if (currentYear < 0)      return 52.0f;   // Bronze age
+    if (currentYear < 500)    return 58.0f;   // Iron age
+    if (currentYear < 1200)   return 62.0f;   // Classical
+    if (currentYear < 1700)   return 65.0f;   // Medieval
+    if (currentYear < 1900)   return 70.0f;   // Early Modern
+    return 78.0f;                              // Modern
+}
+
 struct DevelopmentalHistory {
     bool hadSecureAttachment;      // relation des parents était comment bien ou mauvaise ??
     float childhoodTraumaScore;    // négligé, violenté, etc...
@@ -236,7 +247,8 @@ public:
     float entityGeneralAnger;
     float entityHygiene;
     char entitySex;
-    int entityBDay;
+    int entityBDay;       // birth day of the year (0-364)
+    int entityBirthYear;   // BC/AD year of birth (e.g. -4985 for 4985 BC)
     int entityAntiBody; // pourcentage
     int entityDiseaseType; //-1 if no disease
     LifeStage entityLifeStage;
@@ -311,7 +323,8 @@ public:
            entityPointedAnger*,
            entityPointedCouple*,
            entityPointedSocial*,
-           std::string goalType);
+           std::string goalType,
+           int birthYear = -5000);
 
     // Methods
     std::string getName();
@@ -394,7 +407,8 @@ public:
     HesitationState  hesitation;
     std::string      selfGrounding = "";
 
-    // ── Civilization ─────────────────────────────────────────────────────────
+    // ── Geography / Civilization ─────────────────────────────────────────────
+    int   originRegionId = -1;   // cradle/landmass this lineage started in (-1 = none)
     int   tribeId       = -1;    // which tribe this entity belongs to (-1 = none)
     int   religionId    = -1;    // which religion they follow (-1 = none)
     float dominanceRank = 0.0f;  // emergent social hierarchy position (0-100)

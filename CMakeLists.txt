@@ -45,6 +45,7 @@ include_directories(
     src/modules
     src/environment
     src/observability
+    src/world
 )
 
 # Link directories
@@ -78,6 +79,11 @@ set(OBSERVABILITY_SOURCES
 # Créer l'exécutable
 add_executable(app
 src/main.cpp
+src/WorldSeed.cpp
+src/world/Noise.cpp
+src/world/Planet.cpp
+src/world/PlanetView.cpp
+src/world/Lexicon.cpp
 src/UI.cpp
 src/Entity.cpp
 src/Disease.cpp

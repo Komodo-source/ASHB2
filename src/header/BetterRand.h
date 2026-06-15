@@ -19,17 +19,25 @@ namespace BetterRand
     struct NORMAL {};
     struct UNIFORM {};
 
-    namespace
+    // Single shared generator across all translation units (inline function's
+    // static local has one instance program-wide in C++17). Reseed from the
+    // master world seed for deterministic, replayable runs.
+    inline std::mt19937& gen()
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-    };
+        static std::mt19937 g(std::random_device{}());
+        return g;
+    }
+
+    inline void reseed(unsigned long long seed)
+    {
+        gen().seed(static_cast<std::mt19937::result_type>(seed));
+    }
 
     template<typename D=UNIFORM, typename T>
     T genNrInInterval(T low, T high)
     {
         uniform_distribution_t<T> uniform_dist(low, high);
-        return uniform_dist(gen);
+        return uniform_dist(gen());
     }
 
     template<typename D, typename T>
@@ -39,7 +47,7 @@ namespace BetterRand
         static_assert(std::is_same<T,float>::value || std::is_same<T,double>::value,
             "Bernouli distribution needs a probability value as argument!");
         std::bernoulli_distribution bernouli(probability);
-        return bernouli(gen);
+        return bernouli(gen());
     }
 
     template<typename D>
@@ -47,7 +55,7 @@ namespace BetterRand
     genNrInInterval(int nrOfTrials, double probabilityDist)
     {
         std::binomial_distribution<> binomial(nrOfTrials, probabilityDist);
-        return binomial(gen);
+        return binomial(gen());
     }
 
     template<typename D>
@@ -55,7 +63,7 @@ namespace BetterRand
     genNrInInterval(double mean)
     {
         std::poisson_distribution<> poisson(mean);
-        return poisson(gen);
+        return poisson(gen());
     }
 
     template<typename D>
@@ -63,7 +71,7 @@ namespace BetterRand
     genNrInInterval(double mean = 0.0, double stddev = 1.0)
     {
         std::normal_distribution<> normal(mean, stddev);
-        return normal(gen);
+        return normal(gen());
     }
 
     template<typename T>
@@ -71,13 +79,13 @@ namespace BetterRand
     {
         return [low, high]() {
              uniform_distribution_t<T> dist(low, high);
-             return dist(gen);
+             return dist(gen());
         };
     }
 
     template<typename Container>
     void shuffleContainer(Container& cont)
     {
-        shuffle(cont.begin(), cont.end(), rd);
+        shuffle(cont.begin(), cont.end(), gen());
     }
 };

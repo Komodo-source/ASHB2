@@ -29,6 +29,10 @@
 #include "header/Image.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
+#include "./header/WorldSeed.h"
+#include "world/Planet.h"
+#include "world/PlanetView.h"
+#include "world/Lexicon.h"
 #include <unordered_map>
 #include <unordered_set>
 
@@ -765,8 +769,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 entity->entityHygiene = pdclamp(entity->entityHygiene - hygieneDecay, 0.0f, 100.0f);
 
                 // Stress builds; neurotic entities accumulate it faster
-                float stressGrowth = 0.15f + (p.neuroticism / 100.0f) * 0.20f;
-                if (entity->entityLoneliness > 60.0f) stressGrowth += 0.08f;
+                float stressGrowth = 0.06f + (p.neuroticism / 100.0f) * 0.12f;
+                if (entity->entityLoneliness > 60.0f) stressGrowth += 0.04f;
                 entity->entityStress = pdclamp(entity->entityStress + stressGrowth, 0.0f, 100.0f);
 
                 // Boredom builds gently
@@ -790,12 +794,14 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
                 // Mental health degrades under chronic stress, recovers in calm
                 if (entity->entityStress > 70.0f)
-                    entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.15f, 0.0f, 100.0f);
+                    entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.10f, 0.0f, 100.0f);
                 else if (entity->entityStress < 30.0f)
                     entity->entityMentalHealth = pdclamp(entity->entityMentalHealth + 0.08f, 0.0f, 100.0f);
+                else
+                    entity->entityMentalHealth = pdclamp(entity->entityMentalHealth + 0.02f, 0.0f, 100.0f);  // small passive recovery
 
                 // Health decays very slowly; high stress accelerates, conscientiousness slows it
-                float healthDecay = 0.005f + (entity->entityStress / 100.0f) * 0.015f
+                float healthDecay = 0.002f + (entity->entityStress / 100.0f) * 0.008f
                                           - (p.conscientiousness  / 100.0f) * 0.003f;
                 entity->entityHealth = pdclamp(entity->entityHealth - healthDecay, 0.0f, 100.0f);
 
@@ -810,9 +816,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.1f, 0.0f, 100.0f);
             }
 
-            // Passive recovery: not sick + low stress = slow heal
-            if (entity->entityDiseaseType == -1 && entity->entityHealth < 97.0f && entity->entityStress < 60.0f)
-                entity->entityHealth = std::min(100.0f, entity->entityHealth + 0.008f);
+            // Passive recovery: not sick = slow heal (recovery no longer blocked by moderate stress)
+            if (entity->entityDiseaseType == -1 && entity->entityHealth < 97.0f)
+                entity->entityHealth = std::min(100.0f, entity->entityHealth + 0.04f);
 
             //apply tick relationship
             tickRelationshipDecay(entity, 1.0f);
@@ -953,7 +959,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                                    chosenAction->name == "TeachSkill" ||
                                    chosenAction->name == "ChallengeLeader" ||
                                    chosenAction->name == "DeclareWar" ||
-                                   chosenAction->name == "Negotiate");
+                                   chosenAction->name == "Negotiate" ||
+                                   chosenAction->name == "Trade" ||
+                                   chosenAction->name == "Marry" ||
+                                   chosenAction->name == "Duel" ||
+                                   chosenAction->name == "Raid");
 
             Entity* target = nullptr;
             if(isPointedAction && !neighbors.empty()){
@@ -1049,13 +1059,6 @@ void sync_clock_stats(Entity* ent, int neighboors){
 
 
 void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, bool isPaused, int width, int height, int& selectedEntityIndex, bool& showEntityWindow) {
-    // Birthday: one year = 8 sim-ticks (visibly ages over time)
-    if((day / 60) % 8 == 0 && day > 0){
-        for(Entity& ent : entities){
-            ent.IncrementBDay();
-        }
-    }
-
     // ── Safe dead-entity removal ──────────────────────────────────────────────
     // Raw Entity* pointers become dangling after erase() shifts the vector.
     // Strategy: snapshot old addresses, null pointers to dead entities, batch
@@ -1135,6 +1138,16 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
         frameCounter++;
         if(frameCounter >= UPDATE_FREQUENCY){
             frameCounter = 0;
+
+            // Birthday: one year = 8 sim-ticks. Gated to fire exactly once per
+            // tick (this block runs once per UPDATE_FREQUENCY frames); otherwise
+            // it ran every frame and aged everyone decades per second, draining
+            // health past life expectancy and killing the whole population on entry.
+            if((day / UPDATE_FREQUENCY) % 8 == 0 && day > 0){
+                for(Entity& ent : entities){
+                    ent.IncrementBDay();
+                }
+            }
 
             // Recalculate entity groups based on current positions
             close_entity_together = getSocialGroups(ent_quad);
@@ -1285,24 +1298,103 @@ int main(int argc, char* argv[]) {
     std::cin >> entity_num;
     int renderingType = getRenderingChoice();
 
-    srand(time(NULL));
+    // ── World seed (determines the whole planet & history; same seed = same run) ──
+    {
+        std::string seedInput;
+        std::cout << "enter world seed (text or number, blank = random): ";
+        std::cin.ignore();
+        std::getline(std::cin, seedInput);
+        if (seedInput.empty()) {
+            g_worldSeed.master = std::random_device{}() ^
+                (static_cast<uint64_t>(std::random_device{}()) << 32);
+        } else {
+            g_worldSeed = WorldSeed::fromString(seedInput);
+        }
+        std::cout << "world seed = " << g_worldSeed.master << "\n";
+        globalLogger->logCmd("world seed = " + std::to_string(g_worldSeed.master));
+
+        // Divergence / chaos level: how wildly history varies between runs.
+        std::cout << "chaos level 0.5 (tame) .. 2.0 (wild) [default 1.3]: ";
+        std::string chaosInput;
+        std::getline(std::cin, chaosInput);
+        float chaos = 1.3f;
+        if (!chaosInput.empty()) { try { chaos = std::stof(chaosInput); } catch (...) {} }
+        chaos = std::max(0.3f, std::min(2.5f, chaos));
+        g_worldSeed.divergence.butterfly       = chaos;
+        g_worldSeed.divergence.innovationLuck  = 0.7f + chaos * 0.4f;
+        g_worldSeed.divergence.catastropheRate = chaos;
+        g_worldSeed.divergence.migrationPressure = chaos;
+        std::cout << "chaos = " << chaos << "\n";
+
+        // Seed every randomness source deterministically from the master seed.
+        BetterRand::reseed(splitmix64(g_worldSeed.master ^ STREAM_SPAWN));
+    }
+
+    srand((unsigned)splitmix64(g_worldSeed.master));
     const int height = 1050;
     const int width = 1400;
+
+    // ── Procedural planet ────────────────────────────────────────────────────
+    g_planet = new Planet();
+    g_planet->generate(g_worldSeed, 200, 150, (float)width, (float)height);
+    {
+        std::stringstream ps;
+        ps << "planet generated: hash=" << g_planet->hash()
+           << " habitable_regions=" << g_planet->habitableRegionCount()
+           << " total_regions=" << g_planet->regions.size();
+        std::cout << ps.str() << "\n";
+        globalLogger->logCmd(ps.str());
+    }
+
+    // ── Per-region procedural languages ──────────────────────────────────────
+    g_lexicon = new Lexicon();
+    g_lexicon->initRegions((int)g_planet->regions.size(), g_worldSeed.master);
+
+        // ── Starting cradles: well-separated fertile homelands ───────────────────
+        std::mt19937_64 cradleRng = makeStream(g_worldSeed.master, STREAM_SPAWN, 1);
+        int cradleCount = std::min(5, std::max(2, entity_num / 12));
+        std::vector<Planet::Cradle> cradles = g_planet->pickCradlePoints(cradleCount, cradleRng);
+        {
+            std::stringstream cs;
+            cs << "seeded " << cradles.size() << " starting cradles at:";
+            for (auto& c : cradles) cs << " (" << c.gx << "," << c.gy << " r" << c.regionId << ")";
+            std::cout << cs.str() << "\n";
+            globalLogger->logCmd(cs.str());
+        }
 
         std::vector<Entity> entities;
         entities.reserve(2048);
         int count = 0;
         for (int y = 0; y < 1; ++y){
             for (int x = 0; x < entity_num; ++x){
+                int birthYear = -5000 - BetterRand::genNrInInterval(15, 30); // born in stone age
                 Entity entity = Entity(
                     count, 15.0f, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
                     , BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 20.0f),
-                    BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness");
+                    BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness", birthYear);
 
                 entity.selected = false;
-                // Random initial position within play area (above Mind Board)
-                entity.posX = BetterRand::genNrInInterval(80.0f, (float)(width - 80));
-                entity.posY = BetterRand::genNrInInterval(60.0f, (float)(height) * 0.60f - 60.0f);
+                // Place into a cradle: each starting band clusters around its homeland,
+                // so populations begin geographically isolated and diverge over time.
+                if (!cradles.empty()) {
+                    const Planet::Cradle& home = cradles[x % cradles.size()];
+                    entity.originRegionId = home.regionId;
+                    float hwx, hwy; g_planet->gridToWorld(home.gx, home.gy, hwx, hwy);
+                    // jitter around the homeland, then snap onto passable land
+                    float jx = hwx + BetterRand::genNrInInterval(-60.0f, 60.0f);
+                    float jy = hwy + BetterRand::genNrInInterval(-60.0f, 60.0f);
+                    jx = std::max(10.0f, std::min((float)width - 10.0f, jx));
+                    jy = std::max(10.0f, std::min((float)height - 10.0f, jy));
+                    const Tile* t = g_planet->tileAtWorld(jx, jy);
+                    if (t && !t->isPassable()) { jx = hwx; jy = hwy; } // fall back to centre
+                    entity.posX = jx;
+                    entity.posY = jy;
+                    // Re-name in the homeland's language now that its region is known.
+                    if (g_lexicon) entity.name = g_lexicon->genName(entity.originRegionId, entity.entitySex);
+                } else {
+                    entity.posX = BetterRand::genNrInInterval(80.0f, (float)(width - 80));
+                    entity.posY = BetterRand::genNrInInterval(60.0f, (float)(height) * 0.60f - 60.0f);
+                }
                 Heritage::UnlinkedNode(&entity);
 
                 // --- Personality (Big Five, already randomized) ---
@@ -1310,7 +1402,7 @@ int main(int argc, char* argv[]) {
 
                 // --- ValueSystem: the "soul" — what this person cares about ---
                 // Each value is correlated with personality for realism
-                std::mt19937 rng_spawn(std::random_device{}());
+                std::mt19937 rng_spawn((unsigned)splitmix64(g_worldSeed.master ^ (0x51ED2C17ull * (count + 1))));
                 std::normal_distribution<float> vd(50.0f, 18.0f);
                 auto vc = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
 
@@ -1513,6 +1605,10 @@ int main(int argc, char* argv[]) {
 
             // ── Civilization panel ────────────────────────────────────────────
             instanceUI.ShowCivilizationPanel(day / 60);
+
+            // ── World map + history panels ────────────────────────────────────
+            DrawPlanetWindow(g_planet, ent_quad);
+            DrawHistoryWindow();
 
             instanceUI.DrawGrid(ent_quad);
 

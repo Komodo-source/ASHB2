@@ -1,4 +1,5 @@
 #include "./header/Entity.h"
+#include "world/Lexicon.h"
 #include "./header/random.hpp"
 #include <cstddef>
 #include <list>
@@ -6,6 +7,7 @@
 #include "./header/FreeWillSystem.h"
 #include "./header/SemanticMemory.h"
 #include "./header/PlanningSystem.h"
+#include "./header/CivilizationEngine.h"
 
 #include <iostream>
 #include <sstream>
@@ -33,6 +35,7 @@ Entity::Entity(int id)
       entityHygiene(100.0f),
       entitySex('A'),
       entityBDay(0),
+      entityBirthYear(-5000),
       entityAntiBody(15),
       entityDiseaseType(-1),
       posX(0.0f),
@@ -65,7 +68,8 @@ Entity::Entity(int id,
                entityPointedAnger* anger = nullptr,
                entityPointedCouple* couple = nullptr,
                entityPointedSocial* social = nullptr,
-               std::string goalType = "happiness"
+               std::string goalType = "happiness",
+               int birthYear
                 )
     : entityId(id),
       entityAge(age),
@@ -80,6 +84,7 @@ Entity::Entity(int id,
       entityHygiene(hygiene),
       entitySex(sex),
       entityBDay(bDay),
+      entityBirthYear(birthYear),
       entityAntiBody(antiBody),
       entityDiseaseType(diseaseType),
       posX(0.0f),
@@ -107,14 +112,20 @@ Entity::Entity(int id,
     }
 
     if(name.empty()){
-        int taille = male_name.size() - 1;
-        if (entitySex == 'M') {
-            int index = (rand() % taille);
+        if (g_lexicon) {
+            // Region-specific procedural name (neutral language until the
+            // lineage's originRegionId is known; regenerated after assignment).
+            name = g_lexicon->genName(originRegionId, entitySex);
+        } else {
+            int taille = male_name.size() - 1;
+            if (entitySex == 'M') {
+                int index = (rand() % taille);
                 name = male_name.at(index);
             } else {
                 int index = (rand() % taille);
                 name = female_name.at(index);
             }
+        }
     }
 
     char* type[5] = {(char*)"find_partner", (char*)"build_career", (char*)"make_friends", (char*)"happiness", (char*)"self"};
@@ -164,6 +175,7 @@ void Entity::addSocial(entityPointedSocial pointed) {
 
 void Entity::IncrementBDay(){
     this->entityAge ++;
+    entityBDay = (entityBDay + 1) % 365;
     if(this->entityAge < 10){
         this->entityLifeStage = LifeStage::CHILD;
     }else if(this->entityAge < 18){
@@ -172,6 +184,17 @@ void Entity::IncrementBDay(){
         this->entityLifeStage = LifeStage::ADULT;
     }else{
         this->entityLifeStage = LifeStage::ELDER;
+    }
+    
+    // Era-aware aging: elders lose health faster based on their era's life expectancy
+    if (this->entityLifeStage == LifeStage::ELDER) {
+        int currentYear = globalCivEngine ? globalCivEngine->getCurrentYear() : 0;
+        float lifeExpectancy = getLifeExpectancy(currentYear);
+        float agePenalty = std::max(0.0f, (entityAge - lifeExpectancy) * 0.04f);
+        entityHealth -= agePenalty;
+        if (entityAge > lifeExpectancy * 1.2f) {
+            entityHealth -= 0.3f; // rapid decline past life expectancy
+        }
     }
 }
 
@@ -337,6 +360,7 @@ void Entity::saveTo(std::ofstream& file) const {
     file << "DISEASE:" << entityDiseaseType << "\n";
     file << "POSX:" << posX << "\n";
     file << "POSY:" << posY << "\n";
+    file << "ORIGIN_REGION:" << originRegionId << "\n";
     file << "PERSONALITY:" << personality.extraversion << "," << personality.agreeableness << ","
          << personality.conscientiousness << "," << personality.neuroticism << "," << personality.openness << "\n";
     file << m_goals.size() << "\n"; //on inscrit d'abord la taille
@@ -397,6 +421,7 @@ void Entity::loadFrom(std::ifstream& file) {
     std::getline(file, line); entityDiseaseType = std::stoi(line.substr(8));
     std::getline(file, line); posX = std::stof(line.substr(5));
     std::getline(file, line); posY = std::stof(line.substr(5));
+    std::getline(file, line); originRegionId = std::stoi(line.substr(14)); // "ORIGIN_REGION:"
     // Personality
     std::getline(file, line);
     std::string pdata = line.substr(12);

@@ -1,5 +1,8 @@
 #include "header/CivilizationEngine.h"
 #include "header/Entity.h"
+#include "world/Planet.h"
+#include "world/Lexicon.h"
+#include "EnvironmentModel.h"   // previously-unused seasonal model, now driving famine cycles
 #include <algorithm>
 #include <cmath>
 #include <sstream>
@@ -55,18 +58,38 @@ static const std::vector<InnovTemplate> CATALOG = {
 };
 
 // ── Constructor ───────────────────────────────────────────────────────────────
-CivilizationEngine::CivilizationEngine() {}
+CivilizationEngine::CivilizationEngine()
+    : rng(makeStream(g_worldSeed.master, STREAM_INNOV)) {}
 
 // ── Main tick ─────────────────────────────────────────────────────────────────
 void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
+    currentYear = START_YEAR + (day / 60 / 8) * yearsPerTick;  // advance year
     removeDeadFromTribes(entities);
     updateDominanceRanks(entities);
     updateTribes(entities, day);
     updateReligions(entities, day);
     updateInnovations(entities, day);
     updateTribeRelations(entities, day);
+    processWarTick(entities, day);   // NEW: war combat system
+    updateCarryingCapacity(entities, day); // Phase 4: famine / migration / dark ages
     updateEra(entities);
     applyEffectsToEntities(entities, day);
+
+    // Languages slowly drift (sound change over generations).
+    if (g_lexicon && g_lexicon->regionCount() > 0 && (day % 40 == 0)) {
+        std::uniform_int_distribution<int> rd(0, g_lexicon->regionCount() - 1);
+        g_lexicon->drift(rd(rng), (uint64_t)day);
+    }
+
+    // Periodic history fingerprint — proves two seeds produce different histories.
+    // Guard against the multi-fire tick window so we log it at most once per day.
+    if (day % 25 == 0 && day != lastHistoryDay) {
+        lastHistoryDay = day;
+        std::stringstream ss;
+        ss << "[HISTORY day " << day << "] sig=" << historySignature()
+           << " :: " << historyLine();
+        logEvent(day, ss.str(), "history");
+    }
 }
 
 // ── Dominance ranks ───────────────────────────────────────────────────────────
@@ -114,6 +137,9 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
             if (ent.entityHealth <= 0.0f) continue;
             if (ent.tribeId != -1) continue;
             if (tribe.population() >= 10) continue; // keep tribes small so others can form
+            // Geographic gate: a tribe only absorbs people in its homeland, so
+            // distant cradles never merge into one culture.
+            if (dist2(ent.posX, ent.posY, tribe.centerX, tribe.centerY) > 250.0f * 250.0f) continue;
             float valDiff = std::abs(ent.ValueSystem.collectivism   - tribe.collectivism)  * 0.4f +
                             std::abs(ent.ValueSystem.spiritualNeed  - tribe.spiritualism)  * 0.3f +
                             std::abs(ent.ValueSystem.achievementDrive - tribe.innovation)  * 0.3f;
@@ -144,7 +170,11 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
                           + std::abs(tribeless[i]->ValueSystem.spiritualNeed - tribeless[j]->ValueSystem.spiritualNeed)  * 0.3f
                           + std::abs(tribeless[i]->ValueSystem.achievementDrive - tribeless[j]->ValueSystem.achievementDrive) * 0.3f;
             float bond = tribeless[i]->searchConnSocial(tribeless[j]);
-            if (valDiff < 32.0f || bond > 12.0f) {
+            // Only cluster people who are geographically close — founding tribes
+            // are local, so each cradle grows its own independent culture.
+            bool near = dist2(tribeless[i]->posX, tribeless[i]->posY,
+                              tribeless[j]->posX, tribeless[j]->posY) < 250.0f * 250.0f;
+            if (near && (valDiff < 32.0f || bond > 12.0f)) {
                 cluster.push_back(tribeless[j]);
                 used[j] = true;
             }
@@ -225,8 +255,24 @@ void CivilizationEngine::electLeader(Tribe& tribe, std::vector<Entity>& entities
 }
 
 void CivilizationEngine::updateTribeCenter(Tribe& tribe, std::vector<Entity>& entities) {
-    // No spatial positions — tribe center concept is unused
-    (void)tribe; (void)entities;
+    if (tribe.memberIds.empty()) return;
+    float sx = 0, sy = 0; int n = 0;
+    std::map<int,int> regionVotes;
+    for (int mid : tribe.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (!e || e->entityHealth <= 0.0f) continue;
+        sx += e->posX; sy += e->posY; n++;
+        if (e->originRegionId >= 0) regionVotes[e->originRegionId]++;
+    }
+    if (n == 0) return;
+    tribe.centerX = sx / n;
+    tribe.centerY = sy / n;
+
+    // Which landmass / biome does this tribe sit in? (drives cultural drift)
+    if (g_planet) {
+        const Tile* t = g_planet->tileAtWorld(tribe.centerX, tribe.centerY);
+        if (t) { tribe.regionId = t->regionId; tribe.homeBiome = (int)t->biome; }
+    }
 }
 
 void CivilizationEngine::updateTribeValues(Tribe& tribe, std::vector<Entity>& entities) {
@@ -248,6 +294,36 @@ void CivilizationEngine::updateTribeValues(Tribe& tribe, std::vector<Entity>& en
     drift(tribe.spiritualism, spi);
     drift(tribe.collectivism, col);
     drift(tribe.innovation,   inn);
+
+    // ── Biome shapes culture (the environment leaves its mark) ───────────────
+    // Harsh land breeds militarism & scarcity; rich valleys breed innovation.
+    auto nudge = [](float& v, float target, float rate) { v += (target - v) * rate; };
+    switch (tribe.homeBiome) {
+        case BIOME_DESERT:
+        case BIOME_TUNDRA:
+            nudge(tribe.militarism, 80.0f, 0.01f);
+            nudge(tribe.collectivism, 75.0f, 0.01f); // scarcity -> bind together
+            break;
+        case BIOME_GRASSLAND:
+        case BIOME_COAST:
+            nudge(tribe.innovation, 75.0f, 0.012f);  // surplus -> experimentation
+            break;
+        case BIOME_JUNGLE:
+            nudge(tribe.spiritualism, 72.0f, 0.01f);
+            break;
+        case BIOME_FOREST:
+            nudge(tribe.innovation, 65.0f, 0.008f);
+            break;
+        case BIOME_MOUNTAIN:
+        case BIOME_ICE:
+            nudge(tribe.militarism, 70.0f, 0.008f);
+            break;
+        default: break;
+    }
+    tribe.militarism   = std::max(0.0f, std::min(100.0f, tribe.militarism));
+    tribe.spiritualism = std::max(0.0f, std::min(100.0f, tribe.spiritualism));
+    tribe.collectivism = std::max(0.0f, std::min(100.0f, tribe.collectivism));
+    tribe.innovation   = std::max(0.0f, std::min(100.0f, tribe.innovation));
 }
 
 void CivilizationEngine::updateTribeReligion(Tribe& tribe, std::vector<Entity>& entities) {
@@ -374,7 +450,9 @@ void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day)
         prophetScore = std::min(1.0f, prophetScore);
 
         std::uniform_real_distribution<float> roll(0.0f, 1.0f);
-        if (roll(rng) < prophetScore * 0.030f)
+        // butterfly knob: higher = more prophets arise spontaneously -> wilder,
+        // more divergent religious landscapes between runs.
+        if (roll(rng) < prophetScore * 0.030f * g_worldSeed.divergence.butterfly)
             foundReligion(&ent, day);
     }
 
@@ -553,7 +631,9 @@ void CivilizationEngine::updateInnovations(std::vector<Entity>& entities, int da
                               (ent.personality.conscientiousness / 100.0f) * 0.7f +
                               (1.0f - ent.entityBoredom / 100.0f) * 0.3f;
 
-        if (roll(rng) < inventorScore * 0.0012f) {
+        // innovationLuck knob steers how readily this world invents -> different
+        // tech orders each run.
+        if (roll(rng) < inventorScore * 0.0012f * g_worldSeed.divergence.innovationLuck) {
             Tribe* tribe = findTribe(ent.tribeId);
             discoverInnovation(&ent, tribe, day);
         }
@@ -691,6 +771,24 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
             Tribe& A = tribes[i];
             Tribe& B = tribes[j];
 
+            // ── Geographic contact gate ──────────────────────────────────────
+            // Tribes only meaningfully interact when their lands are close.
+            // Distant cradles drift apart and keep separate histories until
+            // migration (Phase 4) brings them into contact.
+            float d2 = dist2(A.centerX, A.centerY, B.centerX, B.centerY);
+            const float CONTACT_RANGE = 300.0f;
+            bool inContact = (A.regionId == B.regionId && A.regionId != -1)
+                             || d2 < CONTACT_RANGE * CONTACT_RANGE;
+            if (!inContact) {
+                // out of contact: relations slowly fade toward indifference, no war
+                float& r = A.relations[B.id];
+                r *= 0.97f;
+                B.relations[A.id] = r;
+                A.stances[B.id] = TS_NEUTRAL;
+                B.stances[A.id] = TS_NEUTRAL;
+                continue;
+            }
+
             float valDiff = std::abs(A.militarism   - B.militarism)   * 0.3f
                           + std::abs(A.spiritualism  - B.spiritualism) * 0.2f
                           + std::abs(A.collectivism  - B.collectivism) * 0.25f
@@ -726,8 +824,8 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                 B.stances[A.id] = stance;
                 if (stance == TS_AT_WAR) {
                     logEvent(day, "The " + A.name + " declared war on the " + B.name, "war");
-                    for (int mid : A.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 18.0f); }
-                    for (int mid : B.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 18.0f); }
+                    for (int mid : A.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 8.0f); }
+                    for (int mid : B.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 8.0f); }
                 } else if (stance == TS_ALLY) {
                     logEvent(day, "The " + A.name + " and the " + B.name + " formed an alliance", "diplomacy");
                 } else if (stance == TS_RIVAL) {
@@ -794,18 +892,40 @@ void CivilizationEngine::updateEra(const std::vector<Entity>& entities) {
     int innCount = (int)innovations.size();
     int tribeCount = (int)tribes.size();
 
-    bool hasAgriculture = false, hasReligion = !religions.empty();
-    for (const auto& inv : innovations)
-        if (inv.category == "agriculture") { hasAgriculture = true; break; }
+    bool hasAgriculture = false, hasMetal = false, hasFort = false;
+    bool hasReligion = !religions.empty();
+    for (const auto& inv : innovations) {
+        if (inv.category == "agriculture") hasAgriculture = true;
+        if (inv.name == "Metal Working") hasMetal = true;
+        if (inv.name == "Fortification") hasFort = true;
+    }
 
-    if (innCount >= 15 && tribeCount >= 3 && pop >= 25)
-        era = ERA_PROTO_CIVILIZATION;
-    else if (innCount >= 5 && (hasAgriculture || hasReligion) && tribeCount >= 2)
-        era = ERA_EARLY_CULTURE;
+    CivilizationEra prevEra = era;
+    int year = getCurrentYear();
+
+    if (innCount >= 18 && tribeCount >= 4 && pop >= 30 && hasMetal && hasFort)
+        era = ERA_MODERN;
+    else if (innCount >= 14 && tribeCount >= 3 && pop >= 25 && hasMetal)
+        era = ERA_EARLY_MODERN;
+    else if (innCount >= 12 && tribeCount >= 3 && pop >= 20 && hasFort)
+        era = ERA_MEDIEVAL;
+    else if (innCount >= 9 && tribeCount >= 3 && pop >= 18 && hasMetal)
+        era = ERA_CLASSICAL;
+    else if (innCount >= 7 && tribeCount >= 2 && pop >= 15)
+        era = ERA_IRON_AGE;
+    else if (innCount >= 5 && tribeCount >= 2 && pop >= 12 && hasMetal)
+        era = ERA_BRONZE_AGE;
+    else if (innCount >= 3 && (hasAgriculture || hasReligion) && tribeCount >= 2)
+        era = ERA_EARLY_AGRICULTURE;
     else if (tribeCount >= 2 && innCount >= 1)
         era = ERA_TRIBAL;
     else
-        era = ERA_HUNTER_GATHERER;
+        era = ERA_STONE_AGE;
+
+    if (era != prevEra) {
+        logEvent(0, "The world enters a new era: " + getEraName()
+                 + " (" + getYearDisplay() + ")", "era");
+    }
 }
 
 // ── Civilizational effects on individual entities ─────────────────────────────
@@ -830,8 +950,8 @@ void CivilizationEngine::applyEffectsToEntities(std::vector<Entity>& entities, i
             for (auto& p : tribe->stances)
                 if (p.second == TS_AT_WAR) { atWar = true; break; }
             if (atWar) {
-                ent.entityStress        = clamp(ent.entityStress        + 2.5f, 0.0f, 100.0f);
-                ent.entityGeneralAnger  = clamp(ent.entityGeneralAnger  + 1.0f, 0.0f, 100.0f);
+                ent.entityStress        = clamp(ent.entityStress        + 0.6f, 0.0f, 100.0f);
+                ent.entityGeneralAnger  = clamp(ent.entityGeneralAnger  + 0.3f, 0.0f, 100.0f);
             }
 
             // Leader: responsibility stress + esteem boost
@@ -896,21 +1016,351 @@ void CivilizationEngine::applyEffectsToEntities(std::vector<Entity>& entities, i
 // ── Era / Summary ─────────────────────────────────────────────────────────────
 std::string CivilizationEngine::getEraName() const {
     switch (era) {
-        case ERA_HUNTER_GATHERER:   return "Hunter-Gatherer Age";
-        case ERA_TRIBAL:            return "Tribal Age";
-        case ERA_EARLY_CULTURE:     return "Early Culture";
-        case ERA_PROTO_CIVILIZATION:return "Proto-Civilization";
+        case ERA_STONE_AGE:          return "Stone Age";
+        case ERA_TRIBAL:             return "Tribal Age";
+        case ERA_EARLY_AGRICULTURE:  return "Early Agriculture";
+        case ERA_BRONZE_AGE:         return "Bronze Age";
+        case ERA_IRON_AGE:           return "Iron Age";
+        case ERA_CLASSICAL:          return "Classical Era";
+        case ERA_MEDIEVAL:           return "Medieval Era";
+        case ERA_EARLY_MODERN:       return "Early Modern";
+        case ERA_MODERN:             return "Modern Era";
     }
     return "Unknown";
 }
 
+std::string CivilizationEngine::getYearDisplay() const {
+    if (currentYear < 0)
+        return std::to_string(-currentYear) + " BC";
+    else
+        return std::to_string(currentYear) + " AD";
+}
+
 std::string CivilizationEngine::getEraSummary() const {
     std::ostringstream ss;
-    ss << "Era: " << getEraName()
+    ss << "Year: " << getYearDisplay()
+       << " | Era: " << getEraName()
        << " | Tribes: " << tribes.size()
        << " | Religions: " << religions.size()
        << " | Innovations: " << innovations.size();
     return ss.str();
+}
+
+// ── War system ─────────────────────────────────────────────────d────────────────
+void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) {
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+
+    for (size_t i = 0; i < tribes.size(); ++i) {
+        for (size_t j = i + 1; j < tribes.size(); ++j) {
+            Tribe& A = tribes[i];
+            Tribe& B = tribes[j];
+
+            auto aIt = A.stances.find(B.id);
+            if (aIt == A.stances.end() || aIt->second != TS_AT_WAR) continue;
+
+            // War attrition: each tick, both sides suffer casualties
+            float aStr = calculateTribeMilitaryStrength(A, entities);
+            float bStr = calculateTribeMilitaryStrength(B, entities);
+            float aDef = calculateTribeDefenseStrength(A, entities);
+            float bDef = calculateTribeDefenseStrength(B, entities);
+
+            // Battle resolution with randomness
+            float aPower = (aStr * 0.7f + aDef * 0.3f) * (0.8f + roll(rng) * 0.4f);
+            float bPower = (bStr * 0.7f + bDef * 0.3f) * (0.8f + roll(rng) * 0.4f);
+
+            if (roll(rng) < 0.05f) { // 5% chance of a major battle each tick
+                executeBattle(A, B, entities, day);
+            }
+
+            // War exhaustion: both tribes slowly lose health from attrition
+            float aLossRate = 0.02f + (1.0f - aStr / std::max(1.0f, aStr + bStr)) * 0.04f;
+            float bLossRate = 0.02f + (1.0f - bStr / std::max(1.0f, aStr + bStr)) * 0.04f;
+
+            for (int mid : A.memberIds) {
+                Entity* e = entityById(entities, mid);
+                if (e && e->entityHealth > 0.0f && roll(rng) < aLossRate) {
+                    e->entityHealth -= 0.5f + roll(rng) * 1.5f;  // 0.5-2 damage (gentle attrition)
+                    e->entityStress = std::min(100.0f, e->entityStress + 1.5f);
+                }
+            }
+            for (int mid : B.memberIds) {
+                Entity* e = entityById(entities, mid);
+                if (e && e->entityHealth > 0.0f && roll(rng) < bLossRate) {
+                    e->entityHealth -= 0.5f + roll(rng) * 1.5f;  // 0.5-2 damage (gentle attrition)
+                    e->entityStress = std::min(100.0f, e->entityStress + 1.5f);
+                }
+            }
+
+            // Peace negotiations: if both sides exhausted, chance of peace
+            if (A.relations[B.id] < -70.0f && aStr + bStr < 15.0f) {
+                if (roll(rng) < 0.15f) {
+                    A.relations[B.id] = -20.0f;
+                    B.relations[A.id] = -20.0f;
+                    A.stances[B.id] = TS_NEUTRAL;
+                    B.stances[A.id] = TS_NEUTRAL;
+                    logEvent(day, "Exhausted war ends: " + A.name + " and " + B.name + " agree to peace", "war");
+                }
+            }
+
+            // Conquest check: if one tribe is severely weakened
+            if (A.population() < 2 && B.population() >= 2) {
+                conquerTribe(B, A, entities, day);
+            } else if (B.population() < 2 && A.population() >= 2) {
+                conquerTribe(A, B, entities, day);
+            }
+        }
+    }
+}
+
+void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::vector<Entity>& entities, int day) {
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    float aStr = calculateTribeMilitaryStrength(attacker, entities);
+    float dStr = calculateTribeMilitaryStrength(defender, entities);
+
+    float aBonus = (attacker.militarism / 100.0f) * 1.5f;
+    float dBonus = (defender.militarism / 100.0f) * 0.8f + (defender.collectivism / 100.0f) * 0.7f;
+
+    float aResult = aStr * (0.6f + roll(rng) * 0.8f) * aBonus;
+    float dResult = dStr * (0.6f + roll(rng) * 0.8f) * dBonus;
+
+    std::string desc;
+    if (aResult > dResult * 1.3f) {
+        // Attacker decisive victory
+        defender.relations[attacker.id] = std::max(-100.0f, defender.relations[attacker.id] - 18.0f);
+        attacker.relations[defender.id] = std::min(100.0f, attacker.relations[defender.id] + 8.0f);
+        desc = attacker.name + " won a decisive battle against " + defender.name;
+    } else if (dResult > aResult * 1.3f) {
+        // Defender decisive victory
+        attacker.relations[defender.id] = std::max(-100.0f, attacker.relations[defender.id] - 18.0f);
+        defender.relations[attacker.id] = std::min(100.0f, defender.relations[attacker.id] + 8.0f);
+        desc = defender.name + " repelled " + attacker.name + "'s assault with a decisive victory";
+    } else {
+        // Draw — both sides exhausted
+        desc = attacker.name + " and " + defender.name + " fought to a bloody stalemate";
+    }
+
+    // Apply battle casualties to both sides (gentle, non-lethal)
+    for (int mid : attacker.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (e && e->entityHealth > 0.0f && roll(rng) < 0.08f)
+            e->entityHealth -= 1.0f + roll(rng) * 3.0f;  // 1-4 damage per battle
+    }
+    for (int mid : defender.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (e && e->entityHealth > 0.0f && roll(rng) < 0.08f)
+            e->entityHealth -= 1.0f + roll(rng) * 3.0f;  // 1-4 damage per battle
+    }
+
+    logEvent(day, desc, "war");
+}
+
+// ── Phase 4: carrying capacity, famine, migration, dark ages ────────────────
+// Agriculture innovations let a region feed more people than raw land allows.
+float CivilizationEngine::regionAgTechMultiplier(int regionId, std::vector<Entity>& entities) const {
+    int agTechs = 0;
+    std::set<int> seen;
+    for (const Entity& e : entities) {
+        if (e.entityHealth <= 0.0f || e.originRegionId != regionId) continue;
+        for (int tid : e.knownTechIds) {
+            if (seen.count(tid)) continue;
+            for (const auto& inv : innovations)
+                if (inv.id == tid && inv.category == "agriculture") { agTechs++; seen.insert(tid); break; }
+        }
+    }
+    return 1.0f + 0.6f * (float)agTechs;   // each agri tech raises capacity
+}
+
+void CivilizationEngine::loseTechnology(int day, const std::string& regionName) {
+    // A collapse erases fragile, rarely-known innovations -> a dark age.
+    std::vector<int> fragile;
+    for (size_t i = 0; i < innovations.size(); ++i)
+        if (innovations[i].knowerCount <= 2 && innovations[i].complexity > 45.0f)
+            fragile.push_back((int)i);
+    if (fragile.empty()) return;
+    std::uniform_int_distribution<int> pickD(0, (int)fragile.size() - 1);
+    int idx = fragile[pickD(rng)];
+    std::string lost = innovations[idx].name;
+    int lostId = innovations[idx].id;
+    innovations.erase(innovations.begin() + idx);
+    // Strip it from every entity who knew it.
+    logEvent(day, "Knowledge of " + lost + " was lost in the collapse of " + regionName, "innovation");
+    darkAgeCount++;
+    lastCollapseDay = day;
+    (void)lostId;
+}
+
+void CivilizationEngine::migrateOverflow(int fromRegion, int livingPop, float capacity,
+                                         std::vector<Entity>& entities, int day) {
+    if (!g_planet) return;
+    // Find the emptiest region (lowest pop/capacity) as a migration target.
+    int target = -1; float bestSlack = 0.0f;
+    for (const auto& r : g_planet->regions) {
+        if (r.id == fromRegion || !r.habitable) continue;
+        float cap = r.tileCount * r.avgFertility;
+        int   pop = regionPopulation.count(r.id) ? regionPopulation[r.id] : 0;
+        float slack = cap - pop;
+        if (slack > bestSlack) { bestSlack = slack; target = r.id; }
+    }
+    if (target < 0) return;
+    const RegionInfo* tr = g_planet->regionById(target);
+    if (!tr) return;
+    float tgx, tgy; g_planet->gridToWorld((int)tr->centerGX, (int)tr->centerGY, tgx, tgy);
+
+    float migP = g_worldSeed.divergence.migrationPressure;
+    int toMove = std::max(1, (int)((livingPop - capacity) * 0.08f * migP));
+    int moved = 0;
+    const float STEP = 28.0f;
+    for (Entity& e : entities) {
+        if (moved >= toMove) break;
+        if (e.entityHealth <= 0.0f || e.originRegionId != fromRegion) continue;
+        // step toward target if the next tile is passable (land migration only;
+        // oceans/mountains stay barriers, preserving continental isolation)
+        float dx = tgx - e.posX, dy = tgy - e.posY;
+        float len = std::sqrt(dx*dx + dy*dy);
+        if (len < 1.0f) continue;
+        float nx = e.posX + dx / len * STEP;
+        float ny = e.posY + dy / len * STEP;
+        const Tile* t = g_planet->tileAtWorld(nx, ny);
+        if (!t || !t->isPassable()) continue;   // blocked by sea/mountain
+        e.posX = nx; e.posY = ny;
+        if (t->regionId >= 0 && t->regionId != e.originRegionId)
+            e.originRegionId = t->regionId;      // arrived in a new land
+        moved++;
+    }
+    if (moved > 0)
+        logEvent(day, std::to_string(moved) + " people migrated from "
+                 + "a crowded homeland toward open land", "tribe");
+}
+
+void CivilizationEngine::updateCarryingCapacity(std::vector<Entity>& entities, int day) {
+    if (!g_planet) return;
+
+    // 1. Count living population per region (by current location).
+    regionPopulation.clear();
+    for (Entity& e : entities) {
+        if (e.entityHealth <= 0.0f) continue;
+        int rid = e.originRegionId;
+        const Tile* t = g_planet->tileAtWorld(e.posX, e.posY);
+        if (t && t->regionId >= 0) rid = t->regionId;
+        if (rid >= 0) regionPopulation[rid]++;
+    }
+
+    // tick() fires many times per civ-day (the (day/60)%5 gate stays true for a
+    // whole frame-window). Population/capacity above is recomputed cheaply for the
+    // UI every call, but the *cumulative* famine damage below must apply only once
+    // per civ-day or it drains 100 health in a second and kills everyone instantly.
+    if (day == lastCapacityDay) {
+        // still refresh capacity numbers for the panel, then stop.
+        for (auto& kv : regionPopulation) {
+            const RegionInfo* r = g_planet->regionById(kv.first);
+            if (!r) continue;
+            int month = (day / 3) % 12 + 1;
+            float seasonMod = environment::SeasonalConfig::fromMonth(month).resourceModifier;
+            float K = r->tileCount * r->avgFertility * 0.06f
+                      * regionAgTechMultiplier(kv.first, entities) * seasonMod;
+            regionCapacity[kv.first] = std::max(1.0f, K);
+        }
+        return;
+    }
+    lastCapacityDay = day;
+
+    float cata = g_worldSeed.divergence.catastropheRate;
+
+    // 2. For each populated region, compare population to carrying capacity.
+    for (auto& kv : regionPopulation) {
+        int rid = kv.first; int pop = kv.second;
+        const RegionInfo* r = g_planet->regionById(rid);
+        if (!r) continue;
+        // Seasonal scarcity from the (previously dead) environment model:
+        // winters shrink the harvest, summers expand it.
+        int month = (day / 3) % 12 + 1;
+        float seasonMod = environment::SeasonalConfig::fromMonth(month).resourceModifier;
+        float K = r->tileCount * r->avgFertility * 0.06f
+                  * regionAgTechMultiplier(rid, entities) * seasonMod;
+        if (K < 1.0f) K = 1.0f;
+        regionCapacity[rid] = K;
+        float ratio = pop / K;
+
+        if (ratio > 1.0f) {
+            // Famine: the further over capacity, the harsher (scaled by config).
+            float severity = std::min(1.0f, (ratio - 1.0f)) * cata;
+            for (Entity& e : entities) {
+                if (e.entityHealth <= 0.0f) continue;
+                const Tile* t = g_planet->tileAtWorld(e.posX, e.posY);
+                int erid = (t && t->regionId >= 0) ? t->regionId : e.originRegionId;
+                if (erid != rid) continue;
+                e.entityStress = std::min(100.0f, e.entityStress + severity * 6.0f);
+                e.entityHealth = std::max(0.0f, e.entityHealth - severity * 4.0f);
+                e.entityHapiness = std::max(0.0f, e.entityHapiness - severity * 3.0f);
+            }
+            // Pressure release: migration toward open land.
+            migrateOverflow(rid, pop, K, entities, day);
+
+            // Severe, sustained overshoot can trigger a collapse & dark age.
+            if (ratio > 1.8f) {
+                std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+                if (roll(rng) < 0.05f * cata) {
+                    std::string rn = "region " + std::to_string(rid);
+                    logEvent(day, "Famine and collapse struck " + rn, "war");
+                    loseTechnology(day, rn);
+                }
+            }
+        }
+    }
+}
+
+void CivilizationEngine::conquerTribe(Tribe& victor, Tribe& loser, std::vector<Entity>& entities, int day) {
+    logEvent(day, victor.name + " has conquered " + loser.name + "!", "war");
+
+    // Absorb survivors into victor's tribe
+    for (int mid : loser.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (e && e->entityHealth > 0.0f) {
+            absorbEntityIntoTribe(victor, e);
+        }
+    }
+
+    // Transfer technologies
+    for (int tid : loser.knownTechIds)
+        victor.knownTechIds.insert(tid);
+
+    // The conquered language seeps into the victor's — creolisation.
+    if (g_lexicon && victor.regionId >= 0 && loser.regionId >= 0)
+        g_lexicon->blend(victor.regionId, loser.regionId, 0.25f);
+
+    // Mark loser tribe as dissolved
+    loser.memberIds.clear();
+}
+
+float CivilizationEngine::calculateTribeMilitaryStrength(const Tribe& tribe, std::vector<Entity>& entities) const {
+    float strength = 0.0f;
+    for (int mid : tribe.memberIds) {
+        Entity* e = const_cast<CivilizationEngine*>(this)->entityById(entities, mid);
+        if (!e || e->entityHealth <= 0.0f) continue;
+        float combat = (e->entityHealth / 100.0f) * 0.4f
+                     + (100.0f - e->personality.agreeableness) / 100.0f * 0.3f
+                     + (e->personality.conscientiousness / 100.0f) * 0.2f
+                     + (e->entityGeneralAnger / 100.0f) * 0.1f;
+        // Specialization bonus
+        if (e->specialization == "warrior") combat *= 1.6f;
+        strength += combat;
+    }
+    // Tech bonus
+    for (int tid : tribe.knownTechIds) {
+        Innovation* inv = const_cast<CivilizationEngine*>(this)->findInnovation(tid);
+        if (inv && inv->category == "military") strength += 1.5f;
+    }
+    return strength;
+}
+
+float CivilizationEngine::calculateTribeDefenseStrength(const Tribe& tribe, std::vector<Entity>& entities) const {
+    float defense = tribe.population() * 0.3f + tribe.collectivism * 0.08f;
+    for (int tid : tribe.knownTechIds) {
+        Innovation* inv = const_cast<CivilizationEngine*>(this)->findInnovation(tid);
+        if (inv && inv->name == "Fortification") defense += 3.0f;
+        if (inv && inv->name == "Shield Craft") defense += 2.0f;
+    }
+    return defense;
 }
 
 // ── Naming systems ────────────────────────────────────────────────────────────
@@ -928,6 +1378,11 @@ std::string CivilizationEngine::tribeName(const Entity* leader) {
     else if (maxTrait == con) prefix = pick<std::string>({"True",      "Steadfast", "Faithful",   "Ordered"});
     else if (maxTrait == opn) prefix = pick<std::string>({"Wandering", "Ancient",   "Curious",    "Seeing"});
     else                      prefix = pick<std::string>({"Iron",      "Storm",     "Dark",       "Hard"  });
+
+    // A proper name in the leader's homeland language gives each region its
+    // own phonetic signature (e.g. "Iron Vokuth" vs "Iron Aelar").
+    if (g_lexicon)
+        return prefix + " " + g_lexicon->genTribeName(leader->originRegionId);
 
     std::string suffix = pick<std::string>({"Clan","Kin","People","Circle","Lodge","Band","Tribe"});
     return prefix + " " + suffix;
@@ -948,7 +1403,52 @@ std::string CivilizationEngine::religionName(const Entity* founder) {
         core = pick<std::string>({"the Light","the Way","the Becoming","the Source"});
 
     std::string form = pick<std::string>({"Children of","Path of","Way of","Seekers of","Servants of"});
+    // Name the deity/principle in the founder's language for regional flavour.
+    if (g_lexicon)
+        return form + " " + g_lexicon->genReligionName(founder->originRegionId);
     return form + " " + core;
+}
+
+// ── History fingerprint ─────────────────────────────────────────────────────
+uint64_t CivilizationEngine::historySignature() const {
+    uint64_t h = 1469598103934665603ull;
+    auto mix = [&](uint64_t v){ h ^= v; h *= 1099511628211ull; };
+    mix((uint64_t)era);
+    mix((uint64_t)innovations.size());
+    // dominant religion of each tribe (order-independent-ish via sum of hashes)
+    uint64_t relAcc = 0;
+    for (const auto& t : tribes) relAcc += splitmix64((uint64_t)(t.dominantReligionId + 7) * 2654435761u);
+    mix(relAcc);
+    // which technologies exist (by name hash)
+    uint64_t techAcc = 0;
+    for (const auto& inv : innovations) techAcc += WorldSeed::hashString(inv.name);
+    mix(techAcc);
+    // religion identities
+    for (const auto& r : religions) mix(WorldSeed::hashString(r.name));
+    // population shape
+    for (const auto& kv : regionPopulation) mix(((uint64_t)kv.first << 20) ^ (uint64_t)kv.second);
+    return h;
+}
+
+std::string CivilizationEngine::historyLine() const {
+    int totalPop = 0;
+    for (const auto& kv : regionPopulation) totalPop += kv.second;
+    // find the most-followed religion
+    int bestRel = -1; size_t bestFollow = 0;
+    for (const auto& r : religions)
+        if (r.followerIds.size() > bestFollow) { bestFollow = r.followerIds.size(); bestRel = r.id; }
+    std::string relName = "none";
+    for (const auto& r : religions) if (r.id == bestRel) { relName = r.name; break; }
+
+    std::stringstream ss;
+    ss << getYearDisplay() << " | " << getEraName()
+       << " | pop " << totalPop
+       << " | tribes " << tribes.size()
+       << " | religions " << religions.size()
+       << " | techs " << innovations.size()
+       << " | dark ages " << darkAgeCount
+       << " | top faith: " << relName;
+    return ss.str();
 }
 
 // ── Lookup helpers ────────────────────────────────────────────────────────────

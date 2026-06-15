@@ -7,6 +7,7 @@
 #include <set>
 #include <deque>
 #include <random>
+#include "WorldSeed.h"
 
 class Entity;
 
@@ -65,6 +66,8 @@ struct Tribe {
     // Geographic center of mass
     float centerX = 700.0f;
     float centerY = 525.0f;
+    int   regionId = -1;   // landmass/cradle the tribe currently sits in
+    int   homeBiome = -1;  // Biome at the tribe centre (drives cultural drift)
 
     // Known technologies (by innovation id)
     std::set<int> knownTechIds;
@@ -90,12 +93,21 @@ struct CivEvent {
     std::string category; // "tribe"|"religion"|"innovation"|"war"|"diplomacy"
 };
 
+// ── Year System (BC/AD equivalent) ─────────────────────────────────────────
+// Simulation starts at year 5000 BC equivalent
+// 1 sim-year ≈ 365 in-game days (but compressed: 1 year = 8 birthday ticks)
+// Years < 0 = BC/BCE, Years >= 0 = AD/CE
 // ── Era ───────────────────────────────────────────────────────────────────────
 enum CivilizationEra {
-    ERA_HUNTER_GATHERER,   // scattered bands, no persistent structure
-    ERA_TRIBAL,            // stable tribes, basic tools, oral tradition
-    ERA_EARLY_CULTURE,     // agriculture + religion, >5 innovations
-    ERA_PROTO_CIVILIZATION // 15+ innovations, complex social hierarchy
+    ERA_STONE_AGE,            // ~5000-3000 BC: scattered bands, basic tools
+    ERA_TRIBAL,               // ~3000-1500 BC: stable tribes, oral tradition
+    ERA_EARLY_AGRICULTURE,    // ~1500-500 BC: agriculture, first religions
+    ERA_BRONZE_AGE,           // ~500 BC-0: metal working, trade networks
+    ERA_IRON_AGE,             // 0-500 AD: iron, fortifications, empires
+    ERA_CLASSICAL,            // 500-1200 AD: complex societies, philosophy
+    ERA_MEDIEVAL,             // 1200-1700 AD: kingdoms, organized religion
+    ERA_EARLY_MODERN,         // 1700-1900 AD: science, industry, exploration
+    ERA_MODERN                 // 1900+ AD: advanced civilization
 };
 
 // ── CivilizationEngine ────────────────────────────────────────────────────────
@@ -105,7 +117,10 @@ public:
     std::vector<Religion>   religions;
     std::vector<Innovation> innovations;
     std::deque<CivEvent>    eventLog;   // last 120 civilization events
-    CivilizationEra         era        = ERA_HUNTER_GATHERER;
+    CivilizationEra         era        = ERA_STONE_AGE;
+    int                     currentYear = -5000;  // BC/AD year: starts at 5000 BC
+    static constexpr int    START_YEAR   = -5000;
+    int                     yearsPerTick = 10;     // simulation years advanced per era tick
 
     CivilizationEngine();
 
@@ -115,6 +130,22 @@ public:
     // UI helpers
     std::string getEraName()    const;
     std::string getEraSummary() const;
+    std::string getYearDisplay() const;  // e.g. "4500 BC" or "1200 AD"
+    int         getCurrentYear() const { return currentYear; }
+
+    // Phase 4: Malthusian dynamics — populations per region this tick,
+    // exposed for the UI/History panel.
+    std::map<int,int>   regionPopulation;
+    std::map<int,float> regionCapacity;
+    int                 lastCollapseDay = -1;
+    int                 darkAgeCount    = 0;
+    int                 lastCapacityDay = -1;  // famine effects apply once per civ-day
+    int                 lastHistoryDay  = -1;  // history fingerprint logged once per day
+
+    // A compact fingerprint of the civilisation's state (era, dominant religions,
+    // top techs, population). Two seeds -> different signatures = proof of divergence.
+    uint64_t    historySignature() const;
+    std::string historyLine() const;  // human-readable summary for the History panel
 
     Tribe*      findTribe(int id);
     Religion*   findReligion(int id);
@@ -125,7 +156,7 @@ private:
     int nextTribeId      = 0;
     int nextReligionId   = 0;
     int nextInnovId      = 0;
-    std::mt19937 rng{std::random_device{}()};
+    std::mt19937_64 rng;  // seeded deterministically from the global world seed
 
     // ── Per-tick phases ───────────────────────────────────────────────────────
     void updateDominanceRanks(std::vector<Entity>& entities);
@@ -135,6 +166,13 @@ private:
     void updateTribeRelations(std::vector<Entity>& entities, int day);
     void updateEra(const std::vector<Entity>& entities);
     void applyEffectsToEntities(std::vector<Entity>& entities, int day);
+
+    // ── Phase 4: carrying capacity, famine, migration, dark ages ─────────────
+    void updateCarryingCapacity(std::vector<Entity>& entities, int day);
+    float regionAgTechMultiplier(int regionId, std::vector<Entity>& entities) const;
+    void migrateOverflow(int fromRegion, int livingPop, float capacity,
+                         std::vector<Entity>& entities, int day);
+    void loseTechnology(int day, const std::string& regionName);
 
     // ── Tribe operations ──────────────────────────────────────────────────────
     bool formTribe(std::vector<Entity*>& cluster, int day);
@@ -147,6 +185,13 @@ private:
     void removeDeadFromTribes(std::vector<Entity>& entities);
     void dissolveSmallTribes(std::vector<Entity>& entities, int day);
     void splitLargeTribes(std::vector<Entity>& entities, int day);
+    
+    // ── War system ───────────────────────────────────────────────────────────
+    void processWarTick(std::vector<Entity>& entities, int day);
+    void executeBattle(Tribe& attacker, Tribe& defender, std::vector<Entity>& entities, int day);
+    void conquerTribe(Tribe& victor, Tribe& loser, std::vector<Entity>& entities, int day);
+    float calculateTribeMilitaryStrength(const Tribe& tribe, std::vector<Entity>& entities) const;
+    float calculateTribeDefenseStrength(const Tribe& tribe, std::vector<Entity>& entities) const;
 
     // ── Religion operations ───────────────────────────────────────────────────
     bool foundReligion(Entity* prophet, int day);

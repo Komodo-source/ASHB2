@@ -238,6 +238,7 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/array \
  C:/mingw64/include/c++/14.2.0/compare \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Lexicon.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/random.hpp \
  C:/mingw64/include/c++/14.2.0/chrono \
  C:/mingw64/include/c++/14.2.0/bits/chrono.h \
@@ -255,6 +256,8 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:/mingw64/include/c++/14.2.0/iostream \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/BetterRand.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h

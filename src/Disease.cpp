@@ -59,9 +59,9 @@ int Disease::region;
 
   void Disease::manageSickness(Entity* ent){
     // guerison
-    // Reduced from *1.09/*1.3 — diseases should last days, not kill in seconds
-    ent->entityHealth -= ent->entityDiseaseType * 0.30;
-    ent->entityHygiene -= ent->entityDiseaseType * 0.35;
+    // Diseases drain health slowly — should be survivable for days
+    ent->entityHealth -= ent->entityDiseaseType * 0.10;
+    ent->entityHygiene -= ent->entityDiseaseType * 0.15;
     ent->entityAntiBody += BetterRand::genNrInInterval(3, 14);
     if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 10) > 90){
       std::string dName = Disease::getDiseaseName(ent->entityDiseaseType);
