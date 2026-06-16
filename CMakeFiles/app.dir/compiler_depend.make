@@ -3947,6 +3947,7 @@ CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj: src/LearningAdaptation.cpp \
   src/header/PlanningSystem.h \
   src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
+  src/header/WorldSeed.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
   C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
@@ -5044,6 +5045,7 @@ CMakeFiles/app.dir/src/PlanningSystem.cpp.obj: src/PlanningSystem.cpp \
   src/header/PlanningSystem.h \
   src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
+  src/header/WorldSeed.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
   C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
@@ -5850,6 +5852,7 @@ CMakeFiles/app.dir/src/SemanticMemory.cpp.obj: src/SemanticMemory.cpp \
   src/header/PlanningSystem.h \
   src/header/SemanticMemory.h \
   src/header/SocialNormSystem.h \
+  src/header/WorldSeed.h \
   C:/mingw64/include/c++/14.2.0/algorithm \
   C:/mingw64/include/c++/14.2.0/array \
   C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
@@ -8148,6 +8151,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: src/main.cpp \
   C:/mingw64/x86_64-w64-mingw32/include/wctype.h \
   C:/mingw64/x86_64-w64-mingw32/include/winapifamily.h \
   C:/mingw64/x86_64-w64-mingw32/include/winsdkver.h \
+  src/environment/EnvironmentModel.h \
   src/header/Image.h \
   src/header/SDLEngine.h \
   src/util/Debbug.h \

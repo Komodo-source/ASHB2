@@ -36,3 +36,8 @@
 [2026-06-16 15:59:29] Relationship: Trosar (1038) and Snausmolim (1071) - couple formed
 [2026-06-16 15:59:29] Relationship: Momis (1122) and Mbostraamar (1114) - couple formed
 [2026-06-16 15:59:34] Relationship: Leestor (1076) and Vroois (1068) - couple formed
+[2026-06-16 15:59:43] Relationship: Kausvoonane (5004) and Skaukis (1047) - couple formed
+[2026-06-16 15:59:55] Relationship: Graflooila (1116) and Briakvriazim (1115) - couple formed
+[2026-06-16 16:00:18] Relationship: Mbaaketh (1094) and Draakar (1093) - couple formed
+[2026-06-16 16:00:28] Relationship: Rooseth (1164) and Droolane (1167) - couple formed
+[2026-06-16 16:00:45] Relationship: Hoosis (1143) and Mbausraasim (1162) - couple formed

@@ -131,3 +131,9 @@
 [2026-06-16 15:59:21] Entity 1013 (Droolskoolor) cured from Malaria
 [2026-06-16 15:59:23] Entity 18 (Mbosel) cured from Malaria
 [2026-06-16 15:59:40] Entity 38 (Loobrykae) cured from Typhus
+[2026-06-16 15:59:46] Entity 1022 (Vauseth) contracted Typhus
+[2026-06-16 15:59:58] Entity 1017 (Rausel) contracted Typhus
+[2026-06-16 16:00:15] Entity 26 (Loozon) contracted Typhus
+[2026-06-16 16:00:15] Entity 1014 (Mooksnosel) contracted Malaria
+[2026-06-16 16:00:24] Entity 1019 (Drauksnauzim) contracted Plague
+[2026-06-16 16:00:44] Entity 26 (Loozon) cured from Typhus

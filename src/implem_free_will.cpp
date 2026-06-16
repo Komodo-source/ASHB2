@@ -1,4 +1,6 @@
 #include "./header/BetterRand.h"
+#include "./header/WorldSeed.h"
+#include "world/ResourceSystem.h"
 #include "./header/SemanticMemory.h"
 #include "./header/PlanningSystem.h"
 #include "./header/Entity.h"
@@ -26,6 +28,8 @@
 std::vector<Entity> FreeWillSystem::new_borns;
 int FreeWillSystem::day;
 extern Logger* globalLogger;
+// Seasonal/harvest food multiplier, driven by the EnvironmentModel in main.cpp.
+extern float g_seasonalFoodModifier;
 
 // Calculate memory weight (more recent = more weight)
 float FreeWillSystem::getMemoryWeight(int memoryAge) {
@@ -638,7 +642,7 @@ float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action&
     return modifier;
 }
 
-FreeWillSystem::FreeWillSystem() : currentTime(0), rng(std::random_device{}()) {
+FreeWillSystem::FreeWillSystem() : currentTime(0), rng(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0xF2EE'C0DEull))) {
     initializeNeeds();
     initializeActions();
 }
@@ -776,14 +780,15 @@ void FreeWillSystem::initializeActions() {
     // ==================== SELF-CARE ACTIONS ====================
     // Eat Meal (health) — proactive: fires when health < 80, not just in crisis
     Action eatMeal("EatMeal", 22, "health");
-    eatMeal.requirements = { {"health", 80.0f, 0.5f} };
+    // Hunger is now the dominant driver — a hungry entity eats from its food store.
+    eatMeal.requirements = { {"hunger", 30.0f, 0.9f}, {"health", 80.0f, 0.4f} };
     eatMeal.statChanges = { {"health", 9.0f}, {"happiness", 4.0f}, {"hygiene", -1.0f}, {"boredom", 2.0f} };
     eatMeal.baseSatisfaction = 12.0f;
     availableActions.push_back(eatMeal);
 
     // Sleep — proactive: fires when stress > 50 or health < 78
     Action sleep("Sleep", 23, "health");
-    sleep.requirements = { {"stress", 50.0f, 0.6f}, {"health", 78.0f, 0.5f} };
+    sleep.requirements = { {"fatigue", 45.0f, 0.7f}, {"stress", 50.0f, 0.5f}, {"health", 78.0f, 0.4f} };
     sleep.statChanges = { {"stress", -12.0f}, {"health", 8.0f}, {"mentalHealth", 7.0f}, {"hygiene", -4.0f}, {"boredom", 4.0f} };
     sleep.baseSatisfaction = 13.0f;
     availableActions.push_back(sleep);
@@ -1085,21 +1090,22 @@ void FreeWillSystem::initializeActions() {
     // chunk of health so a population can always feed itself, even before
     // agriculture exists. Costs effort (stress, hygiene).
     Action hunt("Hunt", 210, "survival");
-    hunt.requirements = { {"health", 85.0f, 0.6f}, {"boredom", 30.0f, 0.3f} };
+    // Foraging actions are pulled harder the hungrier the entity (and its kin) get.
+    hunt.requirements = { {"hunger", 25.0f, 0.7f}, {"health", 85.0f, 0.5f} };
     hunt.statChanges  = { {"boredom", -12.0f}, {"happiness", 7.0f},
                            {"health", 14.0f},   {"stress", 4.0f}, {"hygiene", -3.0f} };
     hunt.baseSatisfaction = 18.0f;
     availableActions.push_back(hunt);
 
     Action gather("Gather", 211, "survival");
-    gather.requirements = { {"health", 60.0f, 0.4f}, {"stress", 50.0f, 0.3f} };
+    gather.requirements = { {"hunger", 20.0f, 0.7f}, {"health", 60.0f, 0.3f} };
     gather.statChanges  = { {"boredom", -10.0f}, {"happiness", 5.0f},
                              {"health", 3.0f},    {"stress", -3.0f} };
     gather.baseSatisfaction = 10.0f;
     availableActions.push_back(gather);
 
     Action farm("Farm", 212, "survival");
-    farm.requirements = { {"health", 65.0f, 0.5f}, {"stress", 45.0f, 0.4f} };
+    farm.requirements = { {"hunger", 20.0f, 0.6f}, {"health", 65.0f, 0.4f} };
     farm.statChanges  = { {"boredom", -14.0f}, {"happiness", 6.0f},
                            {"health", 4.0f},    {"stress", 5.0f} };
     farm.baseSatisfaction = 12.0f;
@@ -2697,6 +2703,55 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     //check work action -> implements economics
     if(action->name == "Basic Manual Work"){
       entity->salary.earnMoney(BetterRand::genNrInInterval(100, 200));
+      entity->foodStore = std::min(20.0f, entity->foodStore + 1.0f); // wages buy some bread
+    }
+
+    // ── Subsistence: produce and consume food ────────────────────────────────
+    // Food is a survival good first, a trade good second. Foraging/farming fills
+    // the store; eating draws it down to beat back hunger. With an empty store,
+    // "eating" only scrounges scraps, so starvation still bites.
+    {
+        const std::string& an = action->name;
+        // Seasons and harvest luck scale how much food the land gives up. A clamp
+        // keeps even a hard winter / drought from yielding literally nothing.
+        float envMod = std::max(0.2f, g_seasonalFoodModifier);
+        // Local resource pool: a fertile river valley yields more than barren
+        // ground, and a region worked to exhaustion gives up less until it rests.
+        // Harvesting draws the regional food stock down (see ResourceSystem).
+        int   rid    = entity->originRegionId;
+        float localAb = g_resources.abundance(rid, RES_FOOD);  // 0.6..1.3, 1.0 if no region
+        auto landYield = [&](float gross) {
+            // The land only surrenders what it has; if depleted, the harvester
+            // still scrounges a fraction so a bad spot starves slowly, not instantly.
+            float taken = g_resources.extract(rid, RES_FOOD, gross);
+            return g_resources.valid(rid) ? std::max(taken, gross * 0.30f) : gross;
+        };
+        if (an == "Hunt") {
+            // Game is less seasonal than crops — blend toward 1.0.
+            float huntMod = 0.5f + 0.5f * envMod;
+            float gross = BetterRand::genNrInInterval(2, 5) * huntMod * (0.7f + 0.3f * localAb);
+            entity->foodStore = std::min(20.0f, entity->foodStore + landYield(gross));
+            entity->entityHunger = std::max(0.0f, entity->entityHunger - 10.0f); // eat fresh kill
+        } else if (an == "Gather") {
+            float gross = BetterRand::genNrInInterval(1, 3) * envMod * localAb;
+            entity->foodStore = std::min(20.0f, entity->foodStore + landYield(gross));
+            entity->entityHunger = std::max(0.0f, entity->entityHunger - 6.0f);
+        } else if (an == "Farm") {
+            float gross = BetterRand::genNrInInterval(3, 6) * envMod * localAb; // best sustained yield, most seasonal
+            entity->foodStore = std::min(20.0f, entity->foodStore + landYield(gross));
+        } else if (an == "EatMeal") {
+            float eaten = std::min(entity->foodStore, 1.5f);
+            entity->foodStore   -= eaten;
+            entity->entityHunger = std::max(0.0f, entity->entityHunger - (eaten * 25.0f + 3.0f));
+        }
+
+        // ── Fatigue: physical labour tires you out; rest restores you ────────
+        if (an == "Sleep")                    entity->fatigueLevel = std::max(0.0f, entity->fatigueLevel - 45.0f);
+        else if (an == "Rest")                entity->fatigueLevel = std::max(0.0f, entity->fatigueLevel - 25.0f);
+        else if (an == "Hunt" || an == "Farm" || an == "Build" || an == "Raid" ||
+                 an == "Duel" || an == "Work on Project" || an == "Basic Manual Work")
+            entity->fatigueLevel = std::min(100.0f, entity->fatigueLevel + BetterRand::genNrInInterval(8, 16));
+        else if (an == "Gather")              entity->fatigueLevel = std::min(100.0f, entity->fatigueLevel + 6.0f);
     }
 
 
@@ -2873,6 +2928,8 @@ float FreeWillSystem::getEntityStat(Entity* entity, const std::string& statName)
     if (statName == "boredom") return entity->entityBoredom;
     if (statName == "anger") return entity->entityGeneralAnger;
     if (statName == "hygiene") return (float)entity->entityHygiene;
+    if (statName == "hunger") return entity->entityHunger;
+    if (statName == "fatigue") return entity->fatigueLevel;
     return 0.0f;
 }
 
@@ -2885,6 +2942,8 @@ void FreeWillSystem::setEntityStat(Entity* entity, const std::string& statName, 
     else if (statName == "boredom") entity->entityBoredom = std::max(0.0f, std::min(100.0f, value));
     else if (statName == "anger") entity->entityGeneralAnger = std::max(0.0f, std::min(100.0f, value));
     else if (statName == "hygiene") entity->entityHygiene = (int)std::max(0.0f, std::min(100.0f, value));
+    else if (statName == "hunger") entity->entityHunger = std::max(0.0f, std::min(100.0f, value));
+    else if (statName == "fatigue") entity->fatigueLevel = std::max(0.0f, std::min(100.0f, value));
 }
 
 void FreeWillSystem::saveTo(std::ofstream& file) const {
@@ -3396,7 +3455,7 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
     if (v.hedonism > 70.0f && v.spiritualNeed > 70.0f) conflictLevel += 0.4f;
     if (v.collectivism > 70.0f && v.hedonism > 60.0f) conflictLevel += 0.2f;
     if (conflictLevel > 0.0f && candidates.size() >= 2) {
-        std::mt19937 rng(std::random_device{}());
+        std::mt19937 rng(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0x5A1Bull)));
         std::uniform_real_distribution<float> roll(0.0f, 1.0f);
         if (roll(rng) < conflictLevel) {
             std::swap(candidates[0], candidates[1]);

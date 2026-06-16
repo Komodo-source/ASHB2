@@ -1,5 +1,6 @@
 #include "./header/LearningAdaptation.h"
 #include "./header/Entity.h"
+#include "./header/WorldSeed.h"
 #include <fstream>
 #include <cmath>
 #include <algorithm>
@@ -46,8 +47,7 @@ std::string ActionValueFunction::selectAction(
     const std::vector<std::string>& availableActions,
     bool explore) {
     
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
+    static std::mt19937 gen(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0x1EA2'4111ull)));
     std::uniform_real_distribution<> dis(0.0f, 1.0f);
     
     // Epsilon-greedy exploration

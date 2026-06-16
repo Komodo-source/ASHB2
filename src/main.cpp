@@ -35,8 +35,57 @@
 #include "world/Lexicon.h"
 #include <unordered_map>
 #include <unordered_set>
+#include "environment/EnvironmentModel.h"
+#include "world/ResourceSystem.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
+
+// ── Global climate / season state ────────────────────────────────────────────
+// Wires the previously-dormant EnvironmentModel into the live simulation. Seasons
+// and harvest luck now modulate how much food foraging/farming yields, closing
+// the loop: climate → food production → hunger → population.
+static environment::EnvironmentalState g_env;
+float       g_seasonalFoodModifier = 1.0f;  // read by food production in executeAction
+float       g_seasonTemperature    = 60.0f; // 0..100 — cold winters cost more calories
+float       g_harvestLuck          = 1.0f;  // good year vs bad year (drought / blight / bumper)
+std::string g_seasonName           = "Spring";
+
+// Advance the environment once per new simulation day and recompute modifiers.
+void updateEnvironment(int day) {
+    static int lastDay = -1;
+    static int lastYear = -999999;
+    if (day == lastDay) return;
+    lastDay = day;
+
+    g_env.advanceTime(24.0f);                       // one in-sim day
+    g_seasonName        = g_env.currentSeason.toString();
+    g_seasonTemperature = g_env.currentSeason.temperature;
+
+    // "Good year / bad year": roll harvest luck each new year. Droughts and
+    // blights (bad years) slash yields and create famine pressure; bumper years
+    // swell the granaries. This is the 丰收年 / 歉收年 cycle.
+    int year = day / 365;
+    if (year != lastYear) {
+        lastYear = year;
+        int roll = BetterRand::genNrInInterval(0, 100);
+        if (roll < 12)      g_harvestLuck = 0.45f;  // drought / blight — famine
+        else if (roll < 22) g_harvestLuck = 0.70f;  // poor year
+        else if (roll > 90) g_harvestLuck = 1.45f;  // bumper harvest
+        else                g_harvestLuck = 1.00f;  // ordinary year
+        if (globalLogger) {
+            std::string note = (g_harvestLuck < 0.7f) ? "A year of famine begins - the crops fail."
+                              : (g_harvestLuck > 1.3f) ? "A bountiful year - granaries overflow."
+                                                       : "An ordinary year for the harvest.";
+            globalLogger->logEvent("environment", note);
+        }
+    }
+
+    g_seasonalFoodModifier = g_env.currentSeason.resourceModifier * g_harvestLuck;
+
+    // Regrow / degrade per-region resource stocks for the new day. Living
+    // resources track the same season + harvest luck that drive food yields.
+    g_resources.update(g_seasonalFoodModifier);
+}
 
 /*
 int main(){
@@ -112,8 +161,7 @@ ActionContext createContextFromTime(int day, int numPeopleNearby) {
 
 // Generate random personality using Big Five distribution
 Personality generateRandomPersonality() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0xBAD5'EEDull)));
     std::normal_distribution<float> dist(50.0f, 20.0f);
 
     auto clamp = [](float val) { return std::max(0.0f, std::min(100.0f, val)); };
@@ -703,6 +751,7 @@ void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, 
 }
 
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
+    updateEnvironment(currentDay);   // advance season / harvest before agents act
     EnvironmentalFactors env = generateEnvFactors(currentDay);
 
 
@@ -820,6 +869,39 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 float healthDecay = 0.002f + (entity->entityStress / 100.0f) * 0.008f
                                           - (p.conscientiousness  / 100.0f) * 0.003f;
                 entity->entityHealth = pdclamp(entity->entityHealth - healthDecay, 0.0f, 100.0f);
+
+                // ── Metabolism: burn stored food, or starve ──────────────────
+                // Each tick the body consumes rations. While the store holds out
+                // the entity stays fed; once it runs dry, hunger climbs and —
+                // past a threshold — eats away health. This is what makes food a
+                // requirement for life rather than a market curiosity.
+                // Cold seasons raise the calorie cost of staying alive.
+                float coldFactor = (g_seasonTemperature < 45.0f)
+                                 ? 1.0f + (45.0f - g_seasonTemperature) / 100.0f : 1.0f;
+                float burn = 0.12f * deltaTime * coldFactor;
+                if (entity->foodStore > burn) {
+                    entity->foodStore -= burn;
+                    entity->entityHunger = pdclamp(entity->entityHunger - 0.6f, 0.0f, 100.0f);
+                } else {
+                    entity->foodStore = 0.0f;
+                    entity->entityHunger = pdclamp(entity->entityHunger + 0.9f * coldFactor, 0.0f, 100.0f);
+                }
+                if (entity->entityHunger > 70.0f) {
+                    float starve = (entity->entityHunger - 70.0f) / 30.0f; // 0..1
+                    entity->entityHealth   = pdclamp(entity->entityHealth   - starve * 0.6f, 0.0f, 100.0f);
+                    entity->entityHapiness = pdclamp(entity->entityHapiness - starve * 0.4f, 0.0f, 100.0f);
+                    entity->entityStress   = pdclamp(entity->entityStress   + starve * 0.3f, 0.0f, 100.0f);
+                }
+
+                // ── Fatigue: drifts up with wakefulness, relieved by rest/sleep.
+                // Exhaustion frays the mind and body (the doc's second named need).
+                entity->fatigueLevel = pdclamp(entity->fatigueLevel + 0.25f * deltaTime, 0.0f, 100.0f);
+                if (entity->fatigueLevel > 70.0f) {
+                    float tired = (entity->fatigueLevel - 70.0f) / 30.0f; // 0..1
+                    entity->entityStress      = pdclamp(entity->entityStress      + tired * 0.4f, 0.0f, 100.0f);
+                    entity->entityMentalHealth= pdclamp(entity->entityMentalHealth- tired * 0.2f, 0.0f, 100.0f);
+                    entity->entityHealth      = pdclamp(entity->entityHealth      - tired * 0.15f, 0.0f, 100.0f);
+                }
 
                 // Low hygiene cascades into stress and happiness
                 if (entity->entityHygiene < 25.0f) {
@@ -1443,6 +1525,11 @@ int main(int argc, char* argv[]) {
         std::cout << ps.str() << "\n";
         globalLogger->logCmd(ps.str());
     }
+
+    // ── Per-region resource pools (food/wood/stone/metal/water/herbs) ─────────
+    // Geography sets each region's resource ceilings; the simulation then draws
+    // them down and lets them regrow, so settlement location genuinely matters.
+    g_resources.init(*g_planet);
 
     // ── Per-region procedural languages ──────────────────────────────────────
     g_lexicon = new Lexicon();

@@ -50,6 +50,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/world/Noise.cpp" "CMakeFiles/app.dir/src/world/Noise.cpp.obj" "gcc" "CMakeFiles/app.dir/src/world/Noise.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/world/Planet.cpp" "CMakeFiles/app.dir/src/world/Planet.cpp.obj" "gcc" "CMakeFiles/app.dir/src/world/Planet.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/world/PlanetView.cpp" "CMakeFiles/app.dir/src/world/PlanetView.cpp.obj" "gcc" "CMakeFiles/app.dir/src/world/PlanetView.cpp.obj.d"
+  "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/world/ResourceSystem.cpp" "CMakeFiles/app.dir/src/world/ResourceSystem.cpp.obj" "gcc" "CMakeFiles/app.dir/src/world/ResourceSystem.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

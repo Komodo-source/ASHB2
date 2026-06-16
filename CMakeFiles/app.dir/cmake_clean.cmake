@@ -83,6 +83,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/world/Planet.cpp.obj.d"
   "CMakeFiles/app.dir/src/world/PlanetView.cpp.obj"
   "CMakeFiles/app.dir/src/world/PlanetView.cpp.obj.d"
+  "CMakeFiles/app.dir/src/world/ResourceSystem.cpp.obj"
+  "CMakeFiles/app.dir/src/world/ResourceSystem.cpp.obj.d"
   "app.exe"
   "app.exe.manifest"
   "app.pdb"

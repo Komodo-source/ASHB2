@@ -35,6 +35,18 @@ int UI::showSaveLoadButtons(std::string& filename, int day, int num_entity, int 
     ImGui::Text("Number Entities: %d", num_entity);
     ImGui::Text("day: %d", day);
     ImGui::Text("actual tick: %d", tick);
+
+    // ── Climate / harvest readout (EnvironmentModel) ──────────────────────────
+    extern std::string g_seasonName;
+    extern float g_seasonTemperature;
+    extern float g_seasonalFoodModifier;
+    extern float g_harvestLuck;
+    ImVec4 foodCol = g_seasonalFoodModifier < 0.7f ? ImVec4(1.0f, 0.4f, 0.3f, 1.0f)
+                    : g_seasonalFoodModifier > 1.2f ? ImVec4(0.5f, 1.0f, 0.5f, 1.0f)
+                                                    : ImVec4(0.85f, 0.85f, 0.6f, 1.0f);
+    ImGui::Text("Season: %s  (%.0f temp)", g_seasonName.c_str(), g_seasonTemperature);
+    ImGui::TextColored(foodCol, "Food yield x%.2f  | harvest x%.2f",
+                       g_seasonalFoodModifier, g_harvestLuck);
     ImGui::Separator();
 
     if (ImGui::Button(simulationPaused ? "Resume Simulation" : "Stop Simulation")) {
@@ -133,6 +145,14 @@ void UI::showSystemInformation(){
         ImGui::Text("Mental Health: %.2f", entity->entityMentalHealth);
         ImGui::Text("Loneliness: %.2f", entity->entityLoneliness);
         ImGui::Text("Anger: %.2f", entity->entityGeneralAnger);
+        // Subsistence readout: red when starving so the player feels the stakes.
+        ImVec4 hungerCol = entity->entityHunger > 70.0f ? ImVec4(1.0f, 0.35f, 0.3f, 1.0f)
+                          : entity->entityHunger > 40.0f ? ImVec4(1.0f, 0.8f, 0.3f, 1.0f)
+                                                         : ImVec4(0.6f, 0.9f, 0.6f, 1.0f);
+        ImGui::TextColored(hungerCol, "Hunger: %.1f   Food store: %.1f", entity->entityHunger, entity->foodStore);
+        ImVec4 fatCol = entity->fatigueLevel > 70.0f ? ImVec4(1.0f, 0.45f, 0.3f, 1.0f)
+                                                      : ImVec4(0.7f, 0.8f, 0.9f, 1.0f);
+        ImGui::TextColored(fatCol, "Fatigue: %.1f", entity->fatigueLevel);
         ImGui::Text("Birthday: %dth day", entity->entityBDay);
         //ImGui::Text("Hygiene: %d", entity->entityHygiene);
 
@@ -399,94 +419,176 @@ if (!entity->list_entityPointedAnger.empty()) {
         ImGui::End();
     }
 
-// Compute a stable circular layout position for entity at index i out of n total.
-// Used by both DrawGrid and HandlePointMovement so click detection is consistent.
-static ImVec2 socialGraphPos(int i, int n, float cx = 700.0f, float cy = 330.0f) {
-    if (n <= 0) return ImVec2(cx, cy);
-    float radius = std::min(cx, cy) * 0.85f;
-    float angle  = (2.0f * 3.14159265f * i) / n - 3.14159265f / 2.0f;
-    return ImVec2(cx + radius * std::cos(angle), cy + radius * std::sin(angle));
+// Stable, distinct-ish color for a tribe id (so clusters read at a glance).
+static ImU32 tribeColor(int tribeId, int alpha = 255) {
+    if (tribeId < 0) return IM_COL32(150, 150, 160, alpha); // "no tribe" = grey
+    // Spread hues around the wheel using a large step so neighbors differ.
+    float hue = std::fmod(tribeId * 0.61803398875f, 1.0f); // golden-ratio hashing
+    float r, g, b;
+    float h6 = hue * 6.0f; int seg = (int)h6; float f = h6 - seg;
+    float q = 1.0f - f, t = f;
+    switch (seg % 6) {
+        case 0: r = 1; g = t; b = 0; break;
+        case 1: r = q; g = 1; b = 0; break;
+        case 2: r = 0; g = 1; b = t; break;
+        case 3: r = 0; g = q; b = 1; break;
+        case 4: r = t; g = 0; b = 1; break;
+        default:r = 1; g = 0; b = q; break;
+    }
+    return IM_COL32((int)(70 + r * 185), (int)(70 + g * 185), (int)(70 + b * 185), alpha);
 }
 
-// DrawGrid — social network graph.  No spatial positions: layout is circular,
-// relationship lines reveal who knows / loves / hates whom.
+// Cluster-by-tribe layout: entities of the same tribe sit together in their own
+// little ring; the tribes themselves are arranged on a big ring. This turns the
+// old single-circle "hairball" into readable social neighborhoods at scale.
+// Both DrawGrid and HandlePointMovement call this so click-detection stays exact.
+static void computeSocialLayout(const std::vector<Entity*>& entities,
+                                std::vector<ImVec2>& out,
+                                std::vector<ImVec2>* clusterCenters = nullptr,
+                                std::vector<int>* clusterTribe = nullptr) {
+    const float PI = 3.14159265f;
+    const float cx = 760.0f, cy = 410.0f;
+    int n = (int)entities.size();
+    out.assign(n, ImVec2(cx, cy));
+    if (n == 0) return;
+
+    // Group indices by tribe, preserving first-seen order for determinism.
+    std::vector<int> tribeOrder;
+    std::map<int, int> tribeSlot;                 // tribeId -> cluster index
+    std::vector<std::vector<int>> clusters;
+    for (int i = 0; i < n; ++i) {
+        int t = entities[i]->tribeId;
+        auto it = tribeSlot.find(t);
+        if (it == tribeSlot.end()) {
+            tribeSlot[t] = (int)clusters.size();
+            tribeOrder.push_back(t);
+            clusters.push_back({});
+        }
+        clusters[tribeSlot[t]].push_back(i);
+    }
+
+    int C = (int)clusters.size();
+    float bigR = (C <= 1) ? 0.0f : std::min(cx, cy) * 0.78f;
+    for (int k = 0; k < C; ++k) {
+        float ca = (C <= 1) ? 0.0f : (2.0f * PI * k) / C - PI / 2.0f;
+        ImVec2 center(cx + bigR * std::cos(ca), cy + bigR * std::sin(ca));
+        if (clusterCenters) clusterCenters->push_back(center);
+        if (clusterTribe)   clusterTribe->push_back(tribeOrder[k]);
+
+        int m = (int)clusters[k].size();
+        float sr = std::min(160.0f, 26.0f + m * 2.4f);
+        for (int j = 0; j < m; ++j) {
+            int idx = clusters[k][j];
+            if (m == 1) { out[idx] = center; continue; }
+            float a = (2.0f * PI * j) / m - PI / 2.0f;
+            out[idx] = ImVec2(center.x + sr * std::cos(a), center.y + sr * std::sin(a));
+        }
+    }
+}
+
+// DrawGrid — social network graph. Entities are clustered by tribe; relationship
+// lines reveal who loves / knows / hates whom. With many entities it switches to
+// level-of-detail (only strong links + couples) and, when a node is selected, to
+// an "ego focus" that shows just that person's relationships.
 void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
     if (entities.empty()) return;
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
     int n = (int)entities.size();
 
-    // Build id→index map for relationship lines
+    std::vector<ImVec2> pos;
+    std::vector<ImVec2> clusterCenters;
+    std::vector<int>    clusterTribe;
+    computeSocialLayout(entities, pos, &clusterCenters, &clusterTribe);
+
     std::map<int, int> idToIdx;
-    for (int i = 0; i < n; ++i)
-        idToIdx[entities[i]->entityId] = i;
+    for (int i = 0; i < n; ++i) idToIdx[entities[i]->entityId] = i;
 
-    // ── 1. Relationship lines ─────────────────────────────────────────────────
-    for (int i = 0; i < n; ++i) {
-        Entity* ent = entities[i];
-        ImVec2 from = socialGraphPos(i, n);
-
-        for (auto& d : ent->list_entityPointedDesire) {
-            if (!d.pointedEntity) continue;
-            auto it = idToIdx.find(d.pointedEntity->entityId);
-            if (it == idToIdx.end()) continue;
-            ImVec2 to = socialGraphPos(it->second, n);
-            float alpha = std::min(1.0f, d.desire / 100.0f);
-            draw_list->AddLine(from, to, IM_COL32(255, 80, 180, (int)(alpha * 160)),
-                               1.0f + (d.desire / 100.0f) * 2.5f);
-        }
-        for (auto& a : ent->list_entityPointedAnger) {
-            if (!a.pointedEntity) continue;
-            auto it = idToIdx.find(a.pointedEntity->entityId);
-            if (it == idToIdx.end()) continue;
-            ImVec2 to = socialGraphPos(it->second, n);
-            float alpha = std::min(1.0f, a.anger / 100.0f);
-            draw_list->AddLine(from, to, IM_COL32(255, 40, 40, (int)(alpha * 160)),
-                               1.0f + (a.anger / 100.0f) * 2.5f);
-        }
-        for (auto& s : ent->list_entityPointedSocial) {
-            if (!s.pointedEntity) continue;
-            auto it = idToIdx.find(s.pointedEntity->entityId);
-            if (it == idToIdx.end()) continue;
-            ImVec2 to = socialGraphPos(it->second, n);
-            float alpha = std::min(1.0f, s.social / 100.0f);
-            draw_list->AddLine(from, to, IM_COL32(60, 220, 220, (int)(alpha * 130)),
-                               1.0f + (s.social / 100.0f) * 2.0f);
-        }
-        for (auto& c : ent->list_entityPointedCouple) {
-            if (!c.pointedEntity) continue;
-            auto it = idToIdx.find(c.pointedEntity->entityId);
-            if (it == idToIdx.end()) continue;
-            ImVec2 to = socialGraphPos(it->second, n);
-            draw_list->AddLine(from, to, IM_COL32(255, 215, 0, 210), 3.0f);
-        }
+    // Faint tribe labels at each cluster centroid.
+    for (size_t k = 0; k < clusterCenters.size(); ++k) {
+        char buf[32];
+        if (clusterTribe[k] < 0) snprintf(buf, sizeof(buf), "(no tribe)");
+        else                     snprintf(buf, sizeof(buf), "Tribe %d", clusterTribe[k]);
+        draw_list->AddText(ImVec2(clusterCenters[k].x - 22.0f, clusterCenters[k].y - 6.0f),
+                           tribeColor(clusterTribe[k], 90), buf);
     }
 
+    // Which node (if any) is selected → ego-focus mode.
+    int sel = -1;
+    for (int i = 0; i < n; ++i) if (entities[i]->selected) { sel = i; break; }
 
+    bool large = (n > 50);
+    bool egoMode = (sel >= 0);
+    float thr = large ? 45.0f : 0.0f;   // LOD: hide weak links when crowded
+    int   maxLines = 2500, lines = 0;   // hard cap so huge worlds stay responsive
 
-    // ── 2. Entity dots ────────────────────────────────────────────────────────
+    // Draw one entity's outgoing links. In ego mode we only draw links that
+    // touch the selected node (its own + everyone pointing at it).
+    auto drawFor = [&](int i) {
+        Entity* ent = entities[i];
+        ImVec2 from = pos[i];
+        auto incident = [&](Entity* tgt) {
+            if (!egoMode) return true;
+            return i == sel || (tgt && idToIdx.count(tgt->entityId) && idToIdx[tgt->entityId] == sel);
+        };
+        // Couples first — always shown (they're the backbone of the network).
+        for (auto& c : ent->list_entityPointedCouple) {
+            if (!c.pointedEntity || lines >= maxLines) continue;
+            auto it = idToIdx.find(c.pointedEntity->entityId);
+            if (it == idToIdx.end() || !incident(c.pointedEntity)) continue;
+            draw_list->AddLine(from, pos[it->second], IM_COL32(255, 215, 0, 220), 3.0f); ++lines;
+        }
+        for (auto& d : ent->list_entityPointedDesire) {
+            if (!d.pointedEntity || d.desire < thr || lines >= maxLines) continue;
+            auto it = idToIdx.find(d.pointedEntity->entityId);
+            if (it == idToIdx.end() || !incident(d.pointedEntity)) continue;
+            float al = std::min(1.0f, d.desire / 100.0f);
+            draw_list->AddLine(from, pos[it->second], IM_COL32(255, 80, 180, (int)(al * 170)),
+                               1.0f + al * 2.5f); ++lines;
+        }
+        for (auto& a : ent->list_entityPointedAnger) {
+            if (!a.pointedEntity || a.anger < thr || lines >= maxLines) continue;
+            auto it = idToIdx.find(a.pointedEntity->entityId);
+            if (it == idToIdx.end() || !incident(a.pointedEntity)) continue;
+            float al = std::min(1.0f, a.anger / 100.0f);
+            draw_list->AddLine(from, pos[it->second], IM_COL32(255, 45, 45, (int)(al * 175)),
+                               1.0f + al * 2.5f); ++lines;
+        }
+        for (auto& s : ent->list_entityPointedSocial) {
+            if (!s.pointedEntity || s.social < thr || lines >= maxLines) continue;
+            auto it = idToIdx.find(s.pointedEntity->entityId);
+            if (it == idToIdx.end() || !incident(s.pointedEntity)) continue;
+            float al = std::min(1.0f, s.social / 100.0f);
+            draw_list->AddLine(from, pos[it->second], IM_COL32(60, 220, 220, (int)(al * 120)),
+                               1.0f + al * 2.0f); ++lines;
+        }
+    };
+
+    for (int i = 0; i < n; ++i) drawFor(i);
+
+    // ── Entity dots: filled by happiness, ringed by tribe color ──────────────
     for (int i = 0; i < n; ++i) {
         Entity* entity = entities[i];
-        ImVec2  pos    = socialGraphPos(i, n);
+        ImVec2  p      = pos[i];
         bool isSick    = (entity->entityDiseaseType != -1);
+        bool dimmed    = egoMode && i != sel; // fade non-selected nodes in ego focus
 
-        ImU32 color;
         float size = pointSize;
-
-        if (entity->selected) {
-            color = IM_COL32(255, 100, 100, 255);
-        } else if (isSick) {
-            color = IM_COL32(170, 220, 60, 255);
-        } else {
+        ImU32 fill;
+        if (entity->selected)      { fill = IM_COL32(255, 100, 100, 255); size = pointSize + 2.5f; }
+        else if (isSick)           fill = IM_COL32(170, 220, 60, 255);
+        else {
             float h = std::max(0.0f, std::min(1.0f, entity->entityHapiness / 100.0f));
-            color = IM_COL32((int)(160 + h * 60), (int)(160 + h * 20), (int)(200 - h * 60), 255);
+            int a = (egoMode && dimmed) ? 90 : 255;
+            fill = IM_COL32((int)(150 + h * 70), (int)(150 + h * 25), (int)(205 - h * 70), a);
         }
 
-        draw_list->AddCircleFilled(pos, size, color);
+        draw_list->AddCircleFilled(p, size, fill);
+        // Tribe-colored ring around each dot.
+        draw_list->AddCircle(p, size + 1.5f, tribeColor(entity->tribeId, (egoMode && dimmed) ? 70 : 230), 0, 1.6f);
 
         if (entity->selected) {
-            draw_list->AddText(ImVec2(pos.x + size + 3.0f, pos.y - 7.0f),
-                               IM_COL32(255, 160, 160, 255),
-                               entity->name.c_str());
+            draw_list->AddText(ImVec2(p.x + size + 3.0f, p.y - 7.0f),
+                               IM_COL32(255, 200, 200, 255), entity->name.c_str());
         }
     }
 }
@@ -500,11 +602,12 @@ int UI::HandlePointMovement(std::vector<Entity*>& entities) {
     if (mouseClicked) {
         int n = (int)entities.size();
         selectedIndex = -1;
+        std::vector<ImVec2> pos;
+        computeSocialLayout(entities, pos);
         for (int i = 0; i < n; ++i) {
-            ImVec2 pos = socialGraphPos(i, n);
-            float dx = mousePos.x - pos.x;
-            float dy = mousePos.y - pos.y;
-            if (dx * dx + dy * dy < 100.0f) {
+            float dx = mousePos.x - pos[i].x;
+            float dy = mousePos.y - pos[i].y;
+            if (dx * dx + dy * dy < 144.0f) {  // ~12px pick radius
                 selectedIndex = i;
                 for (auto* e : entities) e->selected = false;
                 entities[i]->selected = true;

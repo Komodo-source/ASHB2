@@ -110,3 +110,8 @@
 [2026-06-16 15:58:57] Entity contaminated: 1015 Fleestim => Plague
 [2026-06-16 15:59:06] Entity contaminated: 18 Mbosel => Malaria
 [2026-06-16 15:59:18] Entity contaminated: 38 Loobrykae => Typhus
+[2026-06-16 15:59:46] Entity contaminated: 1022 Vauseth => Typhus
+[2026-06-16 15:59:58] Entity contaminated: 1017 Rausel => Typhus
+[2026-06-16 16:00:15] Entity contaminated: 26 Loozon => Typhus
+[2026-06-16 16:00:15] Entity contaminated: 1014 Mooksnosel => Malaria
+[2026-06-16 16:00:24] Entity contaminated: 1019 Drauksnauzim => Plague

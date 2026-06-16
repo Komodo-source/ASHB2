@@ -55,4 +55,17 @@ inline std::mt19937_64 makeStream(uint64_t master, uint64_t salt, uint64_t index
 // Global world seed, set once at startup before any generation.
 extern WorldSeed g_worldSeed;
 
+// Deterministic per-object seed source. Replaces std::random_device for any
+// generator that must be reproducible (per-entity cognitive RNGs, etc.).
+// Construction order is fixed for a given world seed + config, so a monotonic
+// counter mixed with the master seed yields a distinct-yet-replayable seed for
+// each caller. Same seed → identical history; different instances → independent
+// streams (so every entity isn't making the same "random" choice).
+// NOTE: assumes generators are constructed on a single thread (true for the
+// simulation/agent loop); concurrent construction would lose determinism.
+inline uint64_t nextDeterministicSeed(uint64_t salt = 0) {
+    static uint64_t counter = 0;
+    return splitmix64(g_worldSeed.master ^ splitmix64(salt + 0x9E3779B97F4A7C15ull * (++counter)));
+}
+
 #endif // WORLD_SEED_H

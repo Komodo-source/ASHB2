@@ -195,3 +195,82 @@
 [2026-06-16 15:59:37] Entity 1072 (Mbaukdroomor, age 8) died: crime of passion by Snausmolim
 [2026-06-16 15:59:40] Entity 1038 (Trosar, age 14) died: crime of passion by Romim
 [2026-06-16 15:59:40] Entity 5005 (Tronmomel, age 11) died: crime of passion by Haazor
+[2026-06-16 15:59:43] Entity 1017 (Rausel, age 20) died: crime of passion by Mooksnosel
+[2026-06-16 15:59:43] Entity 1070 (Roomis, age 10) died: crime of passion by Skaazeth
+[2026-06-16 15:59:45] Entity 1070 (Roomis, age 10) died: hardship
+[2026-06-16 15:59:46] Entity 1017 (Rausel, age 20) died: crime of passion by Mooksnosel
+[2026-06-16 15:59:47] Entity 1038 (Trosar, age 14) died: crime of passion by Romim
+[2026-06-16 15:59:47] Entity 1072 (Mbaukdroomor, age 9) died: crime of passion by Snausmolim
+[2026-06-16 15:59:47] Entity 1078 (Staaryis, age 9) died: crime of passion by Braemis
+[2026-06-16 15:59:49] Entity 1078 (Staaryis, age 9) died: hardship
+[2026-06-16 15:59:50] Entity 1030 (Floseth, age 16) died: crime of passion by Volvauzar
+[2026-06-16 15:59:51] Entity 5005 (Tronmomel, age 11) died: crime of passion by Haazor
+[2026-06-16 15:59:51] Entity 1072 (Mbaukdroomor, age 9) died: crime of passion by Snausmolim
+[2026-06-16 15:59:51] Entity 1071 (Snausmolim, age 9) died: crime of passion by Mbaukdroomor
+[2026-06-16 15:59:51] Entity 1055 (Raaseth, age 12) died: crime of passion by Kausvoonane
+[2026-06-16 15:59:53] Entity 1071 (Snausmolim, age 9) died: hardship
+[2026-06-16 15:59:54] Entity 1011 (Skoolmbaasar, age 23) died: crime of passion by Mbaamor
+[2026-06-16 15:59:54] Entity 1034 (Romim, age 15) died: crime of passion by Trosar
+[2026-06-16 15:59:54] Entity 1055 (Raaseth, age 12) died: crime of passion by Kausvoonane
+[2026-06-16 15:59:56] Entity 1034 (Romim, age 15) died: hardship
+[2026-06-16 15:59:57] Entity 1011 (Skoolmbaasar, age 23) died: crime of passion by Mbaamor
+[2026-06-16 15:59:58] Entity 1030 (Floseth, age 16) died: crime of passion by Volvauzar
+[2026-06-16 15:59:58] Entity 1038 (Trosar, age 14) died: crime of passion by Snaanar
+[2026-06-16 15:59:58] Entity 20006 (Snaanar, age 15) died: crime of passion by Trosar
+[2026-06-16 15:59:58] Entity 1052 (Vrausar, age 12) died: crime of passion by Skaukis
+[2026-06-16 15:59:58] Entity 1056 (Vraasar, age 11) died: crime of passion by Raaseth
+[2026-06-16 16:00:00] Entity 20006 (Snaanar, age 15) died: hardship
+[2026-06-16 16:00:00] Entity 1056 (Vraasar, age 11) died: hardship
+[2026-06-16 16:00:01] Entity 1017 (Rausel, age 20) died: crime of passion by Mooksnosel
+[2026-06-16 16:00:01] Entity 1030 (Floseth, age 16) died: crime of passion by Volvauzar
+[2026-06-16 16:00:02] Entity 1055 (Raaseth, age 12) died: crime of passion by Kausvoonane
+[2026-06-16 16:00:02] Entity 1065 (Vroozim, age 10) died: crime of passion by Hozim
+[2026-06-16 16:00:04] Entity 1017 (Rausel, age 20) died: disease
+[2026-06-16 16:00:04] Entity 1065 (Vroozim, age 10) died: hardship
+[2026-06-16 16:00:05] Entity 1030 (Floseth, age 16) died: crime of passion by Volvauzar
+[2026-06-16 16:00:08] Entity 1030 (Floseth, age 17) died: crime of passion by Volvauzar
+[2026-06-16 16:00:08] Entity 1055 (Raaseth, age 13) died: crime of passion by Kausvoonane
+[2026-06-16 16:00:09] Entity 1047 (Skaukis, age 14) died: crime of passion by Vrausar
+[2026-06-16 16:00:10] Entity 1047 (Skaukis, age 14) died: hardship
+[2026-06-16 16:00:11] Entity 1011 (Skoolmbaasar, age 24) died: crime of passion by Mbaamor
+[2026-06-16 16:00:11] Entity 1055 (Raaseth, age 13) died: crime of passion by Kausvoonane
+[2026-06-16 16:00:12] Entity 1079 (Laathon, age 10) died: crime of passion by Flazbrymor
+[2026-06-16 16:00:13] Entity 1079 (Laathon, age 10) died: hardship
+[2026-06-16 16:00:15] Entity 1030 (Floseth, age 17) died: crime of passion by Volvauzar
+[2026-06-16 16:00:15] Entity 1055 (Raaseth, age 13) died: crime of passion by Kausvoonane
+[2026-06-16 16:00:15] Entity 1061 (Voonmoonor, age 12) died: crime of passion by Kauzeth
+[2026-06-16 16:00:17] Entity 1011 (Skoolmbaasar, age 24) died: crime of passion by Mbaamor
+[2026-06-16 16:00:18] Entity 1030 (Floseth, age 17) died: crime of passion by Volvauzar
+[2026-06-16 16:00:18] Entity 1022 (Vauseth, age 19) died: crime of passion by Floseth
+[2026-06-16 16:00:18] Entity 1045 (Stooklaemila, age 15) died: crime of passion by Stiath
+[2026-06-16 16:00:18] Entity 1061 (Voonmoonor, age 12) died: crime of passion by Kauzeth
+[2026-06-16 16:00:20] Entity 1022 (Vauseth, age 19) died: disease
+[2026-06-16 16:00:20] Entity 1045 (Stooklaemila, age 15) died: hardship
+[2026-06-16 16:00:21] Entity 1030 (Floseth, age 17) died: crime of passion by Volvauzar
+[2026-06-16 16:00:21] Entity 1061 (Voonmoonor, age 12) died: crime of passion by Kauzeth
+[2026-06-16 16:00:24] Entity 1011 (Skoolmbaasar, age 24) died: crime of passion by Mbaamor
+[2026-06-16 16:00:24] Entity 1030 (Floseth, age 17) died: crime of passion by Volvauzar
+[2026-06-16 16:00:24] Entity 1061 (Voonmoonor, age 12) died: crime of passion by Kauzeth
+[2026-06-16 16:00:24] Entity 1059 (Kauzeth, age 12) died: crime of passion by Voonmoonor
+[2026-06-16 16:00:26] Entity 1059 (Kauzeth, age 12) died: hardship
+[2026-06-16 16:00:27] Entity 1011 (Skoolmbaasar, age 24) died: crime of passion by Mbaamor
+[2026-06-16 16:00:27] Entity 5005 (Tronmomel, age 12) died: crime of passion by Kokdrauneth
+[2026-06-16 16:00:29] Entity 5005 (Tronmomel, age 12) died: hardship
+[2026-06-16 16:00:30] Entity 1030 (Floseth, age 17) died: crime of passion by Volvauzar
+[2026-06-16 16:00:30] Entity 1072 (Mbaukdroomor, age 10) died: crime of passion by Voztrozim
+[2026-06-16 16:00:31] Entity 5008 (Skoosmbosel, age 9) died: crime of passion by Flaunvroleth
+[2026-06-16 16:00:31] Entity 1087 (Vaunvraalane, age 9) died: crime of passion by Flauntroolar
+[2026-06-16 16:00:33] Entity 1072 (Mbaukdroomor, age 10) died: hardship
+[2026-06-16 16:00:33] Entity 1087 (Vaunvraalane, age 9) died: hardship
+[2026-06-16 16:00:35] Entity 5004 (Kausvoonane, age 14) died: crime of passion by Raaseth
+[2026-06-16 16:00:38] Entity 5004 (Kausvoonane, age 14) died: hardship
+[2026-06-16 16:00:40] Entity 1073 (Floostila, age 11) died: crime of passion by Greethila
+[2026-06-16 16:00:40] Entity 1048 (Greethila, age 14) died: crime of passion by Floostila
+[2026-06-16 16:00:42] Entity 1048 (Greethila, age 14) died: hardship
+[2026-06-16 16:00:43] Entity 1011 (Skoolmbaasar, age 25) died: crime of passion by Mbaamor
+[2026-06-16 16:00:44] Entity 1030 (Floseth, age 18) died: crime of passion by Volvauzar
+[2026-06-16 16:00:44] Entity 5002 (Volvauzar, age 19) died: crime of passion by Mbaulraamane
+[2026-06-16 16:00:47] Entity 5002 (Volvauzar, age 19) died: hardship
+[2026-06-16 16:00:48] Entity 1011 (Skoolmbaasar, age 25) died: crime of passion by Mbaamor
+[2026-06-16 16:00:48] Entity 1027 (Haanor, age 19) died: crime of passion by Flomel
+[2026-06-16 16:00:50] Entity 1027 (Haanor, age 19) died: hardship

@@ -1,6 +1,7 @@
 #include "./header/SemanticMemory.h"
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
+#include "./header/WorldSeed.h"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
@@ -11,14 +12,14 @@
 // SemanticMemorySystem Implementation
 // ============================================================================
 
-SemanticMemorySystem::SemanticMemorySystem() 
-    : rng(std::random_device{}()) 
+SemanticMemorySystem::SemanticMemorySystem()
+    : rng(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0x53E3'4E3ull)))
 {
     config = EmbeddingConfig();
 }
 
-SemanticMemorySystem::SemanticMemorySystem(const EmbeddingConfig& cfg) 
-    : config(cfg), rng(std::random_device{}()) 
+SemanticMemorySystem::SemanticMemorySystem(const EmbeddingConfig& cfg)
+    : config(cfg), rng(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0x53E3'4E3ull)))
 {}
 
 // ============================================================================

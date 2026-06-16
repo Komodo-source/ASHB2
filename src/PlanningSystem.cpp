@@ -1,6 +1,7 @@
 #include "./header/PlanningSystem.h"
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
+#include "./header/WorldSeed.h"
 #include <algorithm>
 #include <cmath>
 #include <queue>
@@ -9,14 +10,14 @@
 // PlanningSystem Implementation
 // ============================================================================
 
-PlanningSystem::PlanningSystem() 
+PlanningSystem::PlanningSystem()
     : cumulativeFrustration(0.0f), ticksSinceLastPlan(0),
-      rng(std::random_device{}())
+      rng(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0x9111'A11ull)))
 {}
 
-PlanningSystem::PlanningSystem(const PlanningConfig& cfg) 
+PlanningSystem::PlanningSystem(const PlanningConfig& cfg)
     : config(cfg), cumulativeFrustration(0.0f), ticksSinceLastPlan(0),
-      rng(std::random_device{}())
+      rng(static_cast<std::mt19937::result_type>(nextDeterministicSeed(0x9111'A11ull)))
 {}
 
 // ============================================================================

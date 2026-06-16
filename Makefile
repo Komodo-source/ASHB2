@@ -1136,6 +1136,30 @@ src/world/PlanetView.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/PlanetView.cpp.s
 .PHONY : src/world/PlanetView.cpp.s
 
+src/world/ResourceSystem.obj: src/world/ResourceSystem.cpp.obj
+.PHONY : src/world/ResourceSystem.obj
+
+# target to build an object file
+src/world/ResourceSystem.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/ResourceSystem.cpp.obj
+.PHONY : src/world/ResourceSystem.cpp.obj
+
+src/world/ResourceSystem.i: src/world/ResourceSystem.cpp.i
+.PHONY : src/world/ResourceSystem.i
+
+# target to preprocess a source file
+src/world/ResourceSystem.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/ResourceSystem.cpp.i
+.PHONY : src/world/ResourceSystem.cpp.i
+
+src/world/ResourceSystem.s: src/world/ResourceSystem.cpp.s
+.PHONY : src/world/ResourceSystem.s
+
+# target to generate assembly for a file
+src/world/ResourceSystem.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/ResourceSystem.cpp.s
+.PHONY : src/world/ResourceSystem.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -1271,6 +1295,9 @@ help:
 	@echo ... src/world/PlanetView.obj
 	@echo ... src/world/PlanetView.i
 	@echo ... src/world/PlanetView.s
+	@echo ... src/world/ResourceSystem.obj
+	@echo ... src/world/ResourceSystem.i
+	@echo ... src/world/ResourceSystem.s
 .PHONY : help
 
 

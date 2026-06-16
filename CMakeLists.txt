@@ -84,6 +84,7 @@ src/world/Noise.cpp
 src/world/Planet.cpp
 src/world/PlanetView.cpp
 src/world/Lexicon.cpp
+src/world/ResourceSystem.cpp
 src/UI.cpp
 src/Entity.cpp
 src/Disease.cpp

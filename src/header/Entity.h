@@ -291,6 +291,13 @@ public:
     int dayWithoutSocialAction = 0;
     float socialDeficit = 0.0f;
 
+    // ── Subsistence: food is a survival necessity, not just a trade good ──
+    // hunger climbs every tick; eating from foodStore lowers it. A depleted
+    // store + rising hunger starves the entity (health damage → death). Food is
+    // PRODUCED by hunting/gathering/farming and CONSUMED to stay alive.
+    float entityHunger = 25.0f;  // 0 = sated, 100 = starving
+    float foodStore    = 4.0f;   // days of rations this entity holds
+
     std::vector<LifeMemory> lifeMemories;
     EmotionalState emotionalState;
     std::vector<MentalModelOfOther*> list_MentalModelOfOther;
