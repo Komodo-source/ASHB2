@@ -31,8 +31,10 @@ private:
 
 public:
     Logger() {
-        // Create data directory if it doesn't exist
-        std::filesystem::create_directories("./data");
+        // Create the data directory the logs actually live in. This used to be
+        // "./data" while every file below opened under "./src/data", so when that
+        // folder was missing the streams silently failed and nothing was logged.
+        std::filesystem::create_directories("./src/data");
 
         // Open all log files in append mode
         cmdLogFile.open("./src/data/cmd_log.txt", std::ios::app);

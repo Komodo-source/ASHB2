@@ -247,9 +247,14 @@ void UI::showSystemInformation(){
         ImGui::Separator();
 
         //std::ofstream MyFile("test_links.txt");
+        ImGui::Text("Wealth: %.0f tokens", entity->salary.token);
+        ImGui::Text("Monthly revenue: %.0f", entity->salary.getMonthlyRevenue());
+        if (entity->salary.producedProduct >= 0 &&
+            entity->salary.producedProduct < (int)g_market.products.size())
+            ImGui::Text("Sells: %s",
+                        g_market.products[entity->salary.producedProduct].name.c_str());
 
         ImGui::Text("== Pointed Attributes ==");
-
 // DESIRE — pink
 if (!entity->list_entityPointedDesire.empty()) {
     ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.7f, 1.0f), "Desire (%d)", (int)entity->list_entityPointedDesire.size());
@@ -456,6 +461,8 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
         }
     }
 
+
+
     // ── 2. Entity dots ────────────────────────────────────────────────────────
     for (int i = 0; i < n; ++i) {
         Entity* entity = entities[i];
@@ -661,6 +668,126 @@ void UI::ShowCivilizationPanel(int simDay) {
         }
         ImGui::EndChild();
     }
+
+    ImGui::End();
+}
+
+
+// ── ShowMarketPanel ───────────────────────────────────────────────────────────
+// Live supply & demand for every tradable good. Prices climb when the
+// population wants more than is produced and fall when shelves overflow.
+static void DrawMarketRows(GoodCategory cat) {
+    if (!ImGui::BeginTable("##market", 7,
+            ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH |
+            ImGuiTableFlags_SizingStretchProp))
+        return;
+
+    ImGui::TableSetupColumn("Good",   ImGuiTableColumnFlags_WidthStretch, 1.6f);
+    ImGui::TableSetupColumn("Price",  ImGuiTableColumnFlags_WidthStretch, 0.9f);
+    ImGui::TableSetupColumn(u8"Δ%",   ImGuiTableColumnFlags_WidthStretch, 0.7f);
+    ImGui::TableSetupColumn("Supply", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+    ImGui::TableSetupColumn("Demand", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+    ImGui::TableSetupColumn("Sold",   ImGuiTableColumnFlags_WidthStretch, 0.6f);
+    ImGui::TableSetupColumn("Trend",  ImGuiTableColumnFlags_WidthStretch, 1.4f);
+    ImGui::TableHeadersRow();
+
+    for (const auto& p : g_market.products) {
+        if (p.category != cat) continue;
+        ImGui::TableNextRow();
+
+        // Good name (highlight wartime rations).
+        ImGui::TableNextColumn();
+        if (p.isArmyRation)
+            ImGui::TextColored(ImVec4(1.0f, 0.78f, 0.35f, 1.0f), "%s", p.name.c_str());
+        else
+            ImGui::TextUnformatted(p.name.c_str());
+
+        // Current price, coloured by how far it sits from its natural value.
+        float pct = p.basePrice > 0.01f ? (p.price - p.basePrice) / p.basePrice : 0.0f;
+        ImVec4 priceCol = pct > 0.05f  ? ImVec4(1.0f, 0.45f, 0.4f, 1.0f)   // expensive
+                        : pct < -0.05f ? ImVec4(0.45f, 0.95f, 0.55f, 1.0f) // cheap
+                                       : ImVec4(0.85f, 0.85f, 0.85f, 1.0f);
+        ImGui::TableNextColumn();
+        ImGui::TextColored(priceCol, "%.0f", p.price);
+
+        ImGui::TableNextColumn();
+        ImGui::TextColored(priceCol, "%+.0f%%", pct * 100.0f);
+
+        // Supply / demand bars on a shared scale so imbalance is obvious.
+        float scale = std::max(1.0f, std::max(p.supply, p.demand));
+        ImGui::TableNextColumn();
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.35f, 0.7f, 0.95f, 0.85f));
+        ImGui::ProgressBar(p.supply / scale, ImVec2(-1, 12), "");
+        ImGui::PopStyleColor();
+
+        ImGui::TableNextColumn();
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.95f, 0.55f, 0.3f, 0.85f));
+        ImGui::ProgressBar(p.demand / scale, ImVec2(-1, 12), "");
+        ImGui::PopStyleColor();
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%.0f", p.lastVolume);
+
+        // Price history sparkline. Auto-scale to the window's own min/max (with a
+        // little padding) so the actual price wiggle is visible instead of a flat
+        // line lost inside a fixed 0.3x-4x range.
+        ImGui::TableNextColumn();
+        if (p.priceHistory.size() > 1) {
+            std::vector<float> hist(p.priceHistory.begin(), p.priceHistory.end());
+            float lo = hist[0], hi = hist[0];
+            for (float v : hist) { lo = std::min(lo, v); hi = std::max(hi, v); }
+            float pad = std::max(1.0f, (hi - lo) * 0.15f);
+            lo -= pad; hi += pad;
+            ImGui::PushStyleColor(ImGuiCol_PlotLines, priceCol);
+            // Unique id per good so ImGui doesn't merge the plots.
+            std::string id = "##trend_" + p.name;
+            ImGui::PlotLines(id.c_str(), hist.data(), (int)hist.size(), 0, nullptr,
+                             lo, hi, ImVec2(-1.0f, 24.0f));
+            ImGui::PopStyleColor();
+        } else {
+            ImGui::TextDisabled("...");
+        }
+    }
+    ImGui::EndTable();
+}
+
+void UI::ShowMarketPanel() {
+    if (!g_market.initialized) return;
+
+    ImGui::SetNextWindowSize(ImVec2(560, 640), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(480, 420),  ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowBgAlpha(0.92f);
+
+    if (!ImGui::Begin("MARKET", nullptr, ImGuiWindowFlags_NoCollapse)) {
+        ImGui::End(); return;
+    }
+
+    ImGui::TextColored(ImVec4(0.5f, 0.9f, 1.0f, 1.0f), "Supply & Demand");
+    ImGui::SameLine(180);
+    ImGui::TextDisabled("Traded: %.0f  |  Money supply: %.0f tokens",
+                        g_market.totalTradeVolume, g_market.totalMoneySupply);
+
+    // War pressure — soldiers stockpiling rations bids food prices up.
+    ImGui::Text("War pressure"); ImGui::SameLine(110);
+    ImVec4 warCol = g_market.lastWarIntensity > 0.2f
+                        ? ImVec4(1.0f, 0.35f, 0.3f, 1.0f)
+                        : ImVec4(0.4f, 0.8f, 0.5f, 1.0f);
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, warCol);
+    char wbuf[32]; snprintf(wbuf, 32, "%.0f%%", g_market.lastWarIntensity * 100.0f);
+    ImGui::ProgressBar(g_market.lastWarIntensity, ImVec2(-1, 14), wbuf);
+    ImGui::PopStyleColor();
+
+    ImGui::Separator();
+    ImGui::TextDisabled("Blue = supply   Orange = demand   rations in gold");
+    ImGui::Spacing();
+
+    if (ImGui::CollapsingHeader("FOOD MARKET", ImGuiTreeNodeFlags_DefaultOpen))
+        DrawMarketRows(GoodCategory::FOOD);
+
+    ImGui::Spacing();
+
+    if (ImGui::CollapsingHeader("OBJECT MARKET", ImGuiTreeNodeFlags_DefaultOpen))
+        DrawMarketRows(GoodCategory::OBJECT);
 
     ImGui::End();
 }

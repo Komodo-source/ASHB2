@@ -136,7 +136,7 @@ Entity::Entity(int id,
     initialGoal.frustrationLevel = 0.0f;
     initialGoal.ticksSinceProgress = 0;
     m_goals.push_back(initialGoal);
-    
+
     // Rebuild semantic memory index from any existing life memories
     semanticMemory.rebuildFromLifeMemories(this);
 }
@@ -185,7 +185,7 @@ void Entity::IncrementBDay(){
     }else{
         this->entityLifeStage = LifeStage::ELDER;
     }
-    
+
     // Era-aware aging: elders lose health faster based on their era's life expectancy
     if (this->entityLifeStage == LifeStage::ELDER) {
         int currentYear = globalCivEngine ? globalCivEngine->getCurrentYear() : 0;
@@ -368,30 +368,44 @@ void Entity::saveTo(std::ofstream& file) const {
         file << "GOAL:" << m_goal.type << "," << m_goal.priority << "," << m_goal.progressToward << "\n";
     }
 
-    // Save relationship lists (store target entity IDs, not pointers)
-    file << "DESIRE_COUNT:" << list_entityPointedDesire.size() << "\n";
+    // Save relationship lists (store target entity IDs, not pointers).
+    // Skip links whose target has died and been nulled out — dereferencing a
+    // null pointedEntity here used to crash the whole save. We count the valid
+    // links first so COUNT always matches the lines that follow.
+    auto countValid = [](const auto& list) {
+        int n = 0; for (const auto& e : list) if (e.pointedEntity) ++n; return n;
+    };
+
+    file << "DESIRE_COUNT:" << countValid(list_entityPointedDesire) << "\n";
     for (const auto& d : list_entityPointedDesire) {
+        if (!d.pointedEntity) continue;
         file << "DESIRE:" << d.pointedEntity->entityId << "," << d.desire << "\n";
     }
-    file << "ANGER_COUNT:" << list_entityPointedAnger.size() << "\n";
+    file << "ANGER_COUNT:" << countValid(list_entityPointedAnger) << "\n";
     for (const auto& a : list_entityPointedAnger) {
+        if (!a.pointedEntity) continue;
         file << "ANGER_LINK:" << a.pointedEntity->entityId << "," << a.anger << "\n";
     }
-    file << "SOCIAL_COUNT:" << list_entityPointedSocial.size() << "\n";
+    file << "SOCIAL_COUNT:" << countValid(list_entityPointedSocial) << "\n";
     for (const auto& s : list_entityPointedSocial) {
+        if (!s.pointedEntity) continue;
         file << "SOCIAL:" << s.pointedEntity->entityId << "," << s.social << "\n";
     }
-    file << "COUPLE_COUNT:" << list_entityPointedCouple.size() << "\n";
+    file << "COUPLE_COUNT:" << countValid(list_entityPointedCouple) << "\n";
     for (const auto& c : list_entityPointedCouple) {
+        if (!c.pointedEntity) continue;
         file << "COUPLE:" << c.pointedEntity->entityId << "\n";
     }
 
+    // Economy: wallet balance + which good this entity produces.
+    file << "SALARY:" << salary.token << "," << salary.producedProduct << "\n";
+
     // Save FreeWillSystem
     fws.saveTo(file);
-    
+
     // Save SemanticMemorySystem
     semanticMemory.saveTo(file);
-    
+
     // Save PlanningSystem
     planner.saveTo(file);
 
@@ -511,18 +525,33 @@ void Entity::loadFrom(std::ifstream& file) {
         tempCoupleIds.push_back(targetId);
     }
 
+    // Economy: wallet balance + produced good. Tolerant of older saves that
+    // predate this line: peek one line, and if it isn't a SALARY record, rewind
+    // the stream so FreeWillSystem reads it as its own header.
+    std::streampos beforeSalary = file.tellg();
+    std::getline(file, line);
+    if (line.rfind("SALARY:", 0) == 0) {
+        std::string sdata = line.substr(7);
+        size_t comma = sdata.find(',');
+        salary.token = std::stof(sdata.substr(0, comma));
+        salary.producedProduct = (comma != std::string::npos)
+                                 ? std::stoi(sdata.substr(comma + 1)) : -1;
+    } else {
+        file.seekg(beforeSalary); // old save — give the line back to fws
+    }
+
     // Load FreeWillSystem
     fws.loadFrom(file);
-    
+
     // Load SemanticMemorySystem
     semanticMemory.loadFrom(file);
-    
+
     // Load PlanningSystem
     planner.loadFrom(file);
 
     // Read end marker
     std::getline(file, line); // "--- END ENTITY ---"
-    
+
     // Rebuild semantic memory index from loaded life memories
     semanticMemory.rebuildFromLifeMemories(this);
 

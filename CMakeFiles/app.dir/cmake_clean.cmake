@@ -19,6 +19,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj.d"
   "CMakeFiles/app.dir/src/Disease.cpp.obj"
   "CMakeFiles/app.dir/src/Disease.cpp.obj.d"
+  "CMakeFiles/app.dir/src/Economics.cpp.obj"
+  "CMakeFiles/app.dir/src/Economics.cpp.obj.d"
   "CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj"
   "CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj.d"
   "CMakeFiles/app.dir/src/Entity.cpp.obj"

@@ -623,6 +623,14 @@ void CivilizationEngine::spreadReligions(std::vector<Entity>& entities, int day)
 void CivilizationEngine::updateInnovations(std::vector<Entity>& entities, int day) {
     std::uniform_real_distribution<float> roll(0.0f, 1.0f);
 
+    // Until a tribe learns to farm, food is scarce and people starve. Give
+    // agriculture a strong head start by sharply raising the invention rate
+    // while no farming technology exists anywhere yet.
+    bool hasAgriculture = false;
+    for (const auto& inv : innovations)
+        if (inv.category == "agriculture") { hasAgriculture = true; break; }
+    const float agricultureUrgency = hasAgriculture ? 1.0f : 5.0f;
+
     for (Entity& ent : entities) {
         if (ent.entityHealth <= 0.0f) continue;
         if (ent.entityAge < 14.0f) continue;
@@ -632,8 +640,10 @@ void CivilizationEngine::updateInnovations(std::vector<Entity>& entities, int da
                               (1.0f - ent.entityBoredom / 100.0f) * 0.3f;
 
         // innovationLuck knob steers how readily this world invents -> different
-        // tech orders each run.
-        if (roll(rng) < inventorScore * 0.0012f * g_worldSeed.divergence.innovationLuck) {
+        // tech orders each run. agricultureUrgency front-loads farming so the
+        // population gets a reliable food supply early.
+        if (roll(rng) < inventorScore * 0.0012f * agricultureUrgency
+                        * g_worldSeed.divergence.innovationLuck) {
             Tribe* tribe = findTribe(ent.tribeId);
             discoverInnovation(&ent, tribe, day);
         }
@@ -805,18 +815,34 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
             float& rel = A.relations[B.id];
             B.relations[A.id] = rel;
 
-            if (valDiff < 25.0f)
-                rel = std::min(100.0f, rel + 1.2f);
-            else if (valDiff > 50.0f)
-                rel = std::max(-100.0f, rel - 0.9f);
+            // Militaristic neighbours are spoiling for a fight: the more warlike
+            // the two tribes are, the harder relations slide and the sooner that
+            // slide tips over into open war.
+            float aggression = ((A.militarism + B.militarism) * 0.5f) / 100.0f; // 0..1
+
+            // Baseline grind — warlike tribes erode goodwill even at peace.
+            rel -= aggression * 0.6f;
+
+            if (valDiff < 22.0f)
+                rel = std::min(100.0f, rel + 1.0f);
+            else if (valDiff > 40.0f)
+                rel = std::max(-100.0f, rel - (1.2f + aggression * 1.6f));
             else
-                rel = rel * 0.98f;
+                rel = rel * 0.99f - aggression * 0.3f;
+
+            rel = std::max(-100.0f, std::min(100.0f, rel));
+            B.relations[A.id] = rel;
+
+            // War line climbs toward 0 with militarism: very warlike tribes go to
+            // war at merely cool relations (-25), peaceful ones only when hated.
+            float warLine   = -45.0f + aggression * 20.0f;
+            float rivalLine = -15.0f;
 
             TribeStance stance;
-            if      (rel >  55.0f) stance = TS_ALLY;
-            else if (rel > -20.0f) stance = TS_NEUTRAL;
-            else if (rel > -55.0f) stance = TS_RIVAL;
-            else                   stance = TS_AT_WAR;
+            if      (rel >  55.0f)    stance = TS_ALLY;
+            else if (rel > rivalLine) stance = TS_NEUTRAL;
+            else if (rel > warLine)   stance = TS_RIVAL;
+            else                      stance = TS_AT_WAR;
 
             TribeStance prev = A.stances.count(B.id) ? A.stances[B.id] : TS_NEUTRAL;
             if (stance != prev) {
@@ -846,12 +872,60 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                         if (!eb || eb->entityHealth <= 0.0f) continue;
                         int sidx = ea->contains(ea->list_entityPointedSocial, eb, 4);
                         if (sidx == -1) {
-                            if (roll(rng) < 0.20f) {
+                            // Only form a NEW cross-tribe bond occasionally, and only if
+                            // this entity isn't already socially saturated. This keeps
+                            // social links from massively out-numbering desire/anger/couple.
+                            int curBonds = (int)ea->list_entityPointedSocial.size();
+                            if (curBonds < 10 && roll(rng) < 0.06f) {
                                 entityPointedSocial ns; ns.Id = eb->entityId; ns.pointedEntity = eb; ns.social = 6.0f;
                                 ea->list_entityPointedSocial.push_back(ns);
                             }
                         } else {
                             ea->list_entityPointedSocial[sidx].social = std::min(100.0f, ea->list_entityPointedSocial[sidx].social + 0.8f);
+                        }
+
+                        // ── DESIRE: friendly contact between opposite-sex adults can spark
+                        // romantic attraction, giving desire/couple links parity with social. ──
+                        if (ea->entitySex != eb->entitySex && ea->entitySex != 'A' && eb->entitySex != 'A'
+                            && ea->entityAge >= 16.0f && eb->entityAge >= 16.0f) {
+                            int didx = ea->contains(ea->list_entityPointedDesire, eb, 1);
+                            if (didx == -1) {
+                                if ((int)ea->list_entityPointedDesire.size() < 6 && roll(rng) < 0.05f) {
+                                    entityPointedDesire nd; nd.Id = eb->entityId; nd.pointedEntity = eb; nd.desire = 8.0f;
+                                    ea->list_entityPointedDesire.push_back(nd);
+                                    didx = (int)ea->list_entityPointedDesire.size() - 1;
+                                }
+                            } else {
+                                ea->list_entityPointedDesire[didx].desire = std::min(100.0f, ea->list_entityPointedDesire[didx].desire + 1.2f);
+                            }
+
+                            // ── COUPLE: strong mutual desire (and both single) can blossom into a pair bond. ──
+                            if (didx != -1 && ea->list_entityPointedDesire[didx].desire > 60.0f
+                                && ea->list_entityPointedCouple.empty() && eb->list_entityPointedCouple.empty()) {
+                                int dback = eb->contains(eb->list_entityPointedDesire, ea, 1);
+                                bool mutual = (dback != -1 && eb->list_entityPointedDesire[dback].desire > 60.0f);
+                                if (mutual && roll(rng) < 0.10f) {
+                                    entityPointedCouple ca; ca.id = eb->entityId; ca.pointedEntity = eb;
+                                    entityPointedCouple cb; cb.id = ea->entityId; cb.pointedEntity = ea;
+                                    ea->list_entityPointedCouple.push_back(ca);
+                                    eb->list_entityPointedCouple.push_back(cb);
+                                }
+                            }
+                        }
+
+                        // ── HATRED: even among friendly tribes, disagreeable personalities
+                        // generate occasional interpersonal friction, so anger links exist
+                        // outside of formal wars. ──
+                        if (ea->personality.agreeableness < 40.0f && roll(rng) < 0.03f) {
+                            int aIdx = ea->contains(ea->list_entityPointedAnger, eb, 2);
+                            if (aIdx == -1) {
+                                if ((int)ea->list_entityPointedAnger.size() < 6) {
+                                    entityPointedAnger na; na.Id = eb->entityId; na.pointedEntity = eb; na.anger = 5.0f;
+                                    ea->list_entityPointedAnger.push_back(na);
+                                }
+                            } else {
+                                ea->list_entityPointedAnger[aIdx].anger = std::min(100.0f, ea->list_entityPointedAnger[aIdx].anger + 2.0f);
+                            }
                         }
                     }
                 }
@@ -1068,7 +1142,7 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
             float aPower = (aStr * 0.7f + aDef * 0.3f) * (0.8f + roll(rng) * 0.4f);
             float bPower = (bStr * 0.7f + bDef * 0.3f) * (0.8f + roll(rng) * 0.4f);
 
-            if (roll(rng) < 0.05f) { // 5% chance of a major battle each tick
+            if (roll(rng) < 0.09f) { // chance of a major battle each tick
                 executeBattle(A, B, entities, day);
             }
 

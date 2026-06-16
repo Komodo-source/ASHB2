@@ -11,6 +11,7 @@
 #include "./header/CivilizationEngine.h"
 #include "world/Lexicon.h"
 
+
 #include <algorithm>
 #include <cerrno>
 #include <cmath>
@@ -665,12 +666,14 @@ void FreeWillSystem::initializeActions() {
     socialize.statChanges = { {"loneliness", -8.0f}, {"happiness", 7.0f}, {"stress", -5.0f}, {"boredom", -10.0f} };
     socialize.baseSatisfaction = 25.0f;
     availableActions.push_back(socialize);
+    desireLinkedAction.push_back(socialize);
 
     Action desire("Desire", 2, "social");
     desire.requirements = { {"loneliness", 20.0f, 0.7f}, {"happiness", 20.0f, 0.3f} };
     desire.statChanges = { {"loneliness", -12.0f}, {"happiness", 13.0f}, {"stress", -6.0f} };
     desire.baseSatisfaction = 55.0f;
     availableActions.push_back(desire);
+    desireLinkedAction.push_back(desire);
 
     Action goodconn("GoodConnection", 3, "social");
     goodconn.requirements = { {"loneliness", 25.0f, 0.8f}, {"stress", 65.0f, 0.3f} };
@@ -678,11 +681,13 @@ void FreeWillSystem::initializeActions() {
     goodconn.baseSatisfaction = 35.0f;
     availableActions.push_back(goodconn);
 
+
     Action angconn("AngerConnection", 4, "social");
     angconn.requirements = { {"anger", 25.0f, 0.8f}, {"stress", 30.0f, 0.3f} };
     angconn.statChanges = { {"anger", 13.0f}, {"stress", 17.0f}, {"happiness", -12.0f}, {"mentalHealth", -7.0f} };
     angconn.baseSatisfaction = 15.0f;
     availableActions.push_back(angconn);
+    hatredLinkedAction.push_back(angconn);
 
     // Extreme actions requiring high negative stats
     Action murder("Murder", 5, "safety");
@@ -690,12 +695,14 @@ void FreeWillSystem::initializeActions() {
     murder.statChanges = { {"anger", -33.0f}, {"mentalHealth", -23.0f}, {"stress", 17.0f}, {"happiness", 3.0f} };
     murder.baseSatisfaction = 10.0f;
     availableActions.push_back(murder);
+    hatredLinkedAction.push_back(murder);
 
     Action discrimination("Discrimination", 6, "social");
     discrimination.requirements = { {"anger", 45.0f, 0.8f}, {"mentalHealth", 15.0f, 0.6f}, {"stress", 40.0f, 0.5f} };
     discrimination.statChanges = { {"anger", -14.0f}, {"mentalHealth", -12.0f}, {"stress", 5.0f}, {"happiness", -1.0f} };
     discrimination.baseSatisfaction = 3.0f;
     availableActions.push_back(discrimination);
+    hatredLinkedAction.push_back(discrimination);
 
     // Self-harm actions
     Action suicide("Suicide", 7, "safety");
@@ -703,6 +710,7 @@ void FreeWillSystem::initializeActions() {
     suicide.statChanges = { {"health", -100.0f}, {"mentalHealth", -100.0f} };
     suicide.baseSatisfaction = 0.0f;
     availableActions.push_back(suicide);
+
 
     //Action anxiety("Anxiety", 8, "health");
     //anxiety.requirements = { {"stress", 85.0f, 0.9f}, {"mentalHealth", 40.0f, 0.7f} };
@@ -828,6 +836,7 @@ void FreeWillSystem::initializeActions() {
     jealousy.statChanges = { {"anger", 15.0f}, {"happiness", -10.0f}, {"mentalHealth", -5.0f} };
     jealousy.baseSatisfaction = 14.0f;
     availableActions.push_back(jealousy);
+    desireLinkedAction.push_back(jealousy);
 
     // Betray (social)
     Action betray("Betray", 30, "social");
@@ -885,6 +894,7 @@ void FreeWillSystem::initializeActions() {
     flirt.statChanges = { {"loneliness", -5.0f}, {"happiness", 8.0f} };
     flirt.baseSatisfaction = 38.0f;
     availableActions.push_back(flirt);
+    desireLinkedAction.push_back(flirt);
 
     // Date: deeper romantic engagement
     Action date("Date", 36, "social");
@@ -892,6 +902,7 @@ void FreeWillSystem::initializeActions() {
     date.statChanges = { {"loneliness", -15.0f}, {"happiness", 15.0f}, {"stress", -8.0f} };
     date.baseSatisfaction = 50.0f;
     availableActions.push_back(date);
+    desireLinkedAction.push_back(date);
 
     // Break Up (social)
     Action breakUp("BreakUp", 37, "social");
@@ -899,6 +910,7 @@ void FreeWillSystem::initializeActions() {
     breakUp.statChanges = { {"happiness", -20.0f}, {"stress", 15.0f}, {"loneliness", 25.0f}, {"mentalHealth", -10.0f} };
     breakUp.baseSatisfaction = 5.0f;
     availableActions.push_back(breakUp);
+    desireLinkedAction.push_back(breakUp);
 
     // Reconcile (social)
     Action reconcile("Reconcile", 38, "social");
@@ -906,6 +918,7 @@ void FreeWillSystem::initializeActions() {
     reconcile.statChanges = { {"happiness", 20.0f}, {"stress", -10.0f} };
     reconcile.baseSatisfaction = 22.0f;
     availableActions.push_back(reconcile);
+    desireLinkedAction.push_back(reconcile);
 
     // ==================== DEFENSIVE/BOUNDARY ACTIONS ====================
     // Set Boundaries (social)
@@ -927,12 +940,15 @@ void FreeWillSystem::initializeActions() {
     couple.statChanges = { {"happiness", 45.0f}, {"loneliness", -25.0f}, {"stress", 20.0f} };
     couple.baseSatisfaction = 75.0f;
     availableActions.push_back(couple);
+    desireLinkedAction.push_back(couple);
+
 
     Action breeding("breeding", 42, "social");
     breeding.requirements = { {"loneliness", 15.0f, 0.3f} };
     breeding.statChanges = { {"happiness", 45.0f}, {"loneliness", -25.0f}, {"stress", 20.0f} };
     breeding.baseSatisfaction = 75.0f;
     availableActions.push_back(breeding);
+    desireLinkedAction.push_back(breeding);
 
     // Health actions
     //Action exercise("Exercise", 10, "health");
@@ -961,6 +977,12 @@ void FreeWillSystem::initializeActions() {
     work.statChanges = { {"stress", 17.0f}, {"happiness", 15.0f}, {"boredom", -20.0f}, {"loneliness", 10.0f} };
     work.baseSatisfaction = 25.0f;
     availableActions.push_back(work);
+
+    Action basicManualwork("Basic Manual Work", 2212, "achievement");
+    basicManualwork.requirements = {  {"health", 60.0f, 0.4f} };
+    basicManualwork.statChanges = { {"stress", 13.0f}, {"happiness", -7.0f}, {"boredom", -7.0f}, {"loneliness", 12.0f} };
+    basicManualwork.baseSatisfaction = 19.0f;
+    availableActions.push_back(basicManualwork);
 
     // ════════════════════════════════════════════════════════════════════════
     // CIVILISATION-SCALE ACTIONS
@@ -1059,11 +1081,14 @@ void FreeWillSystem::initializeActions() {
     // ════════════════════════════════════════════════════════════════════════
     // ERA-AWARE SURVIVAL & CRAFT ACTIONS (Stone through Modern age)
     // ════════════════════════════════════════════════════════════════════════
+    // Hunt — bring back food. Fires early (health < 85) and restores a solid
+    // chunk of health so a population can always feed itself, even before
+    // agriculture exists. Costs effort (stress, hygiene).
     Action hunt("Hunt", 210, "survival");
-    hunt.requirements = { {"health", 70.0f, 0.5f}, {"boredom", 30.0f, 0.3f} };
+    hunt.requirements = { {"health", 85.0f, 0.6f}, {"boredom", 30.0f, 0.3f} };
     hunt.statChanges  = { {"boredom", -12.0f}, {"happiness", 7.0f},
-                           {"health", 5.0f},    {"stress", 4.0f} };
-    hunt.baseSatisfaction = 14.0f;
+                           {"health", 14.0f},   {"stress", 4.0f}, {"hygiene", -3.0f} };
+    hunt.baseSatisfaction = 18.0f;
     availableActions.push_back(hunt);
 
     Action gather("Gather", 211, "survival");
@@ -1129,6 +1154,7 @@ void FreeWillSystem::initializeActions() {
                             {"mentalHealth", 12.0f}, {"stress", -10.0f} };
     marry.baseSatisfaction = 60.0f;
     availableActions.push_back(marry);
+    desireLinkedAction.push_back(marry);
 
     Action mourn("Mourn", 220, "health");
     mourn.requirements = { {"mentalHealth", 30.0f, 0.6f}, {"loneliness", 50.0f, 0.5f} };
@@ -1341,6 +1367,13 @@ void FreeWillSystem::updateValuesFromExperiences(Entity* ent, Action*& action, f
         v.achievementDrive = std::min(100.0f, v.achievementDrive + 1.5f);
     }
     if ((action->name == "Work on Project" || action->name == "LearnSkill") && outcomeSuccess < 0.2f) {
+        v.achievementDrive = std::max(0.0f, v.achievementDrive - 1.5f);
+    }
+
+    if ((action->name == "Basic Manual Work" || action->name == "LearnSkill") && outcomeSuccess > 0.8f) {
+        v.achievementDrive = std::min(100.0f, v.achievementDrive + 1.5f);
+    }
+    if ((action->name == "Basic Manual Work" || action->name == "LearnSkill") && outcomeSuccess < 0.2f) {
         v.achievementDrive = std::max(0.0f, v.achievementDrive - 1.5f);
     }
     if ((action->name == "Socialize" || action->name == "Flirt" || action->name == "Date") && outcomeSuccess < 0.2f) {
@@ -1745,7 +1778,7 @@ NeedLevel FreeWillSystem::updateHieratchicalNeed(Entity* ent, const Action& acti
         return PHYSIOLOGICAL;
     }
     // ESTEEM
-    else if (action.name == "LearnSkill" || action.name == "Work on Project") {
+    else if (action.name == "LearnSkill" || action.name == "Work on Project" || action.name == "Basic Manual Work") {
         needs["achievement"].satisfactionThreshold += 5.0f;
         needs["recognition"].satisfactionThreshold += 5.0f;
         needs["achievement"].urgency -= 5.0f;
@@ -1777,6 +1810,16 @@ SocialTier FreeWillSystem::getSocialTier(Entity* from, Entity* to) const {
     if (s < 55.0f) return FAMILIAR;
     if (s < 80.0f) return FRIEND;
     return CLOSE_FRIEND;
+}
+
+Action* FreeWillSystem::TriggerDesireLinkedAction(){
+  int choice = BetterRand::genNrInInterval(0, (int)desireLinkedAction.size() -1);
+  return &desireLinkedAction.at(choice);
+}
+
+Action* FreeWillSystem::TriggerHatredLinkedAction(){
+  int choice = BetterRand::genNrInInterval(0, (int)hatredLinkedAction.size()-1);
+  return &hatredLinkedAction.at(choice);
 }
 
 Action* FreeWillSystem::ChooseSpecificSocialAction(Entity* ent){
@@ -1912,6 +1955,29 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             pointer->list_entityPointedDesire[index].desire = std::min(100.0f, pointer->list_entityPointedDesire[index].desire + increment);
             std::cout << "Desire reinforced " << pointer->getName() << " -> " << pointed->getName() << " +" << increment << "\n";
         }
+
+        // ── Reciprocal attraction ────────────────────────────────────────────
+        // Being pursued stirs some desire back, scaled by how attractive the
+        // admirer is to the target. WITHOUT this, desire was one-directional and
+        // the mutual-desire requirement for couples almost never bootstrapped —
+        // the root cause of "barely any couples / no breeding".
+        float myAttractiveness = (pointer->entityHygiene  / 100.0f) * 0.3f +
+                                 (pointer->entityHapiness / 100.0f) * 0.4f +
+                                 (pointer->entityHealth   / 100.0f) * 0.3f;
+        if (pointer->entitySex != pointed->entitySex) myAttractiveness += 0.20f;
+        // The target resists if they already resent the admirer.
+        int recipAnger = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+        bool resents = (recipAnger != -1 && pointed->list_entityPointedAnger[recipAnger].anger > 35.0f);
+        if (!resents && pointed->entityHealth > 0.0f) {
+            int pidx = pointed->contains(pointed->list_entityPointedDesire, pointer, 1);
+            float recip = static_cast<float>(BetterRand::genNrInInterval(3, 7)) * std::max(0.4f, myAttractiveness);
+            if (pidx == -1) {
+                pointed->addDesire({ 1, pointer, recip });
+            } else {
+                pointed->list_entityPointedDesire[pidx].desire =
+                    std::min(100.0f, pointed->list_entityPointedDesire[pidx].desire + recip * 0.6f);
+            }
+        }
     }
     else if (action->name == "AngerConnection") {
         int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
@@ -2003,17 +2069,18 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             desire_index = static_cast<int>(pointer->list_entityPointedDesire.size()) - 1;
         }
 
-        if (pointer->list_entityPointedDesire[desire_index].desire < 15) {
+        if (pointer->list_entityPointedDesire[desire_index].desire < 10) {
             float current_desire = pointer->list_entityPointedDesire[desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointer->getName() << " n'a pas assez de desir pour " << pointed->getName()
-                      << " (" << current_desire << " < 25)\n";
+                      << " (" << current_desire << " < 10)\n";
 
-            // FIX: Slower buildup but more sustainable
+            // Build desire faster so couples actually reach the fertility threshold
+            // instead of dying childless.
             pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f,
-                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(3, 7));
+                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(6, 12));
             return;
         }
 
@@ -2029,17 +2096,16 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             pointed_desire_index = static_cast<int>(pointed->list_entityPointedDesire.size()) - 1;
         }
 
-        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < 15) {
+        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < 10) {
             float pointed_desire = pointed->list_entityPointedDesire[pointed_desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointed->getName() << " n'a pas assez de desir pour " << pointer->getName()
-                      << " (" << pointed_desire << " < 20)\n";
+                      << " (" << pointed_desire << " < 10)\n";
 
-            // FIX: Use correct index (pointed_desire_index not pointed_desire_index on pointer!)
             pointed->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f,
-                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(3, 7));
+                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(6, 12));
 
             return;
         }
@@ -2123,18 +2189,49 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                 baby.dv.hadSecureAttachment = true;
             }
             baby.addOrBoostGoal("self", 100.0f);
-            new_borns.push_back(baby);
 
+            // Inherit averaged parent traits BEFORE storing the baby — previously
+            // push_back copied the baby first, so these inherited values were
+            // silently thrown away.
             float avg_openness_parent = (pointed->personality.openness + pointer->personality.openness) / 2;
             float avg_extraversion_parent = (pointed->personality.extraversion + pointer->personality.extraversion) / 2;
             baby.personality.openness = avg_openness_parent;
             baby.personality.extraversion = avg_extraversion_parent;
             Heritage::add_child(pointed, &baby);
             Heritage::add_child(pointer, &baby);
+
+            new_borns.push_back(baby);
         } else {
+            // Not a formal couple yet. If both already desire each other strongly,
+            // they pair up AND conceive now; otherwise just form the bond so the
+            // relationship can keep growing toward a child next time.
             std::cout << "INFO: couple doesnt exist, creating a new one\n";
             pointer->addCouple({ 1, pointed });
             pointed->addCouple({ 1, pointer });
+
+            float dHere  = pointer->list_entityPointedDesire[desire_index].desire;
+            float dThere = pointed->list_entityPointedDesire[pointed_desire_index].desire;
+            if (dHere >= 30.0f && dThere >= 30.0f) {
+                static int nextBabyId2 = 5000;
+                Entity baby = Entity(nextBabyId2++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1,
+                                     nullptr, nullptr, nullptr, nullptr, "happiness");
+                baby.posX = pointer->posX + BetterRand::genNrInInterval(-15, 15);
+                baby.posY = pointer->posY + BetterRand::genNrInInterval(-15, 15);
+                baby.parent1 = pointed;
+                baby.parent2 = pointer;
+                baby.originRegionId = (pointer->originRegionId >= 0) ? pointer->originRegionId
+                                                                     : pointed->originRegionId;
+                if (g_lexicon) baby.name = g_lexicon->genName(baby.originRegionId, baby.entitySex);
+                baby.personality.openness     = (pointed->personality.openness + pointer->personality.openness) / 2;
+                baby.personality.extraversion = (pointed->personality.extraversion + pointer->personality.extraversion) / 2;
+                baby.dv.hadSecureAttachment = true;
+                baby.addOrBoostGoal("self", 100.0f);
+                Heritage::add_child(pointed, &baby);
+                Heritage::add_child(pointer, &baby);
+                if (globalLogger) globalLogger->logBirth(baby.entityId, baby.getName(),
+                    pointer->getId(), pointed->getId(), pointer->getName(), pointed->getName());
+                new_borns.push_back(baby);
+            }
         }
     }
     else if (action->name == "couple") {
@@ -2144,9 +2241,9 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             std::cout << "Couple blocked: not familiar enough yet (" << pointer->getName() << " <-> " << pointed->getName() << ")\n";
             return;
         }
-        float required_desire = 20.0f;
-        if (pointer->dv.attachmentStyle == AVOIDANT) required_desire = 40.0f;
-        else if (pointer->dv.attachmentStyle == ANXIOUS) required_desire = 15.0f;
+        float required_desire = 14.0f;
+        if (pointer->dv.attachmentStyle == AVOIDANT) required_desire = 30.0f;
+        else if (pointer->dv.attachmentStyle == ANXIOUS) required_desire = 10.0f;
 
         int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
 
@@ -2595,6 +2692,13 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     std::map<std::string, float> statsAfter = captureEntityStats(entity);
     //std::cout << "Stats After:\n";
     //for (auto& [k, v] : statsAfter) std::cout << "  " << k << ": " << v << "\n";
+    //
+
+    //check work action -> implements economics
+    if(action->name == "Basic Manual Work"){
+      entity->salary.earnMoney(BetterRand::genNrInInterval(100, 200));
+    }
+
 
     float outcomeSuccess = calculateOutcomeSuccess(statsBefore, statsAfter);
     action->outcomeSuccess = outcomeSuccess;
@@ -2958,7 +3062,28 @@ Entity* FreeWillSystem::selectSocialTarget(Entity* entity, const std::vector<Ent
                      an == "couple" || an == "breeding");
     bool hostile  = (an == "AngerConnection" || an == "Insult" || an == "Jealousy" ||
                      an == "Betray" || an == "Discrimination");
+    bool friendly = (an == "Socialize" || an == "GoodConnection" || an == "HelpSupport" ||
+                     an == "Gossip"    || an == "Apologize"      || an == "Reconcile");
     std::uniform_real_distribution<float> concentrate(0.0f, 1.0f);
+
+    // ── Friendly actions: deepen real friendships instead of scattering ───────
+    // Without this, every positive interaction lands on a random neighbour and
+    // no bond ever grows strong. Most of the time we re-invest in whoever we are
+    // already closest to (weighted a bit by how much we like being around them).
+    if (friendly) {
+        if (concentrate(rng) < 0.70f) {
+            Entity* best = nullptr; float bestBond = 5.0f; // need a minimum to "prefer"
+            for (Entity* n : neighbors) {
+                if (n == entity || n->entityHealth <= 0.0f) continue;
+                float bond = entity->searchConnSocial(n);
+                // Happier, friendlier company is more rewarding to seek out.
+                float appeal = bond + (n->entityHapiness / 100.0f) * 4.0f;
+                if (appeal > bestBond) { bestBond = appeal; best = n; }
+            }
+            if (best) return best;
+        }
+        // Otherwise reach out to someone new (handled by the generic logic below).
+    }
 
     if (romantic) {
         // 75%: reinforce whoever is already most desired and still nearby.
@@ -3340,4 +3465,267 @@ std::string FreeWillSystem::getPlannedAction(Entity* entity, const std::vector<E
 void FreeWillSystem::reportActionResult(Entity* entity, const std::string& actionName, float successScore, bool wasEmergency) {
     if (!entity) return;
     entity->planner.reportActionResult(entity, actionName, successScore, wasEmergency);
+}
+
+// ============================================================================
+//  SOCIAL REALISM: JEALOUSY - RIVALRY - MATE-GUARDING - CRIMES OF PASSION
+//  --------------------------------------------------------------------------
+//  Relationships in this sim are *vectors* - an entity can accumulate several
+//  couple bonds at once (polygamy) and desire people outside the couple. On its
+//  own that produced no friction. This pass reads those configurations every
+//  tick and turns them into the human drama they imply: a partner who takes a
+//  second spouse breeds resentment among the others; an outsider lusting after
+//  someone's mate becomes a hated rival; betrayal and possessiveness can curdle
+//  into violence; collapsed trust ends relationships in grief.
+// ============================================================================
+
+// Personality-derived jealousy proneness, 0 (serene) .. 1 (volatile possessive).
+float FreeWillSystem::jealousyDisposition(Entity* e) const {
+    if (!e) return 0.0f;
+    float neuro  = e->personality.neuroticism  / 100.0f;          // insecurity, anxiety
+    float disagr = 1.0f - (e->personality.agreeableness / 100.0f); // hostility, possessiveness
+    float base = 0.15f + 0.35f * neuro + 0.30f * disagr;
+    switch (e->dv.attachmentStyle) {
+        case ANXIOUS:      base += 0.25f; break;  // terrified of abandonment
+        case DISORGANIZED: base += 0.20f; break;  // chaotic push/pull
+        case AVOIDANT:     base -= 0.05f; break;  // detaches rather than fights
+        case SECURE:       base -= 0.12f; break;  // trusting, self-assured
+        default: break;
+    }
+    // People who prize family/exclusivity guard partners harder.
+    base += (e->ValueSystem.familyOrientation / 100.0f - 0.5f) * 0.15f;
+    return std::clamp(base, 0.0f, 1.0f);
+}
+
+void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Entity*>& group, int simDay) {
+    if (!e || e->entityHealth <= 0.0f) return;
+    if (e->list_entityPointedCouple.empty()) return;  // only the partnered feel romantic jealousy
+
+    const float jeal = jealousyDisposition(e);
+
+    auto pos = [](float v){ return v < 0.0f ? 0.0f : v; };
+
+    // Boost (or create) e's anger toward a target.
+    auto addAngerToward = [&](Entity* tgt, float amount) {
+        if (!tgt || tgt == e || amount <= 0.0f) return;
+        int idx = e->contains(e->list_entityPointedAnger, tgt, 2);
+        if (idx == -1) e->addAnger({ 1, tgt, std::min(100.0f, amount) });
+        else e->list_entityPointedAnger[idx].anger =
+                 std::min(100.0f, e->list_entityPointedAnger[idx].anger + amount);
+        e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + amount * 0.25f);
+    };
+
+    // Iterate couples by index because breakups erase entries mid-loop.
+    for (size_t ci = 0; ci < e->list_entityPointedCouple.size(); ) {
+        entityPointedCouple& cp = e->list_entityPointedCouple[ci];
+        Entity* P = cp.pointedEntity;
+        if (!P || P->entityHealth <= 0.0f) { ++ci; continue; }
+
+        cp.daysTogether++;
+
+        // How much this entity is invested: lived attraction + built commitment.
+        float love = pos(e->searchConnDesire(P)) * 0.6f + cp.commitment * 0.4f;
+
+        // -- 1. Read the relationship for threats --------------------------
+        Entity* rival = nullptr;
+        float    rivalThreat = 0.0f;
+        bool     partnerStrayed = false;   // partner is the one betraying (polygamy / wandering)
+
+        // (a) Partner keeps OTHER couple bonds - the "multiple wives" case.
+        for (auto& pcp : P->list_entityPointedCouple) {
+            if (!pcp.pointedEntity || pcp.pointedEntity == e) continue;
+            if (pcp.pointedEntity->entityHealth <= 0.0f) continue;
+            partnerStrayed = true;
+            float threat = 45.0f + pcp.commitment * 0.3f;
+            if (threat > rivalThreat) { rivalThreat = threat; rival = pcp.pointedEntity; }
+        }
+        // (b) Partner openly desires someone else.
+        for (auto& pd : P->list_entityPointedDesire) {
+            if (!pd.pointedEntity || pd.pointedEntity == e) continue;
+            if (pd.pointedEntity->entityHealth <= 0.0f) continue;
+            if (pd.desire > 25.0f) {
+                partnerStrayed = true;
+                if (pd.desire > rivalThreat) { rivalThreat = pd.desire; rival = pd.pointedEntity; }
+            }
+        }
+        // (c) Some outsider lusts after MY partner - a poacher/rival to guard against.
+        for (Entity* o : group) {
+            if (!o || o == e || o == P || o->entityHealth <= 0.0f) continue;
+            float od = pos(o->searchConnDesire(P));
+            if (od > 30.0f) {
+                float dx = o->posX - P->posX, dy = o->posY - P->posY;
+                float prox = (dx*dx + dy*dy < 80.0f*80.0f) ? 1.6f : 1.0f;  // seeing it stings more
+                float threat = od * 0.8f * prox;
+                if (threat > rivalThreat) { rivalThreat = threat; rival = o; }
+            }
+        }
+
+        // -- 2. Suspicion / trust / satisfaction dynamics ------------------
+        if (rivalThreat > 0.0f) {
+            float build = rivalThreat * (0.15f + 0.35f * jeal);
+            cp.suspicion    = std::min(100.0f, cp.suspicion + build * 0.05f);
+            cp.trust        = std::max(0.0f,   cp.trust        - build * 0.020f);
+            cp.satisfaction = std::max(0.0f,   cp.satisfaction - build * 0.015f);
+            e->entityStress   = std::min(100.0f, e->entityStress   + build * 0.030f);
+            e->entityHapiness = std::max(0.0f,   e->entityHapiness - build * 0.020f);
+        } else {
+            // No threat in sight: wounds heal, the bond quietly strengthens.
+            cp.suspicion    = std::max(0.0f,   cp.suspicion - 0.30f);
+            cp.trust        = std::min(100.0f, cp.trust        + 0.10f);
+            cp.satisfaction = std::min(100.0f, cp.satisfaction + 0.05f);
+            cp.commitment   = std::min(100.0f, cp.commitment   + 0.05f);
+        }
+
+        // -- 3. Jealous reaction: resent the rival, and the disloyal partner
+        if (rival && cp.suspicion > 20.0f) {
+            float jealAnger = (cp.suspicion / 100.0f) * (8.0f + love * 0.12f) * (0.5f + jeal);
+            addAngerToward(rival, jealAnger);          // mate-guarding aggression (rival catches most)
+            if (partnerStrayed) addAngerToward(P, jealAnger * 0.45f); // betrayal cuts both ways
+            if (cp.suspicion > 40.0f && BetterRand::genNrInInterval(0, 100) < 8) {
+                if (globalLogger) globalLogger->logEvent("jealousy",
+                    e->name + " is consumed by jealousy over " + P->name +
+                    " - sees " + rival->name + " as a rival");
+                e->addToWorkingMemory("jealousy",
+                    "I can't bear how " + rival->name + " circles " + P->name, 0.7f);
+                LifeMemory mem;
+                mem.eventType = "jealousy";
+                mem.entityInvolvedId = rival->entityId;
+                mem.emotionalIntensity = 1.4f;
+                mem.simulationDay = simDay;
+                mem.isFormative = false;
+                mem.internalNarrative = "jealousy gnawed at me";
+                e->lifeMemories.push_back(mem);
+            }
+        }
+
+        // -- 4. Crime of passion -------------------------------------------
+        // Sustained rage + emotional instability + the target within reach.
+        Entity* victim = nullptr;
+        float angAtRival   = rival ? pos(e->searchConnAng(rival)) : 0.0f;
+        float angAtPartner = pos(e->searchConnAng(P));
+        if (rival && angAtRival >= 70.0f)                 victim = rival;   // strike the interloper
+        else if (partnerStrayed && angAtPartner >= 78.0f) victim = P;       // or the betrayer
+
+        if (victim) {
+            float instability = (100.0f - e->entityMentalHealth) / 100.0f * 0.40f
+                              + e->entityStress / 100.0f * 0.30f
+                              + jeal * 0.30f;
+            float dx = victim->posX - e->posX, dy = victim->posY - e->posY;
+            bool near = (dx*dx + dy*dy) < 90.0f * 90.0f;   // must be able to reach them
+            float roll = BetterRand::genNrInInterval(0, 100) / 100.0f;
+            if (near && roll < instability * 0.5f) {
+                bool lethal = (instability > 0.62f) || (victim->entityHealth < 40.0f);
+                std::string mode = lethal ? "murder" : "assault";
+                if (lethal) {
+                    victim->entityHealth = 0.0f;
+                } else {
+                    victim->entityHealth = std::max(1.0f,
+                        victim->entityHealth - (float)BetterRand::genNrInInterval(20, 45));
+                    victim->entityStress  = std::min(100.0f, victim->entityStress + 30.0f);
+                    int vidx = victim->contains(victim->list_entityPointedAnger, e, 2);
+                    if (vidx == -1) victim->addAnger({ 1, e, 40.0f });
+                    else victim->list_entityPointedAnger[vidx].anger =
+                             std::min(100.0f, victim->list_entityPointedAnger[vidx].anger + 40.0f);
+                }
+                // The deed marks the attacker.
+                e->entityMentalHealth      = std::max(0.0f,   e->entityMentalHealth - 15.0f);
+                e->entityStress            = std::min(100.0f, e->entityStress + 20.0f);
+                e->personality.neuroticism = std::min(100.0f, e->personality.neuroticism + 4.0f);
+                LifeMemory mem;
+                mem.eventType = "crime_of_passion";
+                mem.entityInvolvedId = victim->entityId;
+                mem.emotionalIntensity = 2.6f;
+                mem.simulationDay = simDay;
+                mem.isFormative = true;
+                mem.internalNarrative = lethal ? "I killed out of jealousy"
+                                               : "I attacked my rival in a blind rage";
+                e->lifeMemories.push_back(mem);
+                if (globalLogger) {
+                    globalLogger->logEvent("crime_of_passion",
+                        e->name + " committed " + mode + " against " + victim->name +
+                        " out of jealousy over " + P->name);
+                    if (lethal) globalLogger->logDeath(victim->entityId, victim->name,
+                        (int)victim->entityAge, "crime of passion by " + e->name);
+                }
+                // Grief ripples out to everyone who was bonded to the victim.
+                if (lethal) {
+                    for (Entity* o : group) {
+                        if (!o || o == victim || o->entityHealth <= 0.0f) continue;
+                        bool bond = false;
+                        for (auto& s : o->list_entityPointedSocial)
+                            if (s.pointedEntity == victim && s.social > 8.0f) { bond = true; break; }
+                        if (!bond) for (auto& c : o->list_entityPointedCouple)
+                            if (c.pointedEntity == victim) { bond = true; break; }
+                        if (bond) o->addGrief(victim->entityId,
+                            0.7f + BetterRand::genNrInInterval(0, 20) / 100.0f, true);
+                    }
+                }
+            }
+        }
+
+        // -- 4b. Continuity: stable couples have children ------------------
+        // The breeding *action* almost never won the decision lottery, so lineages
+        // died out. A committed, healthy adult pair now conceives on its own at a
+        // measured pace. Only the lower-id partner initiates, so a couple doesn't
+        // double-conceive from both sides on the same tick.
+        if (P->entityHealth > 0.0f && e->entityId < P->entityId &&
+            cp.daysTogether > 20 && (cp.daysTogether % 25 == 0) &&
+            e->entityAge >= 16.0f && e->entityAge <= 55.0f &&
+            P->entityAge >= 16.0f && P->entityAge <= 55.0f &&
+            e->entityHealth > 45.0f && P->entityHealth > 45.0f &&
+            cp.suspicion < 50.0f &&
+            pos(e->searchConnAng(P)) < 35.0f && pos(P->searchConnAng(e)) < 35.0f) {
+            // Fertility chance rises with mutual desire / commitment.
+            float fertility = 18.0f + cp.commitment * 0.25f + pos(e->searchConnDesire(P)) * 0.25f;
+            if (BetterRand::genNrInInterval(0, 100) < fertility) {
+                static int nextLineageBabyId = 20000;
+                Entity baby = Entity(nextLineageBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75,
+                                     'A', 0, 75, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
+                baby.posX = e->posX + BetterRand::genNrInInterval(-15, 15);
+                baby.posY = e->posY + BetterRand::genNrInInterval(-15, 15);
+                baby.parent1 = P;
+                baby.parent2 = e;
+                baby.originRegionId = (e->originRegionId >= 0) ? e->originRegionId : P->originRegionId;
+                if (g_lexicon) baby.name = g_lexicon->genName(baby.originRegionId, baby.entitySex);
+                baby.personality.openness     = (P->personality.openness + e->personality.openness) / 2.0f;
+                baby.personality.extraversion = (P->personality.extraversion + e->personality.extraversion) / 2.0f;
+                baby.personality.agreeableness = (P->personality.agreeableness + e->personality.agreeableness) / 2.0f;
+                baby.dv.hadSecureAttachment = (cp.satisfaction > 40.0f && cp.trust > 40.0f);
+                baby.dv.childhoodNurturingScore = cp.satisfaction / 25.0f;
+                baby.addOrBoostGoal("self", 100.0f);
+                Heritage::add_child(P, &baby);
+                Heritage::add_child(e, &baby);
+                cp.commitment   = std::min(100.0f, cp.commitment + 6.0f);  // a child deepens the bond
+                cp.satisfaction = std::min(100.0f, cp.satisfaction + 4.0f);
+                e->onMajorEventAddOrBoostGoal("reproduction");
+                P->onMajorEventAddOrBoostGoal("reproduction");
+                if (globalLogger) {
+                    globalLogger->logEvent("breeding",
+                        "Child born to the committed couple " + e->name + " & " + P->name);
+                    globalLogger->logBirth(baby.entityId, baby.getName(),
+                        e->getId(), P->getId(), e->getName(), P->getName());
+                }
+                new_borns.push_back(baby);
+            }
+        }
+
+        // -- 5. Breakup when trust or satisfaction collapses ---------------
+        if (P->entityHealth > 0.0f &&
+            (cp.trust < 12.0f || cp.satisfaction < 12.0f) &&
+            BetterRand::genNrInInterval(0, 100) < 12) {
+            Entity* ex = P;
+            if (globalLogger) globalLogger->logRelationship(
+                e->entityId, e->name, ex->entityId, ex->name,
+                "separation", "trust collapsed under jealousy");
+            e->entityLoneliness = std::min(100.0f, e->entityLoneliness + 20.0f);
+            e->addGrief(ex->entityId, 0.4f, false);   // breakup grief, not death
+            int exIdx = ex->contains(ex->list_entityPointedCouple, e, 3);
+            if (exIdx != -1)
+                ex->list_entityPointedCouple.erase(ex->list_entityPointedCouple.begin() + exIdx);
+            e->list_entityPointedCouple.erase(e->list_entityPointedCouple.begin() + ci);
+            continue;  // vector shifted - don't advance ci
+        }
+
+        ++ci;
+    }
 }

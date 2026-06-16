@@ -503,11 +503,26 @@ CMakeFiles/app.dir/src/CivilizationEngine.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/CivilizationEngine.cpp.s"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\CivilizationEngine.cpp -o CMakeFiles\app.dir\src\CivilizationEngine.cpp.s
 
+CMakeFiles/app.dir/src/Economics.cpp.obj: CMakeFiles/app.dir/flags.make
+CMakeFiles/app.dir/src/Economics.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
+CMakeFiles/app.dir/src/Economics.cpp.obj: src/Economics.cpp
+CMakeFiles/app.dir/src/Economics.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/app.dir/src/Economics.cpp.obj"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/Economics.cpp.obj -MF CMakeFiles\app.dir\src\Economics.cpp.obj.d -o CMakeFiles\app.dir\src\Economics.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\Economics.cpp
+
+CMakeFiles/app.dir/src/Economics.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/app.dir/src/Economics.cpp.i"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\Economics.cpp > CMakeFiles\app.dir\src\Economics.cpp.i
+
+CMakeFiles/app.dir/src/Economics.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/app.dir/src/Economics.cpp.s"
+	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\Economics.cpp -o CMakeFiles\app.dir\src\Economics.cpp.s
+
 CMakeFiles/app.dir/src/Action.cpp.obj: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/Action.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/Action.cpp.obj: src/Action.cpp
 CMakeFiles/app.dir/src/Action.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/app.dir/src/Action.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/app.dir/src/Action.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/Action.cpp.obj -MF CMakeFiles\app.dir\src\Action.cpp.obj.d -o CMakeFiles\app.dir\src\Action.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\Action.cpp
 
 CMakeFiles/app.dir/src/Action.cpp.i: cmake_force
@@ -522,7 +537,7 @@ CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj: CMakeFiles/app.dir/flags.m
 CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj: src/CognitiveArchitecture.cpp
 CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj -MF CMakeFiles\app.dir\src\CognitiveArchitecture.cpp.obj.d -o CMakeFiles\app.dir\src\CognitiveArchitecture.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\CognitiveArchitecture.cpp
 
 CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.i: cmake_force
@@ -537,7 +552,7 @@ CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj: CMakeFiles/app.dir/flags.mak
 CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj: src/EmotionalComplexity.cpp
 CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj -MF CMakeFiles\app.dir\src\EmotionalComplexity.cpp.obj.d -o CMakeFiles\app.dir\src\EmotionalComplexity.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\EmotionalComplexity.cpp
 
 CMakeFiles/app.dir/src/EmotionalComplexity.cpp.i: cmake_force
@@ -552,7 +567,7 @@ CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj: CMakeFiles/app.dir/flag
 CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj: src/EnvironmentalInteraction.cpp
 CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj -MF CMakeFiles\app.dir\src\EnvironmentalInteraction.cpp.obj.d -o CMakeFiles\app.dir\src\EnvironmentalInteraction.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\EnvironmentalInteraction.cpp
 
 CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.i: cmake_force
@@ -567,7 +582,7 @@ CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj: src/LearningAdaptation.cpp
 CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj -MF CMakeFiles\app.dir\src\LearningAdaptation.cpp.obj.d -o CMakeFiles\app.dir\src\LearningAdaptation.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\LearningAdaptation.cpp
 
 CMakeFiles/app.dir/src/LearningAdaptation.cpp.i: cmake_force
@@ -582,7 +597,7 @@ CMakeFiles/app.dir/src/LifeCourse.cpp.obj: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/LifeCourse.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/LifeCourse.cpp.obj: src/LifeCourse.cpp
 CMakeFiles/app.dir/src/LifeCourse.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/app.dir/src/LifeCourse.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/app.dir/src/LifeCourse.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/LifeCourse.cpp.obj -MF CMakeFiles\app.dir\src\LifeCourse.cpp.obj.d -o CMakeFiles\app.dir\src\LifeCourse.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\LifeCourse.cpp
 
 CMakeFiles/app.dir/src/LifeCourse.cpp.i: cmake_force
@@ -597,7 +612,7 @@ CMakeFiles/app.dir/src/SocialDynamics.cpp.obj: CMakeFiles/app.dir/flags.make
 CMakeFiles/app.dir/src/SocialDynamics.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/SocialDynamics.cpp.obj: src/SocialDynamics.cpp
 CMakeFiles/app.dir/src/SocialDynamics.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/app.dir/src/SocialDynamics.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/app.dir/src/SocialDynamics.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/SocialDynamics.cpp.obj -MF CMakeFiles\app.dir\src\SocialDynamics.cpp.obj.d -o CMakeFiles\app.dir\src\SocialDynamics.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\SocialDynamics.cpp
 
 CMakeFiles/app.dir/src/SocialDynamics.cpp.i: cmake_force
@@ -612,7 +627,7 @@ CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj: CMakeFiles/app.di
 CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj: src/validation/ValidationFramework.cpp
 CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building CXX object CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.obj -MF CMakeFiles\app.dir\src\validation\ValidationFramework.cpp.obj.d -o CMakeFiles\app.dir\src\validation\ValidationFramework.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\validation\ValidationFramework.cpp
 
 CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.i: cmake_force
@@ -627,7 +642,7 @@ CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj: CMakeFiles/app.dir/flags
 CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj: src/scalability/Scalability.cpp
 CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Building CXX object CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/scalability/Scalability.cpp.obj -MF CMakeFiles\app.dir\src\scalability\Scalability.cpp.obj.d -o CMakeFiles\app.dir\src\scalability\Scalability.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\scalability\Scalability.cpp
 
 CMakeFiles/app.dir/src/scalability/Scalability.cpp.i: cmake_force
@@ -642,7 +657,7 @@ CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj: CMakeFiles/app.dir/flag
 CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj: src/modules/BehavioralModule.cpp
 CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.obj -MF CMakeFiles\app.dir\src\modules\BehavioralModule.cpp.obj.d -o CMakeFiles\app.dir\src\modules\BehavioralModule.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\modules\BehavioralModule.cpp
 
 CMakeFiles/app.dir/src/modules/BehavioralModule.cpp.i: cmake_force
@@ -657,7 +672,7 @@ CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj: CMakeFiles/app.dir/
 CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj: src/environment/EnvironmentModel.cpp
 CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.obj -MF CMakeFiles\app.dir\src\environment\EnvironmentModel.cpp.obj.d -o CMakeFiles\app.dir\src\environment\EnvironmentModel.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\environment\EnvironmentModel.cpp
 
 CMakeFiles/app.dir/src/environment/EnvironmentModel.cpp.i: cmake_force
@@ -672,7 +687,7 @@ CMakeFiles/app.dir/src/observability/Observability.cpp.obj: CMakeFiles/app.dir/f
 CMakeFiles/app.dir/src/observability/Observability.cpp.obj: CMakeFiles/app.dir/includes_CXX.rsp
 CMakeFiles/app.dir/src/observability/Observability.cpp.obj: src/observability/Observability.cpp
 CMakeFiles/app.dir/src/observability/Observability.cpp.obj: CMakeFiles/app.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/app.dir/src/observability/Observability.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building CXX object CMakeFiles/app.dir/src/observability/Observability.cpp.obj"
 	C:\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/app.dir/src/observability/Observability.cpp.obj -MF CMakeFiles\app.dir\src\observability\Observability.cpp.obj.d -o CMakeFiles\app.dir\src\observability\Observability.cpp.obj -c C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\observability\Observability.cpp
 
 CMakeFiles/app.dir/src/observability/Observability.cpp.i: cmake_force
@@ -714,6 +729,7 @@ app_OBJECTS = \
 "CMakeFiles/app.dir/src/PersonaSystem.cpp.obj" \
 "CMakeFiles/app.dir/src/NarrativeEngine.cpp.obj" \
 "CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj" \
+"CMakeFiles/app.dir/src/Economics.cpp.obj" \
 "CMakeFiles/app.dir/src/Action.cpp.obj" \
 "CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj" \
 "CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj" \
@@ -759,6 +775,7 @@ app.exe: CMakeFiles/app.dir/src/PlanningSystem.cpp.obj
 app.exe: CMakeFiles/app.dir/src/PersonaSystem.cpp.obj
 app.exe: CMakeFiles/app.dir/src/NarrativeEngine.cpp.obj
 app.exe: CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj
+app.exe: CMakeFiles/app.dir/src/Economics.cpp.obj
 app.exe: CMakeFiles/app.dir/src/Action.cpp.obj
 app.exe: CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj
 app.exe: CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj
@@ -778,7 +795,7 @@ app.exe: C:/mingw64/x86_64-w64-mingw32/lib/libmingwthrd.a
 app.exe: CMakeFiles/app.dir/linkLibs.rsp
 app.exe: CMakeFiles/app.dir/objects1.rsp
 app.exe: CMakeFiles/app.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Linking CXX executable app.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\LordN.NASHOU\Desktop\code\ASHB2\CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Linking CXX executable app.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\app.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

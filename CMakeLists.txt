@@ -100,6 +100,7 @@ src/PlanningSystem.cpp
 src/PersonaSystem.cpp
 src/NarrativeEngine.cpp
 src/CivilizationEngine.cpp
+src/Economics.cpp
 
 # New AI / cognitive simulation source files
 src/Action.cpp

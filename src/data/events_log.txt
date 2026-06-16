@@ -1,0 +1,425 @@
+[2026-06-16 15:53:25] breeding: Reproduction between Snaushaunar and Vrozel
+[2026-06-16 15:53:28] breeding: Reproduction between Graa and Vriastloo
+[2026-06-16 15:53:34] breeding: Reproduction between Snauneth and Raazar
+[2026-06-16 15:53:35] breeding: Reproduction between Mbaakel and Raazar
+[2026-06-16 15:53:36] breeding: Reproduction between Vraanraazar and Roosmaakim
+[2026-06-16 15:53:36] breeding: Reproduction between Vrastryel and Liazor
+[2026-06-16 15:53:37] breeding: Reproduction between Vraanraazar and Roosmaakim
+[2026-06-16 15:53:40] breeding: Reproduction between Vraanraazar and Roosmaakim
+[2026-06-16 15:53:46] breeding: Reproduction between Vraanraazar and Roosmaakim
+[2026-06-16 15:53:48] breeding: Reproduction between Liazor and Vrastryel
+[2026-06-16 15:53:49] breeding: Child born to the committed couple Raazar & Mbaakel
+[2026-06-16 15:53:58] breeding: Child born to the committed couple Snaushaunar & Vrozel
+[2026-06-16 15:53:58] breeding: Reproduction between Vraanraazar and Roosmaakim
+[2026-06-16 15:54:03] breeding: Reproduction between Mbosel and Haunmbaazar
+[2026-06-16 15:54:03] breeding: Reproduction between Vraanraazar and Roosmaakim
+[2026-06-16 15:54:05] crime_of_passion: Mbaakel committed murder against Snauneth out of jealousy over Raazar
+[2026-06-16 15:54:08] breeding: Child born to the committed couple Snaushaunar & Trausar
+[2026-06-16 15:54:11] jealousy: Loobrykae is consumed by jealousy over Draasim - sees Drosor as a rival
+[2026-06-16 15:54:12] breeding: Child born to the committed couple Loobrykae & Draasim
+[2026-06-16 15:54:16] crime_of_passion: Snaushaunar committed assault against Vraanraazar out of jealousy over Vrozel
+[2026-06-16 15:54:16] jealousy: Trausar is consumed by jealousy over Snaushaunar - sees Vrozel as a rival
+[2026-06-16 15:54:16] crime_of_passion: Vrozel committed assault against Roosmaakim out of jealousy over Vraanraazar
+[2026-06-16 15:54:16] crime_of_passion: Fliael committed murder against Vrastryel out of jealousy over Liazor
+[2026-06-16 15:54:16] breeding: Reproduction between Trommboomar and Drauzis
+[2026-06-16 15:54:17] crime_of_passion: Snaushaunar committed assault against Vraanraazar out of jealousy over Vrozel
+[2026-06-16 15:54:17] crime_of_passion: Vraanraazar committed murder against Snaushaunar out of jealousy over Vrozel
+[2026-06-16 15:54:17] jealousy: Loobrykae is consumed by jealousy over Draasim - sees Drosor as a rival
+[2026-06-16 15:54:19] breeding: Reproduction between Roosmaakim and Vraanraazar
+[2026-06-16 15:54:19] crime_of_passion: Roosmaakim committed murder against Vrozel out of jealousy over Vraanraazar
+[2026-06-16 15:54:19] jealousy: Vrozel is consumed by jealousy over Vraanraazar - sees Roosmaakim as a rival
+[2026-06-16 15:54:20] crime_of_passion: Roosmaakim committed murder against Vrozel out of jealousy over Vraanraazar
+[2026-06-16 15:54:23] jealousy: Vrozel is consumed by jealousy over Vraanraazar - sees Roosmaakim as a rival
+[2026-06-16 15:54:24] crime_of_passion: Roosmaakim committed murder against Vrozel out of jealousy over Vraanraazar
+[2026-06-16 15:54:26] breeding: Reproduction between Graakflooon and Brykgraakila
+[2026-06-16 15:54:27] crime_of_passion: Roosmaakim committed murder against Vrozel out of jealousy over Vraanraazar
+[2026-06-16 15:54:27] crime_of_passion: Vrozel committed assault against Roosmaakim out of jealousy over Vraanraazar
+[2026-06-16 15:54:28] crime_of_passion: Roosmaakim committed murder against Vrozel out of jealousy over Vraanraazar
+[2026-06-16 15:54:28] crime_of_passion: Vrozel committed assault against Roosmaakim out of jealousy over Vraanraazar
+[2026-06-16 15:54:29] crime_of_passion: Vrozel committed murder against Roosmaakim out of jealousy over Vraanraazar
+[2026-06-16 15:54:36] breeding: Reproduction between Mbosel and Haunmbaazar
+[2026-06-16 15:54:42] breeding: Reproduction between Haaltrosel and Raukar
+[2026-06-16 15:54:42] breeding: Reproduction between Vriazfleemor and Riastrakia
+[2026-06-16 15:54:45] breeding: Reproduction between Flaalis and Snozar
+[2026-06-16 15:54:47] jealousy: Loobrykae is consumed by jealousy over Draasim - sees Drosor as a rival
+[2026-06-16 15:54:47] breeding: Reproduction between Raukar and Haaltrosel
+[2026-06-16 15:54:49] breeding: Reproduction between Raukar and Haaltrosel
+[2026-06-16 15:54:55] jealousy: Loobrykae is consumed by jealousy over Draasim - sees Drosor as a rival
+[2026-06-16 15:54:58] breeding: Reproduction between Raukar and Kausflauzis
+[2026-06-16 15:54:58] breeding: Reproduction between Snaundrozar and Haaltrosel
+[2026-06-16 15:55:00] breeding: Reproduction between Kausflauzis and Raukar
+[2026-06-16 15:55:03] breeding: Child born to the committed couple Flaalis & Snozar
+[2026-06-16 15:55:07] breeding: Reproduction between Riastrakia and Mbauzhaalar
+[2026-06-16 15:55:11] breeding: Reproduction between Graa and Vriastloo
+[2026-06-16 15:55:12] breeding: Reproduction between Snaundrozar and Haaltrosel
+[2026-06-16 15:55:13] breeding: Reproduction between Flaalis and Snozar
+[2026-06-16 15:55:20] breeding: Child born to the committed couple Haunmbaazar & Mbosel
+[2026-06-16 15:55:31] jealousy: Loobrykae is consumed by jealousy over Draasim - sees Drosor as a rival
+[2026-06-16 15:55:32] breeding: Reproduction between Snosflonar and Mbaamor
+[2026-06-16 15:55:36] breeding: Reproduction between Drauzis and Mooksnosel
+[2026-06-16 15:55:39] breeding: Child born to the committed couple Mbosel & Mbokdraazar
+[2026-06-16 15:55:39] breeding: Reproduction between Droolskoolor and Flauzar
+[2026-06-16 15:55:41] breeding: Child born to the committed couple Raazar & Mbaakel
+[2026-06-16 15:55:41] breeding: Reproduction between Snaundrozar and Haaltrosel
+[2026-06-16 15:55:41] breeding: Reproduction between Steemuna and Graakflooon
+[2026-06-16 15:55:43] breeding: Reproduction between Snosflonar and Mbaamor
+[2026-06-16 15:55:43] breeding: Reproduction between Skoolmbaasar and Tronflolim
+[2026-06-16 15:55:45] jealousy: Loobrykae is consumed by jealousy over Draasim - sees Drosor as a rival
+[2026-06-16 15:55:45] breeding: Reproduction between Mbaamor and Kookar
+[2026-06-16 15:55:46] crime_of_passion: Mbokdraazar committed murder against Haunmbaazar out of jealousy over Mbosel
+[2026-06-16 15:55:46] breeding: Child born to the committed couple Flaalis & Snozar
+[2026-06-16 15:55:50] breeding: Reproduction between Haaltrosel and Raukar
+[2026-06-16 15:55:50] crime_of_passion: Mbaamor committed murder against Tronflolim out of jealousy over Kookar
+[2026-06-16 15:55:52] breeding: Child born to the committed couple Stauna & Graethon
+[2026-06-16 15:55:52] crime_of_passion: Raukar committed murder against Snaundrozar out of jealousy over Haaltrosel
+[2026-06-16 15:55:52] breeding: Reproduction between Mbaamor and Kookar
+[2026-06-16 15:55:54] breeding: Reproduction between Stauna and Graethon
+[2026-06-16 15:55:54] crime_of_passion: Kausflauzis committed murder against Haaltrosel out of jealousy over Raukar
+[2026-06-16 15:55:56] breeding: Reproduction between Brykgraakila and Graakflooon
+[2026-06-16 15:55:56] breeding: Reproduction between Vraanflaaketh and Drolar
+[2026-06-16 15:55:58] breeding: Reproduction between Vraanraazar and Flokis
+[2026-06-16 15:55:58] breeding: Reproduction between Vriastloo and Graa
+[2026-06-16 15:55:58] crime_of_passion: Mbaamor committed murder against Draasim out of jealousy over Kookar
+[2026-06-16 15:56:00] breeding: Reproduction between Snaundrozar and Traalar
+[2026-06-16 15:56:00] breeding: Reproduction between Graakflooon and Brykgraakila
+[2026-06-16 15:56:02] breeding: Reproduction between Steemuna and Graakflooon
+[2026-06-16 15:56:03] jealousy: Mbauzhaalar is consumed by jealousy over Riastrakia - sees Vriazfleemor as a rival
+[2026-06-16 15:56:05] crime_of_passion: Mbokdraazar committed murder against Snoonmausar out of jealousy over Mbosel
+[2026-06-16 15:56:06] crime_of_passion: Vrozel committed assault against Vraanraazar out of jealousy over Vraanraazar
+[2026-06-16 15:56:10] crime_of_passion: Vrozel committed assault against Vraanraazar out of jealousy over Vraanraazar
+[2026-06-16 15:56:14] jealousy: Vriazfleemor is consumed by jealousy over Riastrakia - sees Mbauzhaalar as a rival
+[2026-06-16 15:56:16] breeding: Child born to the committed couple Droomhookane & Trauzim
+[2026-06-16 15:56:18] jealousy: Vrozel is consumed by jealousy over Vraanraazar - sees Flokis as a rival
+[2026-06-16 15:56:20] breeding: Reproduction between Traalar and Snaundrozar
+[2026-06-16 15:56:20] crime_of_passion: Drauzis committed assault against Mbauzhaalar out of jealousy over Mooksnosel
+[2026-06-16 15:56:21] crime_of_passion: Drauzis committed murder against Snaundrozar out of jealousy over Trommboomar
+[2026-06-16 15:56:21] crime_of_passion: Drauzis committed murder against Mbauzhaalar out of jealousy over Mooksnosel
+[2026-06-16 15:56:25] crime_of_passion: Vrozel committed assault against Flokis out of jealousy over Vraanraazar
+[2026-06-16 15:56:27] crime_of_passion: Trommboomar committed murder against Mooksnosel out of jealousy over Drauzis
+[2026-06-16 15:56:27] breeding: Reproduction between Vriastloo and Graa
+[2026-06-16 15:56:27] breeding: Reproduction between Drolar and Vraanflaaketh
+[2026-06-16 15:56:29] crime_of_passion: Trommboomar committed murder against Mooksnosel out of jealousy over Drauzis
+[2026-06-16 15:56:29] breeding: Reproduction between Stauna and Graethon
+[2026-06-16 15:56:29] breeding: Reproduction between Vraanflaaketh and Draukar
+[2026-06-16 15:56:29] breeding: Reproduction between Volvauzar and Vrokhookel
+[2026-06-16 15:56:31] jealousy: Drauzis is consumed by jealousy over Mooksnosel - sees Droolskoolor as a rival
+[2026-06-16 15:56:31] breeding: Reproduction between Mooksnosel and Drauzis
+[2026-06-16 15:56:33] crime_of_passion: Vrozel committed assault against Flokis out of jealousy over Vraanraazar
+[2026-06-16 15:56:33] crime_of_passion: Flokis committed murder against Vrozel out of jealousy over Vraanraazar
+[2026-06-16 15:56:33] crime_of_passion: Trommboomar committed murder against Mooksnosel out of jealousy over Drauzis
+[2026-06-16 15:56:33] crime_of_passion: Drauzis committed murder against Snaundrozar out of jealousy over Traalar
+[2026-06-16 15:56:33] breeding: Reproduction between Vriazfleemor and Brykgraakila
+[2026-06-16 15:56:35] crime_of_passion: Drauzis committed murder against Snaundrozar out of jealousy over Traalar
+[2026-06-16 15:56:35] crime_of_passion: Mooksnosel committed murder against Trommboomar out of jealousy over Drauzis
+[2026-06-16 15:56:35] breeding: Reproduction between Rausel and Drauksnauzim
+[2026-06-16 15:56:37] breeding: Reproduction between Kausflauzis and Droolskoolor
+[2026-06-16 15:56:37] crime_of_passion: Vriazfleemor committed murder against Riastrakia out of jealousy over Riastrakia
+[2026-06-16 15:56:39] breeding: Child born to the committed couple Vraanraazar & Flokis
+[2026-06-16 15:56:39] crime_of_passion: Drauzis committed murder against Snaundrozar out of jealousy over Traalar
+[2026-06-16 15:56:39] breeding: Reproduction between Traalar and Snaundrozar
+[2026-06-16 15:56:40] breeding: Reproduction between Steemuna and Graakflooon
+[2026-06-16 15:56:42] crime_of_passion: Drauzis committed murder against Snaundrozar out of jealousy over Traalar
+[2026-06-16 15:56:42] jealousy: Traalar is consumed by jealousy over Drauzis - sees Mooksnosel as a rival
+[2026-06-16 15:56:42] breeding: Reproduction between Snokar and Traalar
+[2026-06-16 15:56:43] crime_of_passion: Kookar committed murder against Snosflonar out of jealousy over Mbaamor
+[2026-06-16 15:56:44] breeding: Child born to the committed couple Graa & Vriastloo
+[2026-06-16 15:56:45] breeding: Reproduction between Rausel and Drauksnauzim
+[2026-06-16 15:56:45] breeding: Reproduction between Mooksnosel and Droolskoolor
+[2026-06-16 15:56:45] crime_of_passion: Snosflonar committed murder against Kookar out of jealousy over Mbaamor
+[2026-06-16 15:56:47] crime_of_passion: Drauzis committed murder against Droolskoolor out of jealousy over Mooksnosel
+[2026-06-16 15:56:47] crime_of_passion: Traalar committed murder against Mooksnosel out of jealousy over Drauzis
+[2026-06-16 15:56:49] jealousy: Drauzis is consumed by jealousy over Mooksnosel - sees Droolskoolor as a rival
+[2026-06-16 15:56:49] crime_of_passion: Drauzis committed murder against Snaundrozar out of jealousy over Traalar
+[2026-06-16 15:56:49] crime_of_passion: Traalar committed murder against Mooksnosel out of jealousy over Drauzis
+[2026-06-16 15:56:50] crime_of_passion: Hookane committed murder against Mbaakel out of jealousy over Raazar
+[2026-06-16 15:56:50] crime_of_passion: Traalar committed murder against Mooksnosel out of jealousy over Drauzis
+[2026-06-16 15:56:50] breeding: Reproduction between Rausel and Drauksnauzim
+[2026-06-16 15:56:52] breeding: Reproduction between Graakflooon and Brykgraakila
+[2026-06-16 15:56:52] breeding: Reproduction between Vriazfleemor and Brykgraakila
+[2026-06-16 15:56:52] crime_of_passion: Traalar committed murder against Mooksnosel out of jealousy over Drauzis
+[2026-06-16 15:56:52] crime_of_passion: Traalar committed murder against Drauzis out of jealousy over Snokar
+[2026-06-16 15:56:54] breeding: Reproduction between Kaakane and Draukar
+[2026-06-16 15:56:54] breeding: Reproduction between Dromel and Mbaalmbaukar
+[2026-06-16 15:56:55] crime_of_passion: Hookane committed murder against Mbaakel out of jealousy over Raazar
+[2026-06-16 15:56:57] crime_of_passion: Kausflauzis committed murder against Mooksnosel out of jealousy over Droolskoolor
+[2026-06-16 15:56:58] crime_of_passion: Hookane committed murder against Mbaakel out of jealousy over Raazar
+[2026-06-16 15:56:59] breeding: Reproduction between Vriastloo and Graa
+[2026-06-16 15:56:59] breeding: Reproduction between Brykgraakila and Graakflooon
+[2026-06-16 15:56:59] jealousy: Brykgraakila is consumed by jealousy over Graakflooon - sees Fleestim as a rival
+[2026-06-16 15:56:59] crime_of_passion: Traalar committed murder against Raukar out of jealousy over Snokar
+[2026-06-16 15:56:59] breeding: Reproduction between Floseth and Flomel
+[2026-06-16 15:57:00] crime_of_passion: Raazar committed murder against Maakane out of jealousy over Mbaakel
+[2026-06-16 15:57:00] crime_of_passion: Traalar committed murder against Droolskoolor out of jealousy over Snaundrozar
+[2026-06-16 15:57:00] breeding: Reproduction between Draukar and Kaakane
+[2026-06-16 15:57:02] crime_of_passion: Traalar committed murder against Droolskoolor out of jealousy over Snaundrozar
+[2026-06-16 15:57:04] crime_of_passion: Hookane committed murder against Mbaakel out of jealousy over Raazar
+[2026-06-16 15:57:05] crime_of_passion: Traalar committed murder against Droolskoolor out of jealousy over Snaundrozar
+[2026-06-16 15:57:06] breeding: Reproduction between Flonis and Snaanar
+[2026-06-16 15:57:07] crime_of_passion: Hookane committed murder against Mbaakel out of jealousy over Raazar
+[2026-06-16 15:57:07] jealousy: Liazor is consumed by jealousy over Fliael - sees Vraezbroo as a rival
+[2026-06-16 15:57:07] crime_of_passion: Traalar committed murder against Droolskoolor out of jealousy over Snaundrozar
+[2026-06-16 15:57:09] crime_of_passion: Traalar committed murder against Droolskoolor out of jealousy over Snaundrozar
+[2026-06-16 15:57:09] breeding: Reproduction between Snaanar and Mboneth
+[2026-06-16 15:57:09] breeding: Reproduction between Greethila and Laemon
+[2026-06-16 15:57:10] crime_of_passion: Snaundrozar committed murder against Snokar out of jealousy over Traalar
+[2026-06-16 15:57:11] crime_of_passion: Traalar committed murder against Droolskoolor out of jealousy over Kausflauzis
+[2026-06-16 15:57:11] breeding: Reproduction between Draakmaazel and Trooseth
+[2026-06-16 15:57:11] breeding: Reproduction between Mbaalmbaukar and Dromel
+[2026-06-16 15:57:12] crime_of_passion: Snaundrozar committed murder against Snokar out of jealousy over Traalar
+[2026-06-16 15:57:12] crime_of_passion: Droolskoolor committed murder against Traalar out of jealousy over Kausflauzis
+[2026-06-16 15:57:14] breeding: Reproduction between Stauna and Graethon
+[2026-06-16 15:57:15] crime_of_passion: Hookane committed murder against Mbaakel out of jealousy over Raazar
+[2026-06-16 15:57:15] breeding: Child born to the committed couple Flaalis & Snozar
+[2026-06-16 15:57:16] breeding: Reproduction between Vriastloo and Graa
+[2026-06-16 15:57:16] breeding: Reproduction between Stoomila and Brykgraakila
+[2026-06-16 15:57:16] breeding: Reproduction between Graamstoomim and Flaethim
+[2026-06-16 15:57:16] crime_of_passion: Droolskoolor committed murder against Kausflauzis out of jealousy over Flauzar
+[2026-06-16 15:57:16] breeding: Reproduction between Drolar and Vraanflaaketh
+[2026-06-16 15:57:17] crime_of_passion: Hookane committed murder against Mbaakel out of jealousy over Raazar
+[2026-06-16 15:57:17] crime_of_passion: Stoomila committed murder against Vriazfleemor out of jealousy over Brykgraakila
+[2026-06-16 15:57:17] crime_of_passion: Droolskoolor committed murder against Flauzar out of jealousy over Flauzar
+[2026-06-16 15:57:17] breeding: Reproduction between Flonis and Snaanar
+[2026-06-16 15:57:19] crime_of_passion: Mbaakel committed assault against Hookane out of jealousy over Raazar
+[2026-06-16 15:57:21] crime_of_passion: Mbaakel committed murder against Hookane out of jealousy over Raazar
+[2026-06-16 15:57:21] breeding: Reproduction between Drolar and Vraanflaaketh
+[2026-06-16 15:57:21] breeding: Reproduction between Floseth and Flomel
+[2026-06-16 15:57:21] breeding: Reproduction between Molar and Snaalraasar
+[2026-06-16 15:57:24] jealousy: Steemuna is consumed by jealousy over Graakflooon - sees Fleestim as a rival
+[2026-06-16 15:57:24] breeding: Reproduction between Stoomila and Graamstoomim
+[2026-06-16 15:57:24] breeding: Reproduction between Drolar and Vraanflaaketh
+[2026-06-16 15:57:24] breeding: Reproduction between Kaakane and Draukar
+[2026-06-16 15:57:24] breeding: Reproduction between Vaunis and Dromel
+[2026-06-16 15:57:26] breeding: Reproduction between Laemon and Greethila
+[2026-06-16 15:57:28] breeding: Reproduction between Floomim and Leestfloostila
+[2026-06-16 15:57:30] breeding: Reproduction between Laastor and Raatheth
+[2026-06-16 15:57:30] breeding: Reproduction between Trooseth and Draakmaazel
+[2026-06-16 15:57:32] breeding: Reproduction between Trauzim and Droomhookane
+[2026-06-16 15:57:32] breeding: Reproduction between Droolskoolor and Mooksnosel
+[2026-06-16 15:57:32] breeding: Reproduction between Floseth and Flomel
+[2026-06-16 15:57:32] breeding: Reproduction between Haazor and Romim
+[2026-06-16 15:57:32] crime_of_passion: Romim committed murder against Draakmaazel out of jealousy over Trooseth
+[2026-06-16 15:57:34] breeding: Reproduction between Vaunis and Kauzkooseth
+[2026-06-16 15:57:34] breeding: Reproduction between Floomim and Leestfloostila
+[2026-06-16 15:57:35] crime_of_passion: Stoomila committed murder against Graakflooon out of jealousy over Brykgraakila
+[2026-06-16 15:57:37] breeding: Reproduction between Vaunis and Dromel
+[2026-06-16 15:57:37] breeding: Reproduction between Floomim and Leestfloostila
+[2026-06-16 15:57:39] breeding: Reproduction between Raatheth and Fleestim
+[2026-06-16 15:57:41] crime_of_passion: Liazor committed assault against Vraezbroo out of jealousy over Fliael
+[2026-06-16 15:57:41] breeding: Reproduction between Raaseth and Vrausar
+[2026-06-16 15:57:41] breeding: Reproduction between Floomim and Leestfloostila
+[2026-06-16 15:57:42] crime_of_passion: Liazor committed assault against Vraezbroo out of jealousy over Fliael
+[2026-06-16 15:57:42] breeding: Reproduction between Flaethim and Brykgraakila
+[2026-06-16 15:57:44] crime_of_passion: Drolar committed murder against Draukar out of jealousy over Vraanflaaketh
+[2026-06-16 15:57:46] breeding: Reproduction between Flooldrosane and Holis
+[2026-06-16 15:57:46] breeding: Reproduction between Steemuna and Brykgraakila
+[2026-06-16 15:57:46] breeding: Reproduction between Stiath and Raatheth
+[2026-06-16 15:57:46] crime_of_passion: Vrokhookel committed murder against Haanor out of jealousy over Volvauzar
+[2026-06-16 15:57:47] breeding: Reproduction between Mbaalmbaukar and Dromel
+[2026-06-16 15:57:48] breeding: Child born to the committed couple Snaundrozar & Droolskoolor
+[2026-06-16 15:57:48] breeding: Reproduction between Draakor and Haanor
+[2026-06-16 15:57:50] breeding: Reproduction between Stiath and Raatheth
+[2026-06-16 15:57:50] jealousy: Vrokhookel is consumed by jealousy over Volvauzar - sees Haanor as a rival
+[2026-06-16 15:57:50] crime_of_passion: Vrokhookel committed murder against Haanor out of jealousy over Volvauzar
+[2026-06-16 15:57:52] breeding: Child born to the committed couple Flooldrosane & Holis
+[2026-06-16 15:57:52] crime_of_passion: Drolar committed murder against Draukar out of jealousy over Vraanflaaketh
+[2026-06-16 15:57:52] crime_of_passion: Volvauzar committed murder against Drolar out of jealousy over Vrokhookel
+[2026-06-16 15:57:52] crime_of_passion: Haanor committed murder against Vrokhookel out of jealousy over Rolis
+[2026-06-16 15:57:52] breeding: Reproduction between Skaukis and Flaalhoosar
+[2026-06-16 15:57:52] breeding: Reproduction between Vauketh and Voolim
+[2026-06-16 15:57:54] breeding: Reproduction between Stiath and Raatheth
+[2026-06-16 15:57:54] breeding: Reproduction between Kaakane and Draukar
+[2026-06-16 15:57:56] crime_of_passion: Stoomila committed murder against Flaethim out of jealousy over Brykgraakila
+[2026-06-16 15:57:56] breeding: Reproduction between Greethila and Laemon
+[2026-06-16 15:57:58] crime_of_passion: Stauna committed murder against Fliael out of jealousy over Graethon
+[2026-06-16 15:57:58] jealousy: Romim is consumed by jealousy over Trooseth - sees Raazel as a rival
+[2026-06-16 15:57:58] crime_of_passion: Mbaalmbaukar committed assault against Vaunis out of jealousy over Dromel
+[2026-06-16 15:57:59] crime_of_passion: Vaunis committed murder against Mbaalmbaukar out of jealousy over Dromel
+[2026-06-16 15:58:00] crime_of_passion: Volvauzar committed murder against Draakor out of jealousy over Haanor
+[2026-06-16 15:58:00] breeding: Reproduction between Steemuna and Laastor
+[2026-06-16 15:58:00] jealousy: Stoomila is consumed by jealousy over Brykgraakila - sees Steemuna as a rival
+[2026-06-16 15:58:00] breeding: Reproduction between Greethila and Laemon
+[2026-06-16 15:58:00] jealousy: Romim is consumed by jealousy over Trooseth - sees Raazel as a rival
+[2026-06-16 15:58:01] breeding: Reproduction between Voonmoonor and Koolmbaakis
+[2026-06-16 15:58:04] crime_of_passion: Snaundrozar committed murder against Mooksnosel out of jealousy over Droolskoolor
+[2026-06-16 15:58:04] crime_of_passion: Mooksnosel committed murder against Snaundrozar out of jealousy over Droolskoolor
+[2026-06-16 15:58:04] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:04] jealousy: Stoomila is consumed by jealousy over Brykgraakila - sees Steemuna as a rival
+[2026-06-16 15:58:04] crime_of_passion: Staaae committed murder against Raatheth out of jealousy over Fleestim
+[2026-06-16 15:58:05] breeding: Reproduction between Vrausar and Kausvoonane
+[2026-06-16 15:58:05] breeding: Reproduction between Hozim and Snoolane
+[2026-06-16 15:58:05] breeding: Reproduction between Liaz and Vree
+[2026-06-16 15:58:07] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:07] breeding: Reproduction between Flomel and Floseth
+[2026-06-16 15:58:07] breeding: Reproduction between Floseth and Flomel
+[2026-06-16 15:58:07] breeding: Reproduction between Kauzeth and Voolim
+[2026-06-16 15:58:08] breeding: Reproduction between Vauketh and Voolim
+[2026-06-16 15:58:09] jealousy: Vraanraazar is consumed by jealousy over Flokis - sees Drosor as a rival
+[2026-06-16 15:58:10] crime_of_passion: Vraanflaaketh committed murder against Kaakane out of jealousy over Draukar
+[2026-06-16 15:58:10] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:10] jealousy: Draukar is consumed by jealousy over Vraanflaaketh - sees Rolis as a rival
+[2026-06-16 15:58:10] crime_of_passion: Stoomila committed murder against Steemuna out of jealousy over Graamstoomim
+[2026-06-16 15:58:13] breeding: Reproduction between Mboneth and Snaanar
+[2026-06-16 15:58:13] crime_of_passion: Romim committed murder against Raazel out of jealousy over Trooseth
+[2026-06-16 15:58:13] breeding: Reproduction between Snoolane and Vroozim
+[2026-06-16 15:58:15] jealousy: Vraanraazar is consumed by jealousy over Flokis - sees Drosor as a rival
+[2026-06-16 15:58:15] crime_of_passion: Vraanflaaketh committed murder against Kaakane out of jealousy over Draukar
+[2026-06-16 15:58:15] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:17] crime_of_passion: Vraanflaaketh committed murder against Kaakane out of jealousy over Draukar
+[2026-06-16 15:58:18] crime_of_passion: Mboneth committed assault against Flonis out of jealousy over Snaanar
+[2026-06-16 15:58:19] crime_of_passion: Flonis committed murder against Mboneth out of jealousy over Snaanar
+[2026-06-16 15:58:19] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:19] breeding: Reproduction between Greethila and Laemon
+[2026-06-16 15:58:19] crime_of_passion: Kaakane committed murder against Vraanflaaketh out of jealousy over Draukar
+[2026-06-16 15:58:20] breeding: Reproduction between Hozim and Snoolane
+[2026-06-16 15:58:21] crime_of_passion: Flonis committed murder against Mboneth out of jealousy over Snaanar
+[2026-06-16 15:58:21] crime_of_passion: Volvauzar committed murder against Rolis out of jealousy over Haanor
+[2026-06-16 15:58:21] crime_of_passion: Mboneth committed murder against Flonis out of jealousy over Snaanar
+[2026-06-16 15:58:22] breeding: Reproduction between Kauzeth and Voolim
+[2026-06-16 15:58:24] breeding: Reproduction between Mbaukdroomor and Kokdrauneth
+[2026-06-16 15:58:24] crime_of_passion: Rosflaulor committed murder against Flaalhoosar out of jealousy over Skaukis
+[2026-06-16 15:58:24] breeding: Reproduction between Vauketh and Voolim
+[2026-06-16 15:58:26] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:29] jealousy: Vraanraazar is consumed by jealousy over Flokis - sees Drosor as a rival
+[2026-06-16 15:58:29] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:29] breeding: Reproduction between Snausmolim and Kokdrauneth
+[2026-06-16 15:58:29] crime_of_passion: Kauzkooseth committed murder against Dromel out of jealousy over Vaunis
+[2026-06-16 15:58:32] breeding: Reproduction between Rosflaulor and Skaukis
+[2026-06-16 15:58:32] breeding: Reproduction between Snaalraasar and Molar
+[2026-06-16 15:58:32] crime_of_passion: Snaalraasar committed murder against Vauketh out of jealousy over Molar
+[2026-06-16 15:58:32] breeding: Reproduction between Snoolane and Hozim
+[2026-06-16 15:58:34] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:34] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:34] crime_of_passion: Graamstoomim committed murder against Brykgraakila out of jealousy over Stoomila
+[2026-06-16 15:58:34] jealousy: Staaae is consumed by jealousy over Fleestim - sees Stoomila as a rival
+[2026-06-16 15:58:34] breeding: Reproduction between Trosar and Haazor
+[2026-06-16 15:58:37] crime_of_passion: Volvauzar committed murder against Haanor out of jealousy over Haanor
+[2026-06-16 15:58:37] crime_of_passion: Staaae committed murder against Stoomila out of jealousy over Fleestim
+[2026-06-16 15:58:37] crime_of_passion: Haazor committed murder against Trooseth out of jealousy over Romim
+[2026-06-16 15:58:37] breeding: Reproduction between Voolim and Voonmoonor
+[2026-06-16 15:58:37] breeding: Reproduction between Snoolane and Vroozim
+[2026-06-16 15:58:38] breeding: Reproduction between Staaryis and Laathon
+[2026-06-16 15:58:39] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:40] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:58:40] breeding: Reproduction between Kausvoonane and Vrausar
+[2026-06-16 15:58:40] breeding: Reproduction between Snommbomel and Vaakmookor
+[2026-06-16 15:58:42] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:58:43] breeding: Reproduction between Mausim and Snokflaanor
+[2026-06-16 15:58:43] breeding: Reproduction between Snoolane and Hozim
+[2026-06-16 15:58:43] breeding: Reproduction between Vaakmookor and Snommbomel
+[2026-06-16 15:58:43] breeding: Reproduction between Laathon and Braemis
+[2026-06-16 15:58:45] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:58:45] breeding: Reproduction between Liaz and Greethila
+[2026-06-16 15:58:45] crime_of_passion: Vauketh committed murder against Snaalraasar out of jealousy over Molar
+[2026-06-16 15:58:45] breeding: Reproduction between Snommbomel and Vaakmookor
+[2026-06-16 15:58:47] breeding: Reproduction between Graethon and Stauna
+[2026-06-16 15:58:47] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:47] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:58:47] crime_of_passion: Liaz committed murder against Laemon out of jealousy over Greethila
+[2026-06-16 15:58:49] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:49] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:58:49] breeding: Reproduction between Trozim and Mbaukel
+[2026-06-16 15:58:51] breeding: Child born to the committed couple Flooldrosane & Holis
+[2026-06-16 15:58:51] jealousy: Vraanraazar is consumed by jealousy over Flokis - sees Drosor as a rival
+[2026-06-16 15:58:51] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:51] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:58:51] crime_of_passion: Kaakane committed murder against Draukar out of jealousy over Draukar
+[2026-06-16 15:58:51] jealousy: Haazor is consumed by jealousy over Romim - sees Tronmomel as a rival
+[2026-06-16 15:58:51] breeding: Reproduction between Mbaukdroomor and Kokdrauneth
+[2026-06-16 15:58:51] crime_of_passion: Rosflaulor committed murder against Kauzkooseth out of jealousy over Skaukis
+[2026-06-16 15:58:51] breeding: Reproduction between Draalar and Vauketh
+[2026-06-16 15:58:51] breeding: Reproduction between Vauketh and Draalar
+[2026-06-16 15:58:51] breeding: Reproduction between Koolmbaakis and Voonmoonor
+[2026-06-16 15:58:51] breeding: Reproduction between Vroonsnoomar and Koshoometh
+[2026-06-16 15:58:53] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:53] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:58:53] jealousy: Liaz is consumed by jealousy over Greethila - sees Vreestvriam as a rival
+[2026-06-16 15:58:55] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:55] breeding: Reproduction between Trosar and Haazor
+[2026-06-16 15:58:55] breeding: Reproduction between Raaseth and Vrausar
+[2026-06-16 15:58:57] breeding: Reproduction between Flaalis and Snozar
+[2026-06-16 15:58:58] breeding: Reproduction between Trozim and Mbaukel
+[2026-06-16 15:58:58] breeding: Reproduction between Braemis and Laathon
+[2026-06-16 15:58:58] breeding: Reproduction between Vraumane and Flaulmaanor
+[2026-06-16 15:58:59] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:58:59] jealousy: Liaz is consumed by jealousy over Greethila - sees Vreestvriam as a rival
+[2026-06-16 15:58:59] breeding: Reproduction between Trosar and Haazor
+[2026-06-16 15:59:01] crime_of_passion: Mbaamor committed assault against Skoolmbaasar out of jealousy over Snosflonar
+[2026-06-16 15:59:01] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:59:03] crime_of_passion: Mbaamor committed murder against Skoolmbaasar out of jealousy over Snosflonar
+[2026-06-16 15:59:04] breeding: Reproduction between Trozim and Mbaukel
+[2026-06-16 15:59:06] crime_of_passion: Mbaamor committed murder against Skoolmbaasar out of jealousy over Snosflonar
+[2026-06-16 15:59:06] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:06] breeding: Reproduction between Vaakmookor and Snommbomel
+[2026-06-16 15:59:08] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:08] breeding: Reproduction between Flaastliazis and Stooklaemila
+[2026-06-16 15:59:08] breeding: Reproduction between Snausmolim and Kokdrauneth
+[2026-06-16 15:59:11] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:11] breeding: Reproduction between Skaukis and Rosflaulor
+[2026-06-16 15:59:13] crime_of_passion: Mbaamor committed murder against Skoolmbaasar out of jealousy over Snosflonar
+[2026-06-16 15:59:13] breeding: Reproduction between Mbaukdroomor and Kokdrauneth
+[2026-06-16 15:59:13] breeding: Reproduction between Vauketh and Draalar
+[2026-06-16 15:59:13] breeding: Reproduction between Vaunvraalane and Flaunvroleth
+[2026-06-16 15:59:14] breeding: Reproduction between Haakane and Voonkaamar
+[2026-06-16 15:59:15] crime_of_passion: Mbaamor committed murder against Skoolmbaasar out of jealousy over Snosflonar
+[2026-06-16 15:59:15] breeding: Child born to the committed couple Graa & Vriastloo
+[2026-06-16 15:59:15] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:15] crime_of_passion: Romim committed murder against Trosar out of jealousy over Haazor
+[2026-06-16 15:59:15] crime_of_passion: Haazor committed murder against Tronmomel out of jealousy over Romim
+[2026-06-16 15:59:16] breeding: Reproduction between Braemis and Laathon
+[2026-06-16 15:59:18] crime_of_passion: Mbaamor committed murder against Skoolmbaasar out of jealousy over Snosflonar
+[2026-06-16 15:59:18] jealousy: Vraanraazar is consumed by jealousy over Flokis - sees Drosor as a rival
+[2026-06-16 15:59:18] jealousy: Volvauzar is consumed by jealousy over Haanor - sees Floseth as a rival
+[2026-06-16 15:59:18] crime_of_passion: Romim committed murder against Trosar out of jealousy over Haazor
+[2026-06-16 15:59:18] crime_of_passion: Haazor committed murder against Tronmomel out of jealousy over Romim
+[2026-06-16 15:59:19] breeding: Reproduction between Snoolane and Hozim
+[2026-06-16 15:59:19] breeding: Reproduction between Stakgreezis and Reem
+[2026-06-16 15:59:19] breeding: Reproduction between Vroosane and Mbostraamar
+[2026-06-16 15:59:19] breeding: Reproduction between Hoometh and Vaasflaanar
+[2026-06-16 15:59:19] breeding: Reproduction between Rook and Riamim
+[2026-06-16 15:59:21] jealousy: Mboneth is consumed by jealousy over Snaanar - sees Kokdrauneth as a rival
+[2026-06-16 15:59:21] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:59:21] breeding: Reproduction between Rausel and Drauksnauzim
+[2026-06-16 15:59:21] breeding: Reproduction between Stiath and Laastor
+[2026-06-16 15:59:21] breeding: Reproduction between Mbaukdroomor and Kokdrauneth
+[2026-06-16 15:59:21] jealousy: Molar is consumed by jealousy over Vauketh - sees Draalar as a rival
+[2026-06-16 15:59:21] breeding: Reproduction between Vauketh and Voolim
+[2026-06-16 15:59:21] breeding: Reproduction between Braemis and Laathon
+[2026-06-16 15:59:22] breeding: Reproduction between Hoometh and Vaasflaanar
+[2026-06-16 15:59:23] breeding: Reproduction between Vauseth and Flomel
+[2026-06-16 15:59:24] crime_of_passion: Vreestvriam committed murder against Liaz out of jealousy over Greethila
+[2026-06-16 15:59:24] crime_of_passion: Romim committed murder against Trosar out of jealousy over Haazor
+[2026-06-16 15:59:24] breeding: Reproduction between Hozim and Snoolane
+[2026-06-16 15:59:24] breeding: Reproduction between Floostila and Vriamleestia
+[2026-06-16 15:59:26] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:26] crime_of_passion: Romim committed murder against Trosar out of jealousy over Haazor
+[2026-06-16 15:59:26] crime_of_passion: Haazor committed murder against Tronmomel out of jealousy over Romim
+[2026-06-16 15:59:26] breeding: Reproduction between Braemis and Laathon
+[2026-06-16 15:59:27] breeding: Reproduction between Vraumane and Flaulmaanor
+[2026-06-16 15:59:29] jealousy: Volvauzar is consumed by jealousy over Haanor - sees Floseth as a rival
+[2026-06-16 15:59:29] breeding: Reproduction between Stiath and Laastor
+[2026-06-16 15:59:29] crime_of_passion: Snaanar committed murder against Trosar out of jealousy over Haazor
+[2026-06-16 15:59:31] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:31] breeding: Reproduction between Floomim and Leestfloostila
+[2026-06-16 15:59:34] crime_of_passion: Mooksnosel committed murder against Rausel out of jealousy over Droolskoolor
+[2026-06-16 15:59:34] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:34] breeding: Reproduction between Floomleestim and Vree
+[2026-06-16 15:59:34] breeding: Reproduction between Floomim and Leestfloostila
+[2026-06-16 15:59:34] crime_of_passion: Romim committed murder against Trosar out of jealousy over Haazor
+[2026-06-16 15:59:34] crime_of_passion: Kauzeth committed murder against Vauketh out of jealousy over Voolim
+[2026-06-16 15:59:35] breeding: Reproduction between Voonis and Flonar
+[2026-06-16 15:59:37] crime_of_passion: Volvauzar committed murder against Floseth out of jealousy over Haanor
+[2026-06-16 15:59:37] breeding: Reproduction between Kaakane and Haanor
+[2026-06-16 15:59:37] crime_of_passion: Haazor committed murder against Tronmomel out of jealousy over Romim
+[2026-06-16 15:59:37] crime_of_passion: Snausmolim committed murder against Mbaukdroomor out of jealousy over Kokdrauneth
+[2026-06-16 15:59:37] breeding: Reproduction between Snokflaanor and Mausim
+[2026-06-16 15:59:37] breeding: Reproduction between Trozim and Mbaukel
+[2026-06-16 15:59:37] breeding: Reproduction between Flykor and Laathon
+[2026-06-16 15:59:37] breeding: Reproduction between Greekfleeae and Laathon
+[2026-06-16 15:59:38] breeding: Reproduction between Vaasflaanar and Hoometh
+[2026-06-16 15:59:38] breeding: Reproduction between Haakane and Voonkaamar
+[2026-06-16 15:59:40] crime_of_passion: Mbaamor committed assault against Skoolmbaasar out of jealousy over Snosflonar
+[2026-06-16 15:59:40] breeding: Reproduction between Floomleestim and Vree
+[2026-06-16 15:59:40] crime_of_passion: Romim committed murder against Trosar out of jealousy over Haazor
+[2026-06-16 15:59:40] crime_of_passion: Haazor committed murder against Tronmomel out of jealousy over Romim
+[2026-06-16 15:59:40] jealousy: Rosflaulor is consumed by jealousy over Skaukis - sees Kausvoonane as a rival
+[2026-06-16 15:59:40] breeding: Reproduction between Laathon and Flykor

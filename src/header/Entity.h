@@ -12,6 +12,7 @@
 #include "SemanticMemory.h"
 #include "PlanningSystem.h"
 #include "PersonaSystem.h"
+#include "Economics.h"
 
 class Entity;
 class Action;
@@ -121,7 +122,7 @@ struct LifeGoal {
 
 
 struct PheromoneRelease {
-    std::string type = ""; 
+    std::string type = "";
         //social, breeding, procreation_simulation
     float releasing_level; //0-100
 };
@@ -229,6 +230,12 @@ struct entityPointedSocial {
 struct entityPointedCouple {
     int id;
     Entity* pointedEntity;  // Changed to pointer
+    // ── Relationship realism (runtime state, not serialized → reset on load) ──
+    float commitment   = 50.0f; // how devoted THIS entity is to the bond (grows over time)
+    float satisfaction = 60.0f; // contentment within the relationship
+    float trust        = 65.0f; // belief that the partner is faithful
+    float suspicion    = 0.0f;  // accumulated evidence/feeling of infidelity (0-100)
+    int   daysTogether = 0;     // how long the bond has lasted
 };
 
 class Entity {
@@ -277,9 +284,9 @@ public:
     LifeStage lifeStage = INFANT;
     Entity* parent1 = nullptr;
     Entity* parent2 = nullptr;
-    
+
     float fatigueLevel = 0.0f;
-    
+
     float socialDrain = 0.0f;
     int dayWithoutSocialAction = 0;
     float socialDeficit = 0.0f;
@@ -300,6 +307,8 @@ public:
     entityPointedSocial social;
 
     PheromoneRelease pheromone;
+    Economic salary;
+
 
     // Constructors
     Entity(int id);
@@ -338,7 +347,7 @@ public:
     void upgradeDesire(Entity* pointed, float value);
     void upgradeAnger(Entity* pointed, float value);
     void upgradeSocial(Entity* pointed, float value);
-    
+
     void IncrementBDay();
     void saveEntityStats(Action* act);
     Entity* mostAngryConn();
@@ -364,7 +373,7 @@ public:
     void initializeHierarchicalNeeds();
 
     void setGoal(std::string type);
-    
+
     bool isGoalType(std::string name){
         for(LifeGoal goal : m_goals){
             if(goal.type == name){
@@ -387,10 +396,10 @@ public:
     void saveTo(std::ofstream& file) const;
     void loadFrom(std::ifstream& file);
     void resolvePointers(std::vector<Entity>& allEntities);
-    
+
     // New: Initialize semantic memory from life memories
     void rebuildSemanticMemory() { semanticMemory.rebuildFromLifeMemories(this); }
-    
+
     // New: Plan management
     void generateDailyPlan() { planner.generateDailyPlan(this); }
 

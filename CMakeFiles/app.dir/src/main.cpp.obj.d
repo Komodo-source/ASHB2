@@ -407,6 +407,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/ExternalData.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Economics.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/mingw64/include/c++/14.2.0/set \
  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \

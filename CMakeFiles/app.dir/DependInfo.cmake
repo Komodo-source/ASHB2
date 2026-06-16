@@ -18,6 +18,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/CivilizationEngine.cpp" "CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj" "gcc" "CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/CognitiveArchitecture.cpp" "CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj" "gcc" "CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Disease.cpp" "CMakeFiles/app.dir/src/Disease.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Disease.cpp.obj.d"
+  "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Economics.cpp" "CMakeFiles/app.dir/src/Economics.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Economics.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/EmotionalComplexity.cpp" "CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj" "gcc" "CMakeFiles/app.dir/src/EmotionalComplexity.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Entity.cpp" "CMakeFiles/app.dir/src/Entity.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Entity.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/EnvironmentalInteraction.cpp" "CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj" "gcc" "CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.obj.d"

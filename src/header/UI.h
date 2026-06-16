@@ -36,6 +36,9 @@ public:
     // Civilization overview panel
     void ShowCivilizationPanel(int simDay);
 
+    // Supply & demand market panel
+    void ShowMarketPanel();
+
     bool isSimulationPaused() const { return simulationPaused; }
     GridPoint getGridPoint();
     // Returns: 0=nothing, 1=save pressed, 2=load pressed

@@ -11,7 +11,9 @@ from typing import Dict, List, Tuple, Set
 
 from ollama import ChatResponse, chat
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+# All simulation data (logs, act_*.csv, numbered tick CSVs) is written into src/data/,
+# which is the parent directory of this script. Point BASE_DIR there.
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 # === CONFIGURATION FOR DATA REDUCTION ===
 MAX_LOG_ENTRIES_PER_CATEGORY = 500  # Cap logs per category
@@ -643,7 +645,7 @@ def safe_read(filepath):
 
 def log_logs():
     """Generate AI summary from command log."""
-    cmd_content = safe_read("../cmd_log.txt")
+    cmd_content = safe_read("cmd_log.txt")
     report_data["cmd_log"] = cmd_content
     try:
         response: ChatResponse = chat(

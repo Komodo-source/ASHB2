@@ -368,6 +368,30 @@ src/Disease.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Disease.cpp.s
 .PHONY : src/Disease.cpp.s
 
+src/Economics.obj: src/Economics.cpp.obj
+.PHONY : src/Economics.obj
+
+# target to build an object file
+src/Economics.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Economics.cpp.obj
+.PHONY : src/Economics.cpp.obj
+
+src/Economics.i: src/Economics.cpp.i
+.PHONY : src/Economics.i
+
+# target to preprocess a source file
+src/Economics.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Economics.cpp.i
+.PHONY : src/Economics.cpp.i
+
+src/Economics.s: src/Economics.cpp.s
+.PHONY : src/Economics.s
+
+# target to generate assembly for a file
+src/Economics.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Economics.cpp.s
+.PHONY : src/Economics.cpp.s
+
 src/EmotionalComplexity.obj: src/EmotionalComplexity.cpp.obj
 .PHONY : src/EmotionalComplexity.obj
 
@@ -1151,6 +1175,9 @@ help:
 	@echo ... src/Disease.obj
 	@echo ... src/Disease.i
 	@echo ... src/Disease.s
+	@echo ... src/Economics.obj
+	@echo ... src/Economics.i
+	@echo ... src/Economics.s
 	@echo ... src/EmotionalComplexity.obj
 	@echo ... src/EmotionalComplexity.i
 	@echo ... src/EmotionalComplexity.s

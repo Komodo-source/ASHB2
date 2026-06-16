@@ -12,7 +12,7 @@
 #include <fstream>
 #include "./ExternalData.h"
 #include "SocialNormSystem.h"
-
+#include "Economics.h"
 class Entity;
 
 struct StatRequirement {
@@ -90,7 +90,7 @@ struct EnvironmentalFactors {
 // Perception: what the entity notices filtered by personality/state
 struct PerceivedEvent {
     int eventId{0};
-    std::string eventType; 
+    std::string eventType;
     float intensity{0.0f};
     Entity* source{nullptr};
 };
@@ -202,6 +202,9 @@ private:
     static const int MAX_MEMORY = 50;
     std::map<std::string, Need> needs;
     std::vector<Action> availableActions;
+    std::vector<Action> desireLinkedAction;
+    std::vector<Action> hatredLinkedAction;
+
     std::vector<Habit> habits;
     int currentTime;
     std::mt19937 rng;
@@ -230,7 +233,7 @@ private:
     float calculateOutcomeSuccess(const std::map<std::string, float>& before,
                                   const std::map<std::string, float>& after);
 
- 
+
 
 
 
@@ -280,6 +283,9 @@ public:
     void updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess);
     void finalizeChildhood(Entity* child);
     Action* ChooseSpecificSocialAction(Entity* ent);
+    Action* TriggerDesireLinkedAction();
+    Action* TriggerHatredLinkedAction();
+
     void updateValuesFromExperiences(Entity* ent, Action* &action, float outcomeSuccess);
     void tickValueGoalAlignment(Entity* entity);
     float applyValueSatisfaction(Entity* entity,  const Action& action);
@@ -289,13 +295,21 @@ public:
     static void clear_new_borns();
     float calculateLifeMemoryBias(Entity* entity, const Action& action);
     SocialTier getSocialTier(Entity* from, Entity* to) const;
-    
+
     // New: Semantic memory-enhanced action scoring
     float calculateSemanticMemoryBias(Entity* entity, const Action& action, const std::vector<Entity*>& neighbors);
-    
+
     // New: Plan-aware action selection
     std::string getPlannedAction(Entity* entity, const std::vector<Entity*>& neighbors, float emergencyUrgency = 0.0f);
     void reportActionResult(Entity* entity, const std::string& actionName, float successScore, bool wasEmergency = false);
+
+    // ── Social realism: jealousy, rivalry, mate-guarding, crimes of passion ──
+    // How prone an entity is to jealousy, derived from personality + attachment.
+    float jealousyDisposition(Entity* e) const;
+    // Per-tick pass that turns relationship configurations (infidelity, polygamy,
+    // partner-poaching) into emergent consequences: suspicion, resentment,
+    // violence, and breakups. Called once per living entity each simulation tick.
+    void  processSocialConsequences(Entity* e, const std::vector<Entity*>& group, int simDay);
 };
 
 #endif

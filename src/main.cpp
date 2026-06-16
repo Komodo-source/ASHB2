@@ -450,10 +450,12 @@ void tickRelationshipDecay(Entity* ent, float deltaTime) {
             float dy = ent->posY - social.pointedEntity->posY;
             float dist = std::sqrt(dx * dx + dy * dy);
             if (dist < 180.0f) {
-                // Closer proximity = more growth; extraverts benefit more
+                // Closer proximity = more growth; extraverts benefit more.
+                // Halved (was 0.012) so passive proximity no longer floods every
+                // entity with strong friendships that crowd out desire/anger bonds.
                 float proximityFactor = (180.0f - dist) / 180.0f;
                 float extraversionBoost = 0.7f + (ent->personality.extraversion / 100.0f) * 0.6f;
-                float growth = proximityFactor * 0.012f * extraversionBoost * deltaTime;
+                float growth = proximityFactor * 0.006f * extraversionBoost * deltaTime;
                 social.social = std::min(100.0f, social.social + growth);
             }
         }
@@ -506,6 +508,19 @@ void tickRelationshipDecay(Entity* ent, float deltaTime) {
         std::remove_if(ent->list_entityPointedSocial.begin(), ent->list_entityPointedSocial.end(),
             [](const entityPointedSocial& s){ return s.social <= 0.0f; }),
         ent->list_entityPointedSocial.end());
+
+    // ── DUNBAR-STYLE CAP: keep social bonds in balance with desire/anger/couple ──
+    // Without a cap, passive proximity + alliance bonding lets an entity rack up
+    // dozens of weak social links while it only ever has a handful of desire/anger
+    // bonds. Extraverts tolerate a few more connections than introverts.
+    const int baseCap = 5;
+    int socialCap = baseCap + (int)(ent->personality.extraversion / 100.0f * 4.0f); // 5–9
+    if ((int)ent->list_entityPointedSocial.size() > socialCap) {
+        // Prune the weakest bonds first, preserving the strongest relationships.
+        std::sort(ent->list_entityPointedSocial.begin(), ent->list_entityPointedSocial.end(),
+            [](const entityPointedSocial& a, const entityPointedSocial& b){ return a.social > b.social; });
+        ent->list_entityPointedSocial.resize(socialCap);
+    }
 }
 
 
@@ -750,11 +765,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             // }
             float deltaTime = 1.0f;
 
-            //va avec l'update de needs
-            entity->entityLoneliness += 0.05f * deltaTime;
-            entity->entityBoredom   += 0.04f * deltaTime;
-            entity->entityLoneliness = std::min(100.0f, entity->entityLoneliness);
-            entity->entityBoredom   = std::min(100.0f, entity->entityBoredom);
+            // NOTE: loneliness & boredom growth now lives solely in the
+            // personality block below. The previous extra `+= 0.05` / `+= 0.04`
+            // here double-counted it, so both stats pinned to 100 and went stale
+            // ("abandoned"). Removing it gives them real dynamic range again.
 
             // Apply direct environmental stat effects
             sys.applyEnvironmentalEffects(entity, env);
@@ -773,7 +787,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 if (entity->entityLoneliness > 60.0f) stressGrowth += 0.04f;
                 entity->entityStress = pdclamp(entity->entityStress + stressGrowth, 0.0f, 100.0f);
 
-                // Boredom builds gently
+                // Boredom builds gently; curious (open) minds tire of routine faster
                 float boredomGrowth = 0.10f + (p.openness / 100.0f) * 0.10f;
                 entity->entityBoredom = pdclamp(entity->entityBoredom + boredomGrowth, 0.0f, 100.0f);
 
@@ -781,8 +795,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 float angerDecay = 0.2f + (p.agreeableness / 100.0f) * 0.4f;
                 entity->entityGeneralAnger = pdclamp(entity->entityGeneralAnger - angerDecay, 0.0f, 100.0f);
 
-                // Loneliness builds slowly always; extraverts feel it faster
-                float lonelinessGrowth = 0.25f + (p.extraversion / 100.0f) * 0.25f;
+                // Loneliness builds slowly always; extraverts feel it faster.
+                // Rate trimmed (was 0.25-0.50) now that the duplicate growth above
+                // is gone, so social actions can actually claw it back down.
+                float lonelinessGrowth = 0.15f + (p.extraversion / 100.0f) * 0.20f;
                 entity->entityLoneliness = pdclamp(entity->entityLoneliness + lonelinessGrowth, 0.0f, 100.0f);
 
                 // Happiness drifts toward a personality-based setpoint
@@ -814,6 +830,13 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 // Extreme loneliness erodes mental health
                 if (entity->entityLoneliness > 80.0f)
                     entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.1f, 0.0f, 100.0f);
+
+                // Chronic boredom saps happiness and, when severe, mental health —
+                // an under-stimulated life slowly grinds someone down.
+                if (entity->entityBoredom > 60.0f)
+                    entity->entityHapiness = pdclamp(entity->entityHapiness - 0.12f, 0.0f, 100.0f);
+                if (entity->entityBoredom > 85.0f)
+                    entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.06f, 0.0f, 100.0f);
             }
 
             // Passive recovery: not sick = slow heal (recovery no longer blocked by moderate stress)
@@ -984,10 +1007,47 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 if (side_social_act) {
                     sys.executeAction(entity, side_social_act, context, target);
                 }
-                // }
                 //saving data
                 entity->saveEntityStats(chosenAction);
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, target->name, "targeted action");
+
+                // ── Romantic side-drive ───────────────────────────────────────
+                // Fires periodically and, crucially, ASSIMILATES on a fitting mate
+                // (most-desired / most-attractive nearby), so desire and couples
+                // actually build instead of only platonic social bonds. The couple/
+                // breeding branches self-throttle via their desire/familiarity gates.
+                if (BetterRand::genNrInInterval(0, 100) < 45) {
+                    Action* romantic = sys.TriggerDesireLinkedAction();
+                    Entity* mate = sys.selectSocialTarget(entity, neighbors, romantic);
+                    if (romantic && mate) {
+                        sys.executeAction(entity, romantic, context, mate);
+                        const std::string& rn = romantic->name;
+                        if (rn == "Desire" || rn == "Flirt" || rn == "Date" ||
+                            rn == "couple" || rn == "breeding" || rn == "Reconcile") {
+                            sys.pointedAssimilation(entity, mate, romantic);
+                        }
+                    }
+                }
+
+                // ── Hostile side-drive ────────────────────────────────────────
+                // Only when there is a genuine grievance, so the world is neither
+                // uniformly friendly nor uniformly hostile. Murder is never driven
+                // from here (it would cause carnage) — only resentment links build.
+                bool hasGrievance = (entity->entityGeneralAnger > 35.0f) ||
+                                    (!entity->list_entityPointedAnger.empty()) ||
+                                    (entity->personality.agreeableness < 35.0f &&
+                                     BetterRand::genNrInInterval(0, 100) < 30);
+                if (hasGrievance && BetterRand::genNrInInterval(0, 100) < 40) {
+                    Action* hostile = sys.TriggerHatredLinkedAction();
+                    Entity* foe = sys.selectSocialTarget(entity, neighbors, hostile);
+                    if (hostile && foe) {
+                        sys.executeAction(entity, hostile, context, foe);
+                        const std::string& hn = hostile->name;
+                        if (hn == "AngerConnection" || hn == "Discrimination") {
+                            sys.pointedAssimilation(entity, foe, hostile);
+                        }
+                    }
+                }
 
                 // ── Narrative + inner monologue ───────────────────────────────
                 {
@@ -1045,6 +1105,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
             }
 
+            // ── Social fallout: jealousy, rivalry, infidelity, crimes of passion ──
+            // Reads this entity's couple/desire configuration against the group and
+            // produces emergent consequences (resentment, violence, breakups).
+            sys.processSocialConsequences(entity, group, currentDay);
+
             sys.applyEmotionalContagion(entity, group);
         }
     }
@@ -1076,6 +1141,12 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
         for (Entity& e : entities) {
             if (e.entityHealth <= 0.0f) {
                 std::cout << "Entity " << e.entityId << " has died.\n";
+                if (globalLogger) {
+                    std::string cause = (e.entityDiseaseType != -1) ? "disease"
+                                       : (e.entityAge > 60.0f)       ? "old age"
+                                                                     : "hardship";
+                    globalLogger->logDeath(e.entityId, e.name, (int)e.entityAge, cause);
+                }
                 deadIds.insert(e.entityId);
             }
         }
@@ -1166,6 +1237,30 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             // ── Civilization tick (every 5 FreeWill updates = ~1 in-game day) ──
             if (globalCivEngine && (day / UPDATE_FREQUENCY) % 5 == 0)
                 globalCivEngine->tick(entities, day / UPDATE_FREQUENCY);
+
+            // ── Economy tick: supply, demand & prices for the whole market ─────
+            {
+                float warIntensity = 0.0f;
+                bool  hasAgriculture = false;
+                if (globalCivEngine) {
+                    int atWarPop = 0, living = 0;
+                    for (const auto& t : globalCivEngine->tribes) {
+                        bool atWar = false;
+                        for (const auto& s : t.stances)
+                            if (s.second == TS_AT_WAR) { atWar = true; break; }
+                        if (atWar) atWarPop += t.population();
+                    }
+                    for (const auto& inv : globalCivEngine->innovations)
+                        if (inv.category == "agriculture") { hasAgriculture = true; break; }
+                    for (const Entity& e : entities)
+                        if (e.entityHealth > 0.0f) living++;
+                    if (living > 0)
+                        warIntensity = std::min(1.0f, (float)atWarPop / (float)living);
+                } else {
+                    hasAgriculture = true; // no civ engine -> treat farming as known
+                }
+                g_market.update(entities, warIntensity, hasAgriculture);
+            }
 
             std::vector<Entity> new_borns = get_new_borns();
             if (!new_borns.empty()) {
@@ -1294,8 +1389,11 @@ int main(int argc, char* argv[]) {
     std::cout << "you can save and load simulation at any moment\n";
     std::cout << "@author: Komodo \n";
     implementRegion();
-    std::cout << "enter entity number (int : 40 is ok ): ";
+    std::cout << "enter entity number (default: 40): ";
     std::cin >> entity_num;
+    if (!entity_num){
+        entity_num = 40;
+    }
     int renderingType = getRenderingChoice();
 
     // ── World seed (determines the whole planet & history; same seed = same run) ──
@@ -1396,6 +1494,7 @@ int main(int argc, char* argv[]) {
                     entity.posY = BetterRand::genNrInInterval(60.0f, (float)(height) * 0.60f - 60.0f);
                 }
                 Heritage::UnlinkedNode(&entity);
+                entity.salary = 200;
 
                 // --- Personality (Big Five, already randomized) ---
                 entity.personality = generateRandomPersonality();
@@ -1605,6 +1704,9 @@ int main(int argc, char* argv[]) {
 
             // ── Civilization panel ────────────────────────────────────────────
             instanceUI.ShowCivilizationPanel(day / 60);
+
+            // ── Market panel (supply & demand) ────────────────────────────────
+            instanceUI.ShowMarketPanel();
 
             // ── World map + history panels ────────────────────────────────────
             DrawPlanetWindow(g_planet, ent_quad);

@@ -1,376 +1,133 @@
-[2026-06-14 01:03:29] Entity 32 (Barkpeosra) contracted Malaria
-[2026-06-14 01:03:32] Entity 37 (Chro) contracted Fever
-[2026-06-14 01:03:35] Entity 5 (Zashchreostor) contracted Fever
-[2026-06-14 01:03:37] Entity 34 (Woolia) contracted Malaria
-[2026-06-14 01:03:42] Entity 26 (Rikchroushis) contracted Typhus
-[2026-06-14 01:03:43] Entity 15 (Toosyeesel) contracted Typhus
-[2026-06-14 01:03:43] Entity 32 (Barkpeosra) cured from Malaria
-[2026-06-14 01:03:44] Entity 37 (Chro) cured from Fever
-[2026-06-14 01:03:49] Entity 5 (Zashchreostor) cured from Fever
-[2026-06-14 01:03:50] Entity 34 (Woolia) cured from Malaria
-[2026-06-14 01:03:51] Entity 3 (Stiamthiarkel) contracted Malaria
-[2026-06-14 01:03:54] Entity 26 (Rikchroushis) cured from Typhus
-[2026-06-14 01:03:58] Entity 15 (Toosyeesel) cured from Typhus
-[2026-06-14 01:04:01] Entity 9 (Throosar) contracted Plague
-[2026-06-14 01:04:01] Entity 20 (Chreelhaastsa) contracted Typhus
-[2026-06-14 01:04:07] Entity 3 (Stiamthiarkel) cured from Malaria
-[2026-06-14 01:04:14] Entity 9 (Throosar) cured from Plague
-[2026-06-14 01:04:14] Entity 14 (Chreostor) contracted Plague
-[2026-06-14 01:04:14] Entity 20 (Chreelhaastsa) cured from Typhus
-[2026-06-14 01:04:19] Entity 2 (Chrousel) contracted Malaria
-[2026-06-14 01:04:26] Entity 14 (Chreostor) cured from Plague
-[2026-06-14 01:04:31] Entity 2 (Chrousel) cured from Malaria
-[2026-06-14 01:04:39] Entity 21 (Fliazis) contracted Typhus
-[2026-06-14 01:04:40] Entity 16 (Chroorka) contracted Malaria
-[2026-06-14 01:04:45] Entity 1 (Toorktruen) contracted Typhus
-[2026-06-14 01:04:45] Entity 19 (Trundklundoth) contracted Malaria
-[2026-06-14 01:04:45] Entity 31 (Chrulis) contracted Typhus
-[2026-06-14 01:04:46] Entity 36 (Vrazax) contracted Malaria
-[2026-06-14 01:04:48] Entity 27 (Vroovrazae) contracted Plague
-[2026-06-14 01:04:51] Entity 21 (Fliazis) cured from Typhus
-[2026-06-14 01:04:51] Entity 8 (Spanek) contracted Malaria
-[2026-06-14 01:04:53] Entity 31 (Chrulis) cured from Typhus
-[2026-06-14 01:04:54] Entity 16 (Chroorka) cured from Malaria
-[2026-06-14 01:04:54] Entity 4 (Luleth) contracted Malaria
-[2026-06-14 01:04:54] Entity 39 (Draulthazane) contracted Typhus
-[2026-06-14 01:04:54] Entity 30 (Baurkae) contracted Plague
-[2026-06-14 01:04:56] Entity 1 (Toorktruen) cured from Typhus
-[2026-06-14 01:04:56] Entity 19 (Trundklundoth) cured from Malaria
-[2026-06-14 01:04:57] Entity 23 (Tralbarkra) contracted Fever
-[2026-06-14 01:04:59] Entity 36 (Vrazax) cured from Malaria
-[2026-06-14 01:04:59] Entity 11 (Chreoshra) contracted Typhus
-[2026-06-14 01:05:02] Entity 27 (Vroovrazae) cured from Plague
-[2026-06-14 01:05:02] Entity 8 (Spanek) cured from Malaria
-[2026-06-14 01:05:05] Entity 4 (Luleth) cured from Malaria
-[2026-06-14 01:05:06] Entity 23 (Tralbarkra) cured from Fever
-[2026-06-14 01:05:08] Entity 39 (Draulthazane) cured from Typhus
-[2026-06-14 01:05:09] Entity 35 (Chroushek) contracted Malaria
-[2026-06-14 01:05:12] Entity 30 (Baurkae) cured from Plague
-[2026-06-14 01:05:13] Entity 29 (Haasten) contracted Fever
-[2026-06-14 01:05:13] Entity 11 (Chreoshra) cured from Typhus
-[2026-06-14 01:05:18] Entity 28 (Klundchro) contracted Malaria
-[2026-06-14 01:05:22] Entity 35 (Chroushek) cured from Malaria
-[2026-06-14 01:05:25] Entity 29 (Haasten) cured from Fever
-[2026-06-14 01:05:29] Entity 28 (Klundchro) cured from Malaria
-[2026-06-14 01:05:36] Entity 0 (Tholon) contracted Fever
-[2026-06-14 01:05:36] Entity 18 (Yaurkvrooan) contracted Fever
-[2026-06-14 01:05:39] Entity 33 (Thrauzvrazae) contracted Fever
-[2026-06-14 01:05:41] Entity 12 (Thiarkel) contracted Fever
-[2026-06-14 01:05:48] Entity 6 (Biastooseth) contracted Typhus
-[2026-06-14 01:05:49] Entity 18 (Yaurkvrooan) cured from Fever
-[2026-06-14 01:05:52] Entity 0 (Tholon) cured from Fever
-[2026-06-14 01:05:52] Entity 33 (Thrauzvrazae) cured from Fever
-[2026-06-14 01:05:53] Entity 7 (Threerkar) contracted Typhus
-[2026-06-14 01:05:56] Entity 22 (Deeim) contracted Fever
-[2026-06-14 01:05:57] Entity 12 (Thiarkel) cured from Fever
-[2026-06-14 01:05:59] Entity 13 (Dodeeim) contracted Plague
-[2026-06-14 01:06:02] Entity 6 (Biastooseth) cured from Typhus
-[2026-06-14 01:06:02] Entity 25 (Klurkim) contracted Fever
-[2026-06-14 01:06:06] Entity 22 (Deeim) cured from Fever
-[2026-06-14 01:06:11] Entity 37 (Chro) contracted Plague
-[2026-06-14 01:06:11] Entity 10 (Truen) contracted Plague
-[2026-06-14 01:06:12] Entity 13 (Dodeeim) cured from Plague
-[2026-06-14 01:06:12] Entity 7 (Threerkar) cured from Typhus
-[2026-06-14 01:06:16] Entity 25 (Klurkim) cured from Fever
-[2026-06-14 01:06:16] Entity 38 (Speenor) contracted Plague
-[2026-06-14 01:06:21] Entity 37 (Chro) cured from Plague
-[2026-06-14 01:06:23] Entity 10 (Truen) cured from Plague
-[2026-06-14 01:06:26] Entity 32 (Barkpeosra) contracted Plague
-[2026-06-14 01:06:26] Entity 38 (Speenor) cured from Plague
-[2026-06-14 01:06:32] Entity 15 (Toosyeesel) contracted Fever
-[2026-06-14 01:06:33] Entity 20 (Chreelhaastsa) contracted Typhus
-[2026-06-14 01:06:36] Entity 32 (Barkpeosra) cured from Plague
-[2026-06-14 01:06:38] Entity 5 (Zashchreostor) contracted Plague
-[2026-06-14 01:06:40] Entity 9 (Throosar) contracted Plague
-[2026-06-14 01:06:40] Entity 34 (Woolia) contracted Fever
-[2026-06-14 01:06:45] Entity 15 (Toosyeesel) cured from Fever
-[2026-06-14 01:06:46] Entity 20 (Chreelhaastsa) cured from Typhus
-[2026-06-14 01:06:51] Entity 9 (Throosar) cured from Plague
-[2026-06-14 01:06:52] Entity 5 (Zashchreostor) cured from Plague
-[2026-06-14 01:06:53] Entity 34 (Woolia) cured from Fever
-[2026-06-14 01:06:56] Entity 26 (Rikchroushis) contracted Typhus
-[2026-06-14 01:07:06] Entity 1 (Toorktruen) contracted Malaria
-[2026-06-14 01:07:06] Entity 31 (Chrulis) contracted Fever
-[2026-06-14 01:07:06] Entity 26 (Rikchroushis) cured from Typhus
-[2026-06-14 01:07:10] Entity 3 (Stiamthiarkel) contracted Typhus
-[2026-06-14 01:07:16] Entity 1 (Toorktruen) cured from Malaria
-[2026-06-14 01:07:17] Entity 31 (Chrulis) cured from Fever
-[2026-06-14 01:07:18] Entity 2 (Chrousel) contracted Plague
-[2026-06-14 01:07:20] Entity 3 (Stiamthiarkel) cured from Typhus
-[2026-06-14 01:07:22] Entity 14 (Chreostor) contracted Malaria
-[2026-06-14 01:07:23] Entity 17 (Zeesrikel) contracted Typhus
-[2026-06-14 01:07:24] Entity 16 (Chroorka) contracted Fever
-[2026-06-14 01:07:29] Entity 21 (Fliazis) contracted Plague
-[2026-06-14 01:07:29] Entity 2 (Chrousel) cured from Plague
-[2026-06-14 01:07:32] Entity 14 (Chreostor) cured from Malaria
-[2026-06-14 01:07:33] Entity 24 (Yeesthrauzel) contracted Fever
-[2026-06-14 01:07:35] Entity 17 (Zeesrikel) cured from Typhus
-[2026-06-14 01:07:36] Entity 16 (Chroorka) cured from Fever
-[2026-06-14 01:07:38] Entity 21 (Fliazis) cured from Plague
-[2026-06-14 01:07:45] Entity 19 (Trundklundoth) contracted Malaria
-[2026-06-14 01:07:46] Entity 24 (Yeesthrauzel) cured from Fever
-[2026-06-14 01:07:48] Entity 4 (Luleth) contracted Fever
-[2026-06-14 01:07:49] Entity 27 (Vroovrazae) contracted Plague
-[2026-06-14 01:07:50] Entity 27 (Vroovrazae) contracted Typhus
-[2026-06-14 01:07:57] Entity 19 (Trundklundoth) cured from Malaria
-[2026-06-14 01:07:59] Entity 4 (Luleth) cured from Fever
-[2026-06-14 01:08:00] Entity 35 (Chroushek) contracted Fever
-[2026-06-14 01:08:00] Entity 11 (Chreoshra) contracted Plague
-[2026-06-14 01:08:03] Entity 27 (Vroovrazae) cured from Typhus
-[2026-06-14 01:08:03] Entity 23 (Tralbarkra) contracted Typhus
-[2026-06-14 01:08:06] Entity 36 (Vrazax) contracted Fever
-[2026-06-14 01:08:09] Entity 11 (Chreoshra) cured from Plague
-[2026-06-14 01:08:12] Entity 35 (Chroushek) cured from Fever
-[2026-06-14 01:08:17] Entity 36 (Vrazax) cured from Fever
-[2026-06-14 01:08:17] Entity 28 (Klundchro) contracted Fever
-[2026-06-14 01:08:20] Entity 23 (Tralbarkra) cured from Typhus
-[2026-06-14 01:08:21] Entity 8 (Spanek) contracted Typhus
-[2026-06-14 01:08:23] Entity 29 (Haasten) contracted Typhus
-[2026-06-14 01:08:28] Entity 28 (Klundchro) cured from Fever
-[2026-06-14 01:08:31] Entity 37 (Chro) contracted Plague
-[2026-06-14 01:08:32] Entity 8 (Spanek) cured from Typhus
-[2026-06-14 01:08:38] Entity 37 (Chro) cured from Plague
-[2026-06-14 01:08:38] Entity 29 (Haasten) cured from Typhus
-[2026-06-14 01:08:38] Entity 32 (Barkpeosra) contracted Plague
-[2026-06-14 01:08:39] Entity 12 (Thiarkel) contracted Typhus
-[2026-06-14 01:08:39] Entity 18 (Yaurkvrooan) contracted Typhus
-[2026-06-14 01:08:42] Entity 33 (Thrauzvrazae) contracted Malaria
-[2026-06-14 01:08:42] Entity 20 (Chreelhaastsa) contracted Malaria
-[2026-06-14 01:08:43] Entity 0 (Tholon) contracted Malaria
-[2026-06-14 01:08:45] Entity 22 (Deeim) contracted Typhus
-[2026-06-14 01:08:47] Entity 6 (Biastooseth) contracted Malaria
-[2026-06-14 01:08:49] Entity 12 (Thiarkel) cured from Typhus
-[2026-06-14 01:08:49] Entity 32 (Barkpeosra) cured from Plague
-[2026-06-14 01:08:50] Entity 18 (Yaurkvrooan) cured from Typhus
-[2026-06-14 01:08:51] Entity 20 (Chreelhaastsa) cured from Malaria
-[2026-06-14 01:08:54] Entity 0 (Tholon) cured from Malaria
-[2026-06-14 01:08:55] Entity 33 (Thrauzvrazae) cured from Malaria
-[2026-06-14 01:08:57] Entity 6 (Biastooseth) cured from Malaria
-[2026-06-14 01:08:57] Entity 13 (Dodeeim) contracted Typhus
-[2026-06-14 01:08:59] Entity 22 (Deeim) cured from Typhus
-[2026-06-14 01:09:00] Entity 7 (Threerkar) contracted Typhus
-[2026-06-14 01:09:03] Entity 30 (Baurkae) contracted Malaria
-[2026-06-14 01:09:10] Entity 13 (Dodeeim) cured from Typhus
-[2026-06-14 01:09:10] Entity 5 (Zashchreostor) contracted Plague
-[2026-06-14 01:09:10] Entity 26 (Rikchroushis) contracted Typhus
-[2026-06-14 01:09:12] Entity 25 (Klurkim) contracted Plague
-[2026-06-14 01:09:13] Entity 7 (Threerkar) cured from Typhus
-[2026-06-14 01:09:15] Entity 30 (Baurkae) cured from Malaria
-[2026-06-14 01:09:16] Entity 9 (Throosar) contracted Malaria
-[2026-06-14 01:09:21] Entity 25 (Klurkim) cured from Plague
-[2026-06-14 01:09:21] Entity 39 (Draulthazane) contracted Typhus
-[2026-06-14 01:09:22] Entity 5 (Zashchreostor) cured from Plague
-[2026-06-14 01:09:23] Entity 15 (Toosyeesel) contracted Fever
-[2026-06-14 01:09:23] Entity 26 (Rikchroushis) cured from Typhus
-[2026-06-14 01:09:27] Entity 9 (Throosar) cured from Malaria
-[2026-06-14 01:09:27] Entity 31 (Chrulis) contracted Plague
-[2026-06-14 01:09:27] Entity 38 (Speenor) contracted Malaria
-[2026-06-14 01:09:32] Entity 39 (Draulthazane) cured from Typhus
-[2026-06-14 01:09:33] Entity 15 (Toosyeesel) cured from Fever
-[2026-06-14 01:09:33] Entity 10 (Truen) contracted Plague
-[2026-06-14 01:09:34] Entity 3 (Stiamthiarkel) contracted Malaria
-[2026-06-14 01:09:38] Entity 1 (Toorktruen) contracted Fever
-[2026-06-14 01:09:38] Entity 31 (Chrulis) cured from Plague
-[2026-06-14 01:09:38] Entity 38 (Speenor) cured from Malaria
-[2026-06-14 01:09:39] Entity 1 (Toorktruen) contracted Malaria
-[2026-06-14 01:09:39] Entity 34 (Woolia) contracted Fever
-[2026-06-14 01:09:42] Entity 3 (Stiamthiarkel) cured from Malaria
-[2026-06-14 01:09:42] Entity 16 (Chroorka) contracted Typhus
-[2026-06-14 01:09:44] Entity 10 (Truen) cured from Plague
-[2026-06-14 01:09:50] Entity 1 (Toorktruen) cured from Malaria
-[2026-06-14 01:09:51] Entity 34 (Woolia) cured from Fever
-[2026-06-14 01:09:52] Entity 16 (Chroorka) cured from Typhus
-[2026-06-14 01:10:01] Entity 14 (Chreostor) contracted Plague
-[2026-06-14 01:10:10] Entity 14 (Chreostor) cured from Plague
-[2026-06-14 01:10:11] Entity 27 (Vroovrazae) contracted Malaria
-[2026-06-14 01:10:11] Entity 2 (Chrousel) contracted Plague
-[2026-06-14 01:10:12] Entity 19 (Trundklundoth) contracted Fever
-[2026-06-14 01:10:14] Entity 21 (Fliazis) contracted Malaria
-[2026-06-14 01:10:17] Entity 4 (Luleth) contracted Plague
-[2026-06-14 01:10:21] Entity 27 (Vroovrazae) cured from Malaria
-[2026-06-14 01:10:22] Entity 19 (Trundklundoth) cured from Fever
-[2026-06-14 01:10:23] Entity 2 (Chrousel) cured from Plague
-[2026-06-14 01:10:24] Entity 21 (Fliazis) cured from Malaria
-[2026-06-14 01:10:27] Entity 4 (Luleth) cured from Plague
-[2026-06-14 01:10:32] Entity 11 (Chreoshra) contracted Fever
-[2026-06-14 01:10:38] Entity 37 (Chro) contracted Plague
-[2026-06-14 01:10:43] Entity 24 (Yeesthrauzel) contracted Fever
-[2026-06-14 01:10:43] Entity 23 (Tralbarkra) contracted Fever
-[2026-06-14 01:10:44] Entity 0 (Tholon) contracted Malaria
-[2026-06-14 01:10:45] Entity 11 (Chreoshra) cured from Fever
-[2026-06-14 01:10:48] Entity 37 (Chro) cured from Plague
-[2026-06-14 01:10:48] Entity 17 (Zeesrikel) contracted Malaria
-[2026-06-14 01:10:49] Entity 17 (Zeesrikel) contracted Plague
-[2026-06-14 01:10:50] Entity 32 (Barkpeosra) contracted Fever
-[2026-06-14 01:10:51] Entity 35 (Chroushek) contracted Typhus
-[2026-06-14 01:10:54] Entity 24 (Yeesthrauzel) cured from Fever
-[2026-06-14 01:10:54] Entity 28 (Klundchro) contracted Typhus
-[2026-06-14 01:10:55] Entity 0 (Tholon) cured from Malaria
-[2026-06-14 01:10:55] Entity 8 (Spanek) contracted Malaria
-[2026-06-14 01:10:55] Entity 20 (Chreelhaastsa) contracted Fever
-[2026-06-14 01:10:55] Entity 23 (Tralbarkra) cured from Fever
-[2026-06-14 01:10:56] Entity 8 (Spanek) contracted Fever
-[2026-06-14 01:10:58] Entity 29 (Haasten) contracted Malaria
-[2026-06-14 01:10:58] Entity 32 (Barkpeosra) cured from Fever
-[2026-06-14 01:11:01] Entity 17 (Zeesrikel) cured from Plague
-[2026-06-14 01:11:02] Entity 28 (Klundchro) cured from Typhus
-[2026-06-14 01:11:03] Entity 8 (Spanek) cured from Fever
-[2026-06-14 01:11:04] Entity 35 (Chroushek) cured from Typhus
-[2026-06-14 01:11:04] Entity 20 (Chreelhaastsa) cured from Fever
-[2026-06-14 01:11:09] Entity 29 (Haasten) cured from Malaria
-[2026-06-14 01:11:14] Entity 12 (Thiarkel) contracted Typhus
-[2026-06-14 01:11:15] Entity 9 (Throosar) contracted Fever
-[2026-06-14 01:11:15] Entity 7 (Threerkar) contracted Typhus
-[2026-06-14 01:11:16] Entity 36 (Vrazax) contracted Fever
-[2026-06-14 01:11:17] Entity 22 (Deeim) contracted Typhus
-[2026-06-14 01:11:22] Entity 9 (Throosar) cured from Fever
-[2026-06-14 01:11:24] Entity 6 (Biastooseth) contracted Malaria
-[2026-06-14 01:11:26] Entity 36 (Vrazax) cured from Fever
-[2026-06-14 01:11:26] Entity 7 (Threerkar) cured from Typhus
-[2026-06-14 01:11:27] Entity 12 (Thiarkel) cured from Typhus
-[2026-06-14 01:11:28] Entity 22 (Deeim) cured from Typhus
-[2026-06-14 01:11:29] Entity 15 (Toosyeesel) contracted Typhus
-[2026-06-14 01:11:30] Entity 13 (Dodeeim) contracted Typhus
-[2026-06-14 01:11:35] Entity 6 (Biastooseth) cured from Malaria
-[2026-06-14 01:11:37] Entity 33 (Thrauzvrazae) contracted Typhus
-[2026-06-14 01:11:38] Entity 3 (Stiamthiarkel) contracted Malaria
-[2026-06-14 01:11:40] Entity 15 (Toosyeesel) cured from Typhus
-[2026-06-14 01:11:40] Entity 13 (Dodeeim) cured from Typhus
-[2026-06-14 01:11:41] Entity 18 (Yaurkvrooan) contracted Malaria
-[2026-06-14 01:11:46] Entity 3 (Stiamthiarkel) cured from Malaria
-[2026-06-14 01:11:48] Entity 33 (Thrauzvrazae) cured from Typhus
-[2026-06-14 01:11:50] Entity 1 (Toorktruen) contracted Malaria
-[2026-06-14 01:11:51] Entity 18 (Yaurkvrooan) cured from Malaria
-[2026-06-14 01:11:51] Entity 31 (Chrulis) contracted Malaria
-[2026-06-14 01:11:54] Entity 5 (Zashchreostor) contracted Typhus
-[2026-06-14 01:11:58] Entity 1 (Toorktruen) cured from Malaria
-[2026-06-14 01:12:00] Entity 16 (Chroorka) contracted Malaria
-[2026-06-14 01:12:01] Entity 31 (Chrulis) cured from Malaria
-[2026-06-14 01:12:02] Entity 27 (Vroovrazae) contracted Malaria
-[2026-06-14 01:12:03] Entity 25 (Klurkim) contracted Fever
-[2026-06-14 01:12:04] Entity 5 (Zashchreostor) cured from Typhus
-[2026-06-14 01:12:04] Entity 38 (Speenor) contracted Plague
-[2026-06-14 01:12:07] Entity 14 (Chreostor) contracted Fever
-[2026-06-14 01:12:13] Entity 16 (Chroorka) cured from Malaria
-[2026-06-14 01:12:13] Entity 34 (Woolia) contracted Typhus
-[2026-06-14 01:12:14] Entity 14 (Chreostor) cured from Fever
-[2026-06-14 01:12:15] Entity 27 (Vroovrazae) cured from Malaria
-[2026-06-14 01:12:15] Entity 38 (Speenor) cured from Plague
-[2026-06-14 01:12:16] Entity 25 (Klurkim) cured from Fever
-[2026-06-14 01:12:21] Entity 34 (Woolia) cured from Typhus
-[2026-06-14 01:12:28] Entity 30 (Baurkae) contracted Fever
-[2026-06-14 01:12:30] Entity 21 (Fliazis) contracted Malaria
-[2026-06-14 01:12:31] Entity 2 (Chrousel) contracted Fever
-[2026-06-14 01:12:35] Entity 19 (Trundklundoth) contracted Malaria
-[2026-06-14 01:12:37] Entity 30 (Baurkae) cured from Fever
-[2026-06-14 01:12:38] Entity 21 (Fliazis) cured from Malaria
-[2026-06-14 01:12:38] Entity 2 (Chrousel) cured from Fever
-[2026-06-14 01:12:43] Entity 4 (Luleth) contracted Plague
-[2026-06-14 01:12:45] Entity 19 (Trundklundoth) cured from Malaria
-[2026-06-14 01:12:52] Entity 37 (Chro) contracted Typhus
-[2026-06-14 01:12:54] Entity 4 (Luleth) cured from Plague
-[2026-06-14 01:12:55] Entity 10 (Truen) contracted Malaria
-[2026-06-14 01:12:56] Entity 8 (Spanek) contracted Typhus
-[2026-06-14 01:12:56] Entity 32 (Barkpeosra) contracted Malaria
-[2026-06-14 01:12:57] Entity 11 (Chreoshra) contracted Malaria
-[2026-06-14 01:13:03] Entity 37 (Chro) cured from Typhus
-[2026-06-14 01:13:06] Entity 8 (Spanek) cured from Typhus
-[2026-06-14 01:13:06] Entity 32 (Barkpeosra) cured from Malaria
-[2026-06-14 01:13:06] Entity 10 (Truen) cured from Malaria
-[2026-06-14 01:13:08] Entity 11 (Chreoshra) cured from Malaria
-[2026-06-14 01:13:10] Entity 39 (Draulthazane) contracted Fever
-[2026-06-14 01:13:15] Entity 0 (Tholon) contracted Malaria
-[2026-06-14 01:13:16] Entity 12 (Thiarkel) contracted Malaria
-[2026-06-14 01:13:19] Entity 23 (Tralbarkra) contracted Typhus
-[2026-06-14 01:13:19] Entity 39 (Draulthazane) cured from Fever
-[2026-06-14 01:13:20] Entity 7 (Threerkar) contracted Fever
-[2026-06-14 01:13:20] Entity 23 (Tralbarkra) contracted Plague
-[2026-06-14 01:13:23] Entity 35 (Chroushek) contracted Plague
-[2026-06-14 01:13:24] Entity 12 (Thiarkel) cured from Malaria
-[2026-06-14 01:13:27] Entity 0 (Tholon) cured from Malaria
-[2026-06-14 01:13:28] Entity 3 (Stiamthiarkel) contracted Malaria
-[2026-06-14 01:13:28] Entity 29 (Haasten) contracted Fever
-[2026-06-14 01:13:32] Entity 7 (Threerkar) cured from Fever
-[2026-06-14 01:13:32] Entity 23 (Tralbarkra) cured from Plague
-[2026-06-14 01:13:34] Entity 20 (Chreelhaastsa) contracted Malaria
-[2026-06-14 01:13:35] Entity 35 (Chroushek) cured from Plague
-[2026-06-14 01:13:38] Entity 9 (Throosar) contracted Fever
-[2026-06-14 01:13:38] Entity 36 (Vrazax) contracted Fever
-[2026-06-14 01:13:38] Entity 24 (Yeesthrauzel) contracted Plague
-[2026-06-14 01:13:39] Entity 33 (Thrauzvrazae) contracted Malaria
-[2026-06-14 01:13:39] Entity 29 (Haasten) cured from Fever
-[2026-06-14 01:13:40] Entity 3 (Stiamthiarkel) cured from Malaria
-[2026-06-14 01:13:40] Entity 17 (Zeesrikel) contracted Fever
-[2026-06-14 01:13:41] Entity 20 (Chreelhaastsa) cured from Malaria
-[2026-06-14 01:13:42] Entity 22 (Deeim) contracted Plague
-[2026-06-14 01:13:45] Entity 9 (Throosar) cured from Fever
-[2026-06-14 01:13:45] Entity 15 (Toosyeesel) contracted Typhus
-[2026-06-14 01:13:46] Entity 18 (Yaurkvrooan) contracted Fever
-[2026-06-14 01:13:47] Entity 36 (Vrazax) cured from Fever
-[2026-06-14 01:13:48] Entity 6 (Biastooseth) contracted Malaria
-[2026-06-14 01:13:48] Entity 24 (Yeesthrauzel) cured from Plague
-[2026-06-14 01:13:48] Entity 17 (Zeesrikel) cured from Fever
-[2026-06-14 01:13:49] Entity 33 (Thrauzvrazae) cured from Malaria
-[2026-06-14 01:13:53] Entity 22 (Deeim) cured from Plague
-[2026-06-14 01:13:55] Entity 18 (Yaurkvrooan) cured from Fever
-[2026-06-14 01:13:55] Entity 15 (Toosyeesel) cured from Typhus
-[2026-06-14 01:13:56] Entity 14 (Chreostor) contracted Plague
-[2026-06-14 01:13:57] Entity 31 (Chrulis) contracted Typhus
-[2026-06-14 01:13:59] Entity 6 (Biastooseth) cured from Malaria
-[2026-06-14 01:14:02] Entity 13 (Dodeeim) contracted Fever
-[2026-06-14 01:14:06] Entity 31 (Chrulis) cured from Typhus
-[2026-06-14 01:14:08] Entity 14 (Chreostor) cured from Plague
-[2026-06-14 01:14:10] Entity 13 (Dodeeim) cured from Fever
-[2026-06-14 01:14:11] Entity 1 (Toorktruen) contracted Typhus
-[2026-06-14 01:14:12] Entity 16 (Chroorka) contracted Plague
-[2026-06-14 01:14:14] Entity 27 (Vroovrazae) contracted Plague
-[2026-06-14 01:14:20] Entity 1 (Toorktruen) cured from Typhus
-[2026-06-14 01:14:23] Entity 16 (Chroorka) cured from Plague
-[2026-06-14 01:14:24] Entity 27 (Vroovrazae) cured from Plague
-[2026-06-14 01:14:26] Entity 25 (Klurkim) contracted Plague
-[2026-06-14 01:14:28] Entity 21 (Fliazis) contracted Malaria
-[2026-06-14 01:49:10] Entity 38 (Speenor) contracted Malaria
-[2026-06-14 07:56:36] Entity 2 (Chrousel) contracted Plague
-[2026-06-14 12:51:13] Entity 25 (Klurkim) cured from Plague
-[2026-06-14 12:51:16] Entity 21 (Fliazis) cured from Malaria
-[2026-06-14 12:51:21] Entity 34 (Woolia) contracted Typhus
-[2026-06-14 12:51:21] Entity 38 (Speenor) cured from Malaria
-[2026-06-14 12:51:22] Entity 2 (Chrousel) cured from Plague
-[2026-06-14 12:51:22] Entity 28 (Klundchro) contracted Typhus
-[2026-06-14 12:51:31] Entity 34 (Woolia) cured from Typhus
-[2026-06-14 12:51:32] Entity 28 (Klundchro) cured from Typhus
-[2026-06-14 12:51:33] Entity 19 (Trundklundoth) contracted Plague
-[2026-06-14 12:51:37] Entity 4 (Luleth) contracted Plague
-[2026-06-14 12:51:41] Entity 19 (Trundklundoth) cured from Plague
-[2026-06-14 12:51:41] Entity 37 (Chro) contracted Fever
-[2026-06-14 12:51:42] Entity 32 (Barkpeosra) contracted Plague
-[2026-06-14 12:51:43] Entity 11 (Chreoshra) contracted Malaria
-[2026-06-14 12:51:46] Entity 20 (Chreelhaastsa) contracted Fever
-[2026-06-14 12:51:47] Entity 4 (Luleth) cured from Plague
-[2026-06-14 12:51:49] Entity 37 (Chro) cured from Fever
-[2026-06-14 12:51:51] Entity 32 (Barkpeosra) cured from Plague
-[2026-06-14 12:51:52] Entity 11 (Chreoshra) cured from Malaria
-[2026-06-14 12:51:56] Entity 20 (Chreelhaastsa) cured from Fever
-[2026-06-14 12:52:00] Entity 8 (Spanek) contracted Plague
-[2026-06-14 12:52:00] Entity 35 (Chroushek) contracted Malaria
-[2026-06-14 12:52:02] Entity 23 (Tralbarkra) contracted Malaria
-[2026-06-14 12:52:06] Entity 9 (Throosar) contracted Typhus
-[2026-06-14 12:52:08] Entity 8 (Spanek) cured from Plague
-[2026-06-14 12:52:09] Entity 35 (Chroushek) cured from Malaria
-[2026-06-14 12:52:10] Entity 3 (Stiamthiarkel) contracted Plague
-[2026-06-14 12:52:11] Entity 29 (Haasten) contracted Fever
-[2026-06-14 12:52:11] Entity 23 (Tralbarkra) cured from Malaria
-[2026-06-14 12:52:12] Entity 0 (Tholon) contracted Fever
-[2026-06-14 12:52:13] Entity 33 (Thrauzvrazae) contracted Typhus
-[2026-06-14 12:52:14] Entity 7 (Threerkar) contracted Plague
-[2026-06-14 12:52:15] Entity 9 (Throosar) cured from Typhus
-[2026-06-14 12:52:15] Entity 7 (Threerkar) contracted Plague
-[2026-06-14 12:52:17] Entity 3 (Stiamthiarkel) cured from Plague
-[2026-06-14 12:52:18] Entity 29 (Haasten) cured from Fever
-[2026-06-14 12:52:21] Entity 0 (Tholon) cured from Fever
-[2026-06-14 12:52:21] Entity 12 (Thiarkel) contracted Fever
-[2026-06-14 12:52:21] Entity 33 (Thrauzvrazae) cured from Typhus
-[2026-06-14 12:52:22] Entity 7 (Threerkar) cured from Plague
-[2026-06-14 12:52:30] Entity 12 (Thiarkel) cured from Fever
-[2026-06-14 12:52:33] Entity 17 (Zeesrikel) contracted Typhus
-[2026-06-14 12:52:34] Entity 15 (Toosyeesel) contracted Typhus
+[2026-06-16 15:53:40] Entity 22 (Vraazmbaakor) contracted Typhus
+[2026-06-16 15:53:51] Entity 34 (Trauzim) contracted Plague
+[2026-06-16 15:53:53] Entity 25 (Trozar) contracted Plague
+[2026-06-16 15:53:54] Entity 22 (Vraazmbaakor) cured from Typhus
+[2026-06-16 15:53:57] Entity 19 (Snozar) contracted Plague
+[2026-06-16 15:54:04] Entity 11 (Bramia) contracted Typhus
+[2026-06-16 15:54:05] Entity 34 (Trauzim) cured from Plague
+[2026-06-16 15:54:07] Entity 30 (Mbokdraazar) contracted Typhus
+[2026-06-16 15:54:07] Entity 16 (Flaalis) contracted Typhus
+[2026-06-16 15:54:07] Entity 23 (Vraezbroo) contracted Malaria
+[2026-06-16 15:54:08] Entity 25 (Trozar) cured from Plague
+[2026-06-16 15:54:09] Entity 29 (Vriastloo) contracted Malaria
+[2026-06-16 15:54:11] Entity 3 (Hookane) contracted Typhus
+[2026-06-16 15:54:12] Entity 3 (Hookane) contracted Malaria
+[2026-06-16 15:54:16] Entity 19 (Snozar) cured from Plague
+[2026-06-16 15:54:17] Entity 36 (Drosor) contracted Fever
+[2026-06-16 15:54:17] Entity 11 (Bramia) cured from Typhus
+[2026-06-16 15:54:20] Entity 30 (Mbokdraazar) cured from Typhus
+[2026-06-16 15:54:20] Entity 16 (Flaalis) cured from Typhus
+[2026-06-16 15:54:20] Entity 23 (Vraezbroo) cured from Malaria
+[2026-06-16 15:54:21] Entity 29 (Vriastloo) cured from Malaria
+[2026-06-16 15:54:22] Entity 0 (Flooldrosane) contracted Malaria
+[2026-06-16 15:54:24] Entity 3 (Hookane) cured from Malaria
+[2026-06-16 15:54:24] Entity 14 (Stauna) contracted Fever
+[2026-06-16 15:54:25] Entity 33 (Flaazis) contracted Typhus
+[2026-06-16 15:54:31] Entity 36 (Drosor) cured from Fever
+[2026-06-16 15:54:31] Entity 39 (Draasim) contracted Malaria
+[2026-06-16 15:54:32] Entity 17 (Graa) contracted Fever
+[2026-06-16 15:54:32] Entity 32 (Brooriastor) contracted Plague
+[2026-06-16 15:54:33] Entity 24 (Mbaakel) contracted Malaria
+[2026-06-16 15:54:36] Entity 31 (Vrozel) contracted Plague
+[2026-06-16 15:54:37] Entity 6 (Maakane) contracted Typhus
+[2026-06-16 15:54:39] Entity 1 (Droomhookane) contracted Fever
+[2026-06-16 15:54:39] Entity 14 (Stauna) cured from Fever
+[2026-06-16 15:54:40] Entity 7 (Voosor) contracted Plague
+[2026-06-16 15:54:40] Entity 28 (Trausar) contracted Typhus
+[2026-06-16 15:54:42] Entity 0 (Flooldrosane) cured from Malaria
+[2026-06-16 15:54:42] Entity 33 (Flaazis) cured from Typhus
+[2026-06-16 15:54:43] Entity 15 (Raazar) contracted Plague
+[2026-06-16 15:54:45] Entity 37 (Flokis) contracted Typhus
+[2026-06-16 15:54:45] Entity 17 (Graa) cured from Fever
+[2026-06-16 15:54:49] Entity 32 (Brooriastor) cured from Plague
+[2026-06-16 15:54:52] Entity 39 (Draasim) cured from Malaria
+[2026-06-16 15:54:53] Entity 6 (Maakane) cured from Typhus
+[2026-06-16 15:54:53] Entity 24 (Mbaakel) cured from Malaria
+[2026-06-16 15:54:53] Entity 31 (Vrozel) cured from Plague
+[2026-06-16 15:54:55] Entity 7 (Voosor) cured from Plague
+[2026-06-16 15:54:55] Entity 28 (Trausar) cured from Typhus
+[2026-06-16 15:54:58] Entity 37 (Flokis) cured from Typhus
+[2026-06-16 15:55:00] Entity 1 (Droomhookane) cured from Fever
+[2026-06-16 15:55:03] Entity 12 (Haunmbaazar) contracted Fever
+[2026-06-16 15:55:03] Entity 15 (Raazar) cured from Plague
+[2026-06-16 15:55:04] Entity 18 (Mbosel) contracted Fever
+[2026-06-16 15:55:06] Entity 9 (Snoonmausar) contracted Plague
+[2026-06-16 15:55:15] Entity 5 (Fliael) contracted Plague
+[2026-06-16 15:55:20] Entity 12 (Haunmbaazar) cured from Fever
+[2026-06-16 15:55:21] Entity 9 (Snoonmausar) cured from Plague
+[2026-06-16 15:55:21] Entity 18 (Mbosel) cured from Fever
+[2026-06-16 15:55:23] Entity 38 (Loobrykae) contracted Fever
+[2026-06-16 15:55:25] Entity 8 (Breeor) contracted Plague
+[2026-06-16 15:55:27] Entity 27 (Holis) contracted Typhus
+[2026-06-16 15:55:29] Entity 26 (Loozon) contracted Plague
+[2026-06-16 15:55:34] Entity 5 (Fliael) cured from Plague
+[2026-06-16 15:55:44] Entity 27 (Holis) cured from Typhus
+[2026-06-16 15:55:45] Entity 38 (Loobrykae) cured from Fever
+[2026-06-16 15:55:48] Entity 8 (Breeor) cured from Plague
+[2026-06-16 15:55:52] Entity 26 (Loozon) cured from Plague
+[2026-06-16 15:57:02] Entity 2 (Liazor) contracted Fever
+[2026-06-16 15:57:05] Entity 34 (Trauzim) contracted Typhus
+[2026-06-16 15:57:07] Entity 13 (Vraanraazar) contracted Fever
+[2026-06-16 15:57:10] Entity 25 (Trozar) contracted Fever
+[2026-06-16 15:57:16] Entity 1005 (Brykgraakila) contracted Malaria
+[2026-06-16 15:57:17] Entity 22 (Vraazmbaakor) contracted Plague
+[2026-06-16 15:57:21] Entity 0 (Flooldrosane) contracted Plague
+[2026-06-16 15:57:21] Entity 2 (Liazor) cured from Fever
+[2026-06-16 15:57:23] Entity 34 (Trauzim) cured from Typhus
+[2026-06-16 15:57:24] Entity 13 (Vraanraazar) cured from Fever
+[2026-06-16 15:57:26] Entity 23 (Vraezbroo) contracted Malaria
+[2026-06-16 15:57:28] Entity 25 (Trozar) cured from Fever
+[2026-06-16 15:57:31] Entity 22 (Vraazmbaakor) cured from Plague
+[2026-06-16 15:57:33] Entity 11 (Bramia) contracted Typhus
+[2026-06-16 15:57:35] Entity 0 (Flooldrosane) cured from Plague
+[2026-06-16 15:57:37] Entity 1005 (Brykgraakila) cured from Malaria
+[2026-06-16 15:57:41] Entity 23 (Vraezbroo) cured from Malaria
+[2026-06-16 15:57:46] Entity 29 (Vriastloo) contracted Plague
+[2026-06-16 15:57:48] Entity 16 (Flaalis) contracted Malaria
+[2026-06-16 15:57:50] Entity 11 (Bramia) cured from Typhus
+[2026-06-16 15:57:54] Entity 1008 (Snaundrozar) contracted Fever
+[2026-06-16 15:57:54] Entity 20001 (Snokar) contracted Fever
+[2026-06-16 15:58:00] Entity 14 (Stauna) contracted Fever
+[2026-06-16 15:58:04] Entity 30 (Mbokdraazar) contracted Fever
+[2026-06-16 15:58:04] Entity 19 (Snozar) contracted Fever
+[2026-06-16 15:58:07] Entity 16 (Flaalis) cured from Malaria
+[2026-06-16 15:58:10] Entity 29 (Vriastloo) cured from Plague
+[2026-06-16 15:58:17] Entity 20001 (Snokar) cured from Fever
+[2026-06-16 15:58:17] Entity 32 (Brooriastor) contracted Typhus
+[2026-06-16 15:58:21] Entity 33 (Flaazis) contracted Typhus
+[2026-06-16 15:58:21] Entity 36 (Drosor) contracted Plague
+[2026-06-16 15:58:23] Entity 30 (Mbokdraazar) cured from Fever
+[2026-06-16 15:58:26] Entity 20000 (Mbaamor) contracted Plague
+[2026-06-16 15:58:26] Entity 19 (Snozar) cured from Fever
+[2026-06-16 15:58:26] Entity 14 (Stauna) cured from Fever
+[2026-06-16 15:58:31] Entity 24 (Mbaakel) contracted Typhus
+[2026-06-16 15:58:34] Entity 17 (Graa) contracted Typhus
+[2026-06-16 15:58:37] Entity 15 (Raazar) contracted Fever
+[2026-06-16 15:58:37] Entity 1011 (Skoolmbaasar) contracted Typhus
+[2026-06-16 15:58:37] Entity 28 (Trausar) contracted Malaria
+[2026-06-16 15:58:37] Entity 32 (Brooriastor) cured from Typhus
+[2026-06-16 15:58:39] Entity 1 (Droomhookane) contracted Typhus
+[2026-06-16 15:58:42] Entity 36 (Drosor) cured from Plague
+[2026-06-16 15:58:42] Entity 7 (Voosor) contracted Fever
+[2026-06-16 15:58:46] Entity 33 (Flaazis) cured from Typhus
+[2026-06-16 15:58:49] Entity 24 (Mbaakel) cured from Typhus
+[2026-06-16 15:58:49] Entity 37 (Flokis) contracted Malaria
+[2026-06-16 15:58:51] Entity 20000 (Mbaamor) cured from Plague
+[2026-06-16 15:58:51] Entity 37 (Flokis) contracted Plague
+[2026-06-16 15:58:53] Entity 5001 (Snosflonar) contracted Typhus
+[2026-06-16 15:58:53] Entity 17 (Graa) cured from Typhus
+[2026-06-16 15:58:55] Entity 1 (Droomhookane) cured from Typhus
+[2026-06-16 15:58:55] Entity 28 (Trausar) cured from Malaria
+[2026-06-16 15:58:57] Entity 15 (Raazar) cured from Fever
+[2026-06-16 15:58:57] Entity 1011 (Skoolmbaasar) cured from Typhus
+[2026-06-16 15:58:57] Entity 1013 (Droolskoolor) contracted Malaria
+[2026-06-16 15:58:57] Entity 1015 (Fleestim) contracted Plague
+[2026-06-16 15:59:01] Entity 7 (Voosor) cured from Fever
+[2026-06-16 15:59:06] Entity 18 (Mbosel) contracted Malaria
+[2026-06-16 15:59:13] Entity 5001 (Snosflonar) cured from Typhus
+[2026-06-16 15:59:13] Entity 37 (Flokis) cured from Plague
+[2026-06-16 15:59:13] Entity 1015 (Fleestim) cured from Plague
+[2026-06-16 15:59:18] Entity 38 (Loobrykae) contracted Typhus
+[2026-06-16 15:59:21] Entity 1013 (Droolskoolor) cured from Malaria
+[2026-06-16 15:59:23] Entity 18 (Mbosel) cured from Malaria
+[2026-06-16 15:59:40] Entity 38 (Loobrykae) cured from Typhus

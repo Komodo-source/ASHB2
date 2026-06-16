@@ -117,6 +117,7 @@ void exportTickHistory(const std::string& filepath, const std::vector<Entity>& e
         file << "\"boredom\":" << entity.entityBoredom << ",";
         file << "\"anger\":" << entity.entityGeneralAnger << ",";
         file << "\"hygiene\":" << entity.entityHygiene << ",";
+        file << "\"wealth\":" << entity.salary.token << ",";
 
         // Ensure character string uses double quotes as string
         file << "\"sex\":\"" << std::string(1, entity.entitySex) << "\",";

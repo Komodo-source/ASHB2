@@ -216,6 +216,7 @@ CMakeFiles/app.dir/src/world/PlanetView.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/ExternalData.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Economics.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/mingw64/include/c++/14.2.0/sstream \
  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
