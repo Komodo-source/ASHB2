@@ -285,6 +285,15 @@ public:
     Entity* parent1 = nullptr;
     Entity* parent2 = nullptr;
 
+    // ── Kinship (ID-based: safe across entity-vector reallocation) ───────────
+    // The legacy parent1/parent2 pointers are kept for back-compat, but these
+    // IDs are the durable source of truth for lineage. Siblings are derived by
+    // shared parent IDs; children are tracked explicitly for fast lineage walks.
+    int              parent1Id = -1;
+    int              parent2Id = -1;
+    std::vector<int> childrenIds;
+    int              familyId  = -1;   // clan/family this entity belongs to (-1 = none)
+
     float fatigueLevel = 0.0f;
 
     float socialDrain = 0.0f;
@@ -428,7 +437,8 @@ public:
     int   tribeId       = -1;    // which tribe this entity belongs to (-1 = none)
     int   religionId    = -1;    // which religion they follow (-1 = none)
     float dominanceRank = 0.0f;  // emergent social hierarchy position (0-100)
-    std::string specialization = ""; // "scholar"|"craftsman"|"trader"|"healer"|"warrior"
+    std::string specialization = ""; // "scholar"|"craftsman"|"trader"|"healer"|"warrior" (latent talent)
+    bool  isSpecialist = false;      // released from subsistence farming, fed from the tribe granary
     std::vector<int> knownTechIds;   // IDs of discovered/learned innovations
 
     // Temporary storage for IDs during loading (before pointer resolution)

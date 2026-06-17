@@ -93,6 +93,7 @@ ${IMGUI_SOURCES}
 src/implem_free_will.cpp
 src/SaveLoad.cpp
 src/Heritage.cpp
+src/Kinship.cpp
 src/Graph.cpp
 src/SDLEngine.cpp
 src/Image.cpp

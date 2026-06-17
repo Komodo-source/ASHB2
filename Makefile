@@ -536,6 +536,30 @@ src/Image.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.s
 .PHONY : src/Image.cpp.s
 
+src/Kinship.obj: src/Kinship.cpp.obj
+.PHONY : src/Kinship.obj
+
+# target to build an object file
+src/Kinship.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Kinship.cpp.obj
+.PHONY : src/Kinship.cpp.obj
+
+src/Kinship.i: src/Kinship.cpp.i
+.PHONY : src/Kinship.i
+
+# target to preprocess a source file
+src/Kinship.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Kinship.cpp.i
+.PHONY : src/Kinship.cpp.i
+
+src/Kinship.s: src/Kinship.cpp.s
+.PHONY : src/Kinship.s
+
+# target to generate assembly for a file
+src/Kinship.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Kinship.cpp.s
+.PHONY : src/Kinship.cpp.s
+
 src/LearningAdaptation.obj: src/LearningAdaptation.cpp.obj
 .PHONY : src/LearningAdaptation.obj
 
@@ -1220,6 +1244,9 @@ help:
 	@echo ... src/Image.obj
 	@echo ... src/Image.i
 	@echo ... src/Image.s
+	@echo ... src/Kinship.obj
+	@echo ... src/Kinship.i
+	@echo ... src/Kinship.s
 	@echo ... src/LearningAdaptation.obj
 	@echo ... src/LearningAdaptation.i
 	@echo ... src/LearningAdaptation.s

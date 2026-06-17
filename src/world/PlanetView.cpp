@@ -75,28 +75,70 @@ void DrawPlanetWindow(const Planet* planet, std::vector<Entity*>& entities) {
     ImGui::End();
 }
 
+// Distinct colour per event category so the History log reads at a glance.
+static ImVec4 eventCatColor(const std::string& cat) {
+    if (cat == "war")        return ImVec4(1.0f, 0.35f, 0.25f, 1.0f);
+    if (cat == "religion")   return ImVec4(0.75f,0.5f, 1.0f,  1.0f);
+    if (cat == "innovation") return ImVec4(0.3f, 0.9f, 0.7f,  1.0f);
+    if (cat == "diplomacy")  return ImVec4(0.3f, 0.8f, 1.0f,  1.0f);
+    if (cat == "tribe")      return ImVec4(1.0f, 0.78f,0.3f,  1.0f);
+    if (cat == "birth")      return ImVec4(0.55f,0.95f,0.55f, 1.0f);
+    if (cat == "death")      return ImVec4(0.7f, 0.7f, 0.72f, 1.0f);
+    if (cat == "environment")return ImVec4(0.5f, 0.8f, 0.9f,  1.0f);
+    return ImVec4(0.8f, 0.8f, 0.8f, 1.0f);
+}
+
 void DrawHistoryWindow() {
     if (!globalCivEngine) return;
-    ImGui::SetNextWindowSize(ImVec2(420, 300), ImGuiCond_FirstUseEver);
-    if (!ImGui::Begin("History & Divergence")) { ImGui::End(); return; }
+    ImGui::SetNextWindowSize(ImVec2(460, 540), ImGuiCond_FirstUseEver);
+    if (!ImGui::Begin("History & Report")) { ImGui::End(); return; }
 
     ImGui::Text("Seed: %llu", (unsigned long long)g_worldSeed.master);
-    ImGui::Text("Chaos: %.2f", g_worldSeed.divergence.butterfly);
-    ImGui::Separator();
-    ImGui::TextWrapped("%s", globalCivEngine->historyLine().c_str());
+    ImGui::SameLine();
+    ImGui::Text("  Chaos: %.2f", g_worldSeed.divergence.butterfly);
     ImGui::Text("Run signature: %016llx",
                 (unsigned long long)globalCivEngine->historySignature());
-    ImGui::Text("Dark ages survived: %d", globalCivEngine->darkAgeCount);
     ImGui::Separator();
 
-    ImGui::Text("Population by region:");
-    for (const auto& kv : globalCivEngine->regionPopulation) {
-        float cap = globalCivEngine->regionCapacity.count(kv.first)
-                    ? globalCivEngine->regionCapacity[kv.first] : 0.0f;
-        bool famine = cap > 0 && kv.second > cap;
-        ImGui::TextColored(famine ? ImVec4(1,0.4f,0.3f,1) : ImVec4(0.7f,0.9f,0.7f,1),
-                           "  region %d: %d people (capacity %.0f)%s",
-                           kv.first, kv.second, cap, famine ? "  FAMINE" : "");
+    // ── BIG SUMMARY: the whole civilisation at a glance ──────────────────────
+    if (ImGui::CollapsingHeader("WORLD SUMMARY", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.92f, 0.9f, 0.78f, 1.0f));
+        ImGui::TextUnformatted(globalCivEngine->getBigSummary().c_str());
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::Separator();
+
+    // ── Current wars ─────────────────────────────────────────────────────────
+    if (ImGui::CollapsingHeader("ACTIVE WARS", ImGuiTreeNodeFlags_DefaultOpen)) {
+        bool any = false;
+        const auto& tribes = globalCivEngine->tribes;
+        for (size_t i = 0; i < tribes.size(); ++i) {
+            for (size_t j = i + 1; j < tribes.size(); ++j) {
+                auto it = tribes[i].stances.find(tribes[j].id);
+                if (it == tribes[i].stances.end() || it->second != TS_AT_WAR) continue;
+                any = true;
+                bool ethnic = tribes[i].ethnicWarWith.count(tribes[j].id) > 0;
+                ImGui::TextColored(ethnic ? ImVec4(1.0f,0.3f,0.3f,1.0f) : ImVec4(1.0f,0.55f,0.3f,1.0f),
+                                   "  %s  vs  %s%s",
+                                   tribes[i].name.c_str(), tribes[j].name.c_str(),
+                                   ethnic ? "   [ETHNIC WAR]" : "");
+            }
+        }
+        if (!any) ImGui::TextDisabled("  The world is at peace.");
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::CollapsingHeader("POPULATION BY REGION", ImGuiTreeNodeFlags_DefaultOpen)) {
+        for (const auto& kv : globalCivEngine->regionPopulation) {
+            float cap = globalCivEngine->regionCapacity.count(kv.first)
+                        ? globalCivEngine->regionCapacity[kv.first] : 0.0f;
+            bool famine = cap > 0 && kv.second > cap;
+            ImGui::TextColored(famine ? ImVec4(1,0.4f,0.3f,1) : ImVec4(0.7f,0.9f,0.7f,1),
+                               "  region %d: %d people (capacity %.0f)%s",
+                               kv.first, kv.second, cap, famine ? "  FAMINE" : "");
+        }
     }
 
     ImGui::Separator();
@@ -104,8 +146,11 @@ void DrawHistoryWindow() {
     ImGui::BeginChild("evt", ImVec2(0, 0), true);
     int shown = 0;
     const auto& log = globalCivEngine->eventLog;
-    for (auto it = log.rbegin(); it != log.rend() && shown < 40; ++it, ++shown)
+    for (auto it = log.rbegin(); it != log.rend() && shown < 60; ++it, ++shown) {
+        ImGui::PushStyleColor(ImGuiCol_Text, eventCatColor(it->category));
         ImGui::TextWrapped("[%d] %s", it->day, it->description.c_str());
+        ImGui::PopStyleColor();
+    }
     ImGui::EndChild();
     ImGui::End();
 }

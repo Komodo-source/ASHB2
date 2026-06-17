@@ -8,6 +8,8 @@
 #include "./header/UI.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
+#include "./header/Kinship.h"
+#include "world/ResourceSystem.h"
 #include "./header/PersonaSystem.h"
 #include <iostream>
 #include "./header/Disease.h"
@@ -153,8 +155,33 @@ void UI::showSystemInformation(){
         ImVec4 fatCol = entity->fatigueLevel > 70.0f ? ImVec4(1.0f, 0.45f, 0.3f, 1.0f)
                                                       : ImVec4(0.7f, 0.8f, 0.9f, 1.0f);
         ImGui::TextColored(fatCol, "Fatigue: %.1f", entity->fatigueLevel);
+        // ── Division of labour & homeland resources ──────────────────────────
+        if (entity->isSpecialist) {
+            ImGui::TextColored(ImVec4(0.85f, 0.7f, 1.0f, 1.0f), "Role: %s (specialist, fed by granary)",
+                               entity->specialization.empty() ? "artisan" : entity->specialization.c_str());
+        } else {
+            std::string role = "subsistence farmer";
+            if (!entity->specialization.empty()) role += " (latent " + entity->specialization + ")";
+            ImGui::TextColored(ImVec4(0.7f, 0.85f, 0.7f, 1.0f), "Role: %s", role.c_str());
+        }
+        if (g_resources.valid(entity->originRegionId)) {
+            int rid = entity->originRegionId;
+            ImGui::Text("Homeland: food x%.2f  water x%.2f  wood x%.2f  | quality %.0f%%",
+                        g_resources.abundance(rid, RES_FOOD),
+                        g_resources.abundance(rid, RES_WATER),
+                        g_resources.abundance(rid, RES_WOOD),
+                        g_resources.settlementQuality(rid) * 100.0f);
+        }
         ImGui::Text("Birthday: %dth day", entity->entityBDay);
         //ImGui::Text("Hygiene: %d", entity->entityHygiene);
+
+        // ── Kinship / family ─────────────────────────────────────────────────
+        if (globalKinship) {
+            ImGui::TextColored(ImVec4(0.85f, 0.78f, 0.55f, 1.0f), "Family: %s",
+                               globalKinship->describeKin(*entity).c_str());
+            if (entity->parent1Id >= 0 || entity->parent2Id >= 0)
+                ImGui::Text("Parents: #%d, #%d", entity->parent1Id, entity->parent2Id);
+        }
 
         ImGui::Text("Life Goal: %s", entity->getTypeGoal().c_str());
         ImGui::Text("   ->: %.2f %%", (float)entity->progressGoal());
@@ -438,6 +465,12 @@ static ImU32 tribeColor(int tribeId, int alpha = 255) {
     return IM_COL32((int)(70 + r * 185), (int)(70 + g * 185), (int)(70 + b * 185), alpha);
 }
 
+// Shared pan offset for the social graph. Right-mouse-drag scrolls the whole
+// network on X/Y so clusters that sit off-screen can be brought into view.
+// Both DrawGrid and HandlePointMovement add this to every node position, so
+// click-detection stays aligned with what's drawn.
+static ImVec2 g_graphPan(0.0f, 0.0f);
+
 // Cluster-by-tribe layout: entities of the same tribe sit together in their own
 // little ring; the tribes themselves are arranged on a big ring. This turns the
 // old single-circle "hairball" into readable social neighborhoods at scale.
@@ -500,6 +533,10 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
     std::vector<int>    clusterTribe;
     computeSocialLayout(entities, pos, &clusterCenters, &clusterTribe);
 
+    // Apply the user's pan offset to everything we draw.
+    for (auto& p : pos)            { p.x += g_graphPan.x; p.y += g_graphPan.y; }
+    for (auto& c : clusterCenters) { c.x += g_graphPan.x; c.y += g_graphPan.y; }
+
     std::map<int, int> idToIdx;
     for (int i = 0; i < n; ++i) idToIdx[entities[i]->entityId] = i;
 
@@ -512,53 +549,43 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
                            tribeColor(clusterTribe[k], 90), buf);
     }
 
-    // Which node (if any) is selected → ego-focus mode.
-    int sel = -1;
-    for (int i = 0; i < n; ++i) if (entities[i]->selected) { sel = i; break; }
+    // All links are always drawn (no click required, no ego-focus gating).
+    float thr = 0.0f;                    // show every relationship, even faint ones
+    int   maxLines = 40000, lines = 0;   // hard cap so huge worlds stay responsive
 
-    bool large = (n > 50);
-    bool egoMode = (sel >= 0);
-    float thr = large ? 45.0f : 0.0f;   // LOD: hide weak links when crowded
-    int   maxLines = 2500, lines = 0;   // hard cap so huge worlds stay responsive
-
-    // Draw one entity's outgoing links. In ego mode we only draw links that
-    // touch the selected node (its own + everyone pointing at it).
+    // Draw one entity's outgoing links.
     auto drawFor = [&](int i) {
         Entity* ent = entities[i];
         ImVec2 from = pos[i];
-        auto incident = [&](Entity* tgt) {
-            if (!egoMode) return true;
-            return i == sel || (tgt && idToIdx.count(tgt->entityId) && idToIdx[tgt->entityId] == sel);
-        };
         // Couples first — always shown (they're the backbone of the network).
         for (auto& c : ent->list_entityPointedCouple) {
             if (!c.pointedEntity || lines >= maxLines) continue;
             auto it = idToIdx.find(c.pointedEntity->entityId);
-            if (it == idToIdx.end() || !incident(c.pointedEntity)) continue;
+            if (it == idToIdx.end()) continue;
             draw_list->AddLine(from, pos[it->second], IM_COL32(255, 215, 0, 220), 3.0f); ++lines;
         }
         for (auto& d : ent->list_entityPointedDesire) {
             if (!d.pointedEntity || d.desire < thr || lines >= maxLines) continue;
             auto it = idToIdx.find(d.pointedEntity->entityId);
-            if (it == idToIdx.end() || !incident(d.pointedEntity)) continue;
+            if (it == idToIdx.end()) continue;
             float al = std::min(1.0f, d.desire / 100.0f);
-            draw_list->AddLine(from, pos[it->second], IM_COL32(255, 80, 180, (int)(al * 170)),
+            draw_list->AddLine(from, pos[it->second], IM_COL32(255, 80, 180, (int)(60 + al * 150)),
                                1.0f + al * 2.5f); ++lines;
         }
         for (auto& a : ent->list_entityPointedAnger) {
             if (!a.pointedEntity || a.anger < thr || lines >= maxLines) continue;
             auto it = idToIdx.find(a.pointedEntity->entityId);
-            if (it == idToIdx.end() || !incident(a.pointedEntity)) continue;
+            if (it == idToIdx.end()) continue;
             float al = std::min(1.0f, a.anger / 100.0f);
-            draw_list->AddLine(from, pos[it->second], IM_COL32(255, 45, 45, (int)(al * 175)),
+            draw_list->AddLine(from, pos[it->second], IM_COL32(255, 45, 45, (int)(60 + al * 155)),
                                1.0f + al * 2.5f); ++lines;
         }
         for (auto& s : ent->list_entityPointedSocial) {
             if (!s.pointedEntity || s.social < thr || lines >= maxLines) continue;
             auto it = idToIdx.find(s.pointedEntity->entityId);
-            if (it == idToIdx.end() || !incident(s.pointedEntity)) continue;
+            if (it == idToIdx.end()) continue;
             float al = std::min(1.0f, s.social / 100.0f);
-            draw_list->AddLine(from, pos[it->second], IM_COL32(60, 220, 220, (int)(al * 120)),
+            draw_list->AddLine(from, pos[it->second], IM_COL32(60, 220, 220, (int)(45 + al * 110)),
                                1.0f + al * 2.0f); ++lines;
         }
     };
@@ -570,7 +597,6 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
         Entity* entity = entities[i];
         ImVec2  p      = pos[i];
         bool isSick    = (entity->entityDiseaseType != -1);
-        bool dimmed    = egoMode && i != sel; // fade non-selected nodes in ego focus
 
         float size = pointSize;
         ImU32 fill;
@@ -578,13 +604,12 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
         else if (isSick)           fill = IM_COL32(170, 220, 60, 255);
         else {
             float h = std::max(0.0f, std::min(1.0f, entity->entityHapiness / 100.0f));
-            int a = (egoMode && dimmed) ? 90 : 255;
-            fill = IM_COL32((int)(150 + h * 70), (int)(150 + h * 25), (int)(205 - h * 70), a);
+            fill = IM_COL32((int)(150 + h * 70), (int)(150 + h * 25), (int)(205 - h * 70), 255);
         }
 
         draw_list->AddCircleFilled(p, size, fill);
         // Tribe-colored ring around each dot.
-        draw_list->AddCircle(p, size + 1.5f, tribeColor(entity->tribeId, (egoMode && dimmed) ? 70 : 230), 0, 1.6f);
+        draw_list->AddCircle(p, size + 1.5f, tribeColor(entity->tribeId, 230), 0, 1.6f);
 
         if (entity->selected) {
             draw_list->AddText(ImVec2(p.x + size + 3.0f, p.y - 7.0f),
@@ -599,11 +624,20 @@ int UI::HandlePointMovement(std::vector<Entity*>& entities) {
     bool mouseClicked = ImGui::IsMouseClicked(0);
     static int selectedIndex = -1;
 
+    // Right-mouse drag pans the whole social graph on X and Y, so you can scroll
+    // across all the tribes. Only pans when not hovering an ImGui window/widget.
+    if (!ImGui::GetIO().WantCaptureMouse && ImGui::IsMouseDragging(1, 0.0f)) {
+        ImVec2 d = ImGui::GetIO().MouseDelta;
+        g_graphPan.x += d.x;
+        g_graphPan.y += d.y;
+    }
+
     if (mouseClicked) {
         int n = (int)entities.size();
         selectedIndex = -1;
         std::vector<ImVec2> pos;
         computeSocialLayout(entities, pos);
+        for (auto& p : pos) { p.x += g_graphPan.x; p.y += g_graphPan.y; }
         for (int i = 0; i < n; ++i) {
             float dx = mousePos.x - pos[i].x;
             float dy = mousePos.y - pos[i].y;
@@ -765,6 +799,8 @@ void UI::ShowCivilizationPanel(int simDay) {
             else if (ev.category == "innovation")col = ImVec4(0.3f, 0.9f, 0.7f,  1.0f);
             else if (ev.category == "diplomacy") col = ImVec4(0.3f, 0.8f, 1.0f,  1.0f);
             else if (ev.category == "tribe")     col = ImVec4(1.0f, 0.78f,0.3f,  1.0f);
+            else if (ev.category == "birth")     col = ImVec4(0.55f,0.95f,0.55f, 1.0f);
+            else if (ev.category == "death")     col = ImVec4(0.7f, 0.7f, 0.72f, 1.0f);
             ImGui::PushStyleColor(ImGuiCol_Text, col);
             ImGui::TextWrapped("[Day %d] %s", ev.day, ev.description.c_str());
             ImGui::PopStyleColor();

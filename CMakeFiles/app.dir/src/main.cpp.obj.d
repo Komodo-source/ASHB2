@@ -408,10 +408,12 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/ExternalData.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Economics.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
  C:/mingw64/include/c++/14.2.0/set \
  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
  C:/mingw64/include/c++/14.2.0/functional \
  C:/mingw64/include/c++/14.2.0/bits/std_function.h \
@@ -446,7 +448,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SDLEngine.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/NarrativeEngine.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Kinship.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Planet.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \

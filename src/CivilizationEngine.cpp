@@ -2,6 +2,7 @@
 #include "header/Entity.h"
 #include "world/Planet.h"
 #include "world/Lexicon.h"
+#include "world/ResourceSystem.h"   // per-region resource pools feed craftsmen
 #include "EnvironmentModel.h"   // previously-unused seasonal model, now driving famine cycles
 #include <algorithm>
 #include <cmath>
@@ -64,6 +65,9 @@ CivilizationEngine::CivilizationEngine()
 // ── Main tick ─────────────────────────────────────────────────────────────────
 void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
     currentYear = START_YEAR + (day / 60 / 8) * yearsPerTick;  // advance year
+    int living = 0;
+    for (const Entity& e : entities) if (e.entityHealth > 0.0f) living++;
+    if (living > peakPopulation) peakPopulation = living;
     removeDeadFromTribes(entities);
     updateDominanceRanks(entities);
     updateTribes(entities, day);
@@ -74,6 +78,7 @@ void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
     updateCarryingCapacity(entities, day); // Phase 4: famine / migration / dark ages
     updateEra(entities);
     applyEffectsToEntities(entities, day);
+    updateDivisionOfLabour(entities, day);   // surplus → specialists; famine → back to the fields
 
     // Languages slowly drift (sound change over generations).
     if (g_lexicon && g_lexicon->regionCount() > 0 && (day % 40 == 0)) {
@@ -849,13 +854,44 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                 A.stances[B.id] = stance;
                 B.stances[A.id] = stance;
                 if (stance == TS_AT_WAR) {
-                    logEvent(day, "The " + A.name + " declared war on the " + B.name, "war");
-                    for (int mid : A.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 8.0f); }
-                    for (int mid : B.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 8.0f); }
+                    // Ethnic / hate war: rooted in clashing faiths or deep mutual
+                    // loathing between two warlike peoples, not mere border friction.
+                    // These burn hotter — more rage, more blood, harder to end.
+                    bool faithClash = (A.dominantReligionId != -1 && B.dominantReligionId != -1
+                                       && A.dominantReligionId != B.dominantReligionId);
+                    bool deepHatred = (rel < -75.0f) && (aggression > 0.55f);
+                    bool ethnic = faithClash || deepHatred;
+
+                    A.ethnicWarWith.insert(ethnic ? B.id : -999);
+                    B.ethnicWarWith.insert(ethnic ? A.id : -999);
+                    A.ethnicWarWith.erase(-999);
+                    B.ethnicWarWith.erase(-999);
+
+                    totalWarsDeclared++;
+                    if (ethnic) {
+                        totalEthnicWars++;
+                        std::string why = faithClash ? "a holy war of faiths"
+                                                     : "a war of ancient hatreds";
+                        logEvent(day, "ETHNIC WAR: the " + A.name + " and the " + B.name
+                                 + " plunge into " + why, "war");
+                    } else {
+                        logEvent(day, "The " + A.name + " declared war on the " + B.name, "war");
+                    }
+                    float rage = ethnic ? 22.0f : 8.0f;
+                    for (int mid : A.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + rage); }
+                    for (int mid : B.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + rage); }
+
+                    // War tears apart any couples that straddle the new front line.
+                    breakCrossTribeCouples(A, B, entities, day);
                 } else if (stance == TS_ALLY) {
                     logEvent(day, "The " + A.name + " and the " + B.name + " formed an alliance", "diplomacy");
                 } else if (stance == TS_RIVAL) {
                     logEvent(day, "Tensions rise between the " + A.name + " and the " + B.name, "diplomacy");
+                }
+                // Leaving war: clear the ethnic-war marker.
+                if (prev == TS_AT_WAR && stance != TS_AT_WAR) {
+                    A.ethnicWarWith.erase(B.id);
+                    B.ethnicWarWith.erase(A.id);
                 }
             }
 
@@ -1087,6 +1123,130 @@ void CivilizationEngine::applyEffectsToEntities(std::vector<Entity>& entities, i
     }
 }
 
+// ── Division of labour ────────────────────────────────────────────────────────
+// The engine of "economic base determines superstructure". Each tribe runs a
+// communal granary: subsistence farmers deposit their surplus; the granary then
+// feeds a capped number of non-farming specialists (artisans, priests, soldiers,
+// traders, scholars). How many specialists a tribe can support is set by the
+// food surplus — so a rich valley sprouts a priestly/artisan class while a
+// hungry one stays all-hands-to-the-plough, and a famine dissolves the
+// superstructure back into farmers overnight.
+void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, int day) {
+    auto clamp = [](float v, float lo, float hi) { return std::max(lo, std::min(hi, v)); };
+
+    for (Tribe& tribe : tribes) {
+        // Gather living members.
+        std::vector<Entity*> members;
+        members.reserve(tribe.memberIds.size());
+        for (int mid : tribe.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (e && e->entityHealth > 0.0f) members.push_back(e);
+        }
+        if (members.empty()) { tribe.granary *= 0.95f; tribe.specialistCount = 0; continue; }
+
+        // 1. Farmers tithe their surplus into the granary (keep a comfort buffer).
+        const float comfort = 12.0f;
+        float deposited = 0.0f;
+        for (Entity* e : members) {
+            if (!e->isSpecialist && e->foodStore > comfort) {
+                float give = (e->foodStore - comfort) * 0.5f;
+                e->foodStore -= give;
+                deposited += give;
+            }
+        }
+        tribe.granary += deposited;
+        tribe.granary *= 0.985f;   // antiquity has no refrigeration — stores spoil
+
+        // 2. How many mouths can the surplus free from the fields?
+        //    A buffer of ~8 rations per specialist must exist; an innovation-led
+        //    cultural ceiling caps the share (more inventive tribes specialise more).
+        const float ration   = 1.2f;
+        int affordable = (int)std::floor(tribe.granary / (ration * 8.0f));
+        float ceilFrac = clamp(0.15f + tribe.innovation / 400.0f, 0.15f, 0.45f);
+        int   ceiling  = (int)std::ceil(members.size() * ceilFrac);
+        int   target   = std::max(0, std::min({ affordable, ceiling, (int)members.size() - 1 }));
+
+        int current = 0;
+        for (Entity* e : members) if (e->isSpecialist) current++;
+
+        // 3. Promote toward target (highest dominance/talent first), or demote the
+        //    surplus (lowest first — survival keeps the ablest provisioned).
+        if (current < target) {
+            std::sort(members.begin(), members.end(), [](Entity* a, Entity* b) {
+                return a->dominanceRank > b->dominanceRank;
+            });
+            for (Entity* e : members) {
+                if (current >= target) break;
+                if (e->isSpecialist) continue;
+                e->isSpecialist = true;
+                if (e->specialization.empty()) e->specialization = "craftsman";
+                current++;
+                logEvent(day, e->name + " is freed from the fields to serve as a "
+                              + e->specialization + " of " + tribe.name, "labour");
+            }
+        } else if (current > target) {
+            std::sort(members.begin(), members.end(), [](Entity* a, Entity* b) {
+                return a->dominanceRank < b->dominanceRank;
+            });
+            int toDemote = current - target;
+            for (Entity* e : members) {
+                if (toDemote <= 0) break;
+                if (!e->isSpecialist) continue;
+                e->isSpecialist = false;
+                toDemote--;
+            }
+        }
+
+        // 4. Provision specialists from the granary; an unfed one returns to the
+        //    fields (the famine fail-safe — nobody starves on principle).
+        tribe.specialistCount = 0;
+        for (Entity* e : members) {
+            if (!e->isSpecialist) continue;
+            if (tribe.granary >= ration) {
+                tribe.granary -= ration;
+                e->foodStore = std::min(20.0f, e->foodStore + ration);
+            } else {
+                e->isSpecialist = false;
+                continue;
+            }
+            tribe.specialistCount++;
+
+            // 5. Specialist output → tribe & self. Kept light so the survival
+            //    balance is untouched; the point is the *structure*, not big buffs.
+            const std::string& s = e->specialization;
+            e->entityBoredom = clamp(e->entityBoredom - 1.0f, 0.0f, 100.0f);
+            e->Esteem        = clamp(e->Esteem + 0.8f, 0.0f, 100.0f);
+            if (s == "craftsman") {
+                // Artisans turn timber & ore into tools — draws on the homeland's pools.
+                g_resources.extract(tribe.regionId, RES_WOOD,  0.4f);
+                g_resources.extract(tribe.regionId, RES_METAL, 0.2f);
+                tribe.innovation = clamp(tribe.innovation + 0.05f, 0.0f, 100.0f);
+            } else if (s == "scholar") {
+                tribe.innovation = clamp(tribe.innovation + 0.08f, 0.0f, 100.0f);
+            } else if (s == "trader") {
+                e->salary.earnMoney(20.0f);
+            } else if (s == "warrior") {
+                tribe.militarism = clamp(tribe.militarism + 0.04f, 0.0f, 100.0f);
+            }
+            // "healer" / priests: cohesion handled below as a tribe-wide effect.
+        }
+
+        // 6. Priests & healers bind the community: their presence eases everyone's
+        //    loneliness and stress a touch (collective cohesion from the cult).
+        int clergy = 0;
+        for (Entity* e : members)
+            if (e->isSpecialist && (e->specialization == "healer" || e->specialization == "scholar"))
+                clergy++;
+        if (clergy > 0) {
+            float relief = std::min(2.0f, 0.4f * clergy);
+            for (Entity* e : members) {
+                e->entityLoneliness = clamp(e->entityLoneliness - relief, 0.0f, 100.0f);
+                e->entityStress     = clamp(e->entityStress     - relief * 0.5f, 0.0f, 100.0f);
+            }
+        }
+    }
+}
+
 // ── Era / Summary ─────────────────────────────────────────────────────────────
 std::string CivilizationEngine::getEraName() const {
     switch (era) {
@@ -1142,28 +1302,32 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
             float aPower = (aStr * 0.7f + aDef * 0.3f) * (0.8f + roll(rng) * 0.4f);
             float bPower = (bStr * 0.7f + bDef * 0.3f) * (0.8f + roll(rng) * 0.4f);
 
-            if (roll(rng) < 0.09f) { // chance of a major battle each tick
+            bool ethnic = A.ethnicWarWith.count(B.id) > 0;
+
+            if (roll(rng) < (ethnic ? 0.18f : 0.09f)) { // ethnic wars erupt into battle twice as often
                 executeBattle(A, B, entities, day);
             }
 
-            // War exhaustion: both tribes slowly lose health from attrition
-            float aLossRate = 0.02f + (1.0f - aStr / std::max(1.0f, aStr + bStr)) * 0.04f;
-            float bLossRate = 0.02f + (1.0f - bStr / std::max(1.0f, aStr + bStr)) * 0.04f;
+            // War exhaustion: both tribes lose health from attrition. Ethnic wars
+            // grind down the civilian population, not just the front line.
+            float attrMul = ethnic ? 2.2f : 1.0f;
+            float aLossRate = (0.02f + (1.0f - aStr / std::max(1.0f, aStr + bStr)) * 0.04f) * attrMul;
+            float bLossRate = (0.02f + (1.0f - bStr / std::max(1.0f, aStr + bStr)) * 0.04f) * attrMul;
+            float attrDmg   = ethnic ? 4.0f : 1.5f;
 
-            for (int mid : A.memberIds) {
-                Entity* e = entityById(entities, mid);
-                if (e && e->entityHealth > 0.0f && roll(rng) < aLossRate) {
-                    e->entityHealth -= 0.5f + roll(rng) * 1.5f;  // 0.5-2 damage (gentle attrition)
+            auto attrit = [&](Tribe& side, float rate) {
+                for (int mid : side.memberIds) {
+                    Entity* e = entityById(entities, mid);
+                    if (!e || e->entityHealth <= 0.0f || roll(rng) >= rate) continue;
+                    float before = e->entityHealth;
+                    e->entityHealth -= 0.5f + roll(rng) * attrDmg;
                     e->entityStress = std::min(100.0f, e->entityStress + 1.5f);
+                    e->entityHapiness = std::max(0.0f, e->entityHapiness - (ethnic ? 2.0f : 0.5f));
+                    if (before > 0.0f && e->entityHealth <= 0.0f) totalWarDeaths++;
                 }
-            }
-            for (int mid : B.memberIds) {
-                Entity* e = entityById(entities, mid);
-                if (e && e->entityHealth > 0.0f && roll(rng) < bLossRate) {
-                    e->entityHealth -= 0.5f + roll(rng) * 1.5f;  // 0.5-2 damage (gentle attrition)
-                    e->entityStress = std::min(100.0f, e->entityStress + 1.5f);
-                }
-            }
+            };
+            attrit(A, aLossRate);
+            attrit(B, bLossRate);
 
             // Peace negotiations: if both sides exhausted, chance of peace
             if (A.relations[B.id] < -70.0f && aStr + bStr < 15.0f) {
@@ -1188,6 +1352,9 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
 
 void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::vector<Entity>& entities, int day) {
     std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    totalBattles++;
+    // Ethnic / hate wars are far bloodier than ordinary border skirmishes.
+    bool ethnic = attacker.ethnicWarWith.count(defender.id) > 0;
     float aStr = calculateTribeMilitaryStrength(attacker, entities);
     float dStr = calculateTribeMilitaryStrength(defender, entities);
 
@@ -1213,17 +1380,26 @@ void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::ve
         desc = attacker.name + " and " + defender.name + " fought to a bloody stalemate";
     }
 
-    // Apply battle casualties to both sides (gentle, non-lethal)
-    for (int mid : attacker.memberIds) {
-        Entity* e = entityById(entities, mid);
-        if (e && e->entityHealth > 0.0f && roll(rng) < 0.08f)
-            e->entityHealth -= 1.0f + roll(rng) * 3.0f;  // 1-4 damage per battle
-    }
-    for (int mid : defender.memberIds) {
-        Entity* e = entityById(entities, mid);
-        if (e && e->entityHealth > 0.0f && roll(rng) < 0.08f)
-            e->entityHealth -= 1.0f + roll(rng) * 3.0f;  // 1-4 damage per battle
-    }
+    // Apply battle casualties. Ethnic wars draw real blood — soldiers actually
+    // fall, so populations shrink and the loss is felt across the society.
+    float castChance = ethnic ? 0.16f : 0.08f;
+    float castDmg    = ethnic ? 14.0f : 4.0f;
+    int   fallen     = 0;
+    auto strike = [&](Tribe& side) {
+        for (int mid : side.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (!e || e->entityHealth <= 0.0f || roll(rng) >= castChance) continue;
+            float before = e->entityHealth;
+            e->entityHealth -= 1.0f + roll(rng) * castDmg;
+            e->entityStress = std::min(100.0f, e->entityStress + 6.0f);
+            if (before > 0.0f && e->entityHealth <= 0.0f) { totalWarDeaths++; fallen++; }
+        }
+    };
+    strike(attacker);
+    strike(defender);
+
+    if (fallen > 0)
+        desc += " — " + std::to_string(fallen) + " fell in the fighting";
 
     logEvent(day, desc, "war");
 }
@@ -1383,7 +1559,44 @@ void CivilizationEngine::updateCarryingCapacity(std::vector<Entity>& entities, i
     }
 }
 
+void CivilizationEngine::breakCrossTribeCouples(Tribe& A, Tribe& B, std::vector<Entity>& entities, int day) {
+    int broken = 0;
+    auto removeCoupleLink = [](Entity* e, int partnerId) {
+        auto& v = e->list_entityPointedCouple;
+        v.erase(std::remove_if(v.begin(), v.end(),
+            [&](const entityPointedCouple& c){
+                return (c.pointedEntity && c.pointedEntity->entityId == partnerId) || c.id == partnerId;
+            }), v.end());
+    };
+    for (int aid : A.memberIds) {
+        Entity* ea = entityById(entities, aid);
+        if (!ea) continue;
+        for (int bid : B.memberIds) {
+            Entity* eb = entityById(entities, bid);
+            if (!eb) continue;
+            bool paired = false;
+            for (const auto& c : ea->list_entityPointedCouple)
+                if ((c.pointedEntity && c.pointedEntity->entityId == eb->entityId) || c.id == eb->entityId) { paired = true; break; }
+            if (!paired) continue;
+            removeCoupleLink(ea, eb->entityId);
+            removeCoupleLink(eb, ea->entityId);
+            // Torn loyalties curdle into grief and resentment.
+            ea->entityHapiness = std::max(0.0f, ea->entityHapiness - 12.0f);
+            eb->entityHapiness = std::max(0.0f, eb->entityHapiness - 12.0f);
+            ea->entityStress   = std::min(100.0f, ea->entityStress + 10.0f);
+            eb->entityStress   = std::min(100.0f, eb->entityStress + 10.0f);
+            broken++;
+        }
+    }
+    if (broken > 0) {
+        totalCouplesBroken += broken;
+        logEvent(day, std::to_string(broken) + " couple(s) were torn apart as the "
+                 + A.name + " and the " + B.name + " went to war", "war");
+    }
+}
+
 void CivilizationEngine::conquerTribe(Tribe& victor, Tribe& loser, std::vector<Entity>& entities, int day) {
+    totalConquests++;
     logEvent(day, victor.name + " has conquered " + loser.name + "!", "war");
 
     // Absorb survivors into victor's tribe
@@ -1522,6 +1735,66 @@ std::string CivilizationEngine::historyLine() const {
        << " | techs " << innovations.size()
        << " | dark ages " << darkAgeCount
        << " | top faith: " << relName;
+    return ss.str();
+}
+
+bool CivilizationEngine::areTribesAtWar(int tribeIdA, int tribeIdB) const {
+    if (tribeIdA < 0 || tribeIdB < 0 || tribeIdA == tribeIdB) return false;
+    for (const auto& t : tribes) {
+        if (t.id != tribeIdA) continue;
+        auto it = t.stances.find(tribeIdB);
+        return it != t.stances.end() && it->second == TS_AT_WAR;
+    }
+    return false;
+}
+
+std::string CivilizationEngine::getBigSummary() const {
+    int livingPop = 0;
+    for (const auto& kv : regionPopulation) livingPop += kv.second;
+
+    int atWarTribes = 0, alliances = 0;
+    for (const auto& t : tribes) {
+        bool w = false;
+        for (const auto& s : t.stances) {
+            if (s.second == TS_AT_WAR) w = true;
+            if (s.second == TS_ALLY)   alliances++;
+        }
+        if (w) atWarTribes++;
+    }
+    alliances /= 2; // each alliance counted from both sides
+
+    // Largest tribe & dominant faith.
+    std::string biggest = "none"; int biggestPop = 0;
+    for (const auto& t : tribes)
+        if (t.population() > biggestPop) { biggestPop = t.population(); biggest = t.name; }
+    int bestRel = -1; size_t bestFollow = 0;
+    for (const auto& r : religions)
+        if (r.followerIds.size() > bestFollow) { bestFollow = r.followerIds.size(); bestRel = r.id; }
+    std::string relName = "none";
+    for (const auto& r : religions) if (r.id == bestRel) { relName = r.name; break; }
+
+    std::stringstream ss;
+    ss << "=== STATE OF THE WORLD ===\n";
+    ss << getYearDisplay() << "   " << getEraName() << "\n";
+    ss << getEraSummary() << "\n\n";
+    ss << "Living people : " << livingPop << "   (peak " << peakPopulation << ")\n";
+    ss << "Tribes        : " << tribes.size()
+       << "   largest: " << biggest << " (" << biggestPop << ")\n";
+    ss << "Religions     : " << religions.size() << "   dominant: " << relName << "\n";
+    ss << "Technologies  : " << innovations.size()
+       << "   dark ages survived: " << darkAgeCount << "\n\n";
+    ss << "--- Vital statistics (whole run) ---\n";
+    ss << "Births        : " << totalBirths << "\n";
+    ss << "Deaths        : " << totalDeaths
+       << "   (of war: " << totalWarDeaths << ")\n";
+    ss << "Couples broken by war: " << totalCouplesBroken << "\n\n";
+    ss << "--- Conflict ---\n";
+    ss << "Wars declared : " << totalWarsDeclared
+       << "   (ethnic/hate: " << totalEthnicWars << ")\n";
+    ss << "Battles fought: " << totalBattles << "\n";
+    ss << "Conquests     : " << totalConquests << "\n";
+    ss << "Tribes now at war: " << atWarTribes
+       << "   active alliances: " << alliances << "\n";
     return ss.str();
 }
 

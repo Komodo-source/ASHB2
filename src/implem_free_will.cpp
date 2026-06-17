@@ -10,6 +10,7 @@
 #include "./header/ExternalData.h"
 #include "./header/SocialNormSystem.h"
 #include "./header/heritage.h"
+#include "./header/Kinship.h"
 #include "./header/CivilizationEngine.h"
 #include "world/Lexicon.h"
 
@@ -1896,7 +1897,7 @@ Action* FreeWillSystem::ChooseSpecificSocialAction(Entity* ent){
 }
 
 // ici on assimile l'action pointé vers sur celui qui est pointé par le pointeur
-void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action) {
+void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Action* action, CivilizationEngine* engineCivilization) {
     if (!pointer || !pointed) {
         return;
     }
@@ -2063,6 +2064,24 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         pointer->onMajorEventAddOrBoostGoal("good_connection");
     }
     else if (action->name == "breeding") {
+        // Kin avoidance: parents/children and (half-)siblings never conceive.
+        // Lineage is tracked by id, so this holds even after the entity vector
+        // reallocates. Cousins are intentionally permitted.
+        if (globalKinship && KinshipSystem::wouldBeIncest(*pointer, *pointed)) {
+            std::cout << "Reproduction bloque: " << pointer->getName() << " et "
+                      << pointed->getName() << " sont parents proches\n";
+            return;
+        }
+
+        // No children are born across the front line of a war: members of two
+        // warring tribes will not breed with one another.
+        if (globalCivEngine && pointer->tribeId != pointed->tribeId &&
+            globalCivEngine->areTribesAtWar(pointer->tribeId, pointed->tribeId)) {
+            std::cout << "Reproduction bloque: " << pointer->getName() << " et "
+                      << pointed->getName() << " sont de tribus en guerre\n";
+            return;
+        }
+
         int desire_index = pointer->contains(pointer->list_entityPointedDesire, pointed, 1);
 
         // FIX: Create relationship entry if it doesn't exist
@@ -2075,18 +2094,18 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             desire_index = static_cast<int>(pointer->list_entityPointedDesire.size()) - 1;
         }
 
-        if (pointer->list_entityPointedDesire[desire_index].desire < 10) {
+        if (pointer->list_entityPointedDesire[desire_index].desire < 25) {
             float current_desire = pointer->list_entityPointedDesire[desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointer->getName() << " n'a pas assez de desir pour " << pointed->getName()
-                      << " (" << current_desire << " < 10)\n";
+                      << " (" << current_desire << " < 25)\n";
 
-            // Build desire faster so couples actually reach the fertility threshold
-            // instead of dying childless.
+            // Desire grows toward the fertility threshold, but courtship takes time —
+            // bonds must be earned over several interactions, not snapped into being.
             pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f,
-                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(6, 12));
+                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(4, 8));
             return;
         }
 
@@ -2102,16 +2121,16 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             pointed_desire_index = static_cast<int>(pointed->list_entityPointedDesire.size()) - 1;
         }
 
-        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < 10) {
+        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < 25) {
             float pointed_desire = pointed->list_entityPointedDesire[pointed_desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointed->getName() << " n'a pas assez de desir pour " << pointer->getName()
-                      << " (" << pointed_desire << " < 10)\n";
+                      << " (" << pointed_desire << " < 25)\n";
 
             pointed->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f,
-                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(6, 12));
+                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(4, 8));
 
             return;
         }
@@ -2137,8 +2156,18 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             pointed->list_entityPointedAnger[pointed_anger_index].anger -= BetterRand::genNrInInterval(3, 8);
             return;
         }
+        if (pointer->entityAge < 18 || pointed->entityAge < 18) {
+          std::cout << "cannot have children under the age of 18";
+          return ;
+        }
+        // Fertility wanes with age — elders rarely conceive.
+        if (pointer->entityAge > 50 || pointed->entityAge > 50) {
+          std::cout << "too old to have children\n";
+          return ;
+        }
 
         if (pointer->checkCouple(pointed)) {
+
             LifeMemory mem;
             mem.eventType = "breeding";
             mem.entityInvolvedId = pointed->entityId;
@@ -2159,10 +2188,19 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
 
             std::cout << "@@@@@@ Nouvelle reproduction  entre: (" << pointer->getId() << ")" << pointer->getName()
                       << " -> (" << pointed->getId() << ")" << pointed->getName() << std::endl;
+
+
             if (globalLogger) globalLogger->logEvent("breeding", "Reproduction between " + pointer->name + " and " + pointed->name);
+
 
             static int nextBabyId = 1000;
             Entity baby = Entity(nextBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1, nullptr, nullptr, nullptr, nullptr, "happiness");
+
+            if (engineCivilization) {
+                engineCivilization->logEvent(-1, baby.getName() + " was born to "
+                    + pointer->name + " and " + pointed->name, "birth");
+                engineCivilization->totalBirths++;
+            }
             if (globalLogger) globalLogger->logBirth(baby.entityId, baby.getName(), pointer->getId(), pointed->getId(), pointer->getName(), pointed->getName());
             baby.posX = pointer->posX + BetterRand::genNrInInterval(-15, 15);
             baby.posY = pointer->posY + BetterRand::genNrInInterval(-15, 15);
@@ -2171,6 +2209,9 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             // Inherit homeland so lineages stay tied to their cradle.
             baby.originRegionId = (pointer->originRegionId >= 0) ? pointer->originRegionId
                                                                  : pointed->originRegionId;
+            // Inherit the parents' tribe so the newborn appears in their cluster /
+            // tribe view immediately, instead of drifting in the grey "no tribe" pool.
+            baby.tribeId = (pointer->tribeId >= 0) ? pointer->tribeId : pointed->tribeId;
             // Name the child in the family's language.
             if (g_lexicon) baby.name = g_lexicon->genName(baby.originRegionId, baby.entitySex);
 
@@ -2203,8 +2244,8 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             float avg_extraversion_parent = (pointed->personality.extraversion + pointer->personality.extraversion) / 2;
             baby.personality.openness = avg_openness_parent;
             baby.personality.extraversion = avg_extraversion_parent;
-            Heritage::add_child(pointed, &baby);
-            Heritage::add_child(pointer, &baby);
+            if (globalKinship) globalKinship->registerBirth(baby, pointed, pointer,
+                globalCivEngine ? globalCivEngine->getCurrentYear() : 0);
 
             new_borns.push_back(baby);
         } else {
@@ -2217,7 +2258,11 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
 
             float dHere  = pointer->list_entityPointedDesire[desire_index].desire;
             float dThere = pointed->list_entityPointedDesire[pointed_desire_index].desire;
-            if (dHere >= 30.0f && dThere >= 30.0f) {
+            // Conceiving on the spot now demands a genuinely strong mutual bond and
+            // both partners being of fertile age — no more snap pregnancies.
+            if (dHere >= 45.0f && dThere >= 45.0f &&
+                pointer->entityAge >= 18 && pointed->entityAge >= 18 &&
+                pointer->entityAge <= 50 && pointed->entityAge <= 50) {
                 static int nextBabyId2 = 5000;
                 Entity baby = Entity(nextBabyId2++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1,
                                      nullptr, nullptr, nullptr, nullptr, "happiness");
@@ -2227,13 +2272,19 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                 baby.parent2 = pointer;
                 baby.originRegionId = (pointer->originRegionId >= 0) ? pointer->originRegionId
                                                                      : pointed->originRegionId;
+                baby.tribeId = (pointer->tribeId >= 0) ? pointer->tribeId : pointed->tribeId;
                 if (g_lexicon) baby.name = g_lexicon->genName(baby.originRegionId, baby.entitySex);
                 baby.personality.openness     = (pointed->personality.openness + pointer->personality.openness) / 2;
                 baby.personality.extraversion = (pointed->personality.extraversion + pointer->personality.extraversion) / 2;
                 baby.dv.hadSecureAttachment = true;
                 baby.addOrBoostGoal("self", 100.0f);
-                Heritage::add_child(pointed, &baby);
-                Heritage::add_child(pointer, &baby);
+                if (globalKinship) globalKinship->registerBirth(baby, pointed, pointer,
+                    globalCivEngine ? globalCivEngine->getCurrentYear() : 0);
+                if (globalCivEngine) {
+                    globalCivEngine->logEvent(-1, baby.getName() + " was born to "
+                        + pointer->name + " and " + pointed->name, "birth");
+                    globalCivEngine->totalBirths++;
+                }
                 if (globalLogger) globalLogger->logBirth(baby.entityId, baby.getName(),
                     pointer->getId(), pointed->getId(), pointer->getName(), pointed->getName());
                 new_borns.push_back(baby);
@@ -2378,6 +2429,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         if (pointed->searchConnAng(pointer) > 40.0 || pointed->personality.neuroticism > 50.0 || pointed->entityMentalHealth < 30) {
             pointed->entityHealth = 0.0f;
         }
+        engineCivilization->logEvent(-1,pointer->getName() + " Murdered " + pointed->getName() , "birth");
     }
     else if (action->name == "Discrimination") {
         int index = pointer->contains(pointer->list_entityPointedAnger, pointed, 2);
@@ -3728,14 +3780,18 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
         // measured pace. Only the lower-id partner initiates, so a couple doesn't
         // double-conceive from both sides on the same tick.
         if (P->entityHealth > 0.0f && e->entityId < P->entityId &&
-            cp.daysTogether > 20 && (cp.daysTogether % 25 == 0) &&
-            e->entityAge >= 16.0f && e->entityAge <= 55.0f &&
-            P->entityAge >= 16.0f && P->entityAge <= 55.0f &&
-            e->entityHealth > 45.0f && P->entityHealth > 45.0f &&
-            cp.suspicion < 50.0f &&
+            cp.daysTogether > 30 && (cp.daysTogether % 40 == 0) &&
+            e->entityAge >= 18.0f && e->entityAge <= 50.0f &&
+            P->entityAge >= 18.0f && P->entityAge <= 50.0f &&
+            e->entityHealth > 50.0f && P->entityHealth > 50.0f &&
+            cp.suspicion < 40.0f &&
+            !(globalKinship && KinshipSystem::wouldBeIncest(*e, *P)) &&
+            !(globalCivEngine && e->tribeId != P->tribeId &&
+              globalCivEngine->areTribesAtWar(e->tribeId, P->tribeId)) &&
             pos(e->searchConnAng(P)) < 35.0f && pos(P->searchConnAng(e)) < 35.0f) {
-            // Fertility chance rises with mutual desire / commitment.
-            float fertility = 18.0f + cp.commitment * 0.25f + pos(e->searchConnDesire(P)) * 0.25f;
+            // Fertility chance rises with mutual desire / commitment, but a child
+            // is now a measured event rather than a near-certainty each cycle.
+            float fertility = 9.0f + cp.commitment * 0.15f + pos(e->searchConnDesire(P)) * 0.15f;
             if (BetterRand::genNrInInterval(0, 100) < fertility) {
                 static int nextLineageBabyId = 20000;
                 Entity baby = Entity(nextLineageBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75,
@@ -3745,6 +3801,7 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
                 baby.parent1 = P;
                 baby.parent2 = e;
                 baby.originRegionId = (e->originRegionId >= 0) ? e->originRegionId : P->originRegionId;
+                baby.tribeId = (e->tribeId >= 0) ? e->tribeId : P->tribeId;
                 if (g_lexicon) baby.name = g_lexicon->genName(baby.originRegionId, baby.entitySex);
                 baby.personality.openness     = (P->personality.openness + e->personality.openness) / 2.0f;
                 baby.personality.extraversion = (P->personality.extraversion + e->personality.extraversion) / 2.0f;
@@ -3752,12 +3809,17 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
                 baby.dv.hadSecureAttachment = (cp.satisfaction > 40.0f && cp.trust > 40.0f);
                 baby.dv.childhoodNurturingScore = cp.satisfaction / 25.0f;
                 baby.addOrBoostGoal("self", 100.0f);
-                Heritage::add_child(P, &baby);
-                Heritage::add_child(e, &baby);
+                if (globalKinship) globalKinship->registerBirth(baby, P, e,
+                    globalCivEngine ? globalCivEngine->getCurrentYear() : 0);
                 cp.commitment   = std::min(100.0f, cp.commitment + 6.0f);  // a child deepens the bond
                 cp.satisfaction = std::min(100.0f, cp.satisfaction + 4.0f);
                 e->onMajorEventAddOrBoostGoal("reproduction");
                 P->onMajorEventAddOrBoostGoal("reproduction");
+                if (globalCivEngine) {
+                    globalCivEngine->logEvent(-1, baby.getName() + " was born to the couple "
+                        + e->name + " & " + P->name, "birth");
+                    globalCivEngine->totalBirths++;
+                }
                 if (globalLogger) {
                     globalLogger->logEvent("breeding",
                         "Child born to the committed couple " + e->name + " & " + P->name);

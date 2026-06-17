@@ -69,6 +69,14 @@ struct Tribe {
     int   regionId = -1;   // landmass/cradle the tribe currently sits in
     int   homeBiome = -1;  // Biome at the tribe centre (drives cultural drift)
 
+    // ── Division of labour ───────────────────────────────────────────────────
+    // Farmers deposit surplus food into the communal granary; it feeds the
+    // non-farming specialists (artisans, priests, soldiers, traders, scholars).
+    // When the granary runs dry, specialists revert to subsistence — economic
+    // base determines superstructure.
+    float granary        = 0.0f;
+    int   specialistCount = 0;  // current non-farming specialists (UI / decisions)
+
     // Known technologies (by innovation id)
     std::set<int> knownTechIds;
 
@@ -78,6 +86,7 @@ struct Tribe {
     // Inter-tribe relations
     std::map<int, TribeStance> stances;
     std::map<int, float>       relations; // -100..+100
+    std::set<int>              ethnicWarWith; // tribe ids this is in an ethnic/hate war with
 
     int  population()  const { return (int)memberIds.size(); }
     bool isMember(int id) const {
@@ -142,6 +151,24 @@ public:
     int                 lastCapacityDay = -1;  // famine effects apply once per civ-day
     int                 lastHistoryDay  = -1;  // history fingerprint logged once per day
 
+    // ── Running tallies for the report / big summary ─────────────────────────
+    // Incremented from across the simulation so the History panel can show a
+    // cumulative picture of the whole run, not just the live snapshot.
+    int  totalBirths       = 0;
+    int  totalDeaths       = 0;
+    int  totalWarDeaths    = 0;   // deaths directly caused by battle/war attrition
+    int  totalBattles      = 0;
+    int  totalWarsDeclared = 0;
+    int  totalEthnicWars   = 0;   // wars rooted in tribal/religious hatred
+    int  totalConquests    = 0;
+    int  totalCouplesBroken= 0;   // couples torn apart by war between their tribes
+    int  peakPopulation    = 0;
+
+    // True when tribes a and b are currently in an open war.
+    bool areTribesAtWar(int tribeIdA, int tribeIdB) const;
+    // A multi-line cumulative report of the whole civilisation so far.
+    std::string getBigSummary() const;
+
     // A compact fingerprint of the civilisation's state (era, dominant religions,
     // top techs, population). Two seeds -> different signatures = proof of divergence.
     uint64_t    historySignature() const;
@@ -151,6 +178,8 @@ public:
     Religion*   findReligion(int id);
     Innovation* findInnovation(int id);
     Innovation* findInnovationByName(const std::string& name);
+
+    void    logEvent(int day, const std::string& desc, const std::string& cat);
 
 private:
     int nextTribeId      = 0;
@@ -166,6 +195,11 @@ private:
     void updateTribeRelations(std::vector<Entity>& entities, int day);
     void updateEra(const std::vector<Entity>& entities);
     void applyEffectsToEntities(std::vector<Entity>& entities, int day);
+
+    // Division of labour: surplus food frees a fraction of each tribe from the
+    // fields to become artisans/priests/soldiers/traders/scholars; famine
+    // forces them back. Runs once per civ tick.
+    void updateDivisionOfLabour(std::vector<Entity>& entities, int day);
 
     // ── Phase 4: carrying capacity, famine, migration, dark ages ─────────────
     void updateCarryingCapacity(std::vector<Entity>& entities, int day);
@@ -185,11 +219,14 @@ private:
     void removeDeadFromTribes(std::vector<Entity>& entities);
     void dissolveSmallTribes(std::vector<Entity>& entities, int day);
     void splitLargeTribes(std::vector<Entity>& entities, int day);
-    
+
     // ── War system ───────────────────────────────────────────────────────────
     void processWarTick(std::vector<Entity>& entities, int day);
     void executeBattle(Tribe& attacker, Tribe& defender, std::vector<Entity>& entities, int day);
     void conquerTribe(Tribe& victor, Tribe& loser, std::vector<Entity>& entities, int day);
+    // War sunders romances that cross enemy lines: members of two warring tribes
+    // who were a couple are forced apart, breeding resentment instead of children.
+    void breakCrossTribeCouples(Tribe& A, Tribe& B, std::vector<Entity>& entities, int day);
     float calculateTribeMilitaryStrength(const Tribe& tribe, std::vector<Entity>& entities) const;
     float calculateTribeDefenseStrength(const Tribe& tribe, std::vector<Entity>& entities) const;
 
@@ -212,7 +249,7 @@ private:
     // ── Helpers ───────────────────────────────────────────────────────────────
     float computeCharisma(const Entity* ent) const;
     Entity* entityById(std::vector<Entity>& entities, int id);
-    void    logEvent(int day, const std::string& desc, const std::string& cat);
+
 
     template<class T>
     const T& pick(const std::vector<T>& v) {

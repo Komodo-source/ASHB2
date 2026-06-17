@@ -242,6 +242,8 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/ExternalData.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Economics.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
@@ -263,6 +265,6 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/heritage.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Kinship.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Lexicon.h

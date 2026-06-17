@@ -25,6 +25,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Graph.cpp" "CMakeFiles/app.dir/src/Graph.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Graph.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Heritage.cpp" "CMakeFiles/app.dir/src/Heritage.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Heritage.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Image.cpp" "CMakeFiles/app.dir/src/Image.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Image.cpp.obj.d"
+  "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Kinship.cpp" "CMakeFiles/app.dir/src/Kinship.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Kinship.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/LearningAdaptation.cpp" "CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj" "gcc" "CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/LifeCourse.cpp" "CMakeFiles/app.dir/src/LifeCourse.cpp.obj" "gcc" "CMakeFiles/app.dir/src/LifeCourse.cpp.obj.d"
   "C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/Logging.cpp" "CMakeFiles/app.dir/src/Logging.cpp.obj" "gcc" "CMakeFiles/app.dir/src/Logging.cpp.obj.d"

@@ -13,6 +13,7 @@
 #include "./ExternalData.h"
 #include "SocialNormSystem.h"
 #include "Economics.h"
+#include "CivilizationEngine.h"
 class Entity;
 
 struct StatRequirement {
@@ -257,7 +258,7 @@ public:
     // New cognitive pipeline entry point (separate from legacy scoring)
     Action* cognitiveChooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context);
     void executeAction(Entity* entity, Action* &action, const ActionContext& context = ActionContext(), Entity* pointed=nullptr);
-    void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action);
+    void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action, CivilizationEngine* engineCivilization);
     float calculateGoalAlignmentModifier(Entity* entity,  Action* action);
     bool isKnown(Entity* entity, Entity* target);
     Entity* selectSocialTarget(Entity* entity, const std::vector<Entity*>& neighbors, const Action* action);

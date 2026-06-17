@@ -218,6 +218,7 @@ CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/ExternalData.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SocialNormSystem.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/Economics.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/CivilizationEngine.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SemanticMemory.h \
  C:/mingw64/include/c++/14.2.0/sstream \
  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
@@ -243,4 +244,5 @@ CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj: \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Planet.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Lexicon.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/ResourceSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/environment/EnvironmentModel.h

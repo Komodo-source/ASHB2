@@ -33,6 +33,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/Heritage.cpp.obj.d"
   "CMakeFiles/app.dir/src/Image.cpp.obj"
   "CMakeFiles/app.dir/src/Image.cpp.obj.d"
+  "CMakeFiles/app.dir/src/Kinship.cpp.obj"
+  "CMakeFiles/app.dir/src/Kinship.cpp.obj.d"
   "CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj"
   "CMakeFiles/app.dir/src/LearningAdaptation.cpp.obj.d"
   "CMakeFiles/app.dir/src/LifeCourse.cpp.obj"

@@ -29,6 +29,7 @@
 #include "header/Image.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
+#include "./header/Kinship.h"
 #include "./header/WorldSeed.h"
 #include "world/Planet.h"
 #include "world/PlanetView.h"
@@ -750,7 +751,7 @@ void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, 
     }
 }
 
-void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay){
+void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay, CivilizationEngine* engineCivilization){
     updateEnvironment(currentDay);   // advance season / harvest before agents act
     EnvironmentalFactors env = generateEnvFactors(currentDay);
 
@@ -1106,7 +1107,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                         const std::string& rn = romantic->name;
                         if (rn == "Desire" || rn == "Flirt" || rn == "Date" ||
                             rn == "couple" || rn == "breeding" || rn == "Reconcile") {
-                            sys.pointedAssimilation(entity, mate, romantic);
+                            sys.pointedAssimilation(entity, mate, romantic, engineCivilization);
                         }
                     }
                 }
@@ -1126,7 +1127,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                         sys.executeAction(entity, hostile, context, foe);
                         const std::string& hn = hostile->name;
                         if (hn == "AngerConnection" || hn == "Discrimination") {
-                            sys.pointedAssimilation(entity, foe, hostile);
+                            sys.pointedAssimilation(entity, foe, hostile, engineCivilization);
                         }
                     }
                 }
@@ -1144,7 +1145,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
 
                 // Update relationship based on action
-                sys.pointedAssimilation(entity, target, chosenAction);
+                sys.pointedAssimilation(entity, target, chosenAction, engineCivilization);
 
 
                 // Detect murder: if target just died, trigger grief in all connected entities
@@ -1205,7 +1206,7 @@ void sync_clock_stats(Entity* ent, int neighboors){
 }
 
 
-void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, bool isPaused, int width, int height, int& selectedEntityIndex, bool& showEntityWindow) {
+void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, bool isPaused, int width, int height, int& selectedEntityIndex, bool& showEntityWindow, CivilizationEngine* engineCivilization) {
     // ── Safe dead-entity removal ──────────────────────────────────────────────
     // Raw Entity* pointers become dangling after erase() shifts the vector.
     // Strategy: snapshot old addresses, null pointers to dead entities, batch
@@ -1223,11 +1224,17 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
         for (Entity& e : entities) {
             if (e.entityHealth <= 0.0f) {
                 std::cout << "Entity " << e.entityId << " has died.\n";
+                std::string cause = (e.entityDiseaseType != -1) ? "disease"
+                                   : (e.entityAge > 60.0f)       ? "old age"
+                                                                 : "hardship";
                 if (globalLogger) {
-                    std::string cause = (e.entityDiseaseType != -1) ? "disease"
-                                       : (e.entityAge > 60.0f)       ? "old age"
-                                                                     : "hardship";
                     globalLogger->logDeath(e.entityId, e.name, (int)e.entityAge, cause);
+                }
+                // Record every death in the civilisation's running history & tally.
+                if (globalCivEngine) {
+                    globalCivEngine->totalDeaths++;
+                    globalCivEngine->logEvent(day / 60, e.name + " died of " + cause
+                        + " at age " + std::to_string((int)e.entityAge), "death");
                 }
                 deadIds.insert(e.entityId);
             }
@@ -1306,7 +1313,7 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             close_entity_together = getSocialGroups(ent_quad);
 
             // Apply free will to all entity groups with current day for context
-            applyFreeWill(close_entity_together, day);
+            applyFreeWill(close_entity_together, day, engineCivilization);
 
             // PersonaSystem: update self-grounding every tick; consolidate memories every 10 ticks
             for (Entity& ent : entities) {
@@ -1399,6 +1406,7 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
     }
 }
 
+/*
 void initialiseSDL(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, int width, int height, int& selectedEntityIndex, bool& showEntityWindow){
     SDLEngine SDLEngine("ASHB2 DEBUG");
     Image obj(SDLEngine, "assets/background.jpg");
@@ -1424,7 +1432,7 @@ void initialiseSDL(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad
 
         SDLEngine.finaliserRendu();
     }
-}
+    } */
 
 
 int getRenderingChoice(){
@@ -1710,6 +1718,13 @@ int main(int argc, char* argv[]) {
         // ── CivilizationEngine initialisation ────────────────────────────────
         globalCivEngine = new CivilizationEngine();
 
+        // ── Kinship initialisation ───────────────────────────────────────────
+        // Every seeded entity founds its own family/clan; their descendants then
+        // inherit it. Done up front so the very first births already have a line.
+        globalKinship = new KinshipSystem();
+        for (Entity& e : entities)
+            globalKinship->ensureFounderFamily(e, globalCivEngine->getCurrentYear());
+
         bool showEntityWindow = false;
         int selectedEntityIndex = -1;
         std::vector<Entity*> ent_quad;
@@ -1757,7 +1772,7 @@ int main(int argc, char* argv[]) {
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            updateSimulationStep(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, instanceUI.isSimulationPaused(), width, height, selectedEntityIndex, showEntityWindow);
+            updateSimulationStep(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, instanceUI.isSimulationPaused(), width, height, selectedEntityIndex, showEntityWindow, globalCivEngine);
 
             std::string saveFilename;
             int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename, day / 60 , entities.size(), UPDATE_FREQUENCY, {});
@@ -1810,14 +1825,13 @@ int main(int argc, char* argv[]) {
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             glfwSwapBuffers(window);
         }
-        std::cout << "s";
 
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
         glfwTerminate();
     }else{// sdl rendering
-        initialiseSDL(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, width, height, selectedEntityIndex, showEntityWindow);
+        //initialiseSDL(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, width, height, selectedEntityIndex, showEntityWindow);
     }
     return 0;
 }
