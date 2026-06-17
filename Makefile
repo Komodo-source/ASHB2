@@ -800,6 +800,30 @@ src/SocialDynamics.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialDynamics.cpp.s
 .PHONY : src/SocialDynamics.cpp.s
 
+src/SocialOrder.obj: src/SocialOrder.cpp.obj
+.PHONY : src/SocialOrder.obj
+
+# target to build an object file
+src/SocialOrder.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialOrder.cpp.obj
+.PHONY : src/SocialOrder.cpp.obj
+
+src/SocialOrder.i: src/SocialOrder.cpp.i
+.PHONY : src/SocialOrder.i
+
+# target to preprocess a source file
+src/SocialOrder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialOrder.cpp.i
+.PHONY : src/SocialOrder.cpp.i
+
+src/SocialOrder.s: src/SocialOrder.cpp.s
+.PHONY : src/SocialOrder.s
+
+# target to generate assembly for a file
+src/SocialOrder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialOrder.cpp.s
+.PHONY : src/SocialOrder.cpp.s
+
 src/UI.obj: src/UI.cpp.obj
 .PHONY : src/UI.obj
 
@@ -1277,6 +1301,9 @@ help:
 	@echo ... src/SocialDynamics.obj
 	@echo ... src/SocialDynamics.i
 	@echo ... src/SocialDynamics.s
+	@echo ... src/SocialOrder.obj
+	@echo ... src/SocialOrder.i
+	@echo ... src/SocialOrder.s
 	@echo ... src/UI.obj
 	@echo ... src/UI.i
 	@echo ... src/UI.s

@@ -247,6 +247,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialOrder.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Logging.h \

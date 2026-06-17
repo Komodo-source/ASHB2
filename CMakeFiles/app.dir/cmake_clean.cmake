@@ -55,6 +55,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/app.dir/src/SemanticMemory.cpp.obj.d"
   "CMakeFiles/app.dir/src/SocialDynamics.cpp.obj"
   "CMakeFiles/app.dir/src/SocialDynamics.cpp.obj.d"
+  "CMakeFiles/app.dir/src/SocialOrder.cpp.obj"
+  "CMakeFiles/app.dir/src/SocialOrder.cpp.obj.d"
   "CMakeFiles/app.dir/src/UI.cpp.obj"
   "CMakeFiles/app.dir/src/UI.cpp.obj.d"
   "CMakeFiles/app.dir/src/WorldSeed.cpp.obj"

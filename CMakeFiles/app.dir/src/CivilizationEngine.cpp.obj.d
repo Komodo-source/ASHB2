@@ -241,6 +241,7 @@ CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/array \
  C:/mingw64/include/c++/14.2.0/compare \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/PersonaSystem.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SocialOrder.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Planet.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Lexicon.h \

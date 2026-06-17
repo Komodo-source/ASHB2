@@ -241,6 +241,7 @@ CMakeFiles/app.dir/src/PlanningSystem.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/quoted_string.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialOrder.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:/mingw64/include/c++/14.2.0/queue \

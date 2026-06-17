@@ -1,44 +1,209 @@
-[2026-06-17 13:40:58] done
-[2026-06-17 13:41:04] world seed = 3502689161359709134
-[2026-06-17 13:41:05] planet generated: hash=1831096708301989970 habitable_regions=4 total_regions=18
-[2026-06-17 13:41:05] seeded 3 starting cradles at: (181,70 r3) (14,125 r8) (50,13 r4)
-[2026-06-17 13:41:05] Entity 0 | Personality E=46 A=15 C=72 N=59 O=60 | Values Fam=31 Ach=60 Hed=28 Col=34 Spi=45 | Attachment=0 Trauma=13 Nurture=94 | Start: Happy=50 Stress=17 Lonely=27 Goal=build_career
-[2026-06-17 13:41:05] Entity 1 | Personality E=53 A=53 C=58 N=71 O=49 | Values Fam=43 Ach=64 Hed=50 Col=52 Spi=40 | Attachment=1 Trauma=38 Nurture=77 | Start: Happy=67 Stress=38 Lonely=16 Goal=build_career
-[2026-06-17 13:41:05] Entity 2 | Personality E=67 A=57 C=14 N=13 O=64 | Values Fam=100 Ach=47 Hed=71 Col=58 Spi=9 | Attachment=0 Trauma=10 Nurture=70 | Start: Happy=77 Stress=9 Lonely=13 Goal=find_partner
-[2026-06-17 13:41:05] Entity 3 | Personality E=49 A=58 C=27 N=81 O=59 | Values Fam=48 Ach=18 Hed=57 Col=74 Spi=59 | Attachment=1 Trauma=40 Nurture=71 | Start: Happy=36 Stress=19 Lonely=36 Goal=make_friends
-[2026-06-17 13:41:05] Entity 4 | Personality E=86 A=71 C=76 N=62 O=59 | Values Fam=20 Ach=65 Hed=82 Col=47 Spi=34 | Attachment=0 Trauma=7 Nurture=99 | Start: Happy=61 Stress=10 Lonely=17 Goal=happiness
-[2026-06-17 13:41:05] Entity 5 | Personality E=49 A=19 C=29 N=78 O=58 | Values Fam=37 Ach=38 Hed=26 Col=66 Spi=59 | Attachment=2 Trauma=49 Nurture=31 | Start: Happy=34 Stress=32 Lonely=13 Goal=make_friends
-[2026-06-17 13:41:05] Entity 6 | Personality E=14 A=45 C=44 N=77 O=8 | Values Fam=52 Ach=38 Hed=66 Col=66 Spi=69 | Attachment=1 Trauma=28 Nurture=57 | Start: Happy=40 Stress=41 Lonely=20 Goal=self
-[2026-06-17 13:41:05] Entity 7 | Personality E=58 A=32 C=100 N=55 O=30 | Values Fam=43 Ach=90 Hed=51 Col=15 Spi=72 | Attachment=1 Trauma=24 Nurture=90 | Start: Happy=74 Stress=23 Lonely=22 Goal=build_career
-[2026-06-17 13:41:05] Entity 8 | Personality E=59 A=47 C=18 N=55 O=40 | Values Fam=48 Ach=31 Hed=78 Col=44 Spi=30 | Attachment=0 Trauma=15 Nurture=100 | Start: Happy=80 Stress=13 Lonely=18 Goal=happiness
-[2026-06-17 13:41:05] Entity 9 | Personality E=57 A=47 C=78 N=42 O=31 | Values Fam=30 Ach=96 Hed=46 Col=28 Spi=71 | Attachment=2 Trauma=48 Nurture=39 | Start: Happy=68 Stress=34 Lonely=9 Goal=build_career
-[2026-06-17 13:41:05] Entity 10 | Personality E=33 A=67 C=34 N=45 O=33 | Values Fam=53 Ach=54 Hed=67 Col=57 Spi=38 | Attachment=0 Trauma=18 Nurture=87 | Start: Happy=37 Stress=18 Lonely=22 Goal=happiness
-[2026-06-17 13:41:05] Entity 11 | Personality E=100 A=58 C=21 N=68 O=98 | Values Fam=49 Ach=51 Hed=68 Col=30 Spi=37 | Attachment=1 Trauma=49 Nurture=51 | Start: Happy=54 Stress=38 Lonely=28 Goal=happiness
-[2026-06-17 13:41:05] Entity 12 | Personality E=92 A=67 C=42 N=79 O=73 | Values Fam=37 Ach=78 Hed=35 Col=87 Spi=18 | Attachment=0 Trauma=0 Nurture=100 | Start: Happy=49 Stress=22 Lonely=34 Goal=make_friends
-[2026-06-17 13:41:05] Entity 13 | Personality E=68 A=38 C=14 N=31 O=49 | Values Fam=19 Ach=25 Hed=26 Col=41 Spi=57 | Attachment=1 Trauma=38 Nurture=65 | Start: Happy=33 Stress=21 Lonely=33 Goal=self
-[2026-06-17 13:41:05] Entity 14 | Personality E=63 A=62 C=41 N=99 O=50 | Values Fam=46 Ach=27 Hed=60 Col=58 Spi=69 | Attachment=1 Trauma=48 Nurture=63 | Start: Happy=63 Stress=26 Lonely=19 Goal=self
-[2026-06-17 13:41:05] Entity 15 | Personality E=54 A=61 C=35 N=47 O=63 | Values Fam=54 Ach=59 Hed=60 Col=55 Spi=30 | Attachment=0 Trauma=9 Nurture=94 | Start: Happy=59 Stress=28 Lonely=42 Goal=happiness
-[2026-06-17 13:41:05] Entity 16 | Personality E=65 A=60 C=47 N=34 O=54 | Values Fam=46 Ach=50 Hed=45 Col=33 Spi=72 | Attachment=0 Trauma=1 Nurture=80 | Start: Happy=45 Stress=4 Lonely=17 Goal=self
-[2026-06-17 13:41:05] Entity 17 | Personality E=78 A=16 C=72 N=70 O=50 | Values Fam=46 Ach=78 Hed=33 Col=11 Spi=30 | Attachment=1 Trauma=27 Nurture=74 | Start: Happy=69 Stress=17 Lonely=20 Goal=build_career
-[2026-06-17 13:41:05] Entity 18 | Personality E=56 A=64 C=39 N=29 O=66 | Values Fam=49 Ach=29 Hed=47 Col=56 Spi=57 | Attachment=0 Trauma=13 Nurture=81 | Start: Happy=58 Stress=24 Lonely=33 Goal=self
-[2026-06-17 13:41:05] Entity 19 | Personality E=59 A=55 C=40 N=56 O=49 | Values Fam=62 Ach=36 Hed=23 Col=43 Spi=71 | Attachment=0 Trauma=3 Nurture=93 | Start: Happy=66 Stress=14 Lonely=34 Goal=self
-[2026-06-17 13:41:05] Entity 20 | Personality E=39 A=69 C=78 N=18 O=30 | Values Fam=27 Ach=23 Hed=33 Col=36 Spi=75 | Attachment=1 Trauma=43 Nurture=75 | Start: Happy=32 Stress=5 Lonely=51 Goal=self
-[2026-06-17 13:41:05] Entity 21 | Personality E=28 A=37 C=38 N=86 O=48 | Values Fam=23 Ach=57 Hed=49 Col=60 Spi=61 | Attachment=1 Trauma=45 Nurture=55 | Start: Happy=52 Stress=39 Lonely=50 Goal=self
-[2026-06-17 13:41:05] Entity 22 | Personality E=28 A=47 C=59 N=38 O=33 | Values Fam=39 Ach=37 Hed=31 Col=45 Spi=23 | Attachment=2 Trauma=47 Nurture=39 | Start: Happy=40 Stress=24 Lonely=41 Goal=make_friends
-[2026-06-17 13:41:05] Entity 23 | Personality E=78 A=58 C=40 N=72 O=60 | Values Fam=45 Ach=42 Hed=67 Col=54 Spi=33 | Attachment=0 Trauma=15 Nurture=83 | Start: Happy=63 Stress=30 Lonely=33 Goal=happiness
-[2026-06-17 13:41:05] Entity 24 | Personality E=74 A=42 C=6 N=59 O=79 | Values Fam=28 Ach=36 Hed=100 Col=54 Spi=62 | Attachment=1 Trauma=27 Nurture=75 | Start: Happy=52 Stress=13 Lonely=13 Goal=happiness
-[2026-06-17 13:41:05] Entity 25 | Personality E=21 A=51 C=20 N=78 O=50 | Values Fam=64 Ach=34 Hed=54 Col=46 Spi=61 | Attachment=0 Trauma=15 Nurture=81 | Start: Happy=43 Stress=20 Lonely=49 Goal=find_partner
-[2026-06-17 13:41:05] Entity 26 | Personality E=73 A=61 C=31 N=49 O=34 | Values Fam=73 Ach=60 Hed=76 Col=36 Spi=70 | Attachment=0 Trauma=5 Nurture=100 | Start: Happy=62 Stress=30 Lonely=36 Goal=happiness
-[2026-06-17 13:41:05] Entity 27 | Personality E=70 A=59 C=48 N=62 O=93 | Values Fam=58 Ach=16 Hed=42 Col=29 Spi=65 | Attachment=0 Trauma=8 Nurture=86 | Start: Happy=47 Stress=31 Lonely=32 Goal=self
-[2026-06-17 13:41:05] Entity 28 | Personality E=69 A=41 C=34 N=50 O=61 | Values Fam=22 Ach=1 Hed=33 Col=32 Spi=12 | Attachment=0 Trauma=12 Nurture=93 | Start: Happy=49 Stress=7 Lonely=1 Goal=happiness
-[2026-06-17 13:41:05] Entity 29 | Personality E=42 A=34 C=57 N=77 O=55 | Values Fam=49 Ach=53 Hed=28 Col=45 Spi=42 | Attachment=1 Trauma=27 Nurture=59 | Start: Happy=32 Stress=32 Lonely=34 Goal=build_career
-[2026-06-17 13:41:05] Entity 30 | Personality E=49 A=55 C=46 N=48 O=54 | Values Fam=61 Ach=29 Hed=23 Col=53 Spi=35 | Attachment=0 Trauma=15 Nurture=65 | Start: Happy=46 Stress=21 Lonely=44 Goal=find_partner
-[2026-06-17 13:41:05] Entity 31 | Personality E=29 A=19 C=51 N=82 O=59 | Values Fam=23 Ach=24 Hed=20 Col=35 Spi=38 | Attachment=1 Trauma=39 Nurture=68 | Start: Happy=49 Stress=23 Lonely=33 Goal=self
-[2026-06-17 13:41:05] Entity 32 | Personality E=59 A=33 C=40 N=69 O=26 | Values Fam=21 Ach=49 Hed=72 Col=45 Spi=61 | Attachment=1 Trauma=38 Nurture=72 | Start: Happy=60 Stress=34 Lonely=14 Goal=happiness
-[2026-06-17 13:41:05] Entity 33 | Personality E=90 A=97 C=57 N=5 O=63 | Values Fam=54 Ach=73 Hed=69 Col=85 Spi=49 | Attachment=1 Trauma=23 Nurture=94 | Start: Happy=40 Stress=5 Lonely=25 Goal=make_friends
-[2026-06-17 13:41:05] Entity 34 | Personality E=82 A=67 C=37 N=17 O=71 | Values Fam=63 Ach=74 Hed=59 Col=47 Spi=69 | Attachment=1 Trauma=38 Nurture=82 | Start: Happy=58 Stress=14 Lonely=40 Goal=build_career
-[2026-06-17 13:41:05] Entity 35 | Personality E=32 A=50 C=36 N=42 O=53 | Values Fam=49 Ach=44 Hed=57 Col=36 Spi=67 | Attachment=1 Trauma=32 Nurture=57 | Start: Happy=51 Stress=9 Lonely=14 Goal=self
-[2026-06-17 13:41:05] Entity 36 | Personality E=44 A=51 C=45 N=89 O=39 | Values Fam=42 Ach=52 Hed=26 Col=58 Spi=47 | Attachment=1 Trauma=36 Nurture=79 | Start: Happy=65 Stress=25 Lonely=28 Goal=make_friends
-[2026-06-17 13:41:05] Entity 37 | Personality E=68 A=39 C=51 N=53 O=56 | Values Fam=65 Ach=51 Hed=36 Col=29 Spi=58 | Attachment=1 Trauma=47 Nurture=58 | Start: Happy=65 Stress=24 Lonely=27 Goal=find_partner
-[2026-06-17 13:41:05] Entity 38 | Personality E=57 A=21 C=52 N=78 O=53 | Values Fam=60 Ach=77 Hed=55 Col=51 Spi=42 | Attachment=1 Trauma=26 Nurture=90 | Start: Happy=74 Stress=18 Lonely=13 Goal=build_career
-[2026-06-17 13:41:05] Entity 39 | Personality E=40 A=49 C=19 N=59 O=84 | Values Fam=46 Ach=26 Hed=47 Col=29 Spi=33 | Attachment=1 Trauma=37 Nurture=83 | Start: Happy=67 Stress=36 Lonely=49 Goal=happiness
+[2026-06-17 17:38:03] done
+[2026-06-17 17:38:10] world seed = 3670757039504546074
+[2026-06-17 17:38:13] planet generated: hash=5065684791747615902 habitable_regions=3 total_regions=7
+[2026-06-17 17:38:13] seeded 3 starting cradles at: (19,101 r1) (171,87 r5) (87,11 r0)
+[2026-06-17 17:38:13] Entity 0 | Personality E=25 A=62 C=55 N=26 O=68 | Values Fam=60 Ach=94 Hed=20 Col=79 Spi=62 | Attachment=1 Trauma=26 Nurture=82 | Start: Happy=69 Stress=21 Lonely=53 Goal=build_career
+[2026-06-17 17:38:13] Entity 1 | Personality E=76 A=81 C=66 N=69 O=76 | Values Fam=65 Ach=63 Hed=59 Col=69 Spi=28 | Attachment=0 Trauma=9 Nurture=82 | Start: Happy=39 Stress=25 Lonely=23 Goal=make_friends
+[2026-06-17 17:38:13] Entity 2 | Personality E=48 A=39 C=68 N=31 O=68 | Values Fam=98 Ach=59 Hed=64 Col=58 Spi=52 | Attachment=1 Trauma=35 Nurture=58 | Start: Happy=38 Stress=13 Lonely=16 Goal=find_partner
+[2026-06-17 17:38:13] Entity 3 | Personality E=56 A=59 C=62 N=91 O=59 | Values Fam=26 Ach=64 Hed=19 Col=57 Spi=50 | Attachment=1 Trauma=33 Nurture=82 | Start: Happy=67 Stress=33 Lonely=33 Goal=build_career
+[2026-06-17 17:38:13] Entity 4 | Personality E=43 A=85 C=79 N=60 O=56 | Values Fam=66 Ach=24 Hed=42 Col=90 Spi=3 | Attachment=1 Trauma=32 Nurture=61 | Start: Happy=55 Stress=34 Lonely=48 Goal=make_friends
+[2026-06-17 17:38:13] Entity 5 | Personality E=44 A=98 C=51 N=37 O=81 | Values Fam=41 Ach=57 Hed=71 Col=51 Spi=21 | Attachment=1 Trauma=24 Nurture=63 | Start: Happy=57 Stress=29 Lonely=48 Goal=happiness
+[2026-06-17 17:38:13] Entity 6 | Personality E=26 A=100 C=13 N=84 O=66 | Values Fam=62 Ach=19 Hed=39 Col=38 Spi=41 | Attachment=1 Trauma=48 Nurture=71 | Start: Happy=66 Stress=36 Lonely=47 Goal=find_partner
+[2026-06-17 17:38:13] Entity 7 | Personality E=41 A=25 C=51 N=44 O=84 | Values Fam=53 Ach=48 Hed=39 Col=18 Spi=35 | Attachment=2 Trauma=48 Nurture=32 | Start: Happy=33 Stress=35 Lonely=18 Goal=find_partner
+[2026-06-17 17:38:13] Entity 8 | Personality E=26 A=34 C=1 N=35 O=56 | Values Fam=30 Ach=36 Hed=50 Col=32 Spi=41 | Attachment=1 Trauma=31 Nurture=56 | Start: Happy=69 Stress=7 Lonely=43 Goal=happiness
+[2026-06-17 17:38:13] Entity 9 | Personality E=61 A=67 C=6 N=21 O=57 | Values Fam=44 Ach=57 Hed=82 Col=62 Spi=23 | Attachment=1 Trauma=36 Nurture=50 | Start: Happy=51 Stress=18 Lonely=45 Goal=happiness
+[2026-06-17 17:38:13] Entity 10 | Personality E=86 A=49 C=36 N=67 O=63 | Values Fam=47 Ach=60 Hed=26 Col=63 Spi=75 | Attachment=1 Trauma=29 Nurture=61 | Start: Happy=49 Stress=17 Lonely=7 Goal=self
+[2026-06-17 17:38:13] Entity 11 | Personality E=27 A=63 C=45 N=53 O=96 | Values Fam=43 Ach=27 Hed=42 Col=70 Spi=32 | Attachment=1 Trauma=38 Nurture=64 | Start: Happy=51 Stress=14 Lonely=43 Goal=make_friends
+[2026-06-17 17:38:13] Entity 12 | Personality E=58 A=54 C=76 N=68 O=78 | Values Fam=57 Ach=71 Hed=49 Col=81 Spi=29 | Attachment=1 Trauma=45 Nurture=67 | Start: Happy=40 Stress=41 Lonely=47 Goal=make_friends
+[2026-06-17 17:38:13] Entity 13 | Personality E=54 A=76 C=83 N=27 O=68 | Values Fam=54 Ach=85 Hed=64 Col=47 Spi=46 | Attachment=0 Trauma=2 Nurture=100 | Start: Happy=54 Stress=0 Lonely=10 Goal=build_career
+[2026-06-17 17:38:13] Entity 14 | Personality E=60 A=35 C=42 N=58 O=72 | Values Fam=36 Ach=40 Hed=58 Col=36 Spi=37 | Attachment=1 Trauma=28 Nurture=88 | Start: Happy=44 Stress=17 Lonely=13 Goal=happiness
+[2026-06-17 17:38:13] Entity 15 | Personality E=25 A=100 C=47 N=22 O=74 | Values Fam=41 Ach=42 Hed=47 Col=79 Spi=45 | Attachment=1 Trauma=28 Nurture=53 | Start: Happy=62 Stress=18 Lonely=50 Goal=make_friends
+[2026-06-17 17:38:13] Entity 16 | Personality E=57 A=70 C=42 N=34 O=61 | Values Fam=71 Ach=22 Hed=43 Col=46 Spi=62 | Attachment=1 Trauma=44 Nurture=49 | Start: Happy=37 Stress=17 Lonely=22 Goal=find_partner
+[2026-06-17 17:38:13] Entity 17 | Personality E=37 A=33 C=13 N=59 O=51 | Values Fam=53 Ach=18 Hed=66 Col=46 Spi=42 | Attachment=1 Trauma=28 Nurture=58 | Start: Happy=61 Stress=26 Lonely=20 Goal=happiness
+[2026-06-17 17:38:13] Entity 18 | Personality E=25 A=55 C=49 N=90 O=53 | Values Fam=31 Ach=76 Hed=38 Col=80 Spi=68 | Attachment=1 Trauma=39 Nurture=81 | Start: Happy=70 Stress=20 Lonely=55 Goal=make_friends
+[2026-06-17 17:38:13] Entity 19 | Personality E=59 A=63 C=26 N=45 O=74 | Values Fam=89 Ach=54 Hed=62 Col=44 Spi=52 | Attachment=0 Trauma=11 Nurture=69 | Start: Happy=59 Stress=24 Lonely=25 Goal=find_partner
+[2026-06-17 17:38:13] Entity 20 | Personality E=48 A=75 C=80 N=71 O=59 | Values Fam=63 Ach=60 Hed=15 Col=88 Spi=52 | Attachment=0 Trauma=15 Nurture=71 | Start: Happy=53 Stress=33 Lonely=7 Goal=make_friends
+[2026-06-17 17:38:13] Entity 21 | Personality E=58 A=88 C=54 N=56 O=58 | Values Fam=61 Ach=41 Hed=63 Col=78 Spi=24 | Attachment=0 Trauma=4 Nurture=97 | Start: Happy=50 Stress=23 Lonely=28 Goal=make_friends
+[2026-06-17 17:38:13] Entity 22 | Personality E=64 A=79 C=44 N=51 O=60 | Values Fam=52 Ach=49 Hed=21 Col=59 Spi=50 | Attachment=0 Trauma=2 Nurture=100 | Start: Happy=61 Stress=28 Lonely=21 Goal=make_friends
+[2026-06-17 17:38:13] Entity 23 | Personality E=83 A=65 C=21 N=47 O=45 | Values Fam=33 Ach=60 Hed=60 Col=58 Spi=22 | Attachment=0 Trauma=10 Nurture=82 | Start: Happy=53 Stress=17 Lonely=8 Goal=build_career
+[2026-06-17 17:38:13] Entity 24 | Personality E=50 A=61 C=56 N=44 O=73 | Values Fam=54 Ach=70 Hed=62 Col=42 Spi=41 | Attachment=1 Trauma=47 Nurture=58 | Start: Happy=43 Stress=11 Lonely=19 Goal=build_career
+[2026-06-17 17:38:13] Entity 25 | Personality E=3 A=72 C=47 N=76 O=89 | Values Fam=68 Ach=37 Hed=26 Col=47 Spi=4 | Attachment=1 Trauma=32 Nurture=71 | Start: Happy=27 Stress=28 Lonely=43 Goal=find_partner
+[2026-06-17 17:38:13] Entity 26 | Personality E=36 A=54 C=41 N=62 O=51 | Values Fam=35 Ach=34 Hed=74 Col=65 Spi=43 | Attachment=1 Trauma=34 Nurture=56 | Start: Happy=32 Stress=20 Lonely=24 Goal=happiness
+[2026-06-17 17:38:13] Entity 27 | Personality E=45 A=29 C=53 N=61 O=100 | Values Fam=50 Ach=60 Hed=55 Col=29 Spi=23 | Attachment=1 Trauma=31 Nurture=87 | Start: Happy=48 Stress=22 Lonely=27 Goal=build_career
+[2026-06-17 17:38:13] Entity 28 | Personality E=100 A=68 C=79 N=23 O=98 | Values Fam=69 Ach=35 Hed=92 Col=65 Spi=58 | Attachment=1 Trauma=25 Nurture=88 | Start: Happy=73 Stress=20 Lonely=13 Goal=happiness
+[2026-06-17 17:38:13] Entity 29 | Personality E=18 A=40 C=63 N=92 O=65 | Values Fam=58 Ach=50 Hed=51 Col=29 Spi=28 | Attachment=1 Trauma=42 Nurture=41 | Start: Happy=44 Stress=41 Lonely=54 Goal=find_partner
+[2026-06-17 17:38:13] Entity 30 | Personality E=89 A=82 C=51 N=57 O=56 | Values Fam=55 Ach=31 Hed=44 Col=84 Spi=50 | Attachment=0 Trauma=4 Nurture=90 | Start: Happy=72 Stress=15 Lonely=4 Goal=make_friends
+[2026-06-17 17:38:13] Entity 31 | Personality E=18 A=84 C=75 N=51 O=80 | Values Fam=56 Ach=89 Hed=0 Col=45 Spi=51 | Attachment=1 Trauma=24 Nurture=88 | Start: Happy=32 Stress=10 Lonely=28 Goal=build_career
+[2026-06-17 17:38:13] Entity 32 | Personality E=61 A=70 C=89 N=47 O=51 | Values Fam=24 Ach=100 Hed=14 Col=56 Spi=50 | Attachment=0 Trauma=16 Nurture=100 | Start: Happy=76 Stress=10 Lonely=7 Goal=build_career
+[2026-06-17 17:38:13] Entity 33 | Personality E=92 A=49 C=81 N=63 O=51 | Values Fam=88 Ach=58 Hed=92 Col=55 Spi=64 | Attachment=1 Trauma=33 Nurture=47 | Start: Happy=47 Stress=35 Lonely=18 Goal=happiness
+[2026-06-17 17:38:13] Entity 34 | Personality E=68 A=71 C=63 N=64 O=43 | Values Fam=38 Ach=65 Hed=40 Col=54 Spi=67 | Attachment=1 Trauma=26 Nurture=86 | Start: Happy=38 Stress=36 Lonely=24 Goal=self
+[2026-06-17 17:38:13] Entity 35 | Personality E=53 A=69 C=98 N=39 O=35 | Values Fam=23 Ach=59 Hed=40 Col=84 Spi=81 | Attachment=0 Trauma=14 Nurture=79 | Start: Happy=52 Stress=8 Lonely=6 Goal=make_friends
+[2026-06-17 17:38:13] Entity 36 | Personality E=45 A=41 C=46 N=47 O=44 | Values Fam=73 Ach=30 Hed=30 Col=34 Spi=49 | Attachment=0 Trauma=13 Nurture=75 | Start: Happy=53 Stress=10 Lonely=18 Goal=find_partner
+[2026-06-17 17:38:13] Entity 37 | Personality E=46 A=34 C=31 N=80 O=27 | Values Fam=39 Ach=19 Hed=49 Col=52 Spi=82 | Attachment=1 Trauma=37 Nurture=53 | Start: Happy=67 Stress=33 Lonely=46 Goal=self
+[2026-06-17 17:38:13] Entity 38 | Personality E=43 A=54 C=40 N=19 O=80 | Values Fam=78 Ach=65 Hed=45 Col=99 Spi=44 | Attachment=1 Trauma=47 Nurture=44 | Start: Happy=49 Stress=10 Lonely=35 Goal=make_friends
+[2026-06-17 17:38:13] Entity 39 | Personality E=62 A=55 C=79 N=66 O=12 | Values Fam=56 Ach=84 Hed=63 Col=34 Spi=78 | Attachment=0 Trauma=8 Nurture=80 | Start: Happy=72 Stress=10 Lonely=28 Goal=build_career
+[2026-06-17 17:41:03] Entity contaminated: 17 Saen => Typhus
+[2026-06-17 17:41:11] Entity contaminated: 22 Haathae => Typhus
+[2026-06-17 17:41:15] Entity contaminated: 16 Gaadrothyn => Malaria
+[2026-06-17 17:42:02] Entity contaminated: 8 Pazglyar => Typhus
+[2026-06-17 17:42:04] Entity contaminated: 23 Ngaathsauna => Typhus
+[2026-06-17 17:42:08] Entity contaminated: 6 Tiaxae => Plague
+[2026-06-17 17:42:08] Entity contaminated: 27 Yiarketh => Fever
+[2026-06-17 17:42:17] Entity contaminated: 30 Glothor => Malaria
+[2026-06-17 17:42:21] Entity contaminated: 12 Trathoth => Typhus
+[2026-06-17 17:42:21] Entity contaminated: 33 Greththiastane => Malaria
+[2026-06-17 17:42:26] Entity contaminated: 15 Haestax => Typhus
+[2026-06-17 17:42:27] Entity contaminated: 38 Mberzathar => Plague
+[2026-06-17 17:42:29] Entity contaminated: 11 Ngambaaar => Plague
+[2026-06-17 17:42:30] Entity contaminated: 9 Haengyaesteth => Plague
+[2026-06-17 17:42:32] Entity contaminated: 7 Seeud => Fever
+[2026-06-17 17:42:33] Entity contaminated: 19 Gaaud => Malaria
+[2026-06-17 17:42:34] Entity contaminated: 32 Sauna => Malaria
+[2026-06-17 17:42:36] Entity contaminated: 14 Mbaauna => Fever
+[2026-06-17 17:42:44] Entity contaminated: 24 Rexgrethax => Typhus
+[2026-06-17 17:42:44] Entity contaminated: 2 Zazara => Malaria
+[2026-06-17 17:42:45] Entity contaminated: 24 Rexgrethax => Plague
+[2026-06-17 17:42:48] Entity contaminated: 26 Glarmbaar => Malaria
+[2026-06-17 17:42:59] Entity contaminated: 3 Hoongtrathoth => Malaria
+[2026-06-17 17:43:00] Entity contaminated: 0 Thaethila => Malaria
+[2026-06-17 17:43:11] Entity contaminated: 25 Drothmbongia => Malaria
+[2026-06-17 17:43:12] Entity contaminated: 35 Zeza => Plague
+[2026-06-17 17:43:19] Entity contaminated: 28 Suim => Fever
+[2026-06-17 17:43:33] Entity contaminated: 18 Yaestyiarketh => Plague
+[2026-06-17 17:43:47] Entity contaminated: 13 Gython => Malaria
+[2026-06-17 17:43:56] Entity contaminated: 10 Miangaara => Malaria
+[2026-06-17 17:43:56] Entity contaminated: 5 Zerus => Malaria
+[2026-06-17 17:44:00] Entity contaminated: 21 Trethila => Fever
+[2026-06-17 17:44:23] Entity contaminated: 29 Ngaathar => Malaria
+[2026-06-17 17:44:27] Entity contaminated: 17 Saen => Fever
+[2026-06-17 17:44:34] Entity contaminated: 34 Mbongia => Fever
+[2026-06-17 17:44:36] Entity contaminated: 23 Ngaathsauna => Fever
+[2026-06-17 17:44:47] Entity contaminated: 6 Tiaxae => Typhus
+[2026-06-17 17:44:52] Entity contaminated: 39 Wengan => Fever
+[2026-06-17 17:44:54] Entity contaminated: 8 Pazglyar => Fever
+[2026-06-17 17:44:54] Entity contaminated: 37 Weengeth => Plague
+[2026-06-17 17:44:55] Entity contaminated: 33 Greththiastane => Malaria
+[2026-06-17 17:45:01] Entity contaminated: 30 Glothor => Malaria
+[2026-06-17 17:45:01] Entity contaminated: 1 Syxud => Typhus
+[2026-06-17 17:45:03] Entity contaminated: 16 Gaadrothyn => Malaria
+[2026-06-17 17:45:03] Entity contaminated: 4 Mbianon => Typhus
+[2026-06-17 17:45:10] Entity contaminated: 22 Haathae => Fever
+[2026-06-17 17:45:15] Entity contaminated: 27 Yiarketh => Plague
+[2026-06-17 17:45:24] Entity contaminated: 19 Gaaud => Plague
+[2026-06-17 17:45:25] Entity contaminated: 24 Rexgrethax => Malaria
+[2026-06-17 17:45:27] Entity contaminated: 12 Trathoth => Malaria
+[2026-06-17 17:45:33] Entity contaminated: 11 Ngambaaar => Malaria
+[2026-06-17 17:45:34] Entity contaminated: 32 Sauna => Fever
+[2026-06-17 17:45:34] Entity contaminated: 38 Mberzathar => Plague
+[2026-06-17 17:45:39] Entity contaminated: 15 Haestax => Malaria
+[2026-06-17 17:45:44] Entity contaminated: 7 Seeud => Typhus
+[2026-06-17 17:45:45] Entity contaminated: 26 Glarmbaar => Fever
+[2026-06-17 17:45:51] Entity contaminated: 14 Mbaauna => Typhus
+[2026-06-17 17:45:52] Entity contaminated: 3 Hoongtrathoth => Typhus
+[2026-06-17 17:45:54] Entity contaminated: 2 Zazara => Typhus
+[2026-06-17 17:45:55] Entity contaminated: 9 Haengyaesteth => Fever
+[2026-06-17 17:45:56] Entity contaminated: 1006 Haaxgiayn => Fever
+[2026-06-17 17:45:56] Entity contaminated: 1005 Thaestwoosteth => Typhus
+[2026-06-17 17:45:56] Entity contaminated: 1007 Yenghangor => Malaria
+[2026-06-17 17:45:57] Entity contaminated: 1004 Hestsa => Plague
+[2026-06-17 17:46:03] Entity contaminated: 0 Thaethila => Typhus
+[2026-06-17 17:46:17] Entity contaminated: 25 Drothmbongia => Plague
+[2026-06-17 17:46:17] Entity contaminated: 28 Suim => Typhus
+[2026-06-17 17:46:17] Entity contaminated: 1013 Zyen => Typhus
+[2026-06-17 17:46:38] Entity contaminated: 18 Yaestyiarketh => Malaria
+[2026-06-17 17:46:38] Entity contaminated: 35 Zeza => Plague
+[2026-06-17 17:46:50] Entity contaminated: 1016 Saasongeth => Malaria
+[2026-06-17 17:46:58] Entity contaminated: 10 Miangaara => Fever
+[2026-06-17 17:46:59] Entity contaminated: 10 Miangaara => Fever
+[2026-06-17 17:46:59] Entity contaminated: 13 Gython => Typhus
+[2026-06-17 17:47:14] Entity contaminated: 1011 Hathane => Malaria
+[2026-06-17 17:47:36] Entity contaminated: 21 Trethila => Plague
+[2026-06-17 17:47:42] Entity contaminated: 1014 Thaengtaestane => Typhus
+[2026-06-17 17:47:43] Entity contaminated: 1017 Mbangetha => Fever
+[2026-06-17 17:47:46] Entity contaminated: 34 Mbongia => Typhus
+[2026-06-17 17:47:50] Entity contaminated: 1012 Krooxar => Malaria
+[2026-06-17 17:47:54] Entity contaminated: 17 Saen => Plague
+[2026-06-17 17:48:07] Entity contaminated: 33 Greththiastane => Fever
+[2026-06-17 17:48:09] Entity contaminated: 6 Tiaxae => Typhus
+[2026-06-17 17:48:20] Entity contaminated: 22 Haathae => Typhus
+[2026-06-17 17:48:35] Entity contaminated: 27 Yiarketh => Typhus
+[2026-06-17 17:48:37] Entity contaminated: 31 Hiaxila => Plague
+[2026-06-17 17:48:43] Entity contaminated: 12 Trathoth => Fever
+[2026-06-17 17:48:43] Entity contaminated: 3 Hoongtrathoth => Fever
+[2026-06-17 17:48:44] Entity contaminated: 12 Trathoth => Plague
+[2026-06-17 17:48:44] Entity contaminated: 30 Glothor => Fever
+[2026-06-17 17:48:54] Entity contaminated: 24 Rexgrethax => Plague
+[2026-06-17 17:48:57] Entity contaminated: 14 Mbaauna => Plague
+[2026-06-17 17:48:59] Entity contaminated: 19 Gaaud => Fever
+[2026-06-17 17:49:03] Entity contaminated: 1023 Zea => Fever
+[2026-06-17 17:49:03] Entity contaminated: 1024 Gletaais => Plague
+[2026-06-17 17:49:05] Entity contaminated: 15 Haestax => Plague
+[2026-06-17 17:49:08] Entity contaminated: 1025 Taaar => Plague
+[2026-06-17 17:49:09] Entity contaminated: 2 Zazara => Typhus
+[2026-06-17 17:49:09] Entity contaminated: 1026 Vaazis => Malaria
+[2026-06-17 17:49:22] Entity contaminated: 0 Thaethila => Plague
+[2026-06-17 17:49:27] Entity contaminated: 25 Drothmbongia => Plague
+[2026-06-17 17:49:31] Entity contaminated: 1005 Thaestwoosteth => Plague
+[2026-06-17 17:49:31] Entity contaminated: 1028 Gianyn => Plague
+[2026-06-17 17:49:39] Entity contaminated: 1029 Saambooon => Fever
+[2026-06-17 17:49:44] Entity contaminated: 28 Suim => Fever
+[2026-06-17 17:50:13] Entity contaminated: 35 Zeza => Typhus
+[2026-06-17 17:50:14] Entity contaminated: 1035 Mbazmbaren => Malaria
+[2026-06-17 17:50:16] Entity contaminated: 1033 Ngaar => Malaria
+[2026-06-17 17:50:19] Entity contaminated: 13 Gython => Typhus
+[2026-06-17 17:50:20] Entity contaminated: 20004 Waexila => Malaria
+[2026-06-17 17:50:23] Entity contaminated: 10 Miangaara => Plague
+[2026-06-17 17:50:23] Entity contaminated: 1038 Soomuthon => Typhus
+[2026-06-17 17:50:36] Entity contaminated: 1040 Mbeenmonon => Plague
+[2026-06-17 17:50:56] Entity contaminated: 6 Tiaxae => Plague
+[2026-06-17 17:50:56] Entity contaminated: 21 Trethila => Fever
+[2026-06-17 17:50:58] Entity contaminated: 17 Saen => Fever
+[2026-06-17 17:50:59] Entity contaminated: 1037 Mbaaruna => Fever
+[2026-06-17 17:51:05] Entity contaminated: 1046 Krethila => Fever
+[2026-06-17 17:51:08] Entity contaminated: 33 Greththiastane => Plague
+[2026-06-17 17:51:11] Entity contaminated: 1045 Mbyon => Malaria
+[2026-06-17 17:51:12] Entity contaminated: 1017 Mbangetha => Fever
+[2026-06-17 17:51:12] Entity contaminated: 1047 Syzsa => Fever
+[2026-06-17 17:51:20] Entity contaminated: 1012 Krooxar => Typhus
+[2026-06-17 17:51:27] Entity contaminated: 30 Glothor => Typhus
+[2026-06-17 17:51:32] Entity contaminated: 1043 Monon => Plague
+[2026-06-17 17:51:38] Entity contaminated: 3 Hoongtrathoth => Typhus
+[2026-06-17 17:51:39] Entity contaminated: 1048 Goothud => Typhus
+[2026-06-17 17:51:40] Entity contaminated: 1048 Goothud => Fever
+[2026-06-17 17:52:05] Entity contaminated: 2 Zazara => Plague
+[2026-06-17 17:52:10] Entity contaminated: 1005 Thaestwoosteth => Malaria
+[2026-06-17 17:52:25] Entity contaminated: 1024 Gletaais => Fever
+[2026-06-17 17:53:05] Entity contaminated: 28 Suim => Fever
+[2026-06-17 17:53:09] Entity contaminated: 1029 Saambooon => Typhus
+[2026-06-17 17:53:09] Entity contaminated: 1038 Soomuthon => Fever
+[2026-06-17 17:53:11] Entity contaminated: 10 Miangaara => Fever
+[2026-06-17 17:53:34] Entity contaminated: 35 Zeza => Malaria
+[2026-06-17 17:53:38] Entity contaminated: 1033 Ngaar => Plague
+[2026-06-17 17:53:46] Entity contaminated: 6 Tiaxae => Fever
+[2026-06-17 17:53:50] Entity contaminated: 21 Trethila => Malaria
+[2026-06-17 17:54:04] Entity contaminated: 1040 Mbeenmonon => Fever
+[2026-06-17 17:54:08] Entity contaminated: 30 Glothor => Typhus
+[2026-06-17 17:54:34] Entity contaminated: 1046 Krethila => Fever
+[2026-06-17 17:54:38] Entity contaminated: 3 Hoongtrathoth => Typhus
+[2026-06-17 17:54:38] Entity contaminated: 1058 Traexus => Plague
+[2026-06-17 17:54:40] Entity contaminated: 1043 Monon => Plague
+[2026-06-17 17:54:41] Entity contaminated: 5001 Wiangtraexus => Typhus
+[2026-06-17 17:54:54] Entity contaminated: 1057 Pyoth => Plague
+[2026-06-17 17:55:05] Entity contaminated: 1047 Syzsa => Typhus
+[2026-06-17 17:55:07] Entity contaminated: 1048 Goothud => Fever
+[2026-06-17 17:55:12] Entity contaminated: 1062 Gloongar => Fever
+[2026-06-17 17:55:23] Entity contaminated: 20006 Glyngauna => Fever
+[2026-06-17 17:55:27] Entity contaminated: 1059 Krerkek => Plague
+[2026-06-17 17:55:42] Entity contaminated: 1038 Soomuthon => Typhus
+[2026-06-17 17:55:45] Entity contaminated: 1024 Gletaais => Typhus
+[2026-06-17 17:55:52] Entity contaminated: 1064 Mbeenggyxeth => Fever
+[2026-06-17 17:55:54] Entity contaminated: 1065 Krarkus => Fever
+[2026-06-17 17:55:56] Entity contaminated: 1029 Saambooon => Typhus
+[2026-06-17 17:56:02] Entity contaminated: 1063 Droonggreisteth => Fever
+[2026-06-17 17:56:15] Entity contaminated: 35 Zeza => Typhus
+[2026-06-17 17:56:29] Entity contaminated: 1067 Mooxdroonar => Malaria
+[2026-06-17 17:56:31] Entity contaminated: 21 Trethila => Typhus
+[2026-06-17 17:56:34] Entity contaminated: 1066 Mbootheth => Typhus
+[2026-06-17 17:56:39] Entity contaminated: 1040 Mbeenmonon => Malaria
+[2026-06-17 17:57:02] Entity contaminated: 3 Hoongtrathoth => Malaria
+[2026-06-17 17:57:05] Entity contaminated: 1047 Syzsa => Fever

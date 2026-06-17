@@ -183,6 +183,15 @@ void UI::showSystemInformation(){
                 ImGui::Text("Parents: #%d, #%d", entity->parent1Id, entity->parent2Id);
         }
 
+        // ── Social standing (class & clientela) ──────────────────────────────
+        if (globalSocialOrder) {
+            ImVec4 classCol = (entity->socialClass == CLASS_PATRICIAN) ? ImVec4(1.0f, 0.84f, 0.4f, 1.0f)
+                            : (entity->socialClass == CLASS_SLAVE)     ? ImVec4(0.7f, 0.55f, 0.5f, 1.0f)
+                                                                       : ImVec4(0.75f, 0.85f, 0.85f, 1.0f);
+            ImGui::TextColored(classCol, "Standing: %s",
+                               globalSocialOrder->describe(*entity, entities).c_str());
+        }
+
         ImGui::Text("Life Goal: %s", entity->getTypeGoal().c_str());
         ImGui::Text("   ->: %.2f %%", (float)entity->progressGoal());
         ImGui::Spacing();

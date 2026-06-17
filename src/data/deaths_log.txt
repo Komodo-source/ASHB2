@@ -1,0 +1,540 @@
+[2026-06-17 17:43:05] Entity 36 (Groostila, age 26) died: crime of passion by Tiaxthaestus
+[2026-06-17 17:43:06] Entity 36 (Groostila, age 26) died: hardship
+[2026-06-17 17:43:49] Entity 20 (Mbysa, age 30) died: crime of passion by Saen
+[2026-06-17 17:43:49] Entity 20 (Mbysa, age 30) died: hardship
+[2026-06-17 17:43:52] Entity 1003 (Gothsyeth, age 12) died: crime of passion by Haaxgiayn
+[2026-06-17 17:44:07] Entity 1004 (Hestsa, age 12) died: crime of passion by Kraexkreixor
+[2026-06-17 17:44:11] Entity 1003 (Gothsyeth, age 13) died: crime of passion by Haaxgiayn
+[2026-06-17 17:44:13] Entity 1003 (Gothsyeth, age 13) died: crime of passion by Haaxgiayn
+[2026-06-17 17:44:14] Entity 1003 (Gothsyeth, age 14) died: crime of passion by Haaxgiayn
+[2026-06-17 17:44:14] Entity 1004 (Hestsa, age 13) died: crime of passion by Kraexkreixor
+[2026-06-17 17:44:17] Entity 23 (Ngaathsauna, age 33) died: crime of passion by Mbaauna
+[2026-06-17 17:44:17] Entity 1004 (Hestsa, age 13) died: crime of passion by Kraexkreixor
+[2026-06-17 17:44:18] Entity 1003 (Gothsyeth, age 14) died: crime of passion by Haaxgiayn
+[2026-06-17 17:44:19] Entity 23 (Ngaathsauna, age 33) died: crime of passion by Mbaauna
+[2026-06-17 17:44:19] Entity 1004 (Hestsa, age 13) died: crime of passion by Kraexkreixor
+[2026-06-17 17:44:21] Entity 23 (Ngaathsauna, age 33) died: crime of passion by Mbaauna
+[2026-06-17 17:44:21] Entity 1003 (Gothsyeth, age 14) died: crime of passion by Haaxgiayn
+[2026-06-17 17:44:21] Entity 1008 (Traethar, age 11) died: crime of passion by Thaestwoosteth
+[2026-06-17 17:44:22] Entity 23 (Ngaathsauna, age 33) died: crime of passion by Mbaauna
+[2026-06-17 17:44:22] Entity 1004 (Hestsa, age 13) died: crime of passion by Kraexkreixor
+[2026-06-17 17:44:22] Entity 1008 (Traethar, age 11) died: crime of passion by Thaestwoosteth
+[2026-06-17 17:44:24] Entity 1008 (Traethar, age 11) died: crime of passion by Thaestwoosteth
+[2026-06-17 17:44:24] Entity 1004 (Hestsa, age 13) died: crime of passion by Kraexkreixor
+[2026-06-17 17:44:24] Entity 1002 (Kraexkreixor, age 14) died: crime of passion by Hestsa
+[2026-06-17 17:44:24] Entity 1002 (Kraexkreixor, age 14) died: hardship
+[2026-06-17 17:44:25] Entity 23 (Ngaathsauna, age 34) died: crime of passion by Mbaauna
+[2026-06-17 17:44:25] Entity 1003 (Gothsyeth, age 15) died: crime of passion by Haaxgiayn
+[2026-06-17 17:44:27] Entity 1003 (Gothsyeth, age 15) died: hardship
+[2026-06-17 17:44:28] Entity 23 (Ngaathsauna, age 34) died: crime of passion by Mbaauna
+[2026-06-17 17:44:30] Entity 23 (Ngaathsauna, age 34) died: crime of passion by Mbaauna
+[2026-06-17 17:44:33] Entity 23 (Ngaathsauna, age 34) died: crime of passion by Mbaauna
+[2026-06-17 17:44:37] Entity 23 (Ngaathsauna, age 35) died: crime of passion by Mbaauna
+[2026-06-17 17:44:37] Entity 23 (Ngaathsauna, age 35) died: disease
+[2026-06-17 17:44:39] Entity 1008 (Traethar, age 13) died: crime of passion by Yenghangor
+[2026-06-17 17:44:40] Entity 1008 (Traethar, age 13) died: crime of passion by Yenghangor
+[2026-06-17 17:44:40] Entity 1008 (Traethar, age 13) died: hardship
+[2026-06-17 17:44:47] Entity 1010 (Hangthaengeth, age 11) died: crime of passion by Hestsa
+[2026-06-17 17:44:48] Entity 1010 (Hangthaengeth, age 12) died: crime of passion by Hestsa
+[2026-06-17 17:44:48] Entity 1000 (Tiaxthaestus, age 18) died: crime of passion by Thaestwoosteth
+[2026-06-17 17:44:48] Entity 1000 (Tiaxthaestus, age 18) died: hardship
+[2026-06-17 17:44:51] Entity 1010 (Hangthaengeth, age 12) died: crime of passion by Hestsa
+[2026-06-17 17:44:51] Entity 1010 (Hangthaengeth, age 12) died: hardship
+[2026-06-17 17:44:58] Entity 1001 (Gunra, age 18) died: crime of passion by Weengeth
+[2026-06-17 17:45:00] Entity 1001 (Gunra, age 19) died: crime of passion by Weengeth
+[2026-06-17 17:45:02] Entity 1001 (Gunra, age 19) died: crime of passion by Weengeth
+[2026-06-17 17:45:04] Entity 1001 (Gunra, age 19) died: crime of passion by Weengeth
+[2026-06-17 17:45:15] Entity 1001 (Gunra, age 20) died: crime of passion by Weengeth
+[2026-06-17 17:45:15] Entity 1015 (Mbyrpyruna, age 12) died: crime of passion by Mbangetha
+[2026-06-17 17:45:15] Entity 1015 (Mbyrpyruna, age 12) died: hardship
+[2026-06-17 17:45:18] Entity 1001 (Gunra, age 20) died: crime of passion by Weengeth
+[2026-06-17 17:45:18] Entity 1001 (Gunra, age 20) died: hardship
+[2026-06-17 17:45:27] Entity 1014 (Thaengtaestane, age 13) died: crime of passion by Hestsa
+[2026-06-17 17:45:30] Entity 5 (Zerus, age 39) died: crime of passion by Zeza
+[2026-06-17 17:45:30] Entity 5 (Zerus, age 39) died: hardship
+[2026-06-17 17:45:33] Entity 1014 (Thaengtaestane, age 13) died: crime of passion by Hestsa
+[2026-06-17 17:45:34] Entity 1014 (Thaengtaestane, age 13) died: crime of passion by Hestsa
+[2026-06-17 17:45:36] Entity 1014 (Thaengtaestane, age 14) died: crime of passion by Hestsa
+[2026-06-17 17:45:39] Entity 1016 (Saasongeth, age 13) died: crime of passion by Weengeth
+[2026-06-17 17:45:40] Entity 1016 (Saasongeth, age 13) died: crime of passion by Weengeth
+[2026-06-17 17:45:42] Entity 1016 (Saasongeth, age 13) died: crime of passion by Weengeth
+[2026-06-17 17:45:45] Entity 1006 (Haaxgiayn, age 19) died: crime of passion by Weengeth
+[2026-06-17 17:45:45] Entity 1014 (Thaengtaestane, age 14) died: crime of passion by Hestsa
+[2026-06-17 17:45:48] Entity 1006 (Haaxgiayn, age 20) died: crime of passion by Weengeth
+[2026-06-17 17:45:48] Entity 1014 (Thaengtaestane, age 15) died: crime of passion by Hestsa
+[2026-06-17 17:45:51] Entity 1006 (Haaxgiayn, age 20) died: crime of passion by Weengeth
+[2026-06-17 17:45:51] Entity 1007 (Yenghangor, age 20) died: crime of passion by Thaestwoosteth
+[2026-06-17 17:45:52] Entity 1006 (Haaxgiayn, age 20) died: crime of passion by Weengeth
+[2026-06-17 17:45:54] Entity 1006 (Haaxgiayn, age 20) died: crime of passion by Weengeth
+[2026-06-17 17:45:56] Entity 1006 (Haaxgiayn, age 20) died: crime of passion by Weengeth
+[2026-06-17 17:45:56] Entity 37 (Weengeth, age 41) died: crime of passion by Hiathar
+[2026-06-17 17:45:56] Entity 1007 (Yenghangor, age 20) died: crime of passion by Thaestwoosteth
+[2026-06-17 17:45:56] Entity 37 (Weengeth, age 41) died: hardship
+[2026-06-17 17:45:56] Entity 1006 (Haaxgiayn, age 20) died: disease
+[2026-06-17 17:45:56] Entity 1007 (Yenghangor, age 20) died: disease
+[2026-06-17 17:45:57] Entity 1014 (Thaengtaestane, age 15) died: crime of passion by Hestsa
+[2026-06-17 17:45:59] Entity 1014 (Thaengtaestane, age 15) died: crime of passion by Hestsa
+[2026-06-17 17:46:02] Entity 18 (Yaestyiarketh, age 42) died: crime of passion by Haengyaesteth
+[2026-06-17 17:46:02] Entity 9 (Haengyaesteth, age 42) died: crime of passion by Yaestyiarketh
+[2026-06-17 17:46:02] Entity 20001 (Ngepythoth, age 8) died: crime of passion by Zyen
+[2026-06-17 17:46:02] Entity 9 (Haengyaesteth, age 42) died: disease
+[2026-06-17 17:46:03] Entity 1014 (Thaengtaestane, age 16) died: crime of passion by Hestsa
+[2026-06-17 17:46:03] Entity 1004 (Hestsa, age 22) died: crime of passion by Thaestwoosteth
+[2026-06-17 17:46:04] Entity 1004 (Hestsa, age 22) died: disease
+[2026-06-17 17:46:04] Entity 20001 (Ngepythoth, age 8) died: hardship
+[2026-06-17 17:46:06] Entity 18 (Yaestyiarketh, age 42) died: crime of passion by Glothor
+[2026-06-17 17:46:06] Entity 16 (Gaadrothyn, age 42) died: crime of passion by Gython
+[2026-06-17 17:46:07] Entity 16 (Gaadrothyn, age 42) died: hardship
+[2026-06-17 17:46:08] Entity 18 (Yaestyiarketh, age 42) died: crime of passion by Glothor
+[2026-06-17 17:46:11] Entity 18 (Yaestyiarketh, age 42) died: crime of passion by Glothor
+[2026-06-17 17:46:12] Entity 18 (Yaestyiarketh, age 43) died: crime of passion by Glothor
+[2026-06-17 17:46:12] Entity 1014 (Thaengtaestane, age 17) died: crime of passion by Trooxkrooxae
+[2026-06-17 17:46:15] Entity 18 (Yaestyiarketh, age 43) died: crime of passion by Glothor
+[2026-06-17 17:46:17] Entity 6 (Tiaxae, age 43) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:46:20] Entity 6 (Tiaxae, age 43) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:46:21] Entity 1009 (Trooxkrooxae, age 19) died: crime of passion by Thaengtaestane
+[2026-06-17 17:46:22] Entity 1009 (Trooxkrooxae, age 19) died: hardship
+[2026-06-17 17:46:23] Entity 6 (Tiaxae, age 43) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:46:26] Entity 18 (Yaestyiarketh, age 44) died: crime of passion by Glothor
+[2026-06-17 17:46:27] Entity 18 (Yaestyiarketh, age 44) died: crime of passion by Glothor
+[2026-06-17 17:46:29] Entity 6 (Tiaxae, age 44) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:46:29] Entity 39 (Wengan, age 44) died: crime of passion by Krooxar
+[2026-06-17 17:46:29] Entity 39 (Wengan, age 44) died: hardship
+[2026-06-17 17:46:30] Entity 6 (Tiaxae, age 44) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:46:30] Entity 32 (Sauna, age 44) died: crime of passion by Zeza
+[2026-06-17 17:46:31] Entity 32 (Sauna, age 44) died: hardship
+[2026-06-17 17:46:32] Entity 6 (Tiaxae, age 44) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:46:32] Entity 1 (Syxud, age 44) died: crime of passion by Gython
+[2026-06-17 17:46:32] Entity 1 (Syxud, age 44) died: hardship
+[2026-06-17 17:46:33] Entity 18 (Yaestyiarketh, age 44) died: crime of passion by Glothor
+[2026-06-17 17:46:34] Entity 20000 (Pyruna, age 17) died: hardship
+[2026-06-17 17:46:35] Entity 18 (Yaestyiarketh, age 44) died: crime of passion by Glothor
+[2026-06-17 17:46:39] Entity 18 (Yaestyiarketh, age 45) died: crime of passion by Glothor
+[2026-06-17 17:46:39] Entity 1012 (Krooxar, age 20) died: crime of passion by Hathane
+[2026-06-17 17:46:40] Entity 18 (Yaestyiarketh, age 45) died: disease
+[2026-06-17 17:46:43] Entity 1028 (Gianyn, age 7) died: crime of passion by Hiathar
+[2026-06-17 17:46:45] Entity 20003 (Zersaar, age 8) died: crime of passion by Zyen
+[2026-06-17 17:46:49] Entity 20003 (Zersaar, age 9) died: crime of passion by Zyen
+[2026-06-17 17:46:49] Entity 1028 (Gianyn, age 8) died: crime of passion by Hiathar
+[2026-06-17 17:46:49] Entity 20003 (Zersaar, age 9) died: hardship
+[2026-06-17 17:46:50] Entity 1028 (Gianyn, age 8) died: crime of passion by Hiathar
+[2026-06-17 17:46:52] Entity 1012 (Krooxar, age 21) died: crime of passion by Hathane
+[2026-06-17 17:46:52] Entity 1028 (Gianyn, age 8) died: crime of passion by Hiathar
+[2026-06-17 17:46:53] Entity 1012 (Krooxar, age 21) died: crime of passion by Hathane
+[2026-06-17 17:46:53] Entity 5000 (Hiathar, age 15) died: crime of passion by Gianyn
+[2026-06-17 17:46:56] Entity 29 (Ngaathar, age 46) died: crime of passion by Saen
+[2026-06-17 17:46:56] Entity 5000 (Hiathar, age 15) died: crime of passion by Gianyn
+[2026-06-17 17:46:57] Entity 29 (Ngaathar, age 46) died: hardship
+[2026-06-17 17:46:58] Entity 20004 (Waexila, age 5) died: crime of passion by Hathane
+[2026-06-17 17:46:59] Entity 20004 (Waexila, age 5) died: crime of passion by Hathane
+[2026-06-17 17:47:01] Entity 20004 (Waexila, age 6) died: crime of passion by Hathane
+[2026-06-17 17:47:01] Entity 8 (Pazglyar, age 47) died: crime of passion by Mbaauna
+[2026-06-17 17:47:01] Entity 1028 (Gianyn, age 9) died: crime of passion by Hiathar
+[2026-06-17 17:47:01] Entity 5000 (Hiathar, age 16) died: crime of passion by Gianyn
+[2026-06-17 17:47:01] Entity 8 (Pazglyar, age 47) died: hardship
+[2026-06-17 17:47:01] Entity 5000 (Hiathar, age 16) died: hardship
+[2026-06-17 17:47:02] Entity 1012 (Krooxar, age 22) died: crime of passion by Hathane
+[2026-06-17 17:47:07] Entity 20004 (Waexila, age 6) died: crime of passion by Hathane
+[2026-06-17 17:47:07] Entity 1017 (Mbangetha, age 20) died: crime of passion by Zyen
+[2026-06-17 17:47:13] Entity 25 (Drothmbongia, age 48) died: crime of passion by Suim
+[2026-06-17 17:47:16] Entity 1018 (Paaar, age 17) died: crime of passion by Zyen
+[2026-06-17 17:47:17] Entity 1012 (Krooxar, age 23) died: crime of passion by Hathane
+[2026-06-17 17:47:19] Entity 1018 (Paaar, age 17) died: crime of passion by Zyen
+[2026-06-17 17:47:19] Entity 1018 (Paaar, age 17) died: hardship
+[2026-06-17 17:47:21] Entity 20002 (Taestwaexila, age 12) died: crime of passion by Hathane
+[2026-06-17 17:47:21] Entity 7 (Seeud, age 48) died: crime of passion by Mbianon
+[2026-06-17 17:47:21] Entity 25 (Drothmbongia, age 48) died: crime of passion by Suim
+[2026-06-17 17:47:24] Entity 25 (Drothmbongia, age 48) died: crime of passion by Suim
+[2026-06-17 17:47:25] Entity 1017 (Mbangetha, age 22) died: crime of passion by Zyen
+[2026-06-17 17:47:27] Entity 25 (Drothmbongia, age 49) died: crime of passion by Suim
+[2026-06-17 17:47:28] Entity 25 (Drothmbongia, age 49) died: crime of passion by Suim
+[2026-06-17 17:47:30] Entity 20002 (Taestwaexila, age 13) died: crime of passion by Hathane
+[2026-06-17 17:47:30] Entity 25 (Drothmbongia, age 49) died: crime of passion by Suim
+[2026-06-17 17:47:32] Entity 1019 (Zethvythoth, age 16) died: crime of passion by Zyen
+[2026-06-17 17:47:33] Entity 1019 (Zethvythoth, age 16) died: crime of passion by Zyen
+[2026-06-17 17:47:33] Entity 7 (Seeud, age 49) died: crime of passion by Mbianon
+[2026-06-17 17:47:34] Entity 25 (Drothmbongia, age 49) died: crime of passion by Suim
+[2026-06-17 17:47:35] Entity 1019 (Zethvythoth, age 16) died: crime of passion by Zyen
+[2026-06-17 17:47:35] Entity 7 (Seeud, age 49) died: crime of passion by Mbianon
+[2026-06-17 17:47:35] Entity 25 (Drothmbongia, age 49) died: crime of passion by Suim
+[2026-06-17 17:47:35] Entity 1019 (Zethvythoth, age 16) died: hardship
+[2026-06-17 17:47:37] Entity 7 (Seeud, age 49) died: crime of passion by Mbianon
+[2026-06-17 17:47:40] Entity 7 (Seeud, age 50) died: crime of passion by Mbianon
+[2026-06-17 17:47:41] Entity 20002 (Taestwaexila, age 14) died: crime of passion by Hathane
+[2026-06-17 17:47:41] Entity 7 (Seeud, age 50) died: crime of passion by Mbianon
+[2026-06-17 17:47:43] Entity 20002 (Taestwaexila, age 14) died: crime of passion by Hathane
+[2026-06-17 17:47:43] Entity 7 (Seeud, age 50) died: crime of passion by Mbianon
+[2026-06-17 17:47:43] Entity 25 (Drothmbongia, age 50) died: crime of passion by Suim
+[2026-06-17 17:47:43] Entity 31 (Hiaxila, age 50) died: crime of passion by Gython
+[2026-06-17 17:47:44] Entity 7 (Seeud, age 50) died: crime of passion by Mbianon
+[2026-06-17 17:47:44] Entity 25 (Drothmbongia, age 50) died: crime of passion by Suim
+[2026-06-17 17:47:45] Entity 31 (Hiaxila, age 50) died: crime of passion by Gython
+[2026-06-17 17:47:46] Entity 7 (Seeud, age 50) died: crime of passion by Mbianon
+[2026-06-17 17:47:48] Entity 20002 (Taestwaexila, age 14) died: crime of passion by Hathane
+[2026-06-17 17:47:48] Entity 7 (Seeud, age 50) died: crime of passion by Mbianon
+[2026-06-17 17:47:48] Entity 25 (Drothmbongia, age 50) died: crime of passion by Suim
+[2026-06-17 17:47:48] Entity 31 (Hiaxila, age 50) died: crime of passion by Gython
+[2026-06-17 17:47:48] Entity 20004 (Waexila, age 9) died: crime of passion by Taestwaexila
+[2026-06-17 17:47:49] Entity 20002 (Taestwaexila, age 14) died: crime of passion by Hathane
+[2026-06-17 17:47:49] Entity 7 (Seeud, age 50) died: crime of passion by Mbianon
+[2026-06-17 17:47:49] Entity 25 (Drothmbongia, age 50) died: crime of passion by Suim
+[2026-06-17 17:47:50] Entity 31 (Hiaxila, age 50) died: crime of passion by Gython
+[2026-06-17 17:47:51] Entity 20002 (Taestwaexila, age 15) died: crime of passion by Hathane
+[2026-06-17 17:47:51] Entity 7 (Seeud, age 51) died: crime of passion by Mbianon
+[2026-06-17 17:47:51] Entity 25 (Drothmbongia, age 51) died: crime of passion by Suim
+[2026-06-17 17:47:51] Entity 31 (Hiaxila, age 51) died: crime of passion by Gython
+[2026-06-17 17:47:51] Entity 20004 (Waexila, age 10) died: crime of passion by Taestwaexila
+[2026-06-17 17:47:53] Entity 25 (Drothmbongia, age 51) died: crime of passion by Suim
+[2026-06-17 17:47:53] Entity 1029 (Saambooon, age 13) died: crime of passion by Hoyn
+[2026-06-17 17:47:54] Entity 20002 (Taestwaexila, age 15) died: crime of passion by Hathane
+[2026-06-17 17:47:54] Entity 7 (Seeud, age 51) died: crime of passion by Mbianon
+[2026-06-17 17:47:55] Entity 25 (Drothmbongia, age 51) died: crime of passion by Suim
+[2026-06-17 17:47:55] Entity 4 (Mbianon, age 51) died: crime of passion by Seeud
+[2026-06-17 17:47:55] Entity 1029 (Saambooon, age 13) died: crime of passion by Hoyn
+[2026-06-17 17:47:55] Entity 4 (Mbianon, age 51) died: hardship
+[2026-06-17 17:47:56] Entity 20004 (Waexila, age 10) died: crime of passion by Hathane
+[2026-06-17 17:47:56] Entity 26 (Glarmbaar, age 51) died: crime of passion by Ngambaaar
+[2026-06-17 17:47:58] Entity 26 (Glarmbaar, age 51) died: crime of passion by Ngambaaar
+[2026-06-17 17:47:59] Entity 38 (Mberzathar, age 51) died: crime of passion by Saen
+[2026-06-17 17:48:00] Entity 1029 (Saambooon, age 13) died: crime of passion by Hoyn
+[2026-06-17 17:48:00] Entity 38 (Mberzathar, age 51) died: hardship
+[2026-06-17 17:48:01] Entity 20004 (Waexila, age 10) died: crime of passion by Hathane
+[2026-06-17 17:48:03] Entity 26 (Glarmbaar, age 51) died: crime of passion by Saen
+[2026-06-17 17:48:03] Entity 20004 (Waexila, age 10) died: crime of passion by Taestwaexila
+[2026-06-17 17:48:03] Entity 1021 (Vythglaaus, age 17) died: crime of passion by Taaar
+[2026-06-17 17:48:03] Entity 1021 (Vythglaaus, age 17) died: hardship
+[2026-06-17 17:48:04] Entity 26 (Glarmbaar, age 52) died: crime of passion by Saen
+[2026-06-17 17:48:04] Entity 1039 (Haagunim, age 7) died: crime of passion by Gython
+[2026-06-17 17:48:06] Entity 1029 (Saambooon, age 14) died: crime of passion by Hoyn
+[2026-06-17 17:48:07] Entity 26 (Glarmbaar, age 52) died: crime of passion by Ngambaaar
+[2026-06-17 17:48:07] Entity 1022 (Varzeim, age 17) died: crime of passion by Gletaais
+[2026-06-17 17:48:07] Entity 1029 (Saambooon, age 14) died: crime of passion by Hoyn
+[2026-06-17 17:48:08] Entity 26 (Glarmbaar, age 52) died: hardship
+[2026-06-17 17:48:08] Entity 1022 (Varzeim, age 17) died: hardship
+[2026-06-17 17:48:09] Entity 1039 (Haagunim, age 7) died: crime of passion by Gython
+[2026-06-17 17:48:10] Entity 1039 (Haagunim, age 7) died: crime of passion by Gython
+[2026-06-17 17:48:11] Entity 20004 (Waexila, age 11) died: crime of passion by Taestwaexila
+[2026-06-17 17:48:12] Entity 35 (Zeza, age 52) died: crime of passion by Saen
+[2026-06-17 17:48:12] Entity 20002 (Taestwaexila, age 16) died: crime of passion by Waexila
+[2026-06-17 17:48:12] Entity 20002 (Taestwaexila, age 16) died: hardship
+[2026-06-17 17:48:14] Entity 35 (Zeza, age 52) died: crime of passion by Saen
+[2026-06-17 17:48:14] Entity 1020 (Hoyn, age 19) died: crime of passion by Gianyn
+[2026-06-17 17:48:14] Entity 1020 (Hoyn, age 19) died: hardship
+[2026-06-17 17:48:15] Entity 1027 (Glesaoth, age 15) died: crime of passion by Taaar
+[2026-06-17 17:48:15] Entity 22 (Haathae, age 52) died: crime of passion by Seeud
+[2026-06-17 17:48:15] Entity 1027 (Glesaoth, age 15) died: hardship
+[2026-06-17 17:48:17] Entity 20004 (Waexila, age 12) died: crime of passion by Hathane
+[2026-06-17 17:48:17] Entity 11 (Ngambaaar, age 53) died: crime of passion by Saen
+[2026-06-17 17:48:17] Entity 1039 (Haagunim, age 8) died: crime of passion by Gython
+[2026-06-17 17:48:17] Entity 11 (Ngambaaar, age 53) died: hardship
+[2026-06-17 17:48:20] Entity 20004 (Waexila, age 12) died: crime of passion by Hathane
+[2026-06-17 17:48:21] Entity 22 (Haathae, age 53) died: crime of passion by Seeud
+[2026-06-17 17:48:21] Entity 1039 (Haagunim, age 8) died: crime of passion by Gython
+[2026-06-17 17:48:22] Entity 22 (Haathae, age 53) died: disease
+[2026-06-17 17:48:24] Entity 20004 (Waexila, age 12) died: crime of passion by Hathane
+[2026-06-17 17:48:26] Entity 20004 (Waexila, age 12) died: crime of passion by Hathane
+[2026-06-17 17:48:27] Entity 20004 (Waexila, age 12) died: crime of passion by Hathane
+[2026-06-17 17:48:29] Entity 1011 (Hathane, age 30) died: crime of passion by Waexila
+[2026-06-17 17:48:29] Entity 1011 (Hathane, age 30) died: hardship
+[2026-06-17 17:48:31] Entity 1030 (Vatha, age 15) died: crime of passion by Taaar
+[2026-06-17 17:48:31] Entity 1030 (Vatha, age 15) died: hardship
+[2026-06-17 17:48:37] Entity 1039 (Haagunim, age 9) died: crime of passion by Gython
+[2026-06-17 17:48:39] Entity 1032 (Zaaglaara, age 13) died: hardship
+[2026-06-17 17:48:40] Entity 1039 (Haagunim, age 9) died: crime of passion by Gython
+[2026-06-17 17:48:43] Entity 1014 (Thaengtaestane, age 29) died: crime of passion by Waexila
+[2026-06-17 17:48:43] Entity 1014 (Thaengtaestane, age 29) died: hardship
+[2026-06-17 17:48:44] Entity 1013 (Zyen, age 29) died: crime of passion by Mbangetha
+[2026-06-17 17:48:45] Entity 1013 (Zyen, age 29) died: hardship
+[2026-06-17 17:48:47] Entity 1039 (Haagunim, age 10) died: crime of passion by Gython
+[2026-06-17 17:48:49] Entity 1039 (Haagunim, age 10) died: crime of passion by Gython
+[2026-06-17 17:48:50] Entity 27 (Yiarketh, age 55) died: crime of passion by Trathoth
+[2026-06-17 17:48:50] Entity 1039 (Haagunim, age 10) died: crime of passion by Gython
+[2026-06-17 17:48:50] Entity 27 (Yiarketh, age 55) died: disease
+[2026-06-17 17:48:51] Entity 1039 (Haagunim, age 10) died: crime of passion by Gython
+[2026-06-17 17:48:53] Entity 1039 (Haagunim, age 11) died: crime of passion by Gython
+[2026-06-17 17:48:57] Entity 12 (Trathoth, age 56) died: crime of passion by Glothor
+[2026-06-17 17:48:58] Entity 12 (Trathoth, age 56) died: hardship
+[2026-06-17 17:48:59] Entity 7 (Seeud, age 56) died: crime of passion by Saasongeth
+[2026-06-17 17:48:59] Entity 7 (Seeud, age 56) died: hardship
+[2026-06-17 17:49:03] Entity 1016 (Saasongeth, age 29) died: crime of passion by Gianyn
+[2026-06-17 17:49:04] Entity 1016 (Saasongeth, age 29) died: hardship
+[2026-06-17 17:49:08] Entity 31 (Hiaxila, age 57) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:09] Entity 1039 (Haagunim, age 12) died: crime of passion by Gython
+[2026-06-17 17:49:11] Entity 1039 (Haagunim, age 12) died: crime of passion by Gython
+[2026-06-17 17:49:12] Entity 31 (Hiaxila, age 57) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:14] Entity 31 (Hiaxila, age 57) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:15] Entity 15 (Haestax, age 57) died: crime of passion by Trethila
+[2026-06-17 17:49:15] Entity 31 (Hiaxila, age 57) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:15] Entity 1034 (Vethuna, age 14) died: crime of passion by Glarsa
+[2026-06-17 17:49:16] Entity 15 (Haestax, age 57) died: disease
+[2026-06-17 17:49:16] Entity 1034 (Vethuna, age 14) died: hardship
+[2026-06-17 17:49:17] Entity 31 (Hiaxila, age 58) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:21] Entity 31 (Hiaxila, age 58) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:21] Entity 34 (Mbongia, age 58) died: crime of passion by Gianyn
+[2026-06-17 17:49:21] Entity 34 (Mbongia, age 58) died: hardship
+[2026-06-17 17:49:22] Entity 1039 (Haagunim, age 13) died: crime of passion by Gython
+[2026-06-17 17:49:23] Entity 1039 (Haagunim, age 13) died: hardship
+[2026-06-17 17:49:25] Entity 31 (Hiaxila, age 58) died: crime of passion by Gython
+[2026-06-17 17:49:27] Entity 31 (Hiaxila, age 58) died: crime of passion by Gython
+[2026-06-17 17:49:28] Entity 31 (Hiaxila, age 59) died: crime of passion by Gython
+[2026-06-17 17:49:30] Entity 1048 (Goothud, age 10) died: crime of passion by Monon
+[2026-06-17 17:49:30] Entity 19 (Gaaud, age 59) died: crime of passion by Gython
+[2026-06-17 17:49:31] Entity 19 (Gaaud, age 59) died: crime of passion by Gython
+[2026-06-17 17:49:34] Entity 19 (Gaaud, age 59) died: crime of passion by Gython
+[2026-06-17 17:49:34] Entity 31 (Hiaxila, age 59) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:35] Entity 1048 (Goothud, age 10) died: crime of passion by Monon
+[2026-06-17 17:49:36] Entity 1046 (Krethila, age 11) died: crime of passion by Waexila
+[2026-06-17 17:49:37] Entity 31 (Hiaxila, age 59) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:38] Entity 31 (Hiaxila, age 59) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:39] Entity 1046 (Krethila, age 12) died: crime of passion by Waexila
+[2026-06-17 17:49:39] Entity 31 (Hiaxila, age 60) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:41] Entity 19 (Gaaud, age 60) died: crime of passion by Gython
+[2026-06-17 17:49:42] Entity 19 (Gaaud, age 60) died: crime of passion by Gython
+[2026-06-17 17:49:43] Entity 19 (Gaaud, age 60) died: crime of passion by Gython
+[2026-06-17 17:49:44] Entity 1031 (Zear, age 19) died: hardship
+[2026-06-17 17:49:45] Entity 31 (Hiaxila, age 60) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:46] Entity 1046 (Krethila, age 12) died: crime of passion by Waexila
+[2026-06-17 17:49:48] Entity 19 (Gaaud, age 60) died: crime of passion by Gython
+[2026-06-17 17:49:48] Entity 31 (Hiaxila, age 60) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:49] Entity 31 (Hiaxila, age 60) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:50] Entity 1046 (Krethila, age 13) died: crime of passion by Waexila
+[2026-06-17 17:49:52] Entity 19 (Gaaud, age 61) died: crime of passion by Gython
+[2026-06-17 17:49:53] Entity 19 (Gaaud, age 61) died: crime of passion by Gython
+[2026-06-17 17:49:53] Entity 31 (Hiaxila, age 61) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:55] Entity 19 (Gaaud, age 61) died: crime of passion by Gython
+[2026-06-17 17:49:55] Entity 31 (Hiaxila, age 61) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:56] Entity 19 (Gaaud, age 61) died: crime of passion by Gython
+[2026-06-17 17:49:56] Entity 31 (Hiaxila, age 61) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:58] Entity 0 (Thaethila, age 61) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:49:59] Entity 1046 (Krethila, age 13) died: crime of passion by Waexila
+[2026-06-17 17:49:59] Entity 19 (Gaaud, age 61) died: crime of passion by Gython
+[2026-06-17 17:49:59] Entity 19 (Gaaud, age 61) died: crime of passion by Drothmbongia
+[2026-06-17 17:49:59] Entity 0 (Thaethila, age 61) died: old age
+[2026-06-17 17:49:59] Entity 19 (Gaaud, age 61) died: old age
+[2026-06-17 17:50:00] Entity 1046 (Krethila, age 13) died: crime of passion by Waexila
+[2026-06-17 17:50:00] Entity 1023 (Zea, age 25) died: crime of passion by Glarsa
+[2026-06-17 17:50:00] Entity 1023 (Zea, age 25) died: hardship
+[2026-06-17 17:50:01] Entity 1036 (Saaar, age 17) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:01] Entity 1044 (Glaaveuna, age 14) died: crime of passion by Mbaaruna
+[2026-06-17 17:50:04] Entity 1036 (Saaar, age 17) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:04] Entity 1044 (Glaaveuna, age 14) died: crime of passion by Mbaaruna
+[2026-06-17 17:50:04] Entity 1042 (Gunmbeeneth, age 14) died: crime of passion by Mbyon
+[2026-06-17 17:50:04] Entity 1036 (Saaar, age 17) died: hardship
+[2026-06-17 17:50:04] Entity 1042 (Gunmbeeneth, age 14) died: hardship
+[2026-06-17 17:50:04] Entity 1044 (Glaaveuna, age 14) died: hardship
+[2026-06-17 17:50:05] Entity 1046 (Krethila, age 14) died: crime of passion by Waexila
+[2026-06-17 17:50:07] Entity 1046 (Krethila, age 14) died: crime of passion by Waexila
+[2026-06-17 17:50:10] Entity 1046 (Krethila, age 14) died: crime of passion by Waexila
+[2026-06-17 17:50:12] Entity 1046 (Krethila, age 15) died: crime of passion by Waexila
+[2026-06-17 17:50:14] Entity 1041 (Glarsa, age 16) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:17] Entity 1041 (Glarsa, age 16) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:17] Entity 1046 (Krethila, age 15) died: crime of passion by Waexila
+[2026-06-17 17:50:17] Entity 1041 (Glarsa, age 16) died: hardship
+[2026-06-17 17:50:18] Entity 1037 (Mbaaruna, age 18) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:19] Entity 1046 (Krethila, age 15) died: crime of passion by Waexila
+[2026-06-17 17:50:20] Entity 1046 (Krethila, age 15) died: crime of passion by Waexila
+[2026-06-17 17:50:21] Entity 1046 (Krethila, age 15) died: crime of passion by Waexila
+[2026-06-17 17:50:25] Entity 1046 (Krethila, age 16) died: crime of passion by Waexila
+[2026-06-17 17:50:27] Entity 1049 (Mbaaar, age 14) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:27] Entity 1046 (Krethila, age 16) died: crime of passion by Waexila
+[2026-06-17 17:50:31] Entity 1049 (Mbaaar, age 14) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:31] Entity 1046 (Krethila, age 16) died: crime of passion by Waexila
+[2026-06-17 17:50:31] Entity 1049 (Mbaaar, age 14) died: hardship
+[2026-06-17 17:50:33] Entity 1046 (Krethila, age 17) died: crime of passion by Waexila
+[2026-06-17 17:50:35] Entity 1026 (Vaazis, age 28) died: crime of passion by Mbazmbaren
+[2026-06-17 17:50:35] Entity 1026 (Vaazis, age 28) died: hardship
+[2026-06-17 17:50:39] Entity 1046 (Krethila, age 17) died: crime of passion by Waexila
+[2026-06-17 17:50:40] Entity 24 (Rexgrethax, age 65) died: crime of passion by Greththiastane
+[2026-06-17 17:50:40] Entity 1046 (Krethila, age 17) died: crime of passion by Waexila
+[2026-06-17 17:50:40] Entity 24 (Rexgrethax, age 65) died: old age
+[2026-06-17 17:50:41] Entity 1046 (Krethila, age 17) died: crime of passion by Waexila
+[2026-06-17 17:50:43] Entity 1046 (Krethila, age 17) died: crime of passion by Waexila
+[2026-06-17 17:50:43] Entity 31 (Hiaxila, age 65) died: crime of passion by Gython
+[2026-06-17 17:50:43] Entity 31 (Hiaxila, age 65) died: old age
+[2026-06-17 17:50:44] Entity 1046 (Krethila, age 18) died: crime of passion by Waexila
+[2026-06-17 17:50:46] Entity 20004 (Waexila, age 25) died: crime of passion by Krethila
+[2026-06-17 17:50:47] Entity 20004 (Waexila, age 25) died: hardship
+[2026-06-17 17:51:08] Entity 1045 (Mbyon, age 20) died: crime of passion by Gianyn
+[2026-06-17 17:51:12] Entity 1045 (Mbyon, age 20) died: crime of passion by Gianyn
+[2026-06-17 17:51:12] Entity 1045 (Mbyon, age 20) died: disease
+[2026-06-17 17:51:15] Entity 1050 (Ngais, age 14) died: crime of passion by Mbazmbaren
+[2026-06-17 17:51:16] Entity 1050 (Ngais, age 14) died: hardship
+[2026-06-17 17:51:22] Entity 1025 (Taaar, age 32) died: crime of passion by Mbaaruna
+[2026-06-17 17:51:22] Entity 1025 (Taaar, age 32) died: hardship
+[2026-06-17 17:51:29] Entity 1035 (Mbazmbaren, age 27) died: crime of passion by Mbaaruna
+[2026-06-17 17:51:30] Entity 1035 (Mbazmbaren, age 27) died: hardship
+[2026-06-17 17:51:34] Entity 1054 (Varoth, age 9) died: crime of passion by Taarar
+[2026-06-17 17:51:35] Entity 1053 (Zaazuna, age 11) died: crime of passion by Taarar
+[2026-06-17 17:51:35] Entity 1053 (Zaazuna, age 11) died: hardship
+[2026-06-17 17:51:36] Entity 1017 (Mbangetha, age 44) died: crime of passion by Syzsa
+[2026-06-17 17:51:36] Entity 1017 (Mbangetha, age 44) died: hardship
+[2026-06-17 17:51:41] Entity 14 (Mbaauna, age 71) died: old age
+[2026-06-17 17:51:53] Entity 1052 (Vaaar, age 14) died: crime of passion by Varoth
+[2026-06-17 17:51:53] Entity 1052 (Vaaar, age 14) died: hardship
+[2026-06-17 17:51:56] Entity 1051 (Taarar, age 15) died: crime of passion by Varoth
+[2026-06-17 17:51:56] Entity 1051 (Taarar, age 15) died: hardship
+[2026-06-17 17:52:03] Entity 13 (Gython, age 73) died: crime of passion by Saambooon
+[2026-06-17 17:52:03] Entity 13 (Gython, age 73) died: old age
+[2026-06-17 17:52:12] Entity 20005 (Droostek, age 14) died: crime of passion by Trethila
+[2026-06-17 17:52:17] Entity 20005 (Droostek, age 15) died: crime of passion by Trethila
+[2026-06-17 17:52:18] Entity 20005 (Droostek, age 15) died: crime of passion by Trethila
+[2026-06-17 17:52:18] Entity 25 (Drothmbongia, age 75) died: crime of passion by Suim
+[2026-06-17 17:52:18] Entity 25 (Drothmbongia, age 75) died: old age
+[2026-06-17 17:52:21] Entity 20005 (Droostek, age 15) died: crime of passion by Trethila
+[2026-06-17 17:52:21] Entity 1028 (Gianyn, age 37) died: crime of passion by Saambooon
+[2026-06-17 17:52:21] Entity 1028 (Gianyn, age 37) died: hardship
+[2026-06-17 17:52:22] Entity 20005 (Droostek, age 15) died: crime of passion by Trethila
+[2026-06-17 17:52:23] Entity 20005 (Droostek, age 15) died: crime of passion by Trethila
+[2026-06-17 17:52:25] Entity 20005 (Droostek, age 15) died: crime of passion by Trethila
+[2026-06-17 17:52:26] Entity 20005 (Droostek, age 15) died: crime of passion by Trethila
+[2026-06-17 17:52:27] Entity 20005 (Droostek, age 16) died: crime of passion by Trethila
+[2026-06-17 17:52:28] Entity 2 (Zazara, age 76) died: crime of passion by Zeza
+[2026-06-17 17:52:29] Entity 2 (Zazara, age 76) died: old age
+[2026-06-17 17:52:30] Entity 20005 (Droostek, age 16) died: crime of passion by Trethila
+[2026-06-17 17:52:31] Entity 20005 (Droostek, age 16) died: crime of passion by Trethila
+[2026-06-17 17:52:32] Entity 20005 (Droostek, age 16) died: crime of passion by Trethila
+[2026-06-17 17:52:33] Entity 1037 (Mbaaruna, age 31) died: crime of passion by Ngaar
+[2026-06-17 17:52:34] Entity 20005 (Droostek, age 16) died: crime of passion by Trethila
+[2026-06-17 17:52:34] Entity 1037 (Mbaaruna, age 31) died: crime of passion by Ngaar
+[2026-06-17 17:52:34] Entity 1037 (Mbaaruna, age 31) died: hardship
+[2026-06-17 17:52:37] Entity 20005 (Droostek, age 17) died: crime of passion by Trethila
+[2026-06-17 17:52:39] Entity 20005 (Droostek, age 17) died: crime of passion by Trethila
+[2026-06-17 17:52:39] Entity 5001 (Wiangtraexus, age 11) died: crime of passion by Greththiastane
+[2026-06-17 17:52:40] Entity 20005 (Droostek, age 17) died: crime of passion by Trethila
+[2026-06-17 17:52:40] Entity 5001 (Wiangtraexus, age 11) died: crime of passion by Greththiastane
+[2026-06-17 17:52:43] Entity 20005 (Droostek, age 17) died: crime of passion by Trethila
+[2026-06-17 17:52:43] Entity 5001 (Wiangtraexus, age 11) died: crime of passion by Greththiastane
+[2026-06-17 17:52:44] Entity 5001 (Wiangtraexus, age 11) died: crime of passion by Greththiastane
+[2026-06-17 17:52:45] Entity 20005 (Droostek, age 17) died: crime of passion by Trethila
+[2026-06-17 17:52:45] Entity 1058 (Traexus, age 8) died: crime of passion by Krooxar
+[2026-06-17 17:52:46] Entity 20005 (Droostek, age 17) died: crime of passion by Trethila
+[2026-06-17 17:52:46] Entity 5001 (Wiangtraexus, age 11) died: crime of passion by Greththiastane
+[2026-06-17 17:52:48] Entity 20005 (Droostek, age 18) died: crime of passion by Trethila
+[2026-06-17 17:52:48] Entity 1058 (Traexus, age 9) died: crime of passion by Krooxar
+[2026-06-17 17:52:49] Entity 5001 (Wiangtraexus, age 12) died: crime of passion by Greththiastane
+[2026-06-17 17:52:52] Entity 5001 (Wiangtraexus, age 12) died: crime of passion by Greththiastane
+[2026-06-17 17:52:53] Entity 5001 (Wiangtraexus, age 12) died: crime of passion by Greththiastane
+[2026-06-17 17:52:53] Entity 20005 (Droostek, age 18) died: crime of passion by Krooxar
+[2026-06-17 17:52:54] Entity 5001 (Wiangtraexus, age 12) died: crime of passion by Greththiastane
+[2026-06-17 17:52:55] Entity 1012 (Krooxar, age 53) died: crime of passion by Droostek
+[2026-06-17 17:52:55] Entity 1012 (Krooxar, age 53) died: hardship
+[2026-06-17 17:52:56] Entity 5001 (Wiangtraexus, age 12) died: crime of passion by Greththiastane
+[2026-06-17 17:52:57] Entity 20005 (Droostek, age 18) died: crime of passion by Trethila
+[2026-06-17 17:52:57] Entity 5001 (Wiangtraexus, age 12) died: crime of passion by Greththiastane
+[2026-06-17 17:52:58] Entity 20005 (Droostek, age 19) died: crime of passion by Trethila
+[2026-06-17 17:52:58] Entity 5001 (Wiangtraexus, age 13) died: crime of passion by Greththiastane
+[2026-06-17 17:53:01] Entity 20005 (Droostek, age 19) died: crime of passion by Trethila
+[2026-06-17 17:53:04] Entity 5001 (Wiangtraexus, age 13) died: crime of passion by Greththiastane
+[2026-06-17 17:53:05] Entity 20005 (Droostek, age 19) died: crime of passion by Trethila
+[2026-06-17 17:53:06] Entity 20005 (Droostek, age 19) died: crime of passion by Trethila
+[2026-06-17 17:53:08] Entity 20005 (Droostek, age 19) died: crime of passion by Trethila
+[2026-06-17 17:53:08] Entity 33 (Greththiastane, age 79) died: crime of passion by Wiangtraexus
+[2026-06-17 17:53:08] Entity 33 (Greththiastane, age 79) died: old age
+[2026-06-17 17:53:10] Entity 1058 (Traexus, age 11) died: crime of passion by Droostek
+[2026-06-17 17:53:11] Entity 1005 (Thaestwoosteth, age 60) died: crime of passion by Krethila
+[2026-06-17 17:53:12] Entity 1005 (Thaestwoosteth, age 60) died: hardship
+[2026-06-17 17:53:13] Entity 1054 (Varoth, age 19) died: crime of passion by Syzsa
+[2026-06-17 17:53:13] Entity 1054 (Varoth, age 19) died: hardship
+[2026-06-17 17:53:16] Entity 1058 (Traexus, age 11) died: crime of passion by Droostek
+[2026-06-17 17:53:20] Entity 1058 (Traexus, age 12) died: crime of passion by Droostek
+[2026-06-17 17:53:22] Entity 1058 (Traexus, age 12) died: crime of passion by Droostek
+[2026-06-17 17:53:27] Entity 1058 (Traexus, age 12) died: crime of passion by Rengax
+[2026-06-17 17:53:28] Entity 1058 (Traexus, age 12) died: crime of passion by Droostek
+[2026-06-17 17:53:28] Entity 1055 (Vaazyar, age 17) died: crime of passion by Syzsa
+[2026-06-17 17:53:29] Entity 1055 (Vaazyar, age 18) died: crime of passion by Syzsa
+[2026-06-17 17:53:30] Entity 1058 (Traexus, age 13) died: crime of passion by Droostek
+[2026-06-17 17:53:31] Entity 20005 (Droostek, age 22) died: crime of passion by Rengax
+[2026-06-17 17:53:31] Entity 1055 (Vaazyar, age 18) died: crime of passion by Syzsa
+[2026-06-17 17:53:31] Entity 20005 (Droostek, age 22) died: hardship
+[2026-06-17 17:53:33] Entity 1055 (Vaazyar, age 18) died: crime of passion by Syzsa
+[2026-06-17 17:53:36] Entity 1055 (Vaazyar, age 18) died: crime of passion by Syzsa
+[2026-06-17 17:53:42] Entity 1055 (Vaazyar, age 19) died: crime of passion by Syzsa
+[2026-06-17 17:53:44] Entity 1055 (Vaazyar, age 19) died: crime of passion by Syzsa
+[2026-06-17 17:53:45] Entity 1055 (Vaazyar, age 19) died: crime of passion by Syzsa
+[2026-06-17 17:53:45] Entity 1055 (Vaazyar, age 19) died: hardship
+[2026-06-17 17:53:46] Entity 1058 (Traexus, age 14) died: crime of passion by Rengax
+[2026-06-17 17:53:50] Entity 1058 (Traexus, age 15) died: crime of passion by Rengax
+[2026-06-17 17:53:54] Entity 1062 (Gloongar, age 12) died: crime of passion by Triaxdroongane
+[2026-06-17 17:53:55] Entity 17 (Saen, age 84) died: crime of passion by Syzsa
+[2026-06-17 17:53:55] Entity 17 (Saen, age 84) died: old age
+[2026-06-17 17:53:56] Entity 1062 (Gloongar, age 12) died: crime of passion by Triaxdroongane
+[2026-06-17 17:53:56] Entity 20007 (Triaxdroongane, age 13) died: crime of passion by Gloongar
+[2026-06-17 17:53:56] Entity 20007 (Triaxdroongane, age 13) died: hardship
+[2026-06-17 17:53:59] Entity 1058 (Traexus, age 15) died: crime of passion by Rengax
+[2026-06-17 17:54:02] Entity 1058 (Traexus, age 16) died: crime of passion by Rengax
+[2026-06-17 17:54:09] Entity 1060 (Yeixek, age 16) died: crime of passion by Gloongar
+[2026-06-17 17:54:09] Entity 1060 (Yeixek, age 16) died: hardship
+[2026-06-17 17:54:10] Entity 1058 (Traexus, age 16) died: crime of passion by Rengax
+[2026-06-17 17:54:13] Entity 1058 (Traexus, age 17) died: crime of passion by Rengax
+[2026-06-17 17:54:14] Entity 1048 (Goothud, age 37) died: crime of passion by Monon
+[2026-06-17 17:54:16] Entity 1048 (Goothud, age 37) died: crime of passion by Monon
+[2026-06-17 17:54:17] Entity 1048 (Goothud, age 37) died: crime of passion by Monon
+[2026-06-17 17:54:18] Entity 1048 (Goothud, age 37) died: crime of passion by Monon
+[2026-06-17 17:54:19] Entity 1048 (Goothud, age 37) died: crime of passion by Monon
+[2026-06-17 17:54:22] Entity 1048 (Goothud, age 38) died: crime of passion by Monon
+[2026-06-17 17:54:24] Entity 1048 (Goothud, age 38) died: crime of passion by Monon
+[2026-06-17 17:54:27] Entity 1063 (Droonggreisteth, age 14) died: crime of passion by Gloongar
+[2026-06-17 17:54:29] Entity 1063 (Droonggreisteth, age 14) died: crime of passion by Gloongar
+[2026-06-17 17:54:29] Entity 1048 (Goothud, age 38) died: crime of passion by Monon
+[2026-06-17 17:54:31] Entity 1056 (Rengax, age 19) died: crime of passion by Traexus
+[2026-06-17 17:54:31] Entity 1063 (Droonggreisteth, age 14) died: crime of passion by Gloongar
+[2026-06-17 17:54:32] Entity 1056 (Rengax, age 19) died: hardship
+[2026-06-17 17:54:34] Entity 1048 (Goothud, age 39) died: crime of passion by Monon
+[2026-06-17 17:54:35] Entity 1063 (Droonggreisteth, age 15) died: crime of passion by Gloongar
+[2026-06-17 17:54:36] Entity 1063 (Droonggreisteth, age 15) died: crime of passion by Gloongar
+[2026-06-17 17:54:36] Entity 1048 (Goothud, age 39) died: crime of passion by Monon
+[2026-06-17 17:54:39] Entity 1029 (Saambooon, age 50) died: crime of passion by Miangaara
+[2026-06-17 17:54:40] Entity 1029 (Saambooon, age 50) died: crime of passion by Miangaara
+[2026-06-17 17:54:40] Entity 1048 (Goothud, age 39) died: crime of passion by Monon
+[2026-06-17 17:54:41] Entity 1029 (Saambooon, age 50) died: crime of passion by Miangaara
+[2026-06-17 17:54:41] Entity 1048 (Goothud, age 39) died: crime of passion by Monon
+[2026-06-17 17:54:41] Entity 5001 (Wiangtraexus, age 22) died: disease
+[2026-06-17 17:54:43] Entity 1048 (Goothud, age 40) died: crime of passion by Monon
+[2026-06-17 17:54:44] Entity 1063 (Droonggreisteth, age 16) died: crime of passion by Gloongar
+[2026-06-17 17:54:44] Entity 1029 (Saambooon, age 51) died: crime of passion by Miangaara
+[2026-06-17 17:54:44] Entity 10 (Miangaara, age 89) died: crime of passion by Mbootheth
+[2026-06-17 17:54:44] Entity 10 (Miangaara, age 89) died: old age
+[2026-06-17 17:54:46] Entity 1063 (Droonggreisteth, age 16) died: crime of passion by Gloongar
+[2026-06-17 17:54:47] Entity 1063 (Droonggreisteth, age 16) died: crime of passion by Gloongar
+[2026-06-17 17:54:50] Entity 1058 (Traexus, age 20) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:54:52] Entity 1058 (Traexus, age 21) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:54:52] Entity 1061 (Tiastra, age 18) died: crime of passion by Krarkus
+[2026-06-17 17:54:53] Entity 1061 (Tiastra, age 18) died: hardship
+[2026-06-17 17:54:55] Entity 1058 (Traexus, age 21) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:54:57] Entity 1058 (Traexus, age 21) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:54:58] Entity 1058 (Traexus, age 21) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:01] Entity 1058 (Traexus, age 21) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:03] Entity 1058 (Traexus, age 22) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:04] Entity 1046 (Krethila, age 43) died: crime of passion by Glothor
+[2026-06-17 17:55:06] Entity 1058 (Traexus, age 22) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:08] Entity 1058 (Traexus, age 22) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:08] Entity 6 (Tiaxae, age 91) died: crime of passion by Traexus
+[2026-06-17 17:55:08] Entity 6 (Tiaxae, age 91) died: old age
+[2026-06-17 17:55:09] Entity 1043 (Monon, age 43) died: crime of passion by Mooxdroonar
+[2026-06-17 17:55:10] Entity 28 (Suim, age 91) died: crime of passion by Mbootheth
+[2026-06-17 17:55:10] Entity 28 (Suim, age 91) died: old age
+[2026-06-17 17:55:12] Entity 1058 (Traexus, age 23) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:13] Entity 1058 (Traexus, age 23) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:14] Entity 1058 (Traexus, age 23) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:14] Entity 1043 (Monon, age 44) died: crime of passion by Mooxdroonar
+[2026-06-17 17:55:14] Entity 1043 (Monon, age 44) died: hardship
+[2026-06-17 17:55:15] Entity 1058 (Traexus, age 23) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:16] Entity 1058 (Traexus, age 23) died: crime of passion by Hoongtrathoth
+[2026-06-17 17:55:17] Entity 1048 (Goothud, age 43) died: crime of passion by Mbootheth
+[2026-06-17 17:55:17] Entity 1048 (Goothud, age 43) died: disease
+[2026-06-17 17:55:18] Entity 30 (Glothor, age 92) died: crime of passion by Krethila
+[2026-06-17 17:55:18] Entity 30 (Glothor, age 92) died: old age
+[2026-06-17 17:55:22] Entity 1046 (Krethila, age 45) died: crime of passion by Traexus
+[2026-06-17 17:55:22] Entity 1033 (Ngaar, age 52) died: crime of passion by Syzsa
+[2026-06-17 17:55:22] Entity 1033 (Ngaar, age 52) died: hardship
+[2026-06-17 17:55:22] Entity 1046 (Krethila, age 45) died: hardship
+[2026-06-17 17:55:32] Entity 1059 (Krerkek, age 25) died: crime of passion by Krarkus
+[2026-06-17 17:55:32] Entity 1059 (Krerkek, age 25) died: disease
+[2026-06-17 17:55:49] Entity 1062 (Gloongar, age 24) died: crime of passion by Droonggreisteth
+[2026-06-17 17:55:49] Entity 1062 (Gloongar, age 24) died: hardship
+[2026-06-17 17:56:35] Entity 1064 (Mbeenggyxeth, age 27) died: crime of passion by Gyxweexila
+[2026-06-17 17:56:35] Entity 1064 (Mbeenggyxeth, age 27) died: hardship
+[2026-06-17 17:56:41] Entity 1057 (Pyoth, age 33) died: crime of passion by Glyngauna
+[2026-06-17 17:56:42] Entity 1057 (Pyoth, age 33) died: crime of passion by Glyngauna
+[2026-06-17 17:56:50] Entity 1057 (Pyoth, age 34) died: crime of passion by Glyngauna
+[2026-06-17 17:56:50] Entity 1057 (Pyoth, age 34) died: hardship

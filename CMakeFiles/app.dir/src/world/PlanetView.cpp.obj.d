@@ -244,6 +244,7 @@ CMakeFiles/app.dir/src/world/PlanetView.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/array \
  C:/mingw64/include/c++/14.2.0/compare \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialOrder.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/imgui.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/libs/imgui/imconfig.h \

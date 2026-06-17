@@ -1,3 +1,845 @@
-[2026-06-17 13:41:06] environment: An ordinary year for the harvest.
-[2026-06-17 13:41:13] environment: An ordinary year for the harvest.
-[2026-06-17 13:41:21] environment: An ordinary year for the harvest.
+[2026-06-17 17:38:14] environment: An ordinary year for the harvest.
+[2026-06-17 17:38:22] environment: An ordinary year for the harvest.
+[2026-06-17 17:39:37] environment: An ordinary year for the harvest.
+[2026-06-17 17:40:58] environment: An ordinary year for the harvest.
+[2026-06-17 17:40:59] breeding: Reproduction between Wengan and Groostila
+[2026-06-17 17:41:03] breeding: Reproduction between Hiaxila and Gython
+[2026-06-17 17:41:05] environment: An ordinary year for the harvest.
+[2026-06-17 17:41:09] breeding: Reproduction between Groostila and Wengan
+[2026-06-17 17:41:10] breeding: Reproduction between Gython and Hiaxila
+[2026-06-17 17:41:12] environment: An ordinary year for the harvest.
+[2026-06-17 17:41:15] breeding: Reproduction between Wengan and Groostila
+[2026-06-17 17:42:03] environment: An ordinary year for the harvest.
+[2026-06-17 17:42:04] breeding: Reproduction between Groostila and Wengan
+[2026-06-17 17:42:11] environment: An ordinary year for the harvest.
+[2026-06-17 17:42:11] breeding: Reproduction between Hiaxila and Gython
+[2026-06-17 17:42:11] breeding: Reproduction between Groostila and Wengan
+[2026-06-17 17:42:18] environment: An ordinary year for the harvest.
+[2026-06-17 17:42:20] breeding: Reproduction between Wengan and Groostila
+[2026-06-17 17:42:26] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:42:33] environment: An ordinary year for the harvest.
+[2026-06-17 17:42:41] environment: An ordinary year for the harvest.
+[2026-06-17 17:42:41] breeding: Reproduction between Wengan and Groostila
+[2026-06-17 17:42:44] breeding: Reproduction between Wengan and Groostila
+[2026-06-17 17:42:48] breeding: Reproduction between Wengan and Groostila
+[2026-06-17 17:42:50] environment: An ordinary year for the harvest.
+[2026-06-17 17:42:55] breeding: Reproduction between Groostila and Wengan
+[2026-06-17 17:42:58] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:43:00] breeding: Reproduction between Zazara and Glarmbaar
+[2026-06-17 17:43:04] breeding: Reproduction between Groostila and Wengan
+[2026-06-17 17:43:05] environment: An ordinary year for the harvest.
+[2026-06-17 17:43:05] crime_of_passion: Tiaxthaestus committed murder against Groostila out of jealousy over Wengan
+[2026-06-17 17:43:07] breeding: Reproduction between Mbaauna and Pazglyar
+[2026-06-17 17:43:11] breeding: Reproduction between Gaaud and Drothmbongia
+[2026-06-17 17:43:13] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:43:13] breeding: Child born to the committed couple Zazara & Glarmbaar
+[2026-06-17 17:43:19] breeding: Reproduction between Mbaauna and Pazglyar
+[2026-06-17 17:43:21] environment: An ordinary year for the harvest.
+[2026-06-17 17:43:29] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:43:37] environment: An ordinary year for the harvest.
+[2026-06-17 17:43:37] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:43:39] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:43:41] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:43:45] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:43:47] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:43:49] crime_of_passion: Saen committed murder against Mbysa out of jealousy over Zeza
+[2026-06-17 17:43:52] crime_of_passion: Haaxgiayn committed murder against Gothsyeth out of jealousy over Weengeth
+[2026-06-17 17:43:53] environment: An ordinary year for the harvest.
+[2026-06-17 17:43:57] breeding: Reproduction between Mbaauna and Pazglyar
+[2026-06-17 17:44:01] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:44:03] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:44:07] crime_of_passion: Kraexkreixor committed murder against Hestsa out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:09] jealousy: Kraexkreixor is consumed by jealousy over Thaestwoosteth - sees Hestsa as a rival
+[2026-06-17 17:44:10] environment: An ordinary year for the harvest.
+[2026-06-17 17:44:11] crime_of_passion: Haaxgiayn committed murder against Gothsyeth out of jealousy over Weengeth
+[2026-06-17 17:44:13] crime_of_passion: Haaxgiayn committed murder against Gothsyeth out of jealousy over Weengeth
+[2026-06-17 17:44:13] jealousy: Kraexkreixor is consumed by jealousy over Thaestwoosteth - sees Hestsa as a rival
+[2026-06-17 17:44:14] jealousy: Gaaud is consumed by jealousy over Drothmbongia - sees Mbianon as a rival
+[2026-06-17 17:44:14] breeding: Reproduction between Saen and Zeza
+[2026-06-17 17:44:14] crime_of_passion: Haaxgiayn committed murder against Gothsyeth out of jealousy over Weengeth
+[2026-06-17 17:44:14] crime_of_passion: Kraexkreixor committed murder against Hestsa out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:15] breeding: Reproduction between Weengeth and Wengan
+[2026-06-17 17:44:17] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:17] jealousy: Weengeth is consumed by jealousy over Wengan - sees Tiaxthaestus as a rival
+[2026-06-17 17:44:17] crime_of_passion: Kraexkreixor committed murder against Hestsa out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:18] environment: An ordinary year for the harvest.
+[2026-06-17 17:44:18] crime_of_passion: Haaxgiayn committed murder against Gothsyeth out of jealousy over Weengeth
+[2026-06-17 17:44:19] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:19] crime_of_passion: Kraexkreixor committed murder against Hestsa out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:21] jealousy: Mbaauna is consumed by jealousy over Pazglyar - sees Ngaathsauna as a rival
+[2026-06-17 17:44:21] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:21] crime_of_passion: Haaxgiayn committed murder against Gothsyeth out of jealousy over Weengeth
+[2026-06-17 17:44:21] crime_of_passion: Thaestwoosteth committed murder against Traethar out of jealousy over Kraexkreixor
+[2026-06-17 17:44:22] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:22] crime_of_passion: Kraexkreixor committed murder against Hestsa out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:22] crime_of_passion: Thaestwoosteth committed murder against Traethar out of jealousy over Kraexkreixor
+[2026-06-17 17:44:24] crime_of_passion: Thaestwoosteth committed murder against Traethar out of jealousy over Kraexkreixor
+[2026-06-17 17:44:24] crime_of_passion: Kraexkreixor committed murder against Hestsa out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:24] crime_of_passion: Hestsa committed murder against Kraexkreixor out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:25] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:25] jealousy: Weengeth is consumed by jealousy over Wengan - sees Tiaxthaestus as a rival
+[2026-06-17 17:44:25] crime_of_passion: Haaxgiayn committed murder against Gothsyeth out of jealousy over Weengeth
+[2026-06-17 17:44:27] jealousy: Weengeth is consumed by jealousy over Wengan - sees Tiaxthaestus as a rival
+[2026-06-17 17:44:28] environment: An ordinary year for the harvest.
+[2026-06-17 17:44:28] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:30] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:31] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:44:33] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:33] jealousy: Haaxgiayn is consumed by jealousy over Weengeth - sees Wengan as a rival
+[2026-06-17 17:44:33] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:44:34] breeding: Child born to the committed couple Saen & Zeza
+[2026-06-17 17:44:34] jealousy: Weengeth is consumed by jealousy over Wengan - sees Tiaxthaestus as a rival
+[2026-06-17 17:44:36] jealousy: Mbaauna is consumed by jealousy over Pazglyar - sees Ngaathsauna as a rival
+[2026-06-17 17:44:36] jealousy: Hestsa is consumed by jealousy over Thaestwoosteth - sees Tiaxthaestus as a rival
+[2026-06-17 17:44:37] environment: An ordinary year for the harvest.
+[2026-06-17 17:44:37] crime_of_passion: Mbaauna committed murder against Ngaathsauna out of jealousy over Pazglyar
+[2026-06-17 17:44:39] crime_of_passion: Yenghangor committed murder against Traethar out of jealousy over Hangthaengeth
+[2026-06-17 17:44:40] jealousy: Gaaud is consumed by jealousy over Drothmbongia - sees Mbianon as a rival
+[2026-06-17 17:44:40] jealousy: Yenghangor is consumed by jealousy over Hangthaengeth - sees Traethar as a rival
+[2026-06-17 17:44:40] crime_of_passion: Yenghangor committed murder against Traethar out of jealousy over Hangthaengeth
+[2026-06-17 17:44:41] jealousy: Gaaud is consumed by jealousy over Drothmbongia - sees Mbianon as a rival
+[2026-06-17 17:44:41] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:44:43] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:44:44] jealousy: Hestsa is consumed by jealousy over Thaestwoosteth - sees Hangthaengeth as a rival
+[2026-06-17 17:44:45] environment: An ordinary year for the harvest.
+[2026-06-17 17:44:46] jealousy: Yenghangor is consumed by jealousy over Hangthaengeth - sees Trooxkrooxae as a rival
+[2026-06-17 17:44:47] jealousy: Tiaxthaestus is consumed by jealousy over Wengan - sees Weengeth as a rival
+[2026-06-17 17:44:47] jealousy: Hestsa is consumed by jealousy over Thaestwoosteth - sees Hangthaengeth as a rival
+[2026-06-17 17:44:47] crime_of_passion: Hestsa committed murder against Hangthaengeth out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:48] jealousy: Hestsa is consumed by jealousy over Thaestwoosteth - sees Hangthaengeth as a rival
+[2026-06-17 17:44:48] crime_of_passion: Hestsa committed murder against Hangthaengeth out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:48] crime_of_passion: Thaestwoosteth committed murder against Tiaxthaestus out of jealousy over Hestsa
+[2026-06-17 17:44:51] breeding: Reproduction between Saen and Zeza
+[2026-06-17 17:44:51] jealousy: Weengeth is consumed by jealousy over Wengan - sees Mberzathar as a rival
+[2026-06-17 17:44:51] crime_of_passion: Hestsa committed murder against Hangthaengeth out of jealousy over Thaestwoosteth
+[2026-06-17 17:44:54] environment: An ordinary year for the harvest.
+[2026-06-17 17:44:54] breeding: Child born to the committed couple Trathoth & Glothor
+[2026-06-17 17:44:55] breeding: Reproduction between Zazara and Glarmbaar
+[2026-06-17 17:44:57] jealousy: Haaxgiayn is consumed by jealousy over Weengeth - sees Wengan as a rival
+[2026-06-17 17:44:58] crime_of_passion: Weengeth committed murder against Gunra out of jealousy over Wengan
+[2026-06-17 17:45:00] crime_of_passion: Weengeth committed murder against Gunra out of jealousy over Wengan
+[2026-06-17 17:45:02] crime_of_passion: Weengeth committed murder against Gunra out of jealousy over Wengan
+[2026-06-17 17:45:02] jealousy: Haaxgiayn is consumed by jealousy over Weengeth - sees Wengan as a rival
+[2026-06-17 17:45:03] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:45:03] jealousy: Gaaud is consumed by jealousy over Drothmbongia - sees Mbianon as a rival
+[2026-06-17 17:45:03] breeding: Reproduction between Zazara and Glarmbaar
+[2026-06-17 17:45:03] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:45:04] breeding: Child born to the committed couple Zazara & Glarmbaar
+[2026-06-17 17:45:04] breeding: Reproduction between Glarmbaar and Zazara
+[2026-06-17 17:45:04] crime_of_passion: Weengeth committed murder against Gunra out of jealousy over Wengan
+[2026-06-17 17:45:11] environment: An ordinary year for the harvest.
+[2026-06-17 17:45:15] crime_of_passion: Weengeth committed murder against Gunra out of jealousy over Wengan
+[2026-06-17 17:45:15] crime_of_passion: Mbangetha committed murder against Mbyrpyruna out of jealousy over Zyen
+[2026-06-17 17:45:16] breeding: Reproduction between Gython and Hiaxila
+[2026-06-17 17:45:18] crime_of_passion: Weengeth committed murder against Gunra out of jealousy over Wengan
+[2026-06-17 17:45:19] breeding: Reproduction between Gython and Hiaxila
+[2026-06-17 17:45:20] jealousy: Hestsa is consumed by jealousy over Thaestwoosteth - sees Thaengtaestane as a rival
+[2026-06-17 17:45:21] environment: An ordinary year for the harvest.
+[2026-06-17 17:45:21] jealousy: Weengeth is consumed by jealousy over Wengan - sees Mberzathar as a rival
+[2026-06-17 17:45:24] jealousy: Haaxgiayn is consumed by jealousy over Weengeth - sees Wengan as a rival
+[2026-06-17 17:45:27] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:45:28] jealousy: Haaxgiayn is consumed by jealousy over Weengeth - sees Wengan as a rival
+[2026-06-17 17:45:30] environment: An ordinary year for the harvest.
+[2026-06-17 17:45:30] breeding: Reproduction between Glarmbaar and Zazara
+[2026-06-17 17:45:30] crime_of_passion: Zeza committed murder against Zerus out of jealousy over Saen
+[2026-06-17 17:45:31] jealousy: Weengeth is consumed by jealousy over Wengan - sees Mberzathar as a rival
+[2026-06-17 17:45:33] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:45:34] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:45:36] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:45:38] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:45:39] crime_of_passion: Weengeth committed murder against Saasongeth out of jealousy over Haaxgiayn
+[2026-06-17 17:45:40] crime_of_passion: Weengeth committed murder against Saasongeth out of jealousy over Haaxgiayn
+[2026-06-17 17:45:40] jealousy: Haaxgiayn is consumed by jealousy over Weengeth - sees Wengan as a rival
+[2026-06-17 17:45:42] crime_of_passion: Weengeth committed murder against Saasongeth out of jealousy over Saasongeth
+[2026-06-17 17:45:45] crime_of_passion: Weengeth committed murder against Haaxgiayn out of jealousy over Saasongeth
+[2026-06-17 17:45:45] jealousy: Wengan is consumed by jealousy over Weengeth - sees Saasongeth as a rival
+[2026-06-17 17:45:45] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:45:45] jealousy: Mbangetha is consumed by jealousy over Zyen - sees Trooxkrooxae as a rival
+[2026-06-17 17:45:46] jealousy: Haaxgiayn is consumed by jealousy over Weengeth - sees Wengan as a rival
+[2026-06-17 17:45:46] jealousy: Mbangetha is consumed by jealousy over Zyen - sees Trooxkrooxae as a rival
+[2026-06-17 17:45:47] environment: An ordinary year for the harvest.
+[2026-06-17 17:45:48] breeding: Reproduction between Zazara and Glarmbaar
+[2026-06-17 17:45:48] crime_of_passion: Weengeth committed murder against Haaxgiayn out of jealousy over Saasongeth
+[2026-06-17 17:45:48] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:45:49] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:45:51] breeding: Reproduction between Glarmbaar and Zazara
+[2026-06-17 17:45:51] crime_of_passion: Weengeth committed murder against Haaxgiayn out of jealousy over Saasongeth
+[2026-06-17 17:45:51] crime_of_passion: Thaestwoosteth committed murder against Yenghangor out of jealousy over Trooxkrooxae
+[2026-06-17 17:45:52] crime_of_passion: Weengeth committed murder against Haaxgiayn out of jealousy over Saasongeth
+[2026-06-17 17:45:53] jealousy: Mbangetha is consumed by jealousy over Zyen - sees Trooxkrooxae as a rival
+[2026-06-17 17:45:54] breeding: Child born to the committed couple Trathoth & Glothor
+[2026-06-17 17:45:54] crime_of_passion: Weengeth committed murder against Haaxgiayn out of jealousy over Saasongeth
+[2026-06-17 17:45:56] crime_of_passion: Weengeth committed murder against Haaxgiayn out of jealousy over Saasongeth
+[2026-06-17 17:45:56] crime_of_passion: Hiathar committed murder against Weengeth out of jealousy over Hoyn
+[2026-06-17 17:45:56] crime_of_passion: Thaestwoosteth committed murder against Yenghangor out of jealousy over Trooxkrooxae
+[2026-06-17 17:45:57] environment: An ordinary year for the harvest.
+[2026-06-17 17:45:57] crime_of_passion: Glothor committed assault against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:45:57] crime_of_passion: Hoongtrathoth committed assault against Thaethila out of jealousy over Haengyaesteth
+[2026-06-17 17:45:57] crime_of_passion: Yaestyiarketh committed assault against Haengyaesteth out of jealousy over Hoongtrathoth
+[2026-06-17 17:45:57] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:45:57] jealousy: Mbangetha is consumed by jealousy over Zyen - sees Trooxkrooxae as a rival
+[2026-06-17 17:45:59] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:46:02] crime_of_passion: Haengyaesteth committed murder against Yaestyiarketh out of jealousy over Hoongtrathoth
+[2026-06-17 17:46:02] jealousy: Yaestyiarketh is consumed by jealousy over Hoongtrathoth - sees Haengyaesteth as a rival
+[2026-06-17 17:46:02] crime_of_passion: Yaestyiarketh committed murder against Haengyaesteth out of jealousy over Hoongtrathoth
+[2026-06-17 17:46:02] crime_of_passion: Zyen committed murder against Ngepythoth out of jealousy over Mbangetha
+[2026-06-17 17:46:03] crime_of_passion: Hestsa committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:46:03] crime_of_passion: Thaestwoosteth committed murder against Hestsa out of jealousy over Hestsa
+[2026-06-17 17:46:05] jealousy: Mbangetha is consumed by jealousy over Zyen - sees Trooxkrooxae as a rival
+[2026-06-17 17:46:06] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:46:06] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:06] crime_of_passion: Gython committed murder against Gaadrothyn out of jealousy over Hiaxila
+[2026-06-17 17:46:08] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:09] crime_of_passion: Hoongtrathoth committed assault against Tiaxae out of jealousy over Yaestyiarketh
+[2026-06-17 17:46:11] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:12] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:12] crime_of_passion: Trooxkrooxae committed murder against Thaengtaestane out of jealousy over Thaestwoosteth
+[2026-06-17 17:46:13] jealousy: Mbangetha is consumed by jealousy over Zyen - sees Trooxkrooxae as a rival
+[2026-06-17 17:46:14] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:46:15] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:17] environment: An ordinary year for the harvest.
+[2026-06-17 17:46:17] crime_of_passion: Hoongtrathoth committed murder against Tiaxae out of jealousy over Yaestyiarketh
+[2026-06-17 17:46:17] jealousy: Zeza is consumed by jealousy over Saen - sees Sauna as a rival
+[2026-06-17 17:46:17] jealousy: Mbangetha is consumed by jealousy over Zyen - sees Trooxkrooxae as a rival
+[2026-06-17 17:46:20] crime_of_passion: Hoongtrathoth committed murder against Tiaxae out of jealousy over Yaestyiarketh
+[2026-06-17 17:46:21] jealousy: Gaaud is consumed by jealousy over Drothmbongia - sees Mbianon as a rival
+[2026-06-17 17:46:21] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:46:21] crime_of_passion: Thaengtaestane committed murder against Trooxkrooxae out of jealousy over Thaestwoosteth
+[2026-06-17 17:46:23] crime_of_passion: Hoongtrathoth committed murder against Tiaxae out of jealousy over Yaestyiarketh
+[2026-06-17 17:46:26] environment: An ordinary year for the harvest.
+[2026-06-17 17:46:26] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:27] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:28] jealousy: Hiathar is consumed by jealousy over Hoyn - sees Gianyn as a rival
+[2026-06-17 17:46:29] crime_of_passion: Hoongtrathoth committed murder against Tiaxae out of jealousy over Yaestyiarketh
+[2026-06-17 17:46:29] crime_of_passion: Krooxar committed murder against Wengan out of jealousy over Hathane
+[2026-06-17 17:46:30] crime_of_passion: Hoongtrathoth committed murder against Tiaxae out of jealousy over Yaestyiarketh
+[2026-06-17 17:46:30] crime_of_passion: Zeza committed murder against Sauna out of jealousy over Saen
+[2026-06-17 17:46:32] crime_of_passion: Hoongtrathoth committed murder against Tiaxae out of jealousy over Yaestyiarketh
+[2026-06-17 17:46:32] jealousy: Gaaud is consumed by jealousy over Drothmbongia - sees Mbianon as a rival
+[2026-06-17 17:46:32] crime_of_passion: Gython committed murder against Syxud out of jealousy over Hiaxila
+[2026-06-17 17:46:33] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:35] environment: An ordinary year for the harvest.
+[2026-06-17 17:46:35] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:36] jealousy: Zyen is consumed by jealousy over Mbangetha - sees Zersaar as a rival
+[2026-06-17 17:46:38] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:46:39] crime_of_passion: Glothor committed murder against Yaestyiarketh out of jealousy over Trathoth
+[2026-06-17 17:46:39] breeding: Reproduction between Zazara and Glarmbaar
+[2026-06-17 17:46:39] crime_of_passion: Hathane committed murder against Krooxar out of jealousy over Krooxar
+[2026-06-17 17:46:41] breeding: Reproduction between Mbianon and Suim
+[2026-06-17 17:46:42] breeding: Reproduction between Suim and Mbianon
+[2026-06-17 17:46:43] crime_of_passion: Hiathar committed murder against Gianyn out of jealousy over Hoyn
+[2026-06-17 17:46:44] environment: An ordinary year for the harvest.
+[2026-06-17 17:46:44] breeding: Reproduction between Mbianon and Suim
+[2026-06-17 17:46:45] crime_of_passion: Zyen committed murder against Zersaar out of jealousy over Mbangetha
+[2026-06-17 17:46:49] crime_of_passion: Zyen committed murder against Zersaar out of jealousy over Mbangetha
+[2026-06-17 17:46:49] crime_of_passion: Hiathar committed murder against Gianyn out of jealousy over Hoyn
+[2026-06-17 17:46:50] crime_of_passion: Hiathar committed murder against Gianyn out of jealousy over Hoyn
+[2026-06-17 17:46:52] crime_of_passion: Hathane committed murder against Krooxar out of jealousy over Krooxar
+[2026-06-17 17:46:52] crime_of_passion: Hiathar committed murder against Gianyn out of jealousy over Hoyn
+[2026-06-17 17:46:53] environment: An ordinary year for the harvest.
+[2026-06-17 17:46:53] crime_of_passion: Hathane committed murder against Krooxar out of jealousy over Krooxar
+[2026-06-17 17:46:53] crime_of_passion: Gianyn committed murder against Hiathar out of jealousy over Hoyn
+[2026-06-17 17:46:55] jealousy: Hathane is consumed by jealousy over Krooxar - sees Waexila as a rival
+[2026-06-17 17:46:56] crime_of_passion: Saen committed murder against Ngaathar out of jealousy over Zeza
+[2026-06-17 17:46:56] crime_of_passion: Gianyn committed murder against Hiathar out of jealousy over Hoyn
+[2026-06-17 17:46:58] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:46:59] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:47:01] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:47:01] crime_of_passion: Mbaauna committed murder against Pazglyar out of jealousy over Pazglyar
+[2026-06-17 17:47:01] crime_of_passion: Hiathar committed murder against Gianyn out of jealousy over Hoyn
+[2026-06-17 17:47:01] crime_of_passion: Gianyn committed murder against Hiathar out of jealousy over Hoyn
+[2026-06-17 17:47:02] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:47:02] crime_of_passion: Hathane committed murder against Krooxar out of jealousy over Krooxar
+[2026-06-17 17:47:05] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:47:07] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:47:07] crime_of_passion: Zyen committed murder against Mbangetha out of jealousy over Mbangetha
+[2026-06-17 17:47:10] jealousy: Hathane is consumed by jealousy over Krooxar - sees Waexila as a rival
+[2026-06-17 17:47:11] environment: An ordinary year for the harvest.
+[2026-06-17 17:47:13] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:15] jealousy: Gianyn is consumed by jealousy over Hoyn - sees Krooxar as a rival
+[2026-06-17 17:47:16] crime_of_passion: Zyen committed murder against Paaar out of jealousy over Mbangetha
+[2026-06-17 17:47:16] breeding: Reproduction between Seeud and Suim
+[2026-06-17 17:47:16] breeding: Reproduction between Drothmbongia and Mbianon
+[2026-06-17 17:47:16] jealousy: Gianyn is consumed by jealousy over Hoyn - sees Krooxar as a rival
+[2026-06-17 17:47:17] crime_of_passion: Hathane committed murder against Krooxar out of jealousy over Krooxar
+[2026-06-17 17:47:17] breeding: Reproduction between Zazara and Glarmbaar
+[2026-06-17 17:47:18] breeding: Reproduction between Miangaara and Saasongeth
+[2026-06-17 17:47:19] crime_of_passion: Zyen committed murder against Paaar out of jealousy over Mbangetha
+[2026-06-17 17:47:20] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:47:21] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:21] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:21] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:22] breeding: Reproduction between Trethila and Rexgrethax
+[2026-06-17 17:47:24] jealousy: Zyen is consumed by jealousy over Mbangetha - sees Zethvythoth as a rival
+[2026-06-17 17:47:24] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:24] jealousy: Gianyn is consumed by jealousy over Hoyn - sees Krooxar as a rival
+[2026-06-17 17:47:25] crime_of_passion: Zyen committed murder against Mbangetha out of jealousy over Mbangetha
+[2026-06-17 17:47:27] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:28] breeding: Reproduction between Zeza and Saen
+[2026-06-17 17:47:28] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:30] environment: An ordinary year for the harvest.
+[2026-06-17 17:47:30] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:30] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:32] jealousy: Saen is consumed by jealousy over Zeza - sees Mberzathar as a rival
+[2026-06-17 17:47:32] crime_of_passion: Zyen committed murder against Zethvythoth out of jealousy over Mbangetha
+[2026-06-17 17:47:33] crime_of_passion: Zyen committed murder against Zethvythoth out of jealousy over Mbangetha
+[2026-06-17 17:47:33] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:34] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:35] crime_of_passion: Zyen committed murder against Zethvythoth out of jealousy over Mbangetha
+[2026-06-17 17:47:35] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:35] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:37] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:37] breeding: Reproduction between Drothmbongia and Mbianon
+[2026-06-17 17:47:40] environment: An ordinary year for the harvest.
+[2026-06-17 17:47:40] jealousy: Hathane is consumed by jealousy over Krooxar - sees Taestwaexila as a rival
+[2026-06-17 17:47:40] breeding: Reproduction between Glarmbaar and Zazara
+[2026-06-17 17:47:40] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:40] jealousy: Gianyn is consumed by jealousy over Hoyn - sees Krooxar as a rival
+[2026-06-17 17:47:41] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:41] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:41] crime_of_passion: Gython committed assault against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:47:41] jealousy: Gianyn is consumed by jealousy over Hoyn - sees Krooxar as a rival
+[2026-06-17 17:47:43] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:43] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:43] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:43] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:47:44] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:44] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:45] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:47:46] jealousy: Hathane is consumed by jealousy over Krooxar - sees Taestwaexila as a rival
+[2026-06-17 17:47:46] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:48] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:48] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:48] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:48] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:47:48] crime_of_passion: Taestwaexila committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:47:49] environment: An ordinary year for the harvest.
+[2026-06-17 17:47:49] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:49] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:49] jealousy: Suim is consumed by jealousy over Mbianon - sees Drothmbongia as a rival
+[2026-06-17 17:47:49] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:50] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:47:51] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:51] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:51] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:51] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:47:51] jealousy: Taestwaexila is consumed by jealousy over Krooxar - sees Waexila as a rival
+[2026-06-17 17:47:51] crime_of_passion: Taestwaexila committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:47:53] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:53] crime_of_passion: Hoyn committed murder against Saambooon out of jealousy over Gianyn
+[2026-06-17 17:47:54] crime_of_passion: Hathane committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:47:54] crime_of_passion: Mbianon committed murder against Seeud out of jealousy over Suim
+[2026-06-17 17:47:55] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbianon
+[2026-06-17 17:47:55] crime_of_passion: Seeud committed murder against Mbianon out of jealousy over Suim
+[2026-06-17 17:47:55] crime_of_passion: Hoyn committed murder against Saambooon out of jealousy over Gianyn
+[2026-06-17 17:47:56] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:47:56] crime_of_passion: Ngambaaar committed murder against Glarmbaar out of jealousy over Zazara
+[2026-06-17 17:47:57] jealousy: Gianyn is consumed by jealousy over Hoyn - sees Krooxar as a rival
+[2026-06-17 17:47:58] crime_of_passion: Ngambaaar committed murder against Glarmbaar out of jealousy over Zazara
+[2026-06-17 17:47:59] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:47:59] crime_of_passion: Saen committed murder against Mberzathar out of jealousy over Zeza
+[2026-06-17 17:48:00] crime_of_passion: Hoyn committed murder against Saambooon out of jealousy over Gianyn
+[2026-06-17 17:48:01] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:03] crime_of_passion: Saen committed murder against Glarmbaar out of jealousy over Zeza
+[2026-06-17 17:48:03] crime_of_passion: Taestwaexila committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:03] crime_of_passion: Taaar committed murder against Vythglaaus out of jealousy over Vaazis
+[2026-06-17 17:48:04] crime_of_passion: Saen committed murder against Glarmbaar out of jealousy over Zeza
+[2026-06-17 17:48:04] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:04] jealousy: Taestwaexila is consumed by jealousy over Krooxar - sees Waexila as a rival
+[2026-06-17 17:48:06] crime_of_passion: Hoyn committed murder against Saambooon out of jealousy over Gianyn
+[2026-06-17 17:48:07] crime_of_passion: Ngambaaar committed murder against Glarmbaar out of jealousy over Zazara
+[2026-06-17 17:48:07] jealousy: Saen is consumed by jealousy over Zeza - sees Ngambaaar as a rival
+[2026-06-17 17:48:07] crime_of_passion: Gletaais committed murder against Varzeim out of jealousy over Zea
+[2026-06-17 17:48:07] crime_of_passion: Hoyn committed murder against Saambooon out of jealousy over Gianyn
+[2026-06-17 17:48:09] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:10] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:48:10] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:11] crime_of_passion: Taestwaexila committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:11] jealousy: Waexila is consumed by jealousy over Krooxar - sees Taestwaexila as a rival
+[2026-06-17 17:48:12] crime_of_passion: Saen committed murder against Zeza out of jealousy over Zeza
+[2026-06-17 17:48:12] jealousy: Seeud is consumed by jealousy over Suim - sees Haathae as a rival
+[2026-06-17 17:48:12] crime_of_passion: Waexila committed murder against Taestwaexila out of jealousy over Krooxar
+[2026-06-17 17:48:14] crime_of_passion: Saen committed murder against Zeza out of jealousy over Zeza
+[2026-06-17 17:48:14] crime_of_passion: Gianyn committed murder against Hoyn out of jealousy over Saambooon
+[2026-06-17 17:48:15] jealousy: Taaar is consumed by jealousy over Vaazis - sees Glesaoth as a rival
+[2026-06-17 17:48:15] crime_of_passion: Taaar committed murder against Glesaoth out of jealousy over Vaazis
+[2026-06-17 17:48:15] crime_of_passion: Seeud committed murder against Haathae out of jealousy over Suim
+[2026-06-17 17:48:17] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:17] crime_of_passion: Saen committed murder against Ngambaaar out of jealousy over Zeza
+[2026-06-17 17:48:17] jealousy: Seeud is consumed by jealousy over Suim - sees Haathae as a rival
+[2026-06-17 17:48:17] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:20] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:48:20] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:21] crime_of_passion: Seeud committed murder against Haathae out of jealousy over Suim
+[2026-06-17 17:48:21] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:24] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:26] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:27] crime_of_passion: Hathane committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:48:29] environment: An ordinary year for the harvest.
+[2026-06-17 17:48:29] crime_of_passion: Waexila committed murder against Hathane out of jealousy over Krooxar
+[2026-06-17 17:48:31] crime_of_passion: Taaar committed murder against Vatha out of jealousy over Vaazis
+[2026-06-17 17:48:35] jealousy: Gython is consumed by jealousy over Hiaxila - sees Haagunim as a rival
+[2026-06-17 17:48:37] jealousy: Gython is consumed by jealousy over Hiaxila - sees Haagunim as a rival
+[2026-06-17 17:48:37] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:38] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:48:40] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:43] crime_of_passion: Waexila committed murder against Thaengtaestane out of jealousy over Krooxar
+[2026-06-17 17:48:44] crime_of_passion: Mbangetha committed murder against Zyen out of jealousy over Zyen
+[2026-06-17 17:48:46] jealousy: Gython is consumed by jealousy over Hiaxila - sees Haagunim as a rival
+[2026-06-17 17:48:47] environment: An ordinary year for the harvest.
+[2026-06-17 17:48:47] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:49] jealousy: Miangaara is consumed by jealousy over Saasongeth - sees Soomuthon as a rival
+[2026-06-17 17:48:49] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:50] crime_of_passion: Trathoth committed murder against Yiarketh out of jealousy over Glothor
+[2026-06-17 17:48:50] breeding: Reproduction between Gletaais and Zea
+[2026-06-17 17:48:50] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:51] jealousy: Miangaara is consumed by jealousy over Saasongeth - sees Soomuthon as a rival
+[2026-06-17 17:48:51] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:53] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:48:56] environment: An ordinary year for the harvest.
+[2026-06-17 17:48:57] crime_of_passion: Glothor committed murder against Trathoth out of jealousy over Trathoth
+[2026-06-17 17:48:59] jealousy: Gython is consumed by jealousy over Hiaxila - sees Haagunim as a rival
+[2026-06-17 17:48:59] crime_of_passion: Saasongeth committed murder against Seeud out of jealousy over Soomuthon
+[2026-06-17 17:49:03] crime_of_passion: Gianyn committed murder against Saasongeth out of jealousy over Saambooon
+[2026-06-17 17:49:05] environment: An ordinary year for the harvest.
+[2026-06-17 17:49:06] jealousy: Gython is consumed by jealousy over Hiaxila - sees Haagunim as a rival
+[2026-06-17 17:49:08] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:09] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:49:11] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:49:12] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:14] environment: An ordinary year for the harvest.
+[2026-06-17 17:49:14] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:15] crime_of_passion: Trethila committed murder against Haestax out of jealousy over Rexgrethax
+[2026-06-17 17:49:15] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:15] crime_of_passion: Glarsa committed murder against Vethuna out of jealousy over Ngaar
+[2026-06-17 17:49:17] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:18] breeding: Reproduction between Taaar and Vaazis
+[2026-06-17 17:49:21] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:21] crime_of_passion: Gianyn committed murder against Mbongia out of jealousy over Saambooon
+[2026-06-17 17:49:22] environment: An ordinary year for the harvest.
+[2026-06-17 17:49:22] breeding: Reproduction between Gletaais and Zea
+[2026-06-17 17:49:22] crime_of_passion: Gython committed murder against Haagunim out of jealousy over Hiaxila
+[2026-06-17 17:49:24] jealousy: Gython is consumed by jealousy over Hiaxila - sees Gaaud as a rival
+[2026-06-17 17:49:25] jealousy: Gython is consumed by jealousy over Hiaxila - sees Gaaud as a rival
+[2026-06-17 17:49:25] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:49:27] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:49:28] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:49:30] crime_of_passion: Monon committed murder against Goothud out of jealousy over Gunmbeeneth
+[2026-06-17 17:49:30] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:31] environment: An ordinary year for the harvest.
+[2026-06-17 17:49:31] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:32] jealousy: Gython is consumed by jealousy over Hiaxila - sees Gaaud as a rival
+[2026-06-17 17:49:34] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:34] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:35] crime_of_passion: Monon committed murder against Goothud out of jealousy over Gunmbeeneth
+[2026-06-17 17:49:36] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:49:37] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:38] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:39] environment: An ordinary year for the harvest.
+[2026-06-17 17:49:39] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:49:39] breeding: Reproduction between Gletaais and Zea
+[2026-06-17 17:49:39] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:41] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:41] jealousy: Drothmbongia is consumed by jealousy over Gaaud - sees Hiaxila as a rival
+[2026-06-17 17:49:42] breeding: Child born to the committed couple Krooxar & Waexila
+[2026-06-17 17:49:42] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:43] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:45] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:46] jealousy: Waexila is consumed by jealousy over Krooxar - sees Krethila as a rival
+[2026-06-17 17:49:46] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:49:46] crime_of_passion: Mbyon committed assault against Gunmbeeneth out of jealousy over Goothud
+[2026-06-17 17:49:47] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:49:48] jealousy: Gython is consumed by jealousy over Hiaxila - sees Gaaud as a rival
+[2026-06-17 17:49:48] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:48] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:48] crime_of_passion: Mbyon committed assault against Gunmbeeneth out of jealousy over Goothud
+[2026-06-17 17:49:49] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:50] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:49:50] jealousy: Drothmbongia is consumed by jealousy over Gaaud - sees Hiaxila as a rival
+[2026-06-17 17:49:52] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:52] jealousy: Drothmbongia is consumed by jealousy over Gaaud - sees Hiaxila as a rival
+[2026-06-17 17:49:53] jealousy: Gython is consumed by jealousy over Hiaxila - sees Gaaud as a rival
+[2026-06-17 17:49:53] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:53] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:55] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:55] jealousy: Drothmbongia is consumed by jealousy over Gaaud - sees Hiaxila as a rival
+[2026-06-17 17:49:55] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:56] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:56] crime_of_passion: Drothmbongia committed murder against Hiaxila out of jealousy over Gaaud
+[2026-06-17 17:49:57] environment: An ordinary year for the harvest.
+[2026-06-17 17:49:57] jealousy: Waexila is consumed by jealousy over Krooxar - sees Krethila as a rival
+[2026-06-17 17:49:57] breeding: Reproduction between Zea and Gletaais
+[2026-06-17 17:49:58] crime_of_passion: Hoongtrathoth committed murder against Thaethila out of jealousy over Glothor
+[2026-06-17 17:49:59] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:49:59] crime_of_passion: Gython committed murder against Gaaud out of jealousy over Hiaxila
+[2026-06-17 17:49:59] jealousy: Drothmbongia is consumed by jealousy over Gaaud - sees Soomuthon as a rival
+[2026-06-17 17:49:59] crime_of_passion: Drothmbongia committed murder against Gaaud out of jealousy over Gaaud
+[2026-06-17 17:50:00] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:00] crime_of_passion: Glarsa committed murder against Zea out of jealousy over Ngaar
+[2026-06-17 17:50:01] crime_of_passion: Mbazmbaren committed murder against Saaar out of jealousy over Mbaaruna
+[2026-06-17 17:50:01] crime_of_passion: Mbaaruna committed murder against Glaaveuna out of jealousy over Mbazmbaren
+[2026-06-17 17:50:01] jealousy: Mbyon is consumed by jealousy over Goothud - sees Gunmbeeneth as a rival
+[2026-06-17 17:50:04] crime_of_passion: Mbazmbaren committed murder against Saaar out of jealousy over Mbaaruna
+[2026-06-17 17:50:04] crime_of_passion: Mbaaruna committed murder against Glaaveuna out of jealousy over Mbazmbaren
+[2026-06-17 17:50:04] crime_of_passion: Mbyon committed murder against Gunmbeeneth out of jealousy over Goothud
+[2026-06-17 17:50:05] environment: An ordinary year for the harvest.
+[2026-06-17 17:50:05] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:06] jealousy: Mbazmbaren is consumed by jealousy over Mbaaruna - sees Glarsa as a rival
+[2026-06-17 17:50:07] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:10] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:12] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:13] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:50:14] crime_of_passion: Mbazmbaren committed murder against Glarsa out of jealousy over Mbaaruna
+[2026-06-17 17:50:15] jealousy: Mbyon is consumed by jealousy over Goothud - sees Syzsa as a rival
+[2026-06-17 17:50:17] crime_of_passion: Mbazmbaren committed murder against Glarsa out of jealousy over Mbaaruna
+[2026-06-17 17:50:17] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:18] crime_of_passion: Mbazmbaren committed murder against Mbaaruna out of jealousy over Mbaaruna
+[2026-06-17 17:50:19] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:20] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:21] environment: An ordinary year for the harvest.
+[2026-06-17 17:50:21] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:25] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:27] jealousy: Mbazmbaren is consumed by jealousy over Mbaaruna - sees Mbaaar as a rival
+[2026-06-17 17:50:27] crime_of_passion: Mbazmbaren committed murder against Mbaaar out of jealousy over Mbaaruna
+[2026-06-17 17:50:27] jealousy: Waexila is consumed by jealousy over Krooxar - sees Krethila as a rival
+[2026-06-17 17:50:27] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:29] environment: An ordinary year for the harvest.
+[2026-06-17 17:50:30] jealousy: Syzsa is consumed by jealousy over Goothud - sees Mbyon as a rival
+[2026-06-17 17:50:31] breeding: Reproduction between Taaar and Vaazis
+[2026-06-17 17:50:31] crime_of_passion: Mbazmbaren committed murder against Mbaaar out of jealousy over Mbaaruna
+[2026-06-17 17:50:31] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:33] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:35] crime_of_passion: Mbazmbaren committed murder against Vaazis out of jealousy over Mbaaruna
+[2026-06-17 17:50:35] jealousy: Syzsa is consumed by jealousy over Goothud - sees Mbyon as a rival
+[2026-06-17 17:50:37] environment: An ordinary year for the harvest.
+[2026-06-17 17:50:39] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:40] crime_of_passion: Greththiastane committed murder against Rexgrethax out of jealousy over Trethila
+[2026-06-17 17:50:40] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:41] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:43] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:43] crime_of_passion: Gython committed murder against Hiaxila out of jealousy over Hiaxila
+[2026-06-17 17:50:44] crime_of_passion: Waexila committed murder against Krethila out of jealousy over Krooxar
+[2026-06-17 17:50:45] environment: An ordinary year for the harvest.
+[2026-06-17 17:50:46] crime_of_passion: Krethila committed murder against Waexila out of jealousy over Krooxar
+[2026-06-17 17:50:51] jealousy: Syzsa is consumed by jealousy over Goothud - sees Mbyon as a rival
+[2026-06-17 17:50:53] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:00] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:02] jealousy: Syzsa is consumed by jealousy over Goothud - sees Mbyon as a rival
+[2026-06-17 17:51:08] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:08] jealousy: Syzsa is consumed by jealousy over Goothud - sees Mbyon as a rival
+[2026-06-17 17:51:08] crime_of_passion: Gianyn committed murder against Mbyon out of jealousy over Saambooon
+[2026-06-17 17:51:12] crime_of_passion: Gianyn committed murder against Mbyon out of jealousy over Saambooon
+[2026-06-17 17:51:13] breeding: Reproduction between Krooxar and Krethila
+[2026-06-17 17:51:14] breeding: Reproduction between Ngaar and Syzsa
+[2026-06-17 17:51:14] breeding: Reproduction between Krethila and Krooxar
+[2026-06-17 17:51:15] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:15] crime_of_passion: Mbazmbaren committed murder against Ngais out of jealousy over Mbaaruna
+[2026-06-17 17:51:20] breeding: Reproduction between Krooxar and Krethila
+[2026-06-17 17:51:22] crime_of_passion: Mbaaruna committed murder against Taaar out of jealousy over Mbazmbaren
+[2026-06-17 17:51:23] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:51:23] breeding: Reproduction between Krooxar and Krethila
+[2026-06-17 17:51:23] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:51:28] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:51:29] crime_of_passion: Mbaaruna committed murder against Mbazmbaren out of jealousy over Mbazmbaren
+[2026-06-17 17:51:32] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:34] crime_of_passion: Taarar committed murder against Varoth out of jealousy over Zaazuna
+[2026-06-17 17:51:35] breeding: Child born to the committed couple Ngaar & Syzsa
+[2026-06-17 17:51:35] crime_of_passion: Taarar committed murder against Zaazuna out of jealousy over Vaaar
+[2026-06-17 17:51:36] crime_of_passion: Syzsa committed murder against Mbangetha out of jealousy over Ngaar
+[2026-06-17 17:51:36] breeding: Child born to the committed couple Krooxar & Krethila
+[2026-06-17 17:51:40] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:41] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:51:43] jealousy: Goothud is consumed by jealousy over Syzsa - sees Ngaar as a rival
+[2026-06-17 17:51:44] jealousy: Saambooon is consumed by jealousy over Gianyn - sees Soomuthon as a rival
+[2026-06-17 17:51:47] jealousy: Saambooon is consumed by jealousy over Gianyn - sees Soomuthon as a rival
+[2026-06-17 17:51:48] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:48] breeding: Reproduction between Krooxar and Krethila
+[2026-06-17 17:51:49] breeding: Reproduction between Krooxar and Krethila
+[2026-06-17 17:51:49] jealousy: Saambooon is consumed by jealousy over Gianyn - sees Soomuthon as a rival
+[2026-06-17 17:51:53] crime_of_passion: Varoth committed murder against Vaaar out of jealousy over Taarar
+[2026-06-17 17:51:55] jealousy: Goothud is consumed by jealousy over Syzsa - sees Ngaar as a rival
+[2026-06-17 17:51:56] environment: An ordinary year for the harvest.
+[2026-06-17 17:51:56] crime_of_passion: Varoth committed murder against Taarar out of jealousy over Taarar
+[2026-06-17 17:51:57] jealousy: Trethila is consumed by jealousy over Greththiastane - sees Droostek as a rival
+[2026-06-17 17:52:00] jealousy: Syzsa is consumed by jealousy over Goothud - sees Gianyn as a rival
+[2026-06-17 17:52:00] jealousy: Goothud is consumed by jealousy over Syzsa - sees Ngaar as a rival
+[2026-06-17 17:52:00] breeding: Reproduction between Krooxar and Krethila
+[2026-06-17 17:52:02] jealousy: Ngaar is consumed by jealousy over Syzsa - sees Goothud as a rival
+[2026-06-17 17:52:03] crime_of_passion: Saambooon committed murder against Gython out of jealousy over Monon
+[2026-06-17 17:52:04] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:08] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:52:08] jealousy: Goothud is consumed by jealousy over Syzsa - sees Ngaar as a rival
+[2026-06-17 17:52:10] jealousy: Ngaar is consumed by jealousy over Syzsa - sees Goothud as a rival
+[2026-06-17 17:52:10] breeding: Reproduction between Soomuthon and Gianyn
+[2026-06-17 17:52:12] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:12] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:12] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:52:14] jealousy: Trethila is consumed by jealousy over Greththiastane - sees Droostek as a rival
+[2026-06-17 17:52:16] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:52:17] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:17] breeding: Reproduction between Krethila and Krooxar
+[2026-06-17 17:52:18] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:52:18] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:18] crime_of_passion: Suim committed murder against Drothmbongia out of jealousy over Mbeenmonon
+[2026-06-17 17:52:19] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:20] jealousy: Gianyn is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:52:21] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:21] crime_of_passion: Saambooon committed murder against Gianyn out of jealousy over Monon
+[2026-06-17 17:52:22] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:23] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:25] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:26] jealousy: Trethila is consumed by jealousy over Greththiastane - sees Droostek as a rival
+[2026-06-17 17:52:26] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:27] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:27] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:28] crime_of_passion: Zeza committed murder against Zazara out of jealousy over Saen
+[2026-06-17 17:52:30] jealousy: Trethila is consumed by jealousy over Greththiastane - sees Droostek as a rival
+[2026-06-17 17:52:30] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:31] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:32] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:33] jealousy: Ngaar is consumed by jealousy over Syzsa - sees Mbaaruna as a rival
+[2026-06-17 17:52:33] crime_of_passion: Ngaar committed murder against Mbaaruna out of jealousy over Syzsa
+[2026-06-17 17:52:34] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:34] crime_of_passion: Ngaar committed murder against Mbaaruna out of jealousy over Syzsa
+[2026-06-17 17:52:35] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:35] jealousy: Trethila is consumed by jealousy over Greththiastane - sees Droostek as a rival
+[2026-06-17 17:52:35] breeding: Reproduction between Monon and Saambooon
+[2026-06-17 17:52:37] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:37] jealousy: Krooxar is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:52:38] breeding: Reproduction between Monon and Saambooon
+[2026-06-17 17:52:39] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:39] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:39] breeding: Reproduction between Monon and Saambooon
+[2026-06-17 17:52:40] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:40] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:43] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:43] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:43] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:44] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:45] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:45] crime_of_passion: Krooxar committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:52:46] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:46] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:47] jealousy: Krooxar is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:52:48] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:48] crime_of_passion: Krooxar committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:52:49] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:50] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:51] jealousy: Trethila is consumed by jealousy over Greththiastane - sees Droostek as a rival
+[2026-06-17 17:52:52] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:53] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:53] crime_of_passion: Krooxar committed murder against Droostek out of jealousy over Krethila
+[2026-06-17 17:52:54] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:55] crime_of_passion: Droostek committed murder against Krooxar out of jealousy over Krethila
+[2026-06-17 17:52:56] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:57] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:57] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:52:58] environment: An ordinary year for the harvest.
+[2026-06-17 17:52:58] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:52:58] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:53:01] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:53:04] jealousy: Greththiastane is consumed by jealousy over Trethila - sees Wiangtraexus as a rival
+[2026-06-17 17:53:04] crime_of_passion: Greththiastane committed murder against Wiangtraexus out of jealousy over Trethila
+[2026-06-17 17:53:05] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:53:06] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:53:06] jealousy: Droostek is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:53:08] environment: An ordinary year for the harvest.
+[2026-06-17 17:53:08] crime_of_passion: Trethila committed murder against Droostek out of jealousy over Greththiastane
+[2026-06-17 17:53:08] crime_of_passion: Wiangtraexus committed murder against Greththiastane out of jealousy over Trethila
+[2026-06-17 17:53:10] crime_of_passion: Droostek committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:11] crime_of_passion: Krethila committed murder against Thaestwoosteth out of jealousy over Droostek
+[2026-06-17 17:53:13] crime_of_passion: Syzsa committed murder against Varoth out of jealousy over Ngaar
+[2026-06-17 17:53:15] environment: An ordinary year for the harvest.
+[2026-06-17 17:53:16] crime_of_passion: Droostek committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:18] jealousy: Droostek is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:53:20] crime_of_passion: Droostek committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:22] crime_of_passion: Droostek committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:22] jealousy: Rengax is consumed by jealousy over Krethila - sees Droostek as a rival
+[2026-06-17 17:53:23] environment: An ordinary year for the harvest.
+[2026-06-17 17:53:23] jealousy: Droostek is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:53:27] crime_of_passion: Rengax committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:28] jealousy: Droostek is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:53:28] crime_of_passion: Droostek committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:28] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:29] jealousy: Syzsa is consumed by jealousy over Ngaar - sees Vaazyar as a rival
+[2026-06-17 17:53:29] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:30] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:53:30] crime_of_passion: Droostek committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:31] crime_of_passion: Rengax committed murder against Droostek out of jealousy over Krethila
+[2026-06-17 17:53:31] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:33] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:53:33] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:36] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:37] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:53:37] jealousy: Syzsa is consumed by jealousy over Ngaar - sees Vaazyar as a rival
+[2026-06-17 17:53:38] environment: An ordinary year for the harvest.
+[2026-06-17 17:53:38] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:53:40] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:53:42] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:44] jealousy: Syzsa is consumed by jealousy over Ngaar - sees Vaazyar as a rival
+[2026-06-17 17:53:44] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:45] crime_of_passion: Syzsa committed murder against Vaazyar out of jealousy over Ngaar
+[2026-06-17 17:53:46] environment: An ordinary year for the harvest.
+[2026-06-17 17:53:46] crime_of_passion: Rengax committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:46] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:53:46] jealousy: Glyngauna is consumed by jealousy over Yeixek - sees Krerkek as a rival
+[2026-06-17 17:53:47] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:53:47] jealousy: Syzsa is consumed by jealousy over Ngaar - sees Saen as a rival
+[2026-06-17 17:53:50] crime_of_passion: Rengax committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:50] jealousy: Syzsa is consumed by jealousy over Ngaar - sees Saen as a rival
+[2026-06-17 17:53:52] jealousy: Syzsa is consumed by jealousy over Ngaar - sees Saen as a rival
+[2026-06-17 17:53:53] jealousy: Rengax is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:53:53] jealousy: Glyngauna is consumed by jealousy over Yeixek - sees Krerkek as a rival
+[2026-06-17 17:53:54] environment: An ordinary year for the harvest.
+[2026-06-17 17:53:54] crime_of_passion: Triaxdroongane committed murder against Gloongar out of jealousy over Tiastra
+[2026-06-17 17:53:55] crime_of_passion: Syzsa committed murder against Saen out of jealousy over Ngaar
+[2026-06-17 17:53:55] jealousy: Glyngauna is consumed by jealousy over Yeixek - sees Krerkek as a rival
+[2026-06-17 17:53:56] crime_of_passion: Triaxdroongane committed murder against Gloongar out of jealousy over Tiastra
+[2026-06-17 17:53:56] crime_of_passion: Gloongar committed murder against Triaxdroongane out of jealousy over Tiastra
+[2026-06-17 17:53:57] jealousy: Rengax is consumed by jealousy over Krethila - sees Traexus as a rival
+[2026-06-17 17:53:59] crime_of_passion: Rengax committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:53:59] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:54:01] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:54:02] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:54:02] crime_of_passion: Rengax committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:54:06] jealousy: Gloongar is consumed by jealousy over Tiastra - sees Yeixek as a rival
+[2026-06-17 17:54:09] crime_of_passion: Gloongar committed murder against Yeixek out of jealousy over Tiastra
+[2026-06-17 17:54:10] environment: An ordinary year for the harvest.
+[2026-06-17 17:54:10] crime_of_passion: Rengax committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:54:11] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:54:13] crime_of_passion: Rengax committed murder against Traexus out of jealousy over Krethila
+[2026-06-17 17:54:14] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:16] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:16] jealousy: Mbeenggyxeth is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:54:17] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:18] environment: An ordinary year for the harvest.
+[2026-06-17 17:54:18] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:18] jealousy: Saambooon is consumed by jealousy over Monon - sees Miangaara as a rival
+[2026-06-17 17:54:19] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:22] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:54:22] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:24] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:26] environment: An ordinary year for the harvest.
+[2026-06-17 17:54:27] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:29] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:29] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:29] jealousy: Mbeenggyxeth is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:54:31] crime_of_passion: Traexus committed murder against Rengax out of jealousy over Krethila
+[2026-06-17 17:54:31] jealousy: Gloongar is consumed by jealousy over Tiastra - sees Droonggreisteth as a rival
+[2026-06-17 17:54:31] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:34] environment: An ordinary year for the harvest.
+[2026-06-17 17:54:34] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:54:34] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:35] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:35] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:54:36] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:36] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:39] crime_of_passion: Miangaara committed murder against Saambooon out of jealousy over Monon
+[2026-06-17 17:54:40] crime_of_passion: Miangaara committed murder against Saambooon out of jealousy over Monon
+[2026-06-17 17:54:40] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:41] crime_of_passion: Miangaara committed murder against Saambooon out of jealousy over Monon
+[2026-06-17 17:54:41] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:42] environment: An ordinary year for the harvest.
+[2026-06-17 17:54:43] crime_of_passion: Monon committed murder against Goothud out of jealousy over Miangaara
+[2026-06-17 17:54:44] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:44] jealousy: Miangaara is consumed by jealousy over Monon - sees Saambooon as a rival
+[2026-06-17 17:54:44] crime_of_passion: Miangaara committed murder against Saambooon out of jealousy over Monon
+[2026-06-17 17:54:44] crime_of_passion: Mbootheth committed murder against Miangaara out of jealousy over Goothud
+[2026-06-17 17:54:44] jealousy: Mbeenggyxeth is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:54:46] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:47] crime_of_passion: Gloongar committed murder against Droonggreisteth out of jealousy over Tiastra
+[2026-06-17 17:54:50] environment: An ordinary year for the harvest.
+[2026-06-17 17:54:50] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:54:52] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:54:52] crime_of_passion: Krarkus committed murder against Tiastra out of jealousy over Droonggreisteth
+[2026-06-17 17:54:53] jealousy: Mbeenggyxeth is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:54:55] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:54:56] jealousy: Mbeenggyxeth is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:54:57] environment: A bountiful year - granaries overflow.
+[2026-06-17 17:54:57] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:54:57] jealousy: Mbeenggyxeth is consumed by jealousy over Saambooon - sees Monon as a rival
+[2026-06-17 17:54:58] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:01] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:02] jealousy: Mbeenmonon is consumed by jealousy over Gyxweexila - sees Monon as a rival
+[2026-06-17 17:55:02] jealousy: Monon is consumed by jealousy over Saambooon - sees Mbeenggyxeth as a rival
+[2026-06-17 17:55:03] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:04] environment: An ordinary year for the harvest.
+[2026-06-17 17:55:04] crime_of_passion: Glothor committed murder against Krethila out of jealousy over Hoongtrathoth
+[2026-06-17 17:55:06] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:08] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:08] crime_of_passion: Traexus committed murder against Tiaxae out of jealousy over Krethila
+[2026-06-17 17:55:09] crime_of_passion: Mooxdroonar committed murder against Monon out of jealousy over Gyxweexila
+[2026-06-17 17:55:10] jealousy: Suim is consumed by jealousy over Mbeenmonon - sees Gyxweexila as a rival
+[2026-06-17 17:55:10] crime_of_passion: Mbootheth committed murder against Suim out of jealousy over Goothud
+[2026-06-17 17:55:10] jealousy: Glyngauna is consumed by jealousy over Krarkus - sees Droonggreisteth as a rival
+[2026-06-17 17:55:11] jealousy: Mbootheth is consumed by jealousy over Goothud - sees Syzsa as a rival
+[2026-06-17 17:55:12] environment: An ordinary year for the harvest.
+[2026-06-17 17:55:12] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:13] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:13] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:55:14] jealousy: Hoongtrathoth is consumed by jealousy over Glothor - sees Traexus as a rival
+[2026-06-17 17:55:14] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:14] crime_of_passion: Mooxdroonar committed murder against Monon out of jealousy over Gyxweexila
+[2026-06-17 17:55:15] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:16] crime_of_passion: Hoongtrathoth committed murder against Traexus out of jealousy over Glothor
+[2026-06-17 17:55:17] jealousy: Mbootheth is consumed by jealousy over Goothud - sees Mbeenggyxeth as a rival
+[2026-06-17 17:55:17] crime_of_passion: Mbootheth committed murder against Goothud out of jealousy over Goothud
+[2026-06-17 17:55:18] crime_of_passion: Krethila committed murder against Glothor out of jealousy over Traexus
+[2026-06-17 17:55:18] jealousy: Glyngauna is consumed by jealousy over Krarkus - sees Droonggreisteth as a rival
+[2026-06-17 17:55:19] environment: An ordinary year for the harvest.
+[2026-06-17 17:55:19] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:55:22] crime_of_passion: Traexus committed murder against Krethila out of jealousy over Krethila
+[2026-06-17 17:55:22] crime_of_passion: Syzsa committed murder against Ngaar out of jealousy over Ngaar
+[2026-06-17 17:55:23] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:55:25] environment: An ordinary year for the harvest.
+[2026-06-17 17:55:27] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:55:28] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:55:29] jealousy: Mbeenmonon is consumed by jealousy over Gyxweexila - sees Mooxdroonar as a rival
+[2026-06-17 17:55:32] environment: An ordinary year for the harvest.
+[2026-06-17 17:55:32] crime_of_passion: Krarkus committed murder against Krerkek out of jealousy over Droonggreisteth
+[2026-06-17 17:55:33] jealousy: Krarkus is consumed by jealousy over Glyngauna - sees Zeza as a rival
+[2026-06-17 17:55:33] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:55:37] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:55:37] jealousy: Glyngauna is consumed by jealousy over Krarkus - sees Droonggreisteth as a rival
+[2026-06-17 17:55:39] environment: An ordinary year for the harvest.
+[2026-06-17 17:55:39] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:55:40] jealousy: Glyngauna is consumed by jealousy over Krarkus - sees Droonggreisteth as a rival
+[2026-06-17 17:55:46] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:55:47] jealousy: Krarkus is consumed by jealousy over Glyngauna - sees Zeza as a rival
+[2026-06-17 17:55:47] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:55:49] crime_of_passion: Droonggreisteth committed murder against Gloongar out of jealousy over Krarkus
+[2026-06-17 17:55:51] jealousy: Mbeenmonon is consumed by jealousy over Gyxweexila - sees Mooxdroonar as a rival
+[2026-06-17 17:55:51] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:55:52] environment: An ordinary year for the harvest.
+[2026-06-17 17:55:52] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:55:59] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:07] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:56:08] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:56:08] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:56:12] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:56:13] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:13] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:56:18] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:56:20] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:20] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:56:26] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:33] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:34] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:56:35] crime_of_passion: Gyxweexila committed murder against Mbeenggyxeth out of jealousy over Mooxdroonar
+[2026-06-17 17:56:36] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:56:39] jealousy: Mooxdroonar is consumed by jealousy over Gyxweexila - sees Mbeenmonon as a rival
+[2026-06-17 17:56:40] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:40] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:56:41] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:56:41] crime_of_passion: Glyngauna committed murder against Pyoth out of jealousy over Zeza
+[2026-06-17 17:56:42] crime_of_passion: Glyngauna committed murder against Pyoth out of jealousy over Zeza
+[2026-06-17 17:56:46] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:46] jealousy: Zeza is consumed by jealousy over Glyngauna - sees Krarkus as a rival
+[2026-06-17 17:56:48] jealousy: Zeza is consumed by jealousy over Glyngauna - sees Krarkus as a rival
+[2026-06-17 17:56:50] crime_of_passion: Glyngauna committed murder against Pyoth out of jealousy over Zeza
+[2026-06-17 17:56:53] environment: An ordinary year for the harvest.
+[2026-06-17 17:56:57] jealousy: Zeza is consumed by jealousy over Glyngauna - sees Krarkus as a rival
+[2026-06-17 17:56:59] jealousy: Droonggreisteth is consumed by jealousy over Krarkus - sees Glyngauna as a rival
+[2026-06-17 17:57:00] environment: A year of famine begins - the crops fail.
+[2026-06-17 17:57:02] jealousy: Zeza is consumed by jealousy over Glyngauna - sees Krarkus as a rival
+[2026-06-17 17:57:06] environment: An ordinary year for the harvest.

@@ -1540,7 +1540,7 @@ void CivilizationEngine::updateCarryingCapacity(std::vector<Entity>& entities, i
                 int erid = (t && t->regionId >= 0) ? t->regionId : e.originRegionId;
                 if (erid != rid) continue;
                 e.entityStress = std::min(100.0f, e.entityStress + severity * 6.0f);
-                e.entityHealth = std::max(0.0f, e.entityHealth - severity * 4.0f);
+                e.entityHealth = std::max(0.0f, e.entityHealth - severity * 2.5f);
                 e.entityHapiness = std::max(0.0f, e.entityHapiness - severity * 3.0f);
             }
             // Pressure release: migration toward open land.

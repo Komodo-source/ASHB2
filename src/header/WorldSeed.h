@@ -18,7 +18,8 @@ enum RngStream : uint64_t {
     STREAM_DISEASE   = 0xD6E8FEB86659FD93ull,
     STREAM_NAMES     = 0xA0761D6478BD642Full,
     STREAM_SPAWN     = 0xE7037ED1A0B428DBull,
-    STREAM_MIGRATION = 0x8EBC6AF09C88C6E3ull
+    STREAM_MIGRATION = 0x8EBC6AF09C88C6E3ull,
+    STREAM_SOCIAL    = 0x589965CC75374CC3ull  // clientela, class mobility, feuds
 };
 
 // How "wild" each run is. Same seed + same config = identical history.

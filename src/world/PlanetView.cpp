@@ -130,6 +130,27 @@ void DrawHistoryWindow() {
 
     ImGui::Separator();
 
+    // ── Social order: classes & clientela ────────────────────────────────────
+    if (globalSocialOrder && ImGui::CollapsingHeader("SOCIETY", ImGuiTreeNodeFlags_DefaultOpen)) {
+        int sl = globalSocialOrder->cSlaves;
+        int pl = globalSocialOrder->cPlebs;
+        int pa = globalSocialOrder->cPatricians;
+        int tot = std::max(1, sl + pl + pa);
+        ImGui::TextColored(ImVec4(1.0f,0.84f,0.4f,1.0f), "  Patricians: %d (%.0f%%)",
+                           pa, 100.0f * pa / tot);
+        ImGui::TextColored(ImVec4(0.75f,0.85f,0.85f,1.0f), "  Plebeians:  %d (%.0f%%)",
+                           pl, 100.0f * pl / tot);
+        ImGui::TextColored(ImVec4(0.7f,0.55f,0.5f,1.0f), "  Slaves:     %d (%.0f%%)",
+                           sl, 100.0f * sl / tot);
+        ImGui::Text("  Patron-client bonds: %d", globalSocialOrder->bondCount());
+        ImGui::TextDisabled("  ascended %d  enslaved %d  freed %d",
+                            globalSocialOrder->totalAscended,
+                            globalSocialOrder->totalEnslaved,
+                            globalSocialOrder->totalFreed);
+    }
+
+    ImGui::Separator();
+
     if (ImGui::CollapsingHeader("POPULATION BY REGION", ImGuiTreeNodeFlags_DefaultOpen)) {
         for (const auto& kv : globalCivEngine->regionPopulation) {
             float cap = globalCivEngine->regionCapacity.count(kv.first)

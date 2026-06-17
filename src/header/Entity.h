@@ -13,6 +13,7 @@
 #include "PlanningSystem.h"
 #include "PersonaSystem.h"
 #include "Economics.h"
+#include "SocialOrder.h"   // SocialClass enum + clientela/class fields
 
 class Entity;
 class Action;
@@ -437,6 +438,14 @@ public:
     int   tribeId       = -1;    // which tribe this entity belongs to (-1 = none)
     int   religionId    = -1;    // which religion they follow (-1 = none)
     float dominanceRank = 0.0f;  // emergent social hierarchy position (0-100)
+
+    // ── Social stratification (Clientela & Class) ────────────────────────────
+    // socialClass is derived each civ-tick from wealth + auctoritas by the
+    // SocialOrderSystem; auctoritas is earned standing/prestige (office, glory,
+    // patronage of many clients) that, with wealth, governs class mobility.
+    SocialClass socialClass = CLASS_PLEBEIAN;
+    float       auctoritas  = 10.0f; // 0-100+ standing in the eyes of society
+
     std::string specialization = ""; // "scholar"|"craftsman"|"trader"|"healer"|"warrior" (latent talent)
     bool  isSpecialist = false;      // released from subsistence farming, fed from the tribe granary
     std::vector<int> knownTechIds;   // IDs of discovered/learned innovations

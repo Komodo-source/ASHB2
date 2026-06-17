@@ -887,21 +887,27 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     entity->foodStore = 0.0f;
                     entity->entityHunger = pdclamp(entity->entityHunger + 0.9f * coldFactor, 0.0f, 100.0f);
                 }
-                if (entity->entityHunger > 70.0f) {
-                    float starve = (entity->entityHunger - 70.0f) / 30.0f; // 0..1
-                    entity->entityHealth   = pdclamp(entity->entityHealth   - starve * 0.6f, 0.0f, 100.0f);
+                if (entity->entityHunger > 75.0f) {
+                    // Real hunger still kills, but more slowly — it should grind a
+                    // neglected agent down over many ticks, not wipe out anyone who
+                    // misses a couple of meals.
+                    float starve = (entity->entityHunger - 75.0f) / 25.0f; // 0..1
+                    entity->entityHealth   = pdclamp(entity->entityHealth   - starve * 0.28f, 0.0f, 100.0f);
                     entity->entityHapiness = pdclamp(entity->entityHapiness - starve * 0.4f, 0.0f, 100.0f);
                     entity->entityStress   = pdclamp(entity->entityStress   + starve * 0.3f, 0.0f, 100.0f);
                 }
 
                 // ── Fatigue: drifts up with wakefulness, relieved by rest/sleep.
                 // Exhaustion frays the mind and body (the doc's second named need).
-                entity->fatigueLevel = pdclamp(entity->fatigueLevel + 0.25f * deltaTime, 0.0f, 100.0f);
-                if (entity->fatigueLevel > 70.0f) {
-                    float tired = (entity->fatigueLevel - 70.0f) / 30.0f; // 0..1
+                entity->fatigueLevel = pdclamp(entity->fatigueLevel + 0.18f * deltaTime, 0.0f, 100.0f);
+                if (entity->fatigueLevel > 80.0f) {
+                    // Exhaustion mostly frays the mind and raises stress; it only
+                    // lightly chips health, since people rarely die of tiredness
+                    // alone (it makes them vulnerable, it doesn't kill outright).
+                    float tired = (entity->fatigueLevel - 80.0f) / 20.0f; // 0..1
                     entity->entityStress      = pdclamp(entity->entityStress      + tired * 0.4f, 0.0f, 100.0f);
                     entity->entityMentalHealth= pdclamp(entity->entityMentalHealth- tired * 0.2f, 0.0f, 100.0f);
-                    entity->entityHealth      = pdclamp(entity->entityHealth      - tired * 0.15f, 0.0f, 100.0f);
+                    entity->entityHealth      = pdclamp(entity->entityHealth      - tired * 0.04f, 0.0f, 100.0f);
                 }
 
                 // Low hygiene cascades into stress and happiness
@@ -922,9 +928,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.06f, 0.0f, 100.0f);
             }
 
-            // Passive recovery: not sick = slow heal (recovery no longer blocked by moderate stress)
+            // Passive recovery: not sick = slow heal (recovery no longer blocked by
+            // moderate stress). Slightly stronger than the chronic-need drains so a
+            // fed, rested agent reliably mends instead of slowly bleeding to death.
             if (entity->entityDiseaseType == -1 && entity->entityHealth < 97.0f)
-                entity->entityHealth = std::min(100.0f, entity->entityHealth + 0.04f);
+                entity->entityHealth = std::min(100.0f, entity->entityHealth + 0.06f);
 
             //apply tick relationship
             tickRelationshipDecay(entity, 1.0f);
@@ -1236,6 +1244,18 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
                     globalCivEngine->logEvent(day / 60, e.name + " died of " + cause
                         + " at age " + std::to_string((int)e.entityAge), "death");
                 }
+                // Pass the estate of obligations (debts, clients, creditors) to the
+                // eldest living child; with no heir, those bonds simply dissolve.
+                if (globalSocialOrder) {
+                    int heir = -1;
+                    for (int cid : e.childrenIds) {
+                        for (const Entity& cand : entities)
+                            if (cand.entityId == cid && cand.entityHealth > 0.0f) { heir = cid; break; }
+                        if (heir != -1) break;
+                    }
+                    globalSocialOrder->onDeath(entities, e.entityId, heir,
+                        globalCivEngine ? globalCivEngine->getCurrentYear() : 0);
+                }
                 deadIds.insert(e.entityId);
             }
         }
@@ -1324,8 +1344,13 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             }
 
             // ── Civilization tick (every 5 FreeWill updates = ~1 in-game day) ──
-            if (globalCivEngine && (day / UPDATE_FREQUENCY) % 5 == 0)
+            if (globalCivEngine && (day / UPDATE_FREQUENCY) % 5 == 0) {
                 globalCivEngine->tick(entities, day / UPDATE_FREQUENCY);
+                // Social order rides the same cadence: refresh classes, clientela
+                // and the debt cascade once per civ-day.
+                if (globalSocialOrder)
+                    globalSocialOrder->tick(entities, globalCivEngine->getCurrentYear());
+            }
 
             // ── Economy tick: supply, demand & prices for the whole market ─────
             {
@@ -1724,6 +1749,11 @@ int main(int argc, char* argv[]) {
         globalKinship = new KinshipSystem();
         for (Entity& e : entities)
             globalKinship->ensureFounderFamily(e, globalCivEngine->getCurrentYear());
+
+        // ── Social order (classes & clientela) ───────────────────────────────
+        // Everyone starts a free plebeian; wealth, standing and debt then sort
+        // society into slaves, plebeians and patricians over the generations.
+        globalSocialOrder = new SocialOrderSystem();
 
         bool showEntityWindow = false;
         int selectedEntityIndex = -1;

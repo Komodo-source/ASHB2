@@ -2094,18 +2094,19 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             desire_index = static_cast<int>(pointer->list_entityPointedDesire.size()) - 1;
         }
 
-        if (pointer->list_entityPointedDesire[desire_index].desire < 25) {
+        if (pointer->list_entityPointedDesire[desire_index].desire < 18) {
             float current_desire = pointer->list_entityPointedDesire[desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointer->getName() << " n'a pas assez de desir pour " << pointed->getName()
-                      << " (" << current_desire << " < 25)\n";
+                      << " (" << current_desire << " < 18)\n";
 
-            // Desire grows toward the fertility threshold, but courtship takes time —
-            // bonds must be earned over several interactions, not snapped into being.
+            // Desire grows toward the fertility threshold. Courtship still takes a
+            // few interactions, but not so many that lineages die out faster than
+            // they form.
             pointer->list_entityPointedDesire[desire_index].desire = std::min(100.0f,
-                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(4, 8));
+                pointer->list_entityPointedDesire[desire_index].desire + BetterRand::genNrInInterval(6, 11));
             return;
         }
 
@@ -2121,16 +2122,16 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             pointed_desire_index = static_cast<int>(pointed->list_entityPointedDesire.size()) - 1;
         }
 
-        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < 25) {
+        if (pointed->list_entityPointedDesire[pointed_desire_index].desire < 18) {
             float pointed_desire = pointed->list_entityPointedDesire[pointed_desire_index].desire;
             if (!pointer || !pointed) {
                 return;
             }
             std::cout << "Couple bloque: " << pointed->getName() << " n'a pas assez de desir pour " << pointer->getName()
-                      << " (" << pointed_desire << " < 25)\n";
+                      << " (" << pointed_desire << " < 18)\n";
 
             pointed->list_entityPointedDesire[pointed_desire_index].desire = std::min(100.0f,
-                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(4, 8));
+                pointed->list_entityPointedDesire[pointed_desire_index].desire + BetterRand::genNrInInterval(6, 11));
 
             return;
         }
@@ -2161,7 +2162,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
           return ;
         }
         // Fertility wanes with age — elders rarely conceive.
-        if (pointer->entityAge > 50 || pointed->entityAge > 50) {
+        if (pointer->entityAge > 55 || pointed->entityAge > 55) {
           std::cout << "too old to have children\n";
           return ;
         }
@@ -2260,9 +2261,9 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             float dThere = pointed->list_entityPointedDesire[pointed_desire_index].desire;
             // Conceiving on the spot now demands a genuinely strong mutual bond and
             // both partners being of fertile age — no more snap pregnancies.
-            if (dHere >= 45.0f && dThere >= 45.0f &&
+            if (dHere >= 35.0f && dThere >= 35.0f &&
                 pointer->entityAge >= 18 && pointed->entityAge >= 18 &&
-                pointer->entityAge <= 50 && pointed->entityAge <= 50) {
+                pointer->entityAge <= 55 && pointed->entityAge <= 55) {
                 static int nextBabyId2 = 5000;
                 Entity baby = Entity(nextBabyId2++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1,
                                      nullptr, nullptr, nullptr, nullptr, "happiness");
@@ -3780,18 +3781,20 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
         // measured pace. Only the lower-id partner initiates, so a couple doesn't
         // double-conceive from both sides on the same tick.
         if (P->entityHealth > 0.0f && e->entityId < P->entityId &&
-            cp.daysTogether > 30 && (cp.daysTogether % 40 == 0) &&
-            e->entityAge >= 18.0f && e->entityAge <= 50.0f &&
-            P->entityAge >= 18.0f && P->entityAge <= 50.0f &&
-            e->entityHealth > 50.0f && P->entityHealth > 50.0f &&
-            cp.suspicion < 40.0f &&
+            cp.daysTogether > 20 && (cp.daysTogether % 24 == 0) &&
+            e->entityAge >= 18.0f && e->entityAge <= 55.0f &&
+            P->entityAge >= 18.0f && P->entityAge <= 55.0f &&
+            e->entityHealth > 45.0f && P->entityHealth > 45.0f &&
+            cp.suspicion < 45.0f &&
             !(globalKinship && KinshipSystem::wouldBeIncest(*e, *P)) &&
             !(globalCivEngine && e->tribeId != P->tribeId &&
               globalCivEngine->areTribesAtWar(e->tribeId, P->tribeId)) &&
             pos(e->searchConnAng(P)) < 35.0f && pos(P->searchConnAng(e)) < 35.0f) {
-            // Fertility chance rises with mutual desire / commitment, but a child
-            // is now a measured event rather than a near-certainty each cycle.
-            float fertility = 9.0f + cp.commitment * 0.15f + pos(e->searchConnDesire(P)) * 0.15f;
+            // Fertility rises with mutual desire / commitment. Tuned so a committed
+            // couple reliably raises several children across their fertile years —
+            // enough for lineages to outpace mortality — without spawning a child
+            // every cycle.
+            float fertility = 22.0f + cp.commitment * 0.22f + pos(e->searchConnDesire(P)) * 0.22f;
             if (BetterRand::genNrInInterval(0, 100) < fertility) {
                 static int nextLineageBabyId = 20000;
                 Entity baby = Entity(nextLineageBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75,
