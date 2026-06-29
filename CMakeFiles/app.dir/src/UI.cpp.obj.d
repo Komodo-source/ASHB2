@@ -232,6 +232,7 @@ CMakeFiles/app.dir/src/UI.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/LearningAdaptation.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/mingw64/include/c++/14.2.0/sstream \
  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
@@ -255,6 +256,8 @@ CMakeFiles/app.dir/src/UI.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/compare \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialOrder.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Drive.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/JungianType.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/UI.h \
  C:/mingw64/include/c++/14.2.0/filesystem \
  C:/mingw64/include/c++/14.2.0/bits/fs_fwd.h \
@@ -267,8 +270,10 @@ CMakeFiles/app.dir/src/UI.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/fs_ops.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/NarrativeEngine.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/TechTree.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Kinship.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/ResourceSystem.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Ecosystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
  C:/mingw64/include/c++/14.2.0/iostream \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Disease.h \

@@ -10,6 +10,7 @@
 #include "imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <algorithm>
 #include <time.h>
 #include <random>
 #include "./header/FreeWillSystem.h"
@@ -38,6 +39,7 @@
 #include <unordered_set>
 #include "environment/EnvironmentModel.h"
 #include "world/ResourceSystem.h"
+#include "world/Ecosystem.h"
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -86,6 +88,10 @@ void updateEnvironment(int day) {
     // Regrow / degrade per-region resource stocks for the new day. Living
     // resources track the same season + harvest luck that drive food yields.
     g_resources.update(g_seasonalFoodModifier);
+
+    // Advance the food chain on the same season: plants grow/are grazed,
+    // herbivores breed/starve/are preyed upon, predators track the game.
+    g_ecosystem.update(g_seasonalFoodModifier, day);
 }
 
 /*
@@ -230,6 +236,82 @@ Personality generateRandomPersonality() {
             }
         }
     }
+
+
+// Human-readable life-stage label for the death ledger.
+static const char* lifeStageName(LifeStage s) {
+    switch (s) {
+        case INFANT:     return "infant";
+        case CHILD:      return "child";
+        case ADOLESCENT: return "adolescent";
+        case ADULT:      return "adult";
+        case ELDER:      return "elder";
+        default:         return "unknown";
+    }
+}
+
+// ── Cause-of-death attribution ───────────────────────────────────────────────
+// "hardship" used to be the dumping ground for everything that wasn't disease,
+// old age, or a killing — which meant the ledger could not tell starvation from
+// despair from exposure. Here we name the *specific* terminal stressor by asking
+// which lethal system was deepest into its kill-zone at the moment of death.
+//
+// Killings are attributed upstream (pendingDeathCause) and take precedence; this
+// function only resolves "natural"/environmental deaths.
+static std::string determineDeathCause(const Entity& e) {
+    // An external agent already named the cause (murder / crime of passion).
+    if (!e.pendingDeathCause.empty()) return e.pendingDeathCause;
+
+    // Disease is unambiguous and self-naming.
+    if (e.entityDiseaseType == -2) return "illness (cancer)";
+    if (e.entityDiseaseType  >  0)
+        return std::string("disease (") + Disease::getDiseaseName(e.entityDiseaseType) + ")";
+
+    // Rank every active terminal stressor by how far past its lethal threshold
+    // the entity is; the deepest one is what the chronicle blames.
+    struct Cand { const char* cause; float severity; };
+    std::vector<Cand> c;
+
+    if (e.entityHunger      > 75.0f) c.push_back({ "starvation",            (e.entityHunger - 75.0f) / 25.0f });
+    if (e.fatigueLevel      > 80.0f) c.push_back({ "exhaustion",            (e.fatigueLevel - 80.0f) / 20.0f });
+    if (e.entityMentalHealth < 25.0f) c.push_back({ "despair",             (25.0f - e.entityMentalHealth) / 25.0f });
+    if (e.entityHygiene     < 20.0f) c.push_back({ "sickness from squalor", (20.0f - e.entityHygiene) / 20.0f });
+    if (e.entityStress      > 85.0f) c.push_back({ "chronic stress",        (e.entityStress - 85.0f) / 15.0f });
+    if (e.entityLoneliness  > 85.0f) c.push_back({ "isolation",             (e.entityLoneliness - 85.0f) / 15.0f });
+    if (g_seasonTemperature < 28.0f) c.push_back({ "exposure to the cold",  (28.0f - g_seasonTemperature) / 28.0f });
+
+    // Old age competes only for those who actually reached it, scaled by how far
+    // past their era's life expectancy they lived.
+    int   year = globalCivEngine ? globalCivEngine->getCurrentYear() : 0;
+    float lifeExp = getLifeExpectancy(year);
+    if (e.entityAge >= lifeExp * 0.85f)
+        c.push_back({ "old age", 0.5f + (e.entityAge - lifeExp * 0.85f) / lifeExp });
+
+    if (c.empty()) return "hardship";
+    auto best = std::max_element(c.begin(), c.end(),
+        [](const Cand& a, const Cand& b) { return a.severity < b.severity; });
+    return best->cause;
+}
+
+// Compact key=value snapshot of the deceased's terminal state, appended to the
+// death line so the post-mortem can correlate cause with the life that ended.
+static std::string deathContext(const Entity& e) {
+    int livingKids = 0;
+    for (int cid : e.childrenIds) (void)cid, ++livingKids; // count of recorded offspring
+    bool partnered = !e.list_entityPointedCouple.empty();
+    auto i = [](float v){ return std::to_string((int)(v + 0.5f)); };
+    std::stringstream ss;
+    ss << "stage=" << lifeStageName(e.entityLifeStage)
+       << " kids=" << livingKids
+       << " partnered=" << (partnered ? 1 : 0)
+       << " happy=" << i(e.entityHapiness)
+       << " stress=" << i(e.entityStress)
+       << " hunger=" << i(e.entityHunger)
+       << " mental=" << i(e.entityMentalHealth)
+       << " hygiene=" << i(e.entityHygiene)
+       << " fatigue=" << i(e.fatigueLevel);
+    return ss.str();
+}
 
 
 // Social-graph grouping: hybrid proximity + social bonds.
@@ -803,6 +885,13 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 handleDeath(entity, group);
             }
 
+            // handle old people
+            if (entity->entityAge > 100){
+              entity->entityHealth -= BetterRand::genNrInInterval(0, 8);
+              Disease d;
+              d.checkInfamousDisease(entity);
+            }
+
 
 
             FreeWillSystem& sys = entity->getFreeWill();
@@ -879,20 +968,20 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 // Cold seasons raise the calorie cost of staying alive.
                 float coldFactor = (g_seasonTemperature < 45.0f)
                                  ? 1.0f + (45.0f - g_seasonTemperature) / 100.0f : 1.0f;
-                float burn = 0.12f * deltaTime * coldFactor;
+                float burn = 0.08f * deltaTime * coldFactor;
                 if (entity->foodStore > burn) {
                     entity->foodStore -= burn;
-                    entity->entityHunger = pdclamp(entity->entityHunger - 0.6f, 0.0f, 100.0f);
+                    entity->entityHunger = pdclamp(entity->entityHunger - 0.8f, 0.0f, 100.0f);
                 } else {
                     entity->foodStore = 0.0f;
-                    entity->entityHunger = pdclamp(entity->entityHunger + 0.9f * coldFactor, 0.0f, 100.0f);
+                    entity->entityHunger = pdclamp(entity->entityHunger + 0.45f * coldFactor, 0.0f, 100.0f);
                 }
-                if (entity->entityHunger > 75.0f) {
+                if (entity->entityHunger > 80.0f) {
                     // Real hunger still kills, but more slowly — it should grind a
                     // neglected agent down over many ticks, not wipe out anyone who
                     // misses a couple of meals.
-                    float starve = (entity->entityHunger - 75.0f) / 25.0f; // 0..1
-                    entity->entityHealth   = pdclamp(entity->entityHealth   - starve * 0.28f, 0.0f, 100.0f);
+                    float starve = (entity->entityHunger - 80.0f) / 20.0f; // 0..1
+                    entity->entityHealth   = pdclamp(entity->entityHealth   - starve * 0.18f, 0.0f, 100.0f);
                     entity->entityHapiness = pdclamp(entity->entityHapiness - starve * 0.4f, 0.0f, 100.0f);
                     entity->entityStress   = pdclamp(entity->entityStress   + starve * 0.3f, 0.0f, 100.0f);
                 }
@@ -926,6 +1015,100 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     entity->entityHapiness = pdclamp(entity->entityHapiness - 0.12f, 0.0f, 100.0f);
                 if (entity->entityBoredom > 85.0f)
                     entity->entityMentalHealth = pdclamp(entity->entityMentalHealth - 0.06f, 0.0f, 100.0f);
+
+                // ── Bipolar drives (0 -> setpoint <- 1) ──────────────────────
+                // The block above is the legacy *unipolar* drift: every stat only
+                // climbs and only the high pole bites. The drive layer adds the
+                // missing half — a lethal FLOOR, chronic allostatic load, and
+                // dopamine habituation — without disturbing that tuned drift.
+                //
+                // The legacy floats only ever span "deprivation -> fine", so they
+                // feed the LOWER half of each axis (deprivation pole -> setpoint);
+                // the ceiling is only reached once an action over-satisfies via
+                // Drive::satisfy(). Happiness is genuinely bidirectional, so it
+                // maps to the FULL pleasure axis — making the joy-overload and
+                // down-regulation loop live immediately.
+                {
+                    DriveSet& dr = entity->drives;
+                    if (dr.has("pleasure")) {   // guard: drives are initialized
+                        // Lazy psychology init for entities that bypassed spawn
+                        // (births, loaded saves). Safe: the bridge re-syncs drive
+                        // values from the legacy floats just below, so this only
+                        // (re)shapes setpoints/bands from the function stack.
+                        if (!entity->cognition.built) entity->initPsychology();
+
+                        auto half = [](Drive& d, float legacy01){
+                            // legacy 0 (fine) -> setpoint, legacy 1 (deprived) -> deprivation pole
+                            d.value = Drive::clamp01(d.setpoint * (1.0f - legacy01));
+                        };
+                        auto highHalf = [](Drive& d, float legacy01){
+                            // legacy 0 (sated) -> setpoint, legacy 1 (starving) -> high lethal pole
+                            d.value = Drive::clamp01(d.setpoint + (1.0f - d.setpoint) * legacy01);
+                        };
+                        highHalf(dr["hunger"],      entity->entityHunger     / 100.0f);
+                        highHalf(dr["fatigue"],     entity->fatigueLevel     / 100.0f);
+                        half    (dr["stimulation"], entity->entityBoredom    / 100.0f);
+                        half    (dr["social"],      entity->entityLoneliness / 100.0f);
+                        dr["pleasure"].value = Drive::clamp01(entity->entityHapiness / 100.0f);
+
+                        // Bridge mode: we move the values ourselves above, so the
+                        // drive only accrues load/tolerance and reports damage.
+                        float dmg = dr.tick(deltaTime, /*applyEntropy=*/false);
+                        entity->entityHealth = pdclamp(entity->entityHealth - dmg, 0.0f, 100.0f);
+
+                        // Mind-axis wear frays the mind: isolation and an under-
+                        // stimulated life grind down mental health past what the
+                        // legacy thresholds caught.
+                        float mindLoad = dr["stimulation"].load + dr["social"].load
+                                       + dr["pleasure"].load;
+                        entity->entityMentalHealth = pdclamp(
+                            entity->entityMentalHealth - mindLoad * 0.05f, 0.0f, 100.0f);
+
+                        // Hedonic treadmill: as pleasure habituates, the same input
+                        // feels flatter — the felt baseline is dragged down, so
+                        // nothing natural quite satisfies anymore.
+                        entity->entityHapiness = pdclamp(
+                            entity->entityHapiness - dr["pleasure"].tolerance * 0.15f,
+                            0.0f, 100.0f);
+
+                        // ── Beebe grip / shadow ─────────────────────────────
+                        // Psychic load (worst drive wear + stress) decides who is
+                        // driving. Below threshold the Hero leads; above it the
+                        // inferior erupts, and at extreme load a context-specific
+                        // shadow archetype takes over and acts out.
+                        float worstLoad = 0.0f;
+                        for (auto& kv : dr.axes)
+                            worstLoad = std::max(worstLoad, kv.second.load);
+                        float psychicLoad = Drive::clamp01(
+                            0.6f * worstLoad + 0.4f * (entity->entityStress / 100.0f));
+
+                        unsigned flags = GT_NONE;
+                        if (entity->entityHealth < 25.0f ||
+                            entity->getGriefIntensity() > 0.6f)         flags |= GT_THREAT;
+                        if (entity->entityGeneralAnger > 60.0f)         flags |= GT_CHALLENGED;
+                        if (entity->dominanceRank > 60.0f)              flags |= GT_AUTHORITY;
+                        for (auto& c : entity->list_entityPointedCouple)
+                            if (c.suspicion > 50.0f) { flags |= GT_DOUBLEBIND; break; }
+                        if (entity->entityLoneliness > 60.0f &&
+                            !entity->list_entityPointedCouple.empty())  flags |= GT_DOUBLEBIND;
+
+                        Archetype prev = entity->cognition.active;
+                        Archetype now  = entity->cognition.resolveActive(psychicLoad, flags);
+                        if (now != Archetype::Hero) {
+                            float in = entity->cognition.gripIntensity(psychicLoad);
+                            // The grip is itself stressful; the destructive shadows
+                            // (Demon/Trickster) also spill into anger.
+                            float stressKick = (now == Archetype::Demon) ? 1.2f : 0.5f;
+                            entity->entityStress   = pdclamp(entity->entityStress   + in * stressKick, 0.0f, 100.0f);
+                            entity->entityHapiness = pdclamp(entity->entityHapiness - in * 0.4f,        0.0f, 100.0f);
+                            if (now == Archetype::Demon || now == Archetype::Trickster)
+                                entity->entityGeneralAnger = pdclamp(entity->entityGeneralAnger + in * 0.8f, 0.0f, 100.0f);
+                            // Narrate only on transition, so it reads as an event.
+                            if (now != prev)
+                                entity->innerMonologue = entity->cognition.gripNarrative();
+                        }
+                    }
+                }
             }
 
             // Passive recovery: not sick = slow heal (recovery no longer blocked by
@@ -1161,7 +1344,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     std::stringstream ss;
                     ss << "DEATH EVENT: " << target->name << " was killed. Propagating grief.";
                     globalLogger->logCmd(ss.str());
-                    globalLogger->logDeath(target->entityId, target->name, target->entityAge, "murder by " + entity->name);
+                    // Attribute the cause now; the central death-handler is the
+                    // sole site that writes the death line, so the ledger no
+                    // longer double-counts this body as both "murder" and
+                    // "hardship".
+                    target->pendingDeathCause = "murder by " + entity->name;
                     for(Entity* other : group){
                         if(other == target || other->entityHealth <= 0.0f) continue;
                         bool hadBond = false;
@@ -1232,11 +1419,14 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
         for (Entity& e : entities) {
             if (e.entityHealth <= 0.0f) {
                 std::cout << "Entity " << e.entityId << " has died.\n";
-                std::string cause = (e.entityDiseaseType != -1) ? "disease"
-                                   : (e.entityAge > 60.0f)       ? "old age"
-                                                                 : "hardship";
+                // Single, authoritative attribution: killings carry an explicit
+                // cause (pendingDeathCause); everything else is resolved from the
+                // deceased's terminal state into a specific named cause rather
+                // than the old catch-all "hardship".
+                std::string cause = determineDeathCause(e);
                 if (globalLogger) {
-                    globalLogger->logDeath(e.entityId, e.name, (int)e.entityAge, cause);
+                    globalLogger->logDeath(e.entityId, e.name, (int)e.entityAge,
+                                           cause, deathContext(e));
                 }
                 // Record every death in the civilisation's running history & tally.
                 if (globalCivEngine) {
@@ -1564,6 +1754,11 @@ int main(int argc, char* argv[]) {
     // them down and lets them regrow, so settlement location genuinely matters.
     g_resources.init(*g_planet);
 
+    // ── Living food chain layered on the resource pools ──────────────────────
+    // Plants, herbivores (game) and predators per region; agents hunt and forage
+    // it, drought starves it, overhunting collapses it. Seed it from the pools.
+    g_ecosystem.init();
+
     // ── Per-region procedural languages ──────────────────────────────────────
     g_lexicon = new Lexicon();
     g_lexicon->initRegions((int)g_planet->regions.size(), g_worldSeed.master);
@@ -1653,6 +1848,11 @@ int main(int argc, char* argv[]) {
                 entity.personality.agreeableness  = vc(entity.personality.agreeableness  - traumaRoll  * 0.15f + nurtureRoll * 0.12f);
                 entity.personality.extraversion   = vc(entity.personality.extraversion   - traumaRoll  * 0.10f + nurtureRoll * 0.10f);
                 entity.personality.openness       = vc(entity.personality.openness       + nurtureRoll * 0.15f);
+
+                // Personality is now finalized — build drives AND the Jungian
+                // stack so setpoints/type reflect this individual (the ctor ran
+                // with default midline traits before personality was assigned).
+                entity.initPsychology();
 
                 // --- Starting emotional stats: no two people start at zero ---
                 // Neuroticism → more stress; conscientiousness → better hygiene; extraversion → less loneliness

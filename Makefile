@@ -344,6 +344,30 @@ src/CognitiveArchitecture.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.s
 .PHONY : src/CognitiveArchitecture.cpp.s
 
+src/Diplomacy.obj: src/Diplomacy.cpp.obj
+.PHONY : src/Diplomacy.obj
+
+# target to build an object file
+src/Diplomacy.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Diplomacy.cpp.obj
+.PHONY : src/Diplomacy.cpp.obj
+
+src/Diplomacy.i: src/Diplomacy.cpp.i
+.PHONY : src/Diplomacy.i
+
+# target to preprocess a source file
+src/Diplomacy.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Diplomacy.cpp.i
+.PHONY : src/Diplomacy.cpp.i
+
+src/Diplomacy.s: src/Diplomacy.cpp.s
+.PHONY : src/Diplomacy.s
+
+# target to generate assembly for a file
+src/Diplomacy.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Diplomacy.cpp.s
+.PHONY : src/Diplomacy.cpp.s
+
 src/Disease.obj: src/Disease.cpp.obj
 .PHONY : src/Disease.obj
 
@@ -367,6 +391,30 @@ src/Disease.s: src/Disease.cpp.s
 src/Disease.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Disease.cpp.s
 .PHONY : src/Disease.cpp.s
+
+src/Drive.obj: src/Drive.cpp.obj
+.PHONY : src/Drive.obj
+
+# target to build an object file
+src/Drive.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Drive.cpp.obj
+.PHONY : src/Drive.cpp.obj
+
+src/Drive.i: src/Drive.cpp.i
+.PHONY : src/Drive.i
+
+# target to preprocess a source file
+src/Drive.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Drive.cpp.i
+.PHONY : src/Drive.cpp.i
+
+src/Drive.s: src/Drive.cpp.s
+.PHONY : src/Drive.s
+
+# target to generate assembly for a file
+src/Drive.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Drive.cpp.s
+.PHONY : src/Drive.cpp.s
 
 src/Economics.obj: src/Economics.cpp.obj
 .PHONY : src/Economics.obj
@@ -535,6 +583,30 @@ src/Image.s: src/Image.cpp.s
 src/Image.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.s
 .PHONY : src/Image.cpp.s
+
+src/JungianType.obj: src/JungianType.cpp.obj
+.PHONY : src/JungianType.obj
+
+# target to build an object file
+src/JungianType.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/JungianType.cpp.obj
+.PHONY : src/JungianType.cpp.obj
+
+src/JungianType.i: src/JungianType.cpp.i
+.PHONY : src/JungianType.i
+
+# target to preprocess a source file
+src/JungianType.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/JungianType.cpp.i
+.PHONY : src/JungianType.cpp.i
+
+src/JungianType.s: src/JungianType.cpp.s
+.PHONY : src/JungianType.s
+
+# target to generate assembly for a file
+src/JungianType.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/JungianType.cpp.s
+.PHONY : src/JungianType.cpp.s
 
 src/Kinship.obj: src/Kinship.cpp.obj
 .PHONY : src/Kinship.obj
@@ -824,6 +896,30 @@ src/SocialOrder.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SocialOrder.cpp.s
 .PHONY : src/SocialOrder.cpp.s
 
+src/TechTree.obj: src/TechTree.cpp.obj
+.PHONY : src/TechTree.obj
+
+# target to build an object file
+src/TechTree.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/TechTree.cpp.obj
+.PHONY : src/TechTree.cpp.obj
+
+src/TechTree.i: src/TechTree.cpp.i
+.PHONY : src/TechTree.i
+
+# target to preprocess a source file
+src/TechTree.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/TechTree.cpp.i
+.PHONY : src/TechTree.cpp.i
+
+src/TechTree.s: src/TechTree.cpp.s
+.PHONY : src/TechTree.s
+
+# target to generate assembly for a file
+src/TechTree.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/TechTree.cpp.s
+.PHONY : src/TechTree.cpp.s
+
 src/UI.obj: src/UI.cpp.obj
 .PHONY : src/UI.obj
 
@@ -1088,6 +1184,30 @@ src/validation/ValidationFramework.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/validation/ValidationFramework.cpp.s
 .PHONY : src/validation/ValidationFramework.cpp.s
 
+src/world/Ecosystem.obj: src/world/Ecosystem.cpp.obj
+.PHONY : src/world/Ecosystem.obj
+
+# target to build an object file
+src/world/Ecosystem.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/Ecosystem.cpp.obj
+.PHONY : src/world/Ecosystem.cpp.obj
+
+src/world/Ecosystem.i: src/world/Ecosystem.cpp.i
+.PHONY : src/world/Ecosystem.i
+
+# target to preprocess a source file
+src/world/Ecosystem.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/Ecosystem.cpp.i
+.PHONY : src/world/Ecosystem.cpp.i
+
+src/world/Ecosystem.s: src/world/Ecosystem.cpp.s
+.PHONY : src/world/Ecosystem.s
+
+# target to generate assembly for a file
+src/world/Ecosystem.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/Ecosystem.cpp.s
+.PHONY : src/world/Ecosystem.cpp.s
+
 src/world/Lexicon.obj: src/world/Lexicon.cpp.obj
 .PHONY : src/world/Lexicon.obj
 
@@ -1244,9 +1364,15 @@ help:
 	@echo ... src/CognitiveArchitecture.obj
 	@echo ... src/CognitiveArchitecture.i
 	@echo ... src/CognitiveArchitecture.s
+	@echo ... src/Diplomacy.obj
+	@echo ... src/Diplomacy.i
+	@echo ... src/Diplomacy.s
 	@echo ... src/Disease.obj
 	@echo ... src/Disease.i
 	@echo ... src/Disease.s
+	@echo ... src/Drive.obj
+	@echo ... src/Drive.i
+	@echo ... src/Drive.s
 	@echo ... src/Economics.obj
 	@echo ... src/Economics.i
 	@echo ... src/Economics.s
@@ -1268,6 +1394,9 @@ help:
 	@echo ... src/Image.obj
 	@echo ... src/Image.i
 	@echo ... src/Image.s
+	@echo ... src/JungianType.obj
+	@echo ... src/JungianType.i
+	@echo ... src/JungianType.s
 	@echo ... src/Kinship.obj
 	@echo ... src/Kinship.i
 	@echo ... src/Kinship.s
@@ -1304,6 +1433,9 @@ help:
 	@echo ... src/SocialOrder.obj
 	@echo ... src/SocialOrder.i
 	@echo ... src/SocialOrder.s
+	@echo ... src/TechTree.obj
+	@echo ... src/TechTree.i
+	@echo ... src/TechTree.s
 	@echo ... src/UI.obj
 	@echo ... src/UI.i
 	@echo ... src/UI.s
@@ -1337,6 +1469,9 @@ help:
 	@echo ... src/validation/ValidationFramework.obj
 	@echo ... src/validation/ValidationFramework.i
 	@echo ... src/validation/ValidationFramework.s
+	@echo ... src/world/Ecosystem.obj
+	@echo ... src/world/Ecosystem.i
+	@echo ... src/world/Ecosystem.s
 	@echo ... src/world/Lexicon.obj
 	@echo ... src/world/Lexicon.i
 	@echo ... src/world/Lexicon.s

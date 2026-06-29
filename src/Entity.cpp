@@ -47,6 +47,7 @@ Entity::Entity(int id)
 {
     // Rebuild semantic memory index from any existing life memories
     semanticMemory.rebuildFromLifeMemories(this);
+    initDrives();
 }
 
 Entity::Entity(int id,
@@ -139,6 +140,7 @@ Entity::Entity(int id,
 
     // Rebuild semantic memory index from any existing life memories
     semanticMemory.rebuildFromLifeMemories(this);
+    initDrives();
 }
 
 // Getter for name
@@ -620,6 +622,29 @@ void Entity::initializeHierarchicalNeeds() {
     // SELF-ACTUALIZATION — slowest decay
     needs["meaning"]    = HierarchicalNeed("meaning",    SELF_ACTUALIZATION, 0.03f);
     needs["creativity"] = HierarchicalNeed("creativity", SELF_ACTUALIZATION, 0.02f);
+}
+
+void Entity::initDrives() {
+    // Personality shapes the sweet spot: open minds crave more stimulation,
+    // extraverts need more company, neurotics tolerate less deviation, the
+    // disciplined decay a little slower.
+    drives.initHuman(personality.openness, personality.extraversion,
+                     personality.neuroticism, personality.conscientiousness);
+}
+
+void Entity::initPsychology() {
+    initDrives();
+    // Type derives from the Big Five (one coherent person); seed off the entity
+    // id + traits so it's deterministic per individual yet varies between them.
+    unsigned seed = static_cast<unsigned>(
+        entityId * 2654435761u
+        ^ (static_cast<unsigned>(personality.openness * 7.0f)      << 1)
+        ^ (static_cast<unsigned>(personality.extraversion * 13.0f) << 5)
+        ^ (static_cast<unsigned>(personality.agreeableness * 17.0f)<< 9));
+    cognition.deriveFromBigFive(personality.extraversion, personality.openness,
+                                personality.agreeableness, personality.conscientiousness,
+                                personality.neuroticism, seed);
+    cognition.applyToDrives(drives);
 }
 
 

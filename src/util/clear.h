@@ -52,6 +52,7 @@ void rm_log_files(){
       "./src/data/movements_log.txt",
       "./src/data/births_log.txt",
       "./src/data/events_log.txt",
+      "./src/data/civilization_log.txt",
       "./src/data/tick_history.jsonl"
     };
 

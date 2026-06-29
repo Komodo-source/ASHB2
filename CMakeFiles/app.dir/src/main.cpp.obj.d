@@ -413,6 +413,7 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/bits/stl_set.h \
  C:/mingw64/include/c++/14.2.0/bits/stl_multiset.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/LearningAdaptation.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
  C:/mingw64/include/c++/14.2.0/functional \
@@ -425,6 +426,8 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/compare \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialOrder.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Drive.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/JungianType.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/BetterRand.h \
  C:/mingw64/include/c++/14.2.0/iostream \
@@ -458,4 +461,5 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/unordered_set \
  C:/mingw64/include/c++/14.2.0/bits/unordered_set.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\environment/EnvironmentModel.h \
- C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/ResourceSystem.h
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/ResourceSystem.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Ecosystem.h

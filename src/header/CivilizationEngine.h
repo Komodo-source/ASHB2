@@ -77,8 +77,17 @@ struct Tribe {
     float granary        = 0.0f;
     int   specialistCount = 0;  // current non-farming specialists (UI / decisions)
 
-    // Known technologies (by innovation id)
+    // Known technologies (by innovation id) — emergent innovation diffusion.
     std::set<int> knownTechIds;
+
+    // ── Structured technology tree (see TechTree.h) ──────────────────────────
+    // Distinct from the emergent `knownTechIds` above: this is a deliberate,
+    // prerequisite-gated tech tree that a tribe researches over time. Research
+    // points accumulate from population + scholars; unlocking a node also costs
+    // stockpiled food (granary), so the economy gates advancement. Unlocked
+    // nodes grant concrete, stacking bonuses (food, military, defense, research).
+    float         researchPoints   = 0.0f;
+    std::set<int> techTreeUnlocked;
 
     // Dominant religion among members (-1 = diverse)
     int dominantReligionId = -1;
@@ -94,6 +103,35 @@ struct Tribe {
         return false;
     }
 };
+
+// ── Diplomacy: formal treaties between tribes ──────────────────────────────────
+// Distinct from the emergent `stances`/`relations` drift: a Treaty is a deliberate,
+// persistent agreement two tribes enter into and that produces ongoing effects
+// until it lapses or is broken. Diplomacy lets weaker peoples buy peace, trading
+// partners enrich each other, and the strong extract tribute instead of blood.
+enum TreatyType {
+    TREATY_PEACE,      // ends a war and bars its rekindling for the term
+    TREATY_ALLIANCE,   // mutual friendship & defence; holds tribes at TS_ALLY
+    TREATY_TRADE,      // ongoing exchange: both granaries & relations grow
+    TREATY_TRIBUTE     // tribeB pays tribeA food to avoid being raided
+};
+
+struct Treaty {
+    TreatyType type;
+    int   tribeA       = -1;   // proposer / (for tribute) the receiver
+    int   tribeB       = -1;   // other party / (for tribute) the payer
+    int   startDay     = 0;
+    int   expiryDay    = -1;   // day it lapses (-1 = until broken)
+    float tributeAmount = 0.0f; // food transferred per civ tick (TRIBUTE only)
+    bool  active       = true;
+
+    bool involves(int id) const { return tribeA == id || tribeB == id; }
+    bool between(int a, int b) const {
+        return (tribeA == a && tribeB == b) || (tribeA == b && tribeB == a);
+    }
+};
+
+const char* treatyTypeName(TreatyType t);
 
 // ── Civilization event ────────────────────────────────────────────────────────
 struct CivEvent {
@@ -125,6 +163,7 @@ public:
     std::vector<Tribe>      tribes;
     std::vector<Religion>   religions;
     std::vector<Innovation> innovations;
+    std::vector<Treaty>     treaties;   // active & lapsed formal agreements
     std::deque<CivEvent>    eventLog;   // last 120 civilization events
     CivilizationEra         era        = ERA_STONE_AGE;
     int                     currentYear = -5000;  // BC/AD year: starts at 5000 BC
@@ -163,6 +202,7 @@ public:
     int  totalConquests    = 0;
     int  totalCouplesBroken= 0;   // couples torn apart by war between their tribes
     int  peakPopulation    = 0;
+    int  totalTreatiesSigned = 0; // formal treaties ever concluded
 
     // True when tribes a and b are currently in an open war.
     bool areTribesAtWar(int tribeIdA, int tribeIdB) const;
@@ -179,7 +219,21 @@ public:
     Innovation* findInnovation(int id);
     Innovation* findInnovationByName(const std::string& name);
 
-    void    logEvent(int day, const std::string& desc, const std::string& cat);
+    // Records a civilization-scale event. It is kept in the in-memory `eventLog`
+    // deque (for the live History panel) AND flushed to the persistent
+    // civilization_log.txt via the global Logger. The optional `data` is a
+    // " key=value" structured block (file-only) for the post-mortem analyst —
+    // it never appears in the UI description.
+    void    logEvent(int day, const std::string& desc, const std::string& cat,
+                     const std::string& data = "");
+
+    // ── Diplomacy (see Diplomacy.cpp) ────────────────────────────────────────
+    // Is there an active treaty of `type` between tribes a and b?
+    bool        hasActiveTreaty(int a, int b, TreatyType type) const;
+    // Count of currently-active treaties (for the UI / report).
+    int         activeTreatyCount() const;
+    // A short human-readable list of active treaties for the History panel.
+    std::string diplomacySummary() const;
 
 private:
     int nextTribeId      = 0;
@@ -193,6 +247,11 @@ private:
     void updateReligions(std::vector<Entity>& entities, int day);
     void updateInnovations(std::vector<Entity>& entities, int day);
     void updateTribeRelations(std::vector<Entity>& entities, int day);
+    // Formal treaties: apply ongoing effects, expire/break stale ones, and let
+    // tribes deliberately propose peace, alliances, trade pacts and tribute.
+    void updateDiplomacy(std::vector<Entity>& entities, int day);
+    void applyTreatyEffects(std::vector<Entity>& entities, int day);
+    void proposeTreaties(std::vector<Entity>& entities, int day);
     void updateEra(const std::vector<Entity>& entities);
     void applyEffectsToEntities(std::vector<Entity>& entities, int day);
 
@@ -200,6 +259,10 @@ private:
     // fields to become artisans/priests/soldiers/traders/scholars; famine
     // forces them back. Runs once per civ tick.
     void updateDivisionOfLabour(std::vector<Entity>& entities, int day);
+
+    // Structured technology tree: accumulate research and unlock prerequisite-
+    // gated tech nodes that grant stacking bonuses. Runs once per civ tick.
+    void updateTechTree(std::vector<Entity>& entities, int day);
 
     // ── Phase 4: carrying capacity, famine, migration, dark ages ─────────────
     void updateCarryingCapacity(std::vector<Entity>& entities, int day);

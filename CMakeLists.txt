@@ -85,8 +85,11 @@ src/world/Planet.cpp
 src/world/PlanetView.cpp
 src/world/Lexicon.cpp
 src/world/ResourceSystem.cpp
+src/world/Ecosystem.cpp
 src/UI.cpp
 src/Entity.cpp
+src/Drive.cpp
+src/JungianType.cpp
 src/Disease.cpp
 src/Logging.cpp
 ${IMGUI_SOURCES}
@@ -103,6 +106,8 @@ src/PlanningSystem.cpp
 src/PersonaSystem.cpp
 src/NarrativeEngine.cpp
 src/CivilizationEngine.cpp
+src/TechTree.cpp
+src/Diplomacy.cpp
 src/Economics.cpp
 
 # New AI / cognitive simulation source files

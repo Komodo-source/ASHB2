@@ -1,6 +1,7 @@
 #include "./header/BetterRand.h"
 #include "./header/WorldSeed.h"
 #include "world/ResourceSystem.h"
+#include "world/Ecosystem.h"
 #include "./header/SemanticMemory.h"
 #include "./header/PlanningSystem.h"
 #include "./header/Entity.h"
@@ -1183,6 +1184,106 @@ void FreeWillSystem::initializeActions() {
                                 {"happiness", 8.0f}, {"mentalHealth", 4.0f} };
     storytell.baseSatisfaction = 16.0f;
     availableActions.push_back(storytell);
+
+    // ── Reflexive survival action (subsumption reactive layer) ───────────────
+    // Flee is almost never chosen deliberately (tiny baseSatisfaction); it is
+    // forced by reflexLayer() when the entity perceives imminent danger. The
+    // act of escaping spikes fatigue/stress but removes the entity from harm.
+    Action flee("Flee", 230, "safety");
+    flee.requirements = { {"health", 25.0f, 0.2f} };
+    flee.statChanges  = { {"stress", 16.0f},  {"fatigue", 12.0f},
+                           {"happiness", -7.0f}, {"health", -2.0f},
+                           {"boredom", -6.0f} };
+    flee.baseSatisfaction = 2.0f;
+    availableActions.push_back(flee);
+}
+
+// ── findActionByName ─────────────────────────────────────────────────────────
+Action* FreeWillSystem::findActionByName(const std::string& name) {
+    for (Action& a : availableActions) {
+        if (a.name == name) return &a;
+    }
+    return nullptr;
+}
+
+// ── Subsumption architecture: reactive survival layer ────────────────────────
+// Evaluated before deliberation. Returns an overriding survival action when a
+// hard threshold is crossed, else nullptr (let the higher layers reason). The
+// checks are ordered by immediacy of the threat to life.
+Action* FreeWillSystem::reflexLayer(Entity* entity,
+                                    const std::vector<Entity*>& neighbors,
+                                    const ActionContext& context) {
+    if (!entity) return nullptr;
+
+    auto fire = [&](const char* name, const std::string& reason) -> Action* {
+        Action* a = findActionByName(name);
+        if (!a) return nullptr;
+        ++reflexOverrideCount;
+        lastReflexReason = reason;
+        entity->innerMonologue = "[reflex] " + reason;
+        return a;
+    };
+
+    // (1) IMMINENT DANGER — environmental hazard (fire/predator/disaster) or an
+    //     aggressor nearby who is enraged at this entity. Highest priority: a
+    //     threat to life right now overrides everything, including hunger.
+    bool envHazard = context.env.safetyLevel < 22.0f;
+    Entity* aggressor = nullptr;
+    for (Entity* nb : neighbors) {
+        if (!nb) continue;
+        for (const auto& pa : nb->list_entityPointedAnger) {
+            if (pa.pointedEntity == entity && pa.anger > 55.0f) { aggressor = nb; break; }
+        }
+        if (aggressor) break;
+    }
+    if (envHazard || aggressor) {
+        // Fight-or-flight: a healthy, bold, angry agent with allies will stand
+        // its ground; otherwise the primitive layer chooses flight.
+        bool canFight = entity->entityHealth > 55.0f &&
+                        entity->personality.neuroticism < 48.0f &&
+                        (entity->entityGeneralAnger > 45.0f || !neighbors.empty());
+        if (aggressor && canFight) {
+            if (Action* d = fire("DefendTribe", "stand and defend against aggressor"))
+                return d;
+            if (Action* du = fire("Duel", "confront the aggressor")) return du;
+        }
+        if (Action* f = fire("Flee", envHazard ? "flee environmental danger"
+                                               : "flee from hostile aggressor"))
+            return f;
+    }
+
+    // (2) STARVATION — life-threatening hunger. Eat stored rations if any,
+    //     otherwise go get food before the store runs dry. We engage well before
+    //     health starts bleeding (starvation damage begins at hunger 80), and we
+    //     reach for the best food source the agent can manage rather than only
+    //     the lowest-yield forage — a single Gather can't out-pace real hunger.
+    if (entity->entityHunger >= 70.0f) {
+        if (entity->foodStore >= 1.0f) {
+            if (Action* e = fire("EatMeal", "eat to stop starving")) return e;
+        }
+        // No stored food: produce some. Hunt/Farm yield far more than Gather, so
+        // prefer them when the agent is still fit enough to work; fall back to
+        // gathering (the lowest barrier) when badly weakened.
+        if (entity->entityHealth > 50.0f) {
+            if (Action* h = fire("Hunt", "hunt — larder is empty")) return h;
+        }
+        if (entity->entityHealth > 40.0f) {
+            if (Action* f = fire("Farm", "work the fields — larder is empty")) return f;
+        }
+        if (Action* g = fire("Gather", "forage urgently — no food left")) return g;
+    }
+
+    // (3) TOTAL EXHAUSTION — collapse if not rested.
+    if (entity->fatigueLevel >= 92.0f) {
+        if (Action* s = fire("Sleep", "collapse from exhaustion")) return s;
+    }
+
+    // (4) HEALTH COLLAPSE — barely alive: stop and recover.
+    if (entity->entityHealth < 12.0f) {
+        if (Action* r = fire("Rest", "rest to survive near-fatal injury")) return r;
+    }
+
+    return nullptr; // no reflex fired — defer to deliberation
 }
 
 void FreeWillSystem::updatePersonalityFromExperience(Entity* ent, const Action& act, float outcomeSuccess) {
@@ -1430,9 +1531,35 @@ float calculateNormModifier(Entity* entity, const Action& action, const SocialNo
     return 1.0f;
 }
 
+// Reinforcement-learning state signature.
+// Encodes the handful of drives most predictive of which action pays off into a
+// short string (e.g. "Ma_p"). Buckets: loneliness L/M/H, anger present, hunger
+// present, social context p(eers)/s(olo). ~24 distinct states keep the per-agent
+// Q-table small while still letting agents learn context-dependent preferences.
+std::string FreeWillSystem::rlStateSignature(Entity* entity, int numNearby) const {
+    if (!entity) return "none";
+    auto b3 = [](float v) -> const char* {
+        return v < 33.0f ? "L" : (v < 66.0f ? "M" : "H");
+    };
+    std::string s;
+    s.reserve(4);
+    s += b3(entity->entityLoneliness);
+    s += (entity->entityGeneralAnger > 50.0f ? "a" : "_");
+    s += (entity->entityHunger      > 50.0f ? "h" : "_");
+    s += (numNearby > 0              ? "p" : "s");
+    return s;
+}
+
 // Main decision-making function
 // main entry = entree principale de fichier
 Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context) {
+    // ── Subsumption: the reactive survival layer runs first and can seize
+    //    control from all higher reasoning. If a reflex fires (danger, hunger,
+    //    exhaustion, near-death) we act on instinct and skip deliberation.
+    if (Action* reflex = reflexLayer(entity, neighbors, context)) {
+        return reflex;
+    }
+
     // Attempt the cognitive pipeline path first
     Action* cp = cognitiveChooseAction(entity, neighbors, context);
     if (cp != nullptr) return cp;
@@ -1445,6 +1572,10 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
     }
 
     std::vector<std::pair<Action*, float>> actionWeights;
+
+    // RL: snapshot the current situation once; each candidate's learned value is
+    // looked up against this same state below.
+    const std::string rlState = rlStateSignature(entity, (int)neighbors.size());
 
     tickValueGoalAlignment(entity);
 
@@ -1461,7 +1592,6 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
 
 
     for (auto& action : availableActions) {
-
         bool isSocialCat = (action.needCategory == "social" ||
                             action.name == "Murder" || action.name == "Betray");
         if (isSocialCat && neighbors.empty()) {
@@ -1633,6 +1763,14 @@ Action* FreeWillSystem::chooseAction(Entity* entity, const std::vector<Entity*>&
         float randomFactor = dist(rng);
         weight *= randomFactor;
         weight *= selfConceptMultiplier;
+
+        // RL: bias toward actions that have historically paid off in this state.
+        // Neutral at the default Q (50); ±40% at the extremes so learning shapes
+        // choices without overriding the hand-tuned scoring above.
+        {
+            float q = rlSystem.getActionValue(entity->getId(), rlState, an);
+            weight *= (0.6f + 0.8f * (q / 100.0f));
+        }
 
         if (action.needCategory == "social" && !neighbors.empty()) {
             float avgDecay = 0.0f;
@@ -2153,16 +2291,15 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                 return;
             }
             std::cout << "Reproduction bloque: " << pointed->getName() << " a trop de colere envers " << pointer->getName() << "\n";
-            // FIX: Reduce anger instead of increasing desire incorrectly
             pointed->list_entityPointedAnger[pointed_anger_index].anger -= BetterRand::genNrInInterval(3, 8);
             return;
         }
-        if (pointer->entityAge < 18 || pointed->entityAge < 18) {
+        if (pointer->entityAge < 15 || pointed->entityAge < 15) {
           std::cout << "cannot have children under the age of 18";
           return ;
         }
         // Fertility wanes with age — elders rarely conceive.
-        if (pointer->entityAge > 55 || pointed->entityAge > 55) {
+        if (pointer->entityAge > 60 || pointed->entityAge > 60) {
           std::cout << "too old to have children\n";
           return ;
         }
@@ -2731,6 +2868,9 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
 // Execute chosen action
 void FreeWillSystem::executeAction(Entity* entity, Action*& action, const ActionContext& context, Entity* pointed) {
     std::cout << "\n=== Executing Action: " << action->name << " ===\n";
+    // RL: capture the situation *before* the action so the outcome below can be
+    // attributed to the right (state, action) pair.
+    const std::string rlPreState = rlStateSignature(entity, context.numPeopleNearby);
     std::map<std::string, float> statsBefore = captureEntityStats(entity);
     //std::cout << "Stats Before:\n";
     //for (auto& [k, v] : statsBefore) std::cout << "  " << k << ": " << v << "\n";
@@ -2756,7 +2896,8 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     //check work action -> implements economics
     if(action->name == "Basic Manual Work"){
       entity->salary.earnMoney(BetterRand::genNrInInterval(100, 200));
-      entity->foodStore = std::min(20.0f, entity->foodStore + 1.0f); // wages buy some bread
+      entity->foodStore = std::min(20.0f, entity->foodStore + 2.5f); // wages buy bread at market
+      entity->entityHunger = std::max(0.0f, entity->entityHunger - 4.0f); // and a meal on the way home
     }
 
     // ── Subsistence: produce and consume food ────────────────────────────────
@@ -2777,20 +2918,28 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
             // The land only surrenders what it has; if depleted, the harvester
             // still scrounges a fraction so a bad spot starves slowly, not instantly.
             float taken = g_resources.extract(rid, RES_FOOD, gross);
-            return g_resources.valid(rid) ? std::max(taken, gross * 0.30f) : gross;
+            return g_resources.valid(rid) ? std::max(taken, gross * 0.45f) : gross;
         };
         if (an == "Hunt") {
-            // Game is less seasonal than crops — blend toward 1.0.
+            // Game is less seasonal than crops — blend toward 1.0. The local
+            // food chain scales the kill: a teeming region rewards the hunter,
+            // an overhunted one yields little. Hunting then depletes the herd.
             float huntMod = 0.5f + 0.5f * envMod;
-            float gross = BetterRand::genNrInInterval(2, 5) * huntMod * (0.7f + 0.3f * localAb);
-            entity->foodStore = std::min(20.0f, entity->foodStore + landYield(gross));
-            entity->entityHunger = std::max(0.0f, entity->entityHunger - 10.0f); // eat fresh kill
+            float game = g_ecosystem.gameAbundance(rid);
+            float gross = BetterRand::genNrInInterval(3, 7) * huntMod * (0.7f + 0.3f * localAb) * game;
+            float got = landYield(gross);
+            entity->foodStore = std::min(20.0f, entity->foodStore + got);
+            entity->entityHunger = std::max(0.0f, entity->entityHunger - 14.0f); // eat fresh kill
+            g_ecosystem.huntPressure(rid, got);
         } else if (an == "Gather") {
-            float gross = BetterRand::genNrInInterval(1, 3) * envMod * localAb;
-            entity->foodStore = std::min(20.0f, entity->foodStore + landYield(gross));
-            entity->entityHunger = std::max(0.0f, entity->entityHunger - 6.0f);
+            float forage = g_ecosystem.forageAbundance(rid);
+            float gross = BetterRand::genNrInInterval(2, 4) * envMod * localAb * forage;
+            float got = landYield(gross);
+            entity->foodStore = std::min(20.0f, entity->foodStore + got);
+            entity->entityHunger = std::max(0.0f, entity->entityHunger - 9.0f);
+            g_ecosystem.foragePressure(rid, got);
         } else if (an == "Farm") {
-            float gross = BetterRand::genNrInInterval(3, 6) * envMod * localAb; // best sustained yield, most seasonal
+            float gross = BetterRand::genNrInInterval(4, 8) * envMod * localAb; // best sustained yield, most seasonal
             entity->foodStore = std::min(20.0f, entity->foodStore + landYield(gross));
         } else if (an == "EatMeal") {
             float eaten = std::min(entity->foodStore, 1.5f);
@@ -2811,6 +2960,15 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     float outcomeSuccess = calculateOutcomeSuccess(statsBefore, statsAfter);
     action->outcomeSuccess = outcomeSuccess;
     std::cout << "Outcome Success: " << outcomeSuccess << "\n";
+
+    // RL: reinforce this (state, action) pair from the realised outcome. The
+    // reward is the outcome success scaled to the Q-value range (0..100); the
+    // post-action situation becomes the next state for bootstrapping.
+    {
+        float reward = outcomeSuccess * 100.0f;
+        const std::string rlNextState = rlStateSignature(entity, context.numPeopleNearby);
+        rlSystem.processExperience(entity, rlPreState, action->name, reward, rlNextState);
+    }
 
     // Phase 3: sentiment-modulated emotional impact on pointed target
     if (pointed != nullptr) {
@@ -3343,6 +3501,9 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
 
 
+    // RL: snapshot the situation once; each candidate is scored against it below.
+    const std::string rlState = rlStateSignature(entity, (int)neighbors.size());
+
     // Generate 3-7 candidates using existing scoring utilities
     std::vector<ActionCandidate> candidates;
 
@@ -3453,6 +3614,13 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         if (an == "Gaming") rarityMult *= 0.30f;
         if (an == "Take Shower") rarityMult *= 0.9f;
         score *= rarityMult;
+
+        // RL: bias toward actions that have historically paid off in this state.
+        // Neutral at the default Q (50); ±40% at the extremes.
+        {
+            float q = rlSystem.getActionValue(entity->getId(), rlState, an);
+            score *= (0.6f + 0.8f * (q / 100.0f));
+        }
 
         std::uniform_real_distribution<float> jitter(0.93f, 1.07f);
         score *= jitter(rng);
@@ -3756,9 +3924,11 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
                     globalLogger->logEvent("crime_of_passion",
                         e->name + " committed " + mode + " against " + victim->name +
                         " out of jealousy over " + P->name);
-                    if (lethal) globalLogger->logDeath(victim->entityId, victim->name,
-                        (int)victim->entityAge, "crime of passion by " + e->name);
                 }
+                // Attribute the cause; the central death-handler writes the single
+                // death line, so a jealous killing is no longer also tallied as
+                // generic "hardship".
+                if (lethal) victim->pendingDeathCause = "crime of passion by " + e->name;
                 // Grief ripples out to everyone who was bonded to the victim.
                 if (lethal) {
                     for (Entity* o : group) {
@@ -3781,10 +3951,10 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
         // measured pace. Only the lower-id partner initiates, so a couple doesn't
         // double-conceive from both sides on the same tick.
         if (P->entityHealth > 0.0f && e->entityId < P->entityId &&
-            cp.daysTogether > 20 && (cp.daysTogether % 24 == 0) &&
-            e->entityAge >= 18.0f && e->entityAge <= 55.0f &&
-            P->entityAge >= 18.0f && P->entityAge <= 55.0f &&
-            e->entityHealth > 45.0f && P->entityHealth > 45.0f &&
+            cp.daysTogether > 12 && (cp.daysTogether % 14 == 0) &&
+            e->entityAge >= 16.0f && e->entityAge <= 55.0f &&
+            P->entityAge >= 16.0f && P->entityAge <= 55.0f &&
+            e->entityHealth > 40.0f && P->entityHealth > 40.0f &&
             cp.suspicion < 45.0f &&
             !(globalKinship && KinshipSystem::wouldBeIncest(*e, *P)) &&
             !(globalCivEngine && e->tribeId != P->tribeId &&
@@ -3794,7 +3964,12 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
             // couple reliably raises several children across their fertile years —
             // enough for lineages to outpace mortality — without spawning a child
             // every cycle.
-            float fertility = 22.0f + cp.commitment * 0.22f + pos(e->searchConnDesire(P)) * 0.22f;
+            float fertility = 38.0f + cp.commitment * 0.28f + pos(e->searchConnDesire(P)) * 0.28f;
+            // Young couples in their prime are markedly more fertile, so the
+            // population pyramid refills from the bottom instead of greying out.
+            float youngerAge = std::min(e->entityAge, P->entityAge);
+            if (youngerAge <= 30.0f)      fertility *= 1.6f;
+            else if (youngerAge <= 40.0f) fertility *= 1.25f;
             if (BetterRand::genNrInInterval(0, 100) < fertility) {
                 static int nextLineageBabyId = 20000;
                 Entity baby = Entity(nextLineageBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75,

@@ -14,6 +14,7 @@
 #include "SocialNormSystem.h"
 #include "Economics.h"
 #include "CivilizationEngine.h"
+#include "LearningAdaptation.h"
 class Entity;
 
 struct StatRequirement {
@@ -210,10 +211,25 @@ private:
     int currentTime;
     std::mt19937 rng;
 
+    // ── Reinforcement learning ────────────────────────────────────────────────
+    // Per-entity Q-learning: agents learn which actions pay off in a given
+    // situation. This FreeWillSystem instance is owned by a single Entity
+    // (see Entity::getFreeWill), so rlSystem holds just that agent's Q-table.
+    LearningAdaptationSystem rlSystem;
+
+    // Compact, discretised description of the agent's current situation used as
+    // the RL "state". Kept small (a handful of buckets) to bound the Q-table.
+    std::string rlStateSignature(Entity* entity, int numNearby) const;
+
 
 
     // Last deliberation result (pipeline state) for reflection/logging
     Deliberation lastDeliberation;
+
+    // Look up a registered action by name (returns a stable pointer into
+    // availableActions, or nullptr). Used by the reflex layer to return an
+    // overriding action without dangling pointers.
+    Action* findActionByName(const std::string& name);
 
     // Get stat value from entity
     float getEntityStat(Entity* entity, const std::string& statName);
@@ -257,6 +273,18 @@ public:
     Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {}, const ActionContext& context = ActionContext());
     // New cognitive pipeline entry point (separate from legacy scoring)
     Action* cognitiveChooseAction(Entity* entity, const std::vector<Entity*>& neighbors, const ActionContext& context);
+
+    // ── Subsumption architecture: reactive survival layer ────────────────────
+    // A fast, reflexive layer evaluated BEFORE any deliberation. When a hard
+    // survival threshold is crossed — imminent danger, starvation, total
+    // exhaustion, or health collapse — it returns an overriding action and the
+    // deliberative BDI / planning pipeline is skipped entirely for this tick.
+    // This is the lowest, most primitive competence layer: it can always seize
+    // control of behaviour from the higher reasoning layers (Brooks' subsumption).
+    Action* reflexLayer(Entity* entity, const std::vector<Entity*>& neighbors,
+                        const ActionContext& context);
+    int         reflexOverrideCount = 0;   // times the reflex layer seized control
+    std::string lastReflexReason    = "";  // human-readable trigger of last reflex
     void executeAction(Entity* entity, Action* &action, const ActionContext& context = ActionContext(), Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action, CivilizationEngine* engineCivilization);
     float calculateGoalAlignmentModifier(Entity* entity,  Action* action);
@@ -269,6 +297,7 @@ public:
     void reinforce_link(Entity& a, Entity& b, float base_delta);
     const std::deque<ActionMemory>& getActionHistory() const;
     const std::map<std::string, Need>& getNeeds() const;
+    const LearningAdaptationSystem& getLearning() const { return rlSystem; }
     float calculateEnvironningPheromones(const std::vector<Entity*>& neighbors, const Action* action);
 
     void tickChildDevelopment(Entity* child, float deltaTime);

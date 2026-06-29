@@ -471,6 +471,14 @@ const std::vector<HabitStrength>& LearningAdaptationSystem::getHabits(int entity
     return entityHabits.at(entityId);
 }
 
+float LearningAdaptationSystem::getActionValue(int entityId,
+                                               const std::string& state,
+                                               const std::string& action) const {
+    auto it = entityQFunctions.find(entityId);
+    if (it == entityQFunctions.end()) return 50.0f;  // unseen agent → neutral
+    return it->second.getQValue(state, action);      // returns 50 default if unseen
+}
+
 void LearningAdaptationSystem::saveTo(std::ofstream& file) const {
     // Save Q-functions
     size_t numEntities = entityQFunctions.size();

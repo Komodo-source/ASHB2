@@ -191,6 +191,13 @@ public:
     // Accessors
     const ActionValueFunction& getQFunction(int entityId) const;
     const std::vector<HabitStrength>& getHabits(int entityId) const;
+
+    // Safe Q-value lookup for action scoring: returns the learned value of a
+    // state-action pair, or a neutral default (50) when the entity/state/action
+    // has not been encountered yet. Const and non-mutating: creates no entries.
+    float getActionValue(int entityId,
+                         const std::string& state,
+                         const std::string& action) const;
     
     // Serialization
     void saveTo(std::ofstream& file) const;

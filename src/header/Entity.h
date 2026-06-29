@@ -14,6 +14,8 @@
 #include "PersonaSystem.h"
 #include "Economics.h"
 #include "SocialOrder.h"   // SocialClass enum + clientela/class fields
+#include "Drive.h"         // bipolar homeostatic/novelty drives (0 -> setpoint <- 1)
+#include "JungianType.h"   // Jung's 8 functions in Beebe's 8-archetype stack
 
 class Entity;
 class Action;
@@ -259,6 +261,11 @@ public:
     int entityBirthYear;   // BC/AD year of birth (e.g. -4985 for 4985 BC)
     int entityAntiBody; // pourcentage
     int entityDiseaseType; //-1 if no disease
+    // When a death is caused by an external agent (a killing) the cause is
+    // attributed at the moment of the lethal blow and stashed here, so the
+    // single central death-handler can log it verbatim instead of guessing.
+    // Empty = death (if any) should be attributed from the entity's own state.
+    std::string pendingDeathCause = "";
     LifeStage entityLifeStage;
     float posX = 0.0f;
     float posY = 0.0f;
@@ -281,6 +288,18 @@ public:
     SocialNorm socialNorm;
     std::vector<LifeGoal> m_goals; //une entité peut avoir entre 1 - 5 but de vie
     std::map<std::string, HierarchicalNeed> needs;
+
+    // ── Bipolar drives: every axis has a lethal floor AND a lethal ceiling, a
+    // comfort band around a setpoint, and behaviour is the pull back toward it
+    // (0 -> setpoint <- 1). Adds chronic allostatic load + dopamine habituation
+    // on top of the legacy unipolar stats. See Drive.h.
+    DriveSet drives;
+
+    // ── Jungian type (Beebe 8-function stack): the entity's cognitive spine and
+    // its shadow. Derived from the Big Five at spawn; under psychic load the ego
+    // falls into the grip of the inferior, then the shadow archetypes. See
+    // JungianType.h.
+    JungianStack cognition;
 
     LifeStage lifeStage = INFANT;
     Entity* parent1 = nullptr;
@@ -388,6 +407,13 @@ public:
     FreeWillSystem& getFreeWill(){return fws;};
     bool checkCouple(Entity* ent);
     void initializeHierarchicalNeeds();
+
+    // Build the bipolar drive set from this entity's personality.
+    void initDrives();
+
+    // Build drives + Jungian stack and let the stack shape the drives. Call once
+    // personality is finalized (spawn / birth); also lazily run on first tick.
+    void initPsychology();
 
     void setGoal(std::string type);
 

@@ -231,6 +231,7 @@ CMakeFiles/app.dir/src/SemanticMemory.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Economics.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/LearningAdaptation.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
  C:/mingw64/include/c++/14.2.0/functional \
@@ -243,6 +244,8 @@ CMakeFiles/app.dir/src/SemanticMemory.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/compare \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialOrder.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Drive.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/JungianType.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:/mingw64/include/c++/14.2.0/queue \

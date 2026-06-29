@@ -19,6 +19,7 @@ private:
     std::ofstream movementsLogFile;
     std::ofstream birthsLogFile;
     std::ofstream eventsLogFile;
+    std::ofstream civilizationLogFile;
     std::ofstream completeLogFile;
 
     std::string getTimestamp() {
@@ -45,6 +46,7 @@ public:
         movementsLogFile.open("./src/data/movements_log.txt", std::ios::app);
         birthsLogFile.open("./src/data/births_log.txt", std::ios::app);
         eventsLogFile.open("./src/data/events_log.txt", std::ios::app);
+        civilizationLogFile.open("./src/data/civilization_log.txt", std::ios::app);
         completeLogFile.open("./src/data/complete_logs.txt", std::ios::app);
 
 
@@ -64,12 +66,23 @@ public:
         movementsLogFile.close();
         birthsLogFile.close();
         eventsLogFile.close();
+        civilizationLogFile.close();
         completeLogFile.close();
     }
 
-    void logDeath(int entityId, const std::string& name, int age, const std::string& cause) {
+    // A death line carries the specific cause, and (optionally) a structured
+    // context block that snapshots the deceased's terminal state — life stage,
+    // kin, partner status and the stat that undid them. The leading
+    // "Entity <id> (<name>, age <n>) died: <cause>" shape is kept stable for
+    // parsers; richer fields are appended after a " | " delimiter as key=value
+    // pairs so they can be mined without breaking the base format.
+    void logDeath(int entityId, const std::string& name, int age, const std::string& cause,
+                  const std::string& details = "") {
         std::string timestamp = getTimestamp();
         std::string msg = "[" + timestamp + "] Entity " + std::to_string(entityId) + " (" + name + ", age " + std::to_string(age) + ") died: " + cause;
+        if (!details.empty()) {
+            msg += " | " + details;
+        }
         deathsLogFile << msg << std::endl;
         completeLogFile << msg << std::endl;
     }
@@ -129,6 +142,28 @@ public:
         completeLogFile << msg << std::endl;
     }
 
+    // Civilization-scale events — everything that happens *above* the individual:
+    // tribes forming/splitting/dissolving, wars declared & battles fought,
+    // conquests, alliances & treaties, religions founded & spread, innovations
+    // discovered & lost, famines, migrations, era changes and the rise of farming
+    // specialists. The base shape stays parser-stable —
+    //   "[ts] <category>: <description>"
+    // — and a structured " | key=value ..." block (always carrying day=<n>, plus
+    // event-specific fields like kind=, winner=, fallen=, members=) is appended so
+    // the post-mortem analyst can mine them without scraping prose. Mirrors into
+    // both its own civilization_log.txt and the unified complete_logs.txt.
+    void logCiv(int day, const std::string& category, const std::string& description,
+                const std::string& data = "") {
+        std::string timestamp = getTimestamp();
+        std::string msg = "[" + timestamp + "] " + category + ": " + description
+                        + " | day=" + std::to_string(day);
+        if (!data.empty()) {
+            msg += " " + data;
+        }
+        civilizationLogFile << msg << std::endl;
+        completeLogFile << msg << std::endl;
+    }
+
     void logCmd(const std::string& message) {
         std::string timestamp = getTimestamp();
         std::string msg = "[" + timestamp + "] " + message;
@@ -146,6 +181,7 @@ public:
         movementsLogFile.close();
         birthsLogFile.close();
         eventsLogFile.close();
+        civilizationLogFile.close();
         completeLogFile.close();
 
         // Reopen in truncate mode to clear
@@ -157,6 +193,7 @@ public:
         movementsLogFile.open("./src/data/movements_log.txt", std::ios::trunc);
         birthsLogFile.open("./src/data/births_log.txt", std::ios::trunc);
         eventsLogFile.open("./src/data/events_log.txt", std::ios::trunc);
+        civilizationLogFile.open("./src/data/civilization_log.txt", std::ios::trunc);
         completeLogFile.open("./src/data/complete_logs.txt", std::ios::trunc);
 
         // Re-redirect cout

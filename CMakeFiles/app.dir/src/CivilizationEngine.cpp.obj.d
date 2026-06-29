@@ -219,6 +219,7 @@ CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj: \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SocialNormSystem.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/Economics.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/CivilizationEngine.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/LearningAdaptation.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SemanticMemory.h \
  C:/mingw64/include/c++/14.2.0/sstream \
  C:/mingw64/include/c++/14.2.0/bits/sstream.tcc \
@@ -242,8 +243,23 @@ CMakeFiles/app.dir/src/CivilizationEngine.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/compare \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/PersonaSystem.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SocialOrder.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/Drive.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/JungianType.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Planet.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Lexicon.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/ResourceSystem.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/environment/EnvironmentModel.h
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/environment/EnvironmentModel.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/TechTree.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/Logging.h \
+ C:/mingw64/include/c++/14.2.0/iostream \
+ C:/mingw64/include/c++/14.2.0/chrono \
+ C:/mingw64/include/c++/14.2.0/bits/chrono.h \
+ C:/mingw64/include/c++/14.2.0/ratio \
+ C:/mingw64/include/c++/14.2.0/bits/parse_numbers.h \
+ C:/mingw64/include/c++/14.2.0/filesystem \
+ C:/mingw64/include/c++/14.2.0/bits/fs_fwd.h \
+ C:/mingw64/include/c++/14.2.0/bits/fs_path.h \
+ C:/mingw64/include/c++/14.2.0/codecvt \
+ C:/mingw64/include/c++/14.2.0/bits/fs_dir.h \
+ C:/mingw64/include/c++/14.2.0/bits/fs_ops.h

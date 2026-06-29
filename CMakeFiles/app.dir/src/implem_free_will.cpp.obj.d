@@ -142,6 +142,7 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/ResourceSystem.h \
  C:/mingw64/include/c++/14.2.0/array \
  C:/mingw64/include/c++/14.2.0/compare \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Ecosystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/mingw64/include/c++/14.2.0/map \
  C:/mingw64/include/c++/14.2.0/bits/stl_tree.h \
@@ -244,10 +245,13 @@ CMakeFiles/app.dir/src/implem_free_will.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Economics.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/WorldSeed.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/LearningAdaptation.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SemanticMemory.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PlanningSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialOrder.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Drive.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/JungianType.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/PersonaSystem.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Logging.h \

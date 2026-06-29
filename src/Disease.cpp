@@ -18,6 +18,11 @@ const int Disease::DISEASE_4 = 4;
 const char* Disease::DISEASE_4_NAME = "Typhus";
 int Disease::region;
 
+//infamous disease
+const int Disease::DISEASE_5 = 5;
+const char* Disease::DISEASE_5_NAME = "Cancer";
+
+
   int Disease::pickDisease(){
     return BetterRand::genNrInInterval(1,4);
   }
@@ -28,6 +33,7 @@ int Disease::region;
           case DISEASE_2: return DISEASE_2_NAME;
           case DISEASE_3: return DISEASE_3_NAME;
           case DISEASE_4: return DISEASE_4_NAME;
+          case DISEASE_5: return DISEASE_5_NAME;
           default: return "Unknown Disease";
       }
   }
@@ -43,7 +49,28 @@ int Disease::region;
     }
   }
 
+  void Disease::checkInfamousDisease(Entity* ent) {
+    if(ent->entityDiseaseType == -2){
+      if(ent->entityAntiBody > 95){
+        ent->entityDiseaseType = 0;
+        std::cout << ent->name + " was cured from cancer\n";
+      }else{
+        ent->entityAntiBody += BetterRand::genNrInInterval(0,3);
+        ent->entityAntiBody -= BetterRand::genNrInInterval(0,3);
+      }
+    }else{
+      if(ent->entityAge > 40){
+        if(BetterRand::genNrInInterval(0, 100) > 5){
+          std::cout << ent->name + " has now cancer\n";
+          ent->entityDiseaseType = -2;
+        }
+      }
+    }
+  }
+
   int Disease::calculateDisease(int neighboorsSize, Entity* ent, int nbSickClose){
+    if (ent->entityDiseaseType != -2){
+
     int ranchoice = BetterRand::genNrInInterval(0,2);
     int hygiene = ent->entityHygiene;
     int diseasePicked = pickDisease();
@@ -53,11 +80,13 @@ int Disease::region;
         }else{
           return -1;
         }
-      }
+      }}
       return -1; // Default return to prevent undefined behavior crash
   }
 
   void Disease::manageSickness(Entity* ent){
+    if (ent->entityDiseaseType != -2){
+
     // guerison
     // Diseases drain health slowly — should be survivable for days
     ent->entityHealth -= ent->entityDiseaseType * 0.10;
@@ -70,5 +99,6 @@ int Disease::region;
       ent->entityAntiBody = 80;
       ent->entityDiseaseType = -1;
       if(globalLogger) globalLogger->logDisease(ent->getId(), ent->getName(), dName, true);
+      }
     }
   }

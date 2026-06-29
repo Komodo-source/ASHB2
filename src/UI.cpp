@@ -8,8 +8,10 @@
 #include "./header/UI.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
+#include "./header/TechTree.h"
 #include "./header/Kinship.h"
 #include "world/ResourceSystem.h"
+#include "world/Ecosystem.h"
 #include "./header/PersonaSystem.h"
 #include <iostream>
 #include "./header/Disease.h"
@@ -171,6 +173,12 @@ void UI::showSystemInformation(){
                         g_resources.abundance(rid, RES_WATER),
                         g_resources.abundance(rid, RES_WOOD),
                         g_resources.settlementQuality(rid) * 100.0f);
+            if (g_ecosystem.valid(rid)) {
+                const RegionEcology& eco = g_ecosystem.regions[rid];
+                ImGui::TextColored(ImVec4(0.6f, 0.9f, 0.6f, 1.0f),
+                    "Wildlife: %s  (plants %.0f, game %.0f, predators %.0f)",
+                    g_ecosystem.healthLabel(rid), eco.plants, eco.herbivores, eco.predators);
+            }
         }
         ImGui::Text("Birthday: %dth day", entity->entityBDay);
         //ImGui::Text("Hygiene: %d", entity->entityHygiene);
@@ -725,9 +733,27 @@ void UI::ShowCivilizationPanel(int simDay) {
             ImGui::ProgressBar(tribe.innovation/100.0f, ImVec2(60,8), id3);
             ImGui::PopStyleColor();
 
-            // Known tech count
+            // Known tech count (emergent innovations)
             if (!tribe.knownTechIds.empty())
-                ImGui::TextDisabled("    %d technologies known", (int)tribe.knownTechIds.size());
+                ImGui::TextDisabled("    %d innovations known", (int)tribe.knownTechIds.size());
+
+            // Structured tech tree: unlocked nodes, bonuses, and next goal.
+            ImGui::TextColored(ImVec4(0.55f, 0.85f, 0.95f, 1.0f),
+                               "    Tech tree: %s", TechTreeSystem::summary(tribe).c_str());
+
+            // Active treaties this tribe is party to.
+            for (const Treaty& tr : civ.treaties) {
+                if (!tr.active || !tr.involves(tribe.id)) continue;
+                int otherId = (tr.tribeA == tribe.id) ? tr.tribeB : tr.tribeA;
+                const Tribe* other = nullptr;
+                for (const auto& ot : civ.tribes) if (ot.id == otherId) { other = &ot; break; }
+                if (!other) continue;
+                const char* dir = (tr.type == TREATY_TRIBUTE)
+                                ? (tr.tribeA == tribe.id ? " receives from " : " pays ")
+                                : " with ";
+                ImGui::TextColored(ImVec4(0.85f, 0.8f, 0.5f, 1.0f),
+                    "    %s%s%s", treatyTypeName(tr.type), dir, other->name.c_str());
+            }
             ImGui::Spacing();
         }
     }
