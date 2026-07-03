@@ -22,12 +22,20 @@ private:
     std::ofstream civilizationLogFile;
     std::ofstream completeLogFile;
 
+    // Formatted once per wall-clock second, not per message — localtime +
+    // put_time showed up in profiles once actions were logged by the thousand.
     std::string getTimestamp() {
         auto now = std::chrono::system_clock::now();
         auto time_t = std::chrono::system_clock::to_time_t(now);
-        std::stringstream ss;
-        ss << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S");
-        return ss.str();
+        static std::time_t lastSecond = (std::time_t)-1;
+        static std::string cached;
+        if (time_t != lastSecond) {
+            lastSecond = time_t;
+            std::stringstream ss;
+            ss << std::put_time(std::localtime(&time_t), "%Y-%m-%d %H:%M:%S");
+            cached = ss.str();
+        }
+        return cached;
     }
 
 public:
@@ -83,16 +91,16 @@ public:
         if (!details.empty()) {
             msg += " | " + details;
         }
-        deathsLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        deathsLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     void logDisease(int entityId, const std::string& name, const std::string& disease, bool cured = false) {
         std::string timestamp = getTimestamp();
         std::string action = cured ? "cured from" : "contracted";
         std::string msg = "[" + timestamp + "] Entity " + std::to_string(entityId) + " (" + name + ") " + action + " " + disease;
-        diseasesLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        diseasesLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     void logAction(int entityId, const std::string& name, const std::string& action, const std::string& target = "", const std::string& details = "") {
@@ -104,8 +112,8 @@ public:
         if (!details.empty()) {
             msg += " - " + details;
         }
-        actionsLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        actionsLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     void logRelationship(int entityId1, const std::string& name1, int entityId2, const std::string& name2, const std::string& relationshipType, const std::string& details = "") {
@@ -114,8 +122,8 @@ public:
         if (!details.empty()) {
             msg += " - " + details;
         }
-        relationshipsLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        relationshipsLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     void logMovement(int entityId, const std::string& name, float oldX, float oldY, float newX, float newY, const std::string& reason = "") {
@@ -124,22 +132,22 @@ public:
         if (!reason.empty()) {
             msg += " - " + reason;
         }
-        movementsLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        movementsLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     void logBirth(int entityId, const std::string& name, int parent1Id, int parent2Id, const std::string& parent1Name, const std::string& parent2Name) {
         std::string timestamp = getTimestamp();
         std::string msg = "[" + timestamp + "] Birth: Entity " + std::to_string(entityId) + " (" + name + ") born to " + parent1Name + " (" + std::to_string(parent1Id) + ") and " + parent2Name + " (" + std::to_string(parent2Id) + ")";
-        birthsLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        birthsLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     void logEvent(const std::string& eventType, const std::string& details) {
         std::string timestamp = getTimestamp();
         std::string msg = "[" + timestamp + "] " + eventType + ": " + details;
-        eventsLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        eventsLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     // Civilization-scale events — everything that happens *above* the individual:
@@ -160,15 +168,15 @@ public:
         if (!data.empty()) {
             msg += " " + data;
         }
-        civilizationLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        civilizationLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     void logCmd(const std::string& message) {
         std::string timestamp = getTimestamp();
         std::string msg = "[" + timestamp + "] " + message;
-        cmdLogFile << msg << std::endl;
-        completeLogFile << msg << std::endl;
+        cmdLogFile << msg << '\n';
+        completeLogFile << msg << '\n';
     }
 
     // Utility function to clear all log files

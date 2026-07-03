@@ -244,4 +244,5 @@ CMakeFiles/app.dir/src/NarrativeEngine.cpp.obj: \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/PersonaSystem.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SocialOrder.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/Drive.h \
- C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/JungianType.h
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/JungianType.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/BetterRand.h

@@ -177,7 +177,5 @@ CMakeFiles/app.dir/libs/imgui/imgui_draw.cpp.obj: \
  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/prfchwintrin.h \
  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/keylockerintrin.h \
  C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/amxfp16intrin.h \
- C:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h \
- C:/mingw64/x86_64-w64-mingw32/include/stdint.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\libs\imgui\imstb_rectpack.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\libs\imgui\imstb_truetype.h

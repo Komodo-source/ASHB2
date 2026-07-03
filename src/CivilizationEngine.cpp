@@ -155,6 +155,15 @@ static float dist2(float ax, float ay, float bx, float by) {
 }
 
 void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
+    // M7 healer: an entity whose tribeId points at a tribe that no longer
+    // exists (dissolved while they weren't on its member roll) is really
+    // tribeless — reset it so the clustering pass below can see them again.
+    // Without this, a whole generation of dangling ids froze tribe formation.
+    for (Entity& ent : entities) {
+        if (ent.tribeId >= 0 && findTribe(ent.tribeId) == nullptr)
+            ent.tribeId = -1;
+    }
+
     // 1. Update existing tribes
     for (auto& tribe : tribes) {
         updateTribeCenter(tribe, entities);
@@ -168,7 +177,7 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
         for (Entity& ent : entities) {
             if (ent.entityHealth <= 0.0f) continue;
             if (ent.tribeId != -1) continue;
-            if (tribe.population() >= 10) continue; // keep tribes small so others can form
+            if (tribe.population() >= 20) continue; // cap absorption so new tribes can still form
             // Geographic gate: a tribe only absorbs people in its homeland, so
             // distant cradles never merge into one culture.
             if (dist2(ent.posX, ent.posY, tribe.centerX, tribe.centerY) > 250.0f * 250.0f) continue;
@@ -212,10 +221,90 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
             }
         }
         used[i] = true;
-        if (cluster.size() >= 3) {
+        // M9 tuning: 4 founders minimum — 3 let every stray trio incorporate,
+        // fragmenting the map into dozens of micro-tribes.
+        if (cluster.size() >= 4) {
             if (formTribe(cluster, day)) {
                 formedThisTick = true;
                 break; // one new tribe per tick — others form on subsequent ticks
+            }
+        }
+    }
+
+    // 2b. Cultural schism — keeps NEW tribes appearing across the whole run,
+    // not just at the start. Over time a charismatic member whose values have
+    // drifted far from the tribe gathers like-minded followers and breaks away
+    // to found their own tribe. Deliberately rare and heavily gated (tribe must
+    // be established, the rift must be real, a faction must exist, and even then
+    // only a small per-tick chance) so the map doesn't fragment into a churn of
+    // micro-tribes the way religions can proliferate.
+    {
+        std::uniform_real_distribution<float> rollS(0.0f, 1.0f);
+        // Index loop: formTribe() may push_back to `tribes`. We mutate the parent
+        // and read everything we need BEFORE calling formTribe, and never touch
+        // tribes[ti] afterwards, so a reallocation can't bite us.
+        size_t tribeCountBefore = tribes.size();
+        for (size_t ti = 0; ti < tribeCountBefore; ++ti) {
+            Tribe& tr = tribes[ti];
+            if (tr.population() < 7) continue;           // need a body to split from
+            if (day - tr.foundedOnDay < 240) continue;   // must be established first
+
+            // The would-be breakaway: highest-charisma member (not the leader)
+            // whose values diverge most from the tribe's culture.
+            Entity* dissident = nullptr; float bestScore = 0.0f;
+            for (int mid : tr.memberIds) {
+                Entity* e = entityById(entities, mid);
+                if (!e || e->entityHealth <= 0.0f || e->entityId == tr.leaderId) continue;
+                float div = std::abs(e->ValueSystem.collectivism - tr.collectivism) * 0.4f
+                          + std::abs(e->ValueSystem.spiritualNeed - tr.spiritualism) * 0.3f
+                          + std::abs(e->personality.openness      - tr.innovation)   * 0.3f;
+                float score = (div / 100.0f) * (computeCharisma(e) / 100.0f);
+                if (score > bestScore) { bestScore = score; dissident = e; }
+            }
+            if (!dissident || bestScore < 0.20f) continue;
+
+            // Rare per-tick chance, scaled by how deep the rift is. The 0.004
+            // coefficient is well below the religion-founding roll so schisms
+            // stay an occasional event, not a constant churn.
+            float schismChance = bestScore * 0.004f * g_worldSeed.divergence.butterfly;
+            if (rollS(rng) >= schismChance) continue;
+
+            // The dissident pulls along value-aligned / socially-bonded members.
+            std::vector<Entity*> faction; faction.push_back(dissident);
+            for (int mid : tr.memberIds) {
+                if ((int)faction.size() >= 5) break;
+                Entity* e = entityById(entities, mid);
+                if (!e || e == dissident || e->entityHealth <= 0.0f) continue;
+                if (e->entityId == tr.leaderId) continue;        // the leader stays
+                float valDiff = std::abs(e->ValueSystem.collectivism     - dissident->ValueSystem.collectivism)     * 0.4f
+                              + std::abs(e->ValueSystem.spiritualNeed     - dissident->ValueSystem.spiritualNeed)     * 0.3f
+                              + std::abs(e->ValueSystem.achievementDrive  - dissident->ValueSystem.achievementDrive)  * 0.3f;
+                float bond = e->searchConnSocial(dissident);
+                if (valDiff < 28.0f || bond > 14.0f) faction.push_back(e);
+            }
+            // Need a real faction, and the parent must survive the loss.
+            if (faction.size() < 3) continue;
+            if (tr.population() - (int)faction.size() < 3) continue;
+
+            // Detach the faction from the parent (all parent mutation happens here,
+            // before formTribe), then let them found their own tribe.
+            std::string parentName = tr.name;
+            int parentId = tr.id;
+            for (Entity* e : faction) {
+                e->tribeId = -1;
+                tr.memberIds.erase(std::remove(tr.memberIds.begin(), tr.memberIds.end(), e->entityId),
+                                   tr.memberIds.end());
+            }
+            if (formTribe(faction, day)) {   // may reallocate `tribes`; we touch tr no more
+                logEvent(day, "A faction broke away from " + parentName +
+                         " over irreconcilable values, led by " + dissident->name, "tribe");
+            } else {
+                // Founding fell through (no charismatic leader): re-find the parent
+                // by id (vector may have changed) and reabsorb so nobody leaks out.
+                for (auto& pt : tribes) if (pt.id == parentId) {
+                    for (Entity* e : faction) { e->tribeId = parentId; pt.memberIds.push_back(e->entityId); }
+                    break;
+                }
             }
         }
     }
@@ -423,8 +512,11 @@ void CivilizationEngine::dissolveSmallTribes(std::vector<Entity>& entities, int 
 
 void CivilizationEngine::splitLargeTribes(std::vector<Entity>& entities, int day) {
     // Use index loop: formTribe() push_backs to tribes, invalidating iterators.
+    // M9 tuning: split at >24, not >8. Splitting at 8 was a fragmentation
+    // engine — every growing tribe fissioned within a generation, the map hit
+    // ~48 micro-tribes, and with O(pairs) war checks the war rate exploded.
     for (size_t idx = 0; idx < tribes.size(); ++idx) {
-        if (tribes[idx].population() <= 8) continue;
+        if (tribes[idx].population() <= 24) continue;
 
         std::vector<Entity*> members;
         for (int mid : tribes[idx].memberIds) {
@@ -475,8 +567,31 @@ void CivilizationEngine::splitLargeTribes(std::vector<Entity>& entities, int day
 
 // ── Religion management ────────────────────────────────────────────────────────
 void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day) {
+    // M7: prophets arise in spiritual VACUUMS, not in saturated markets. The
+    // old unconditional roll founded a new faith every few days (15+ by day
+    // 125, still climbing); real religious landscapes stabilise at a handful.
+    int   viableReligions = 0;
+    int   affiliated = 0, living = 0;
+    for (const auto& rel : religions) {
+        int alive = 0;
+        for (int fid : rel.followerIds)
+            if (Entity* f = entityById(entities, fid))
+                if (f->entityHealth > 0.0f) ++alive;
+        if (alive >= 3) ++viableReligions;
+    }
+    for (const Entity& e : entities) {
+        if (e.entityHealth <= 0.0f) continue;
+        ++living;
+        if (e.religionId != -1) ++affiliated;
+    }
+    float vacuum = living > 0 ? 1.0f - (float)affiliated / (float)living : 1.0f;
+    // Gate at 6 viable: small faiths keep growing after founding stops, so a
+    // cutoff of 8 overshot to ~10 viable religions by late run.
+    bool  saturated = (viableReligions >= 6);
+
     // Check for prophets among unaffiliated entities
     for (Entity& ent : entities) {
+        if (saturated) break;
         if (ent.entityHealth <= 0.0f) continue;
         if (ent.religionId != -1) continue;   // already follows one
         if (ent.entityAge < 18.0f) continue;
@@ -491,7 +606,8 @@ void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day)
         std::uniform_real_distribution<float> roll(0.0f, 1.0f);
         // butterfly knob: higher = more prophets arise spontaneously -> wilder,
         // more divergent religious landscapes between runs.
-        if (roll(rng) < prophetScore * 0.030f * g_worldSeed.divergence.butterfly)
+        // `vacuum` scales founding by the unconverted share of the population.
+        if (roll(rng) < prophetScore * 0.030f * vacuum * g_worldSeed.divergence.butterfly)
             foundReligion(&ent, day);
     }
 
@@ -529,6 +645,31 @@ void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day)
             }
         }
     }
+
+    // M7: faiths that fail to gather a congregation fade back into folklore.
+    // A religion older than its 120-day grace period with fewer than 3 living
+    // followers dissolves — its stragglers return to the unaffiliated pool
+    // (where the vacuum term above lets new prophets try again).
+    religions.erase(
+        std::remove_if(religions.begin(), religions.end(),
+            [&](Religion& rel) {
+                if (day - rel.foundedOnDay < 120) return false;
+                int alive = 0;
+                for (int fid : rel.followerIds)
+                    if (Entity* f = entityById(entities, fid))
+                        if (f->entityHealth > 0.0f) ++alive;
+                if (alive >= 3) return false;
+                for (int fid : rel.followerIds)
+                    if (Entity* f = entityById(entities, fid))
+                        if (f->religionId == rel.id) f->religionId = -1;
+                for (auto& t : tribes)
+                    if (t.dominantReligionId == rel.id) t.dominantReligionId = -1;
+                logEvent(day, "The faith of \"" + rel.name + "\" faded into memory, its last "
+                         + std::to_string(alive) + " followers scattered", "religion",
+                         "kind=religion_extinct religionId=" + std::to_string(rel.id));
+                return true;
+            }),
+        religions.end());
 
     // Update influence
     for (auto& rel : religions) {
@@ -861,6 +1002,25 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
 
             // Baseline grind — warlike tribes erode goodwill even at peace.
             rel -= aggression * 0.6f;
+
+            // M7: wars need CAUSES, not just cultural distance. Two concrete
+            // grievances grind relations down no matter how similar the
+            // cultures are — without these, similar tribes warmed to +100 and
+            // the war line was never reached (zero wars in 600 days).
+            // (a) Faith friction: rival dominant religions chafe continuously.
+            if (A.dominantReligionId != -1 && B.dominantReligionId != -1 &&
+                A.dominantReligionId != B.dominantReligionId)
+                rel -= 0.35f;
+            // (b) Hunger envy: a starving tribe eyes a fat neighbour's granary,
+            // and desperation makes it warlike.
+            if (A.granary < 5.0f && B.granary > 30.0f) {
+                rel -= 0.6f;
+                A.militarism = std::min(100.0f, A.militarism + 0.25f);
+            }
+            if (B.granary < 5.0f && A.granary > 30.0f) {
+                rel -= 0.6f;
+                B.militarism = std::min(100.0f, B.militarism + 0.25f);
+            }
 
             if (valDiff < 22.0f)
                 rel = std::min(100.0f, rel + 1.0f);

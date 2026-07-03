@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = @CMakeFiles/app.dir/includes_CXX.rsp
 
-CXX_FLAGS = -std=c++17 -fopenmp -fopenmp
+CXX_FLAGS = -O2 -DNDEBUG -std=c++17 -fopenmp -fopenmp
 

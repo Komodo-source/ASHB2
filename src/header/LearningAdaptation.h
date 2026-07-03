@@ -176,6 +176,17 @@ public:
                         Entity* model,
                         const std::string& behavior,
                         float observedOutcome);
+
+    // M6: vicarious Q-update — nudge the observer's own value estimate toward
+    // the return they just SAW someone else collect, at a fraction (`weight`)
+    // of the firsthand learning rate. Unlike a discounted-reward
+    // processExperience call, this cannot drag an already-high Q down: it is
+    // a small step toward the observed value, gated by weight.
+    void vicariousExperience(Entity* observer,
+                             const std::string& state,
+                             const std::string& action,
+                             float observedReward,
+                             float weight);
     
     void teachBehavior(Entity* teacher,
                       Entity* learner,

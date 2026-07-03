@@ -1,31 +1,99 @@
 #include "./header/SaveLoad.h"
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
+#include "./header/CivilizationEngine.h"
+#include "./header/BetterRand.h"
+#include "core/SimClock.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <algorithm>
 
-void saveGame(const std::string& filepath, const std::vector<Entity>& entities, int day, int frameCounter) {
+// ── V2 helpers: one-line records with '|' fields; ids joined by ',' ──────────
+static std::string joinInts(const std::vector<int>& v) {
+    std::string s;
+    for (size_t i = 0; i < v.size(); ++i) { if (i) s += ','; s += std::to_string(v[i]); }
+    return s;
+}
+static std::vector<int> splitInts(const std::string& s) {
+    std::vector<int> out;
+    std::stringstream ss(s);
+    std::string tok;
+    while (std::getline(ss, tok, ',')) if (!tok.empty()) out.push_back(std::stoi(tok));
+    return out;
+}
+// map<int,float> / map<int,enum> as "id:value" pairs joined by ','
+template <typename M>
+static std::string joinMap(const M& m) {
+    std::string s;
+    bool first = true;
+    for (const auto& [k, v] : m) {
+        if (!first) s += ',';
+        first = false;
+        s += std::to_string(k) + ':' + std::to_string((float)v);
+    }
+    return s;
+}
+static void parseFloatMap(const std::string& s, std::map<int, float>& out) {
+    std::stringstream ss(s);
+    std::string tok;
+    while (std::getline(ss, tok, ',')) {
+        size_t c = tok.find(':');
+        if (c != std::string::npos)
+            out[std::stoi(tok.substr(0, c))] = std::stof(tok.substr(c + 1));
+    }
+}
+
+void saveGame(const std::string& filepath, const std::vector<Entity>& entities,
+              int day, int frameCounter, const CivilizationEngine* civ) {
     std::ofstream file(filepath);
     if (!file.is_open()) {
         std::cerr << "Failed to open save file: " << filepath << std::endl;
         return;
     }
 
-    file << "ASHB2_SAVE\n";
+    file << "ASHB2_SAVE_V2\n";
     file << "DAY:" << day << "\n";
     file << "FRAME:" << frameCounter << "\n";
-    file << "ENTITY_COUNT:" << entities.size() << "\n";
+    file << "CLOCK_FRAME:" << g_clock.frame << "\n";
+    file << "RNG:" << BetterRand::gen() << "\n";   // mt19937 stream state (624 words)
 
+    if (civ) {
+        file << "ERA:" << (int)civ->era << " YEAR:" << civ->currentYear << "\n";
+        file << "TRIBE_COUNT:" << civ->tribes.size() << "\n";
+        for (const Tribe& t : civ->tribes) {
+            file << "TRIBE|" << t.id << '|' << t.name << '|' << t.leaderId << '|'
+                 << t.foundedOnDay << '|' << t.militarism << '|' << t.spiritualism << '|'
+                 << t.collectivism << '|' << t.innovation << '|' << t.centerX << '|'
+                 << t.centerY << '|' << t.regionId << '|' << t.granary << '|'
+                 << t.dominantReligionId << '|' << joinInts(t.memberIds) << '|'
+                 << joinMap(t.relations) << '|' << joinMap(t.stances) << "\n";
+        }
+        file << "RELIGION_COUNT:" << civ->religions.size() << "\n";
+        for (const Religion& r : civ->religions) {
+            file << "REL|" << r.id << '|' << r.name << '|' << r.founderEntityId << '|'
+                 << r.foundedOnDay << '|' << (int)r.moralCode << '|' << (int)r.ritual << '|'
+                 << (r.isPolytheistic ? 1 : 0) << '|' << r.spiritualDemand << '|'
+                 << r.holyPrinciple << '|' << joinInts(r.followerIds) << '|'
+                 << r.parentReligionId << '|' << r.influence << "\n";
+        }
+    } else {
+        file << "TRIBE_COUNT:0\nRELIGION_COUNT:0\n";
+    }
+
+    file << "ENTITY_COUNT:" << entities.size() << "\n";
     for (const Entity& entity : entities) {
         entity.saveTo(file);
     }
 
     file.close();
-    std::cout << "Game saved to " << filepath << std::endl;
+    std::cout << "Game saved to " << filepath << " (V2, " << entities.size()
+              << " entities" << (civ ? ", macro state included" : "") << ")" << std::endl;
 }
 
-bool loadGame(const std::string& filepath, std::vector<Entity>& entities, int& day, int& frameCounter) {
+bool loadGame(const std::string& filepath, std::vector<Entity>& entities,
+              int& day, int& frameCounter, CivilizationEngine* civ) {
     std::ifstream file(filepath);
     if (!file.is_open()) {
         std::cerr << "Failed to open save file: " << filepath << std::endl;
@@ -33,25 +101,86 @@ bool loadGame(const std::string& filepath, std::vector<Entity>& entities, int& d
     }
 
     std::string line;
-
-    // Read header
     std::getline(file, line);
-    if (line != "ASHB2_SAVE") {
+    const bool v2 = (line == "ASHB2_SAVE_V2");
+    if (!v2 && line != "ASHB2_SAVE") {
         std::cerr << "Invalid save file format" << std::endl;
         return false;
     }
 
-    // Read day
     std::getline(file, line);
     day = std::stoi(line.substr(4)); // "DAY:"
-
-    // Read frame counter
     std::getline(file, line);
     frameCounter = std::stoi(line.substr(6)); // "FRAME:"
 
-    // Read entity count
-    std::getline(file, line);
-    int entityCount = std::stoi(line.substr(13)); // "ENTITY_COUNT:"
+    if (v2) {
+        std::getline(file, line);                    // CLOCK_FRAME:
+        g_clock.frame = std::stoull(line.substr(12));
+        std::getline(file, line);                    // RNG:
+        { std::stringstream rs(line.substr(4)); rs >> BetterRand::gen(); }
+
+        std::getline(file, line);                    // ERA:.. YEAR:..  (or TRIBE_COUNT if no civ was saved)
+        if (line.rfind("ERA:", 0) == 0) {
+            if (civ) {
+                std::stringstream es(line);
+                std::string tag; int eraV, yearV;
+                es >> tag; // "ERA:<n>" — reparse manually
+                eraV  = std::stoi(line.substr(4, line.find(" YEAR:") - 4));
+                yearV = std::stoi(line.substr(line.find(" YEAR:") + 6));
+                civ->era = (CivilizationEra)eraV;
+                civ->currentYear = yearV;
+            }
+            std::getline(file, line);                // TRIBE_COUNT:
+        }
+        int tribeCount = std::stoi(line.substr(12));
+        if (civ) { civ->tribes.clear(); civ->religions.clear(); }
+        for (int i = 0; i < tribeCount; ++i) {
+            std::getline(file, line);
+            if (!civ) continue;
+            std::vector<std::string> f;
+            { std::stringstream ss(line); std::string tok;
+              while (std::getline(ss, tok, '|')) f.push_back(tok); }
+            if (f.size() < 17 || f[0] != "TRIBE") continue;
+            Tribe t;
+            t.id = std::stoi(f[1]);        t.name = f[2];
+            t.leaderId = std::stoi(f[3]);  t.foundedOnDay = std::stoi(f[4]);
+            t.militarism = std::stof(f[5]);   t.spiritualism = std::stof(f[6]);
+            t.collectivism = std::stof(f[7]); t.innovation = std::stof(f[8]);
+            t.centerX = std::stof(f[9]);      t.centerY = std::stof(f[10]);
+            t.regionId = std::stoi(f[11]);    t.granary = std::stof(f[12]);
+            t.dominantReligionId = std::stoi(f[13]);
+            t.memberIds = splitInts(f[14]);
+            parseFloatMap(f[15], t.relations);
+            { std::map<int, float> st; parseFloatMap(f[16], st);
+              for (auto& [k, v] : st) t.stances[k] = (TribeStance)(int)v; }
+            civ->tribes.push_back(t);
+        }
+        std::getline(file, line);                    // RELIGION_COUNT:
+        int relCount = std::stoi(line.substr(15));
+        for (int i = 0; i < relCount; ++i) {
+            std::getline(file, line);
+            if (!civ) continue;
+            std::vector<std::string> f;
+            { std::stringstream ss(line); std::string tok;
+              while (std::getline(ss, tok, '|')) f.push_back(tok); }
+            if (f.size() < 13 || f[0] != "REL") continue;
+            Religion r;
+            r.id = std::stoi(f[1]);              r.name = f[2];
+            r.founderEntityId = std::stoi(f[3]); r.foundedOnDay = std::stoi(f[4]);
+            r.moralCode = (MoralCode)std::stoi(f[5]);
+            r.ritual = (RitualType)std::stoi(f[6]);
+            r.isPolytheistic = (f[7] == "1");
+            r.spiritualDemand = std::stof(f[8]);
+            r.holyPrinciple = f[9];
+            r.followerIds = splitInts(f[10]);
+            r.parentReligionId = std::stoi(f[11]);
+            r.influence = std::stof(f[12]);
+            civ->religions.push_back(r);
+        }
+    }
+
+    std::getline(file, line);                        // ENTITY_COUNT:
+    int entityCount = std::stoi(line.substr(13));
 
     entities.clear();
     for (int i = 0; i < entityCount; i++) {
@@ -66,7 +195,8 @@ bool loadGame(const std::string& filepath, std::vector<Entity>& entities, int& d
     }
 
     file.close();
-    std::cout << "Game loaded from " << filepath << std::endl;
+    std::cout << "Game loaded from " << filepath << (v2 ? " (V2)" : " (legacy)")
+              << ": " << entities.size() << " entities" << std::endl;
     return true;
 }
 

@@ -24,7 +24,6 @@
 #include "./header/implot_internal.h"
 #include "./util/clear.h"
 #include "./header/SaveLoad.h"
-#include "./header/heritage.h"
 #include "./header/Logging.h"
 #include "header/SDLEngine.h"
 #include "header/Image.h"
@@ -37,9 +36,18 @@
 #include "world/Lexicon.h"
 #include <unordered_map>
 #include <unordered_set>
+#include <cstdlib>
+#include <cstdint>
+#include "core/SimClock.h"
+#include "core/SpatialGrid.h"
 #include "environment/EnvironmentModel.h"
 #include "world/ResourceSystem.h"
 #include "world/Ecosystem.h"
+#include "./header/LiveConfig.h"
+
+// M10: live config console state — all multipliers default to 1.0 (bit-exact
+// no-op); the GUI console mutates them at runtime.
+LiveConfig g_liveConfig;
 
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
@@ -54,6 +62,7 @@ float       g_harvestLuck          = 1.0f;  // good year vs bad year (drought / 
 std::string g_seasonName           = "Spring";
 
 // Advance the environment once per new simulation day and recompute modifiers.
+// `day` is the SimClock day index (one per tick), not a frame count.
 void updateEnvironment(int day) {
     static int lastDay = -1;
     static int lastYear = -999999;
@@ -67,7 +76,9 @@ void updateEnvironment(int day) {
     // "Good year / bad year": roll harvest luck each new year. Droughts and
     // blights (bad years) slash yields and create famine pressure; bumper years
     // swell the granaries. This is the 丰收年 / 歉收年 cycle.
-    int year = day / 365;
+    // The year is the SAME year agents age by (SimClock::DAYS_PER_YEAR days);
+    // it used to be a 365-frame "year" that never matched the aging cadence.
+    int year = day / SimClock::DAYS_PER_YEAR;
     if (year != lastYear) {
         lastYear = year;
         int roll = BetterRand::genNrInInterval(0, 100);
@@ -83,7 +94,8 @@ void updateEnvironment(int day) {
         }
     }
 
-    g_seasonalFoodModifier = g_env.currentSeason.resourceModifier * g_harvestLuck;
+    g_seasonalFoodModifier = g_env.currentSeason.resourceModifier * g_harvestLuck
+                             * g_liveConfig.foodYieldMul;   // M10 live console
 
     // Regrow / degrade per-region resource stocks for the new day. Living
     // resources track the same season + harvest luck that drive food yields.
@@ -154,8 +166,8 @@ EnvironmentalFactors generateEnvFactors(int day) {
 
 // Generate ActionContext based on simulation time
 ActionContext createContextFromTime(int day, int numPeopleNearby) {
-    int hour = (day % 60) * 24 / 60;
-    int dayOfWeek = (day / 60) % 7;
+    int hour = g_clock.hourOfDay();
+    int dayOfWeek = g_clock.dayOfWeek();
 
     bool isNightTime = (hour >= 22 || hour < 6);
     bool isWeekend = (dayOfWeek >= 5);
@@ -227,12 +239,14 @@ Personality generateRandomPersonality() {
                 // Mémoire formative
                 LifeMemory mem;
                 mem.eventType = "loss_death";
-                ent->rebuildSemanticMemory();
                 mem.entityInvolvedId = dead->entityId;
                 mem.emotionalIntensity = griefIntensity;
                 mem.isFormative = (griefIntensity > 0.6f);
                 mem.internalNarrative = narrative;
                 ent->lifeMemories.push_back(mem);
+                // Consolidate AFTER the memory exists (was called before push,
+                // consolidating stale state once per mourner).
+                ent->rebuildSemanticMemory();
             }
         }
     }
@@ -293,6 +307,17 @@ static std::string determineDeathCause(const Entity& e) {
     return best->cause;
 }
 
+// ── M9: run ledgers for the end-of-run realism report ─────────────────────────
+// Filled as the sim runs (death causes bucketed, actions tallied); consumed by
+// printRealismReport() when a headless run finishes.
+static std::map<std::string, int> g_deathLedger;
+static std::map<std::string, int> g_actionTally;
+
+// M11: true when running --headless. Presentation-only work (inner monologue,
+// narrative sentences) is skipped — nobody is watching, and at 1k+ agents the
+// per-entity string assembly is measurable tick time.
+static bool g_headlessMode = false;
+
 // Compact key=value snapshot of the deceased's terminal state, appended to the
 // death line so the post-mortem can correlate cause with the life that ended.
 static std::string deathContext(const Entity& e) {
@@ -322,6 +347,16 @@ std::vector<std::vector<Entity*>> getSocialGroups(std::vector<Entity*>& entities
     std::vector<bool> inGroup(entities.size(), false);
     std::vector<std::vector<Entity*>> groups;
 
+    // M4: index lookups replace the two O(n²) inner scans. The bond pass walks
+    // the entity's own (Dunbar-capped) social list; the proximity pass asks the
+    // spatial grid. slotOf maps a pointer back to its inGroup flag.
+    std::unordered_map<Entity*, size_t> slotOf;
+    slotOf.reserve(entities.size());
+    for (size_t i = 0; i < entities.size(); ++i) slotOf[entities[i]] = i;
+    static SpatialGrid grid;
+    grid.reset(2000.0f, 2000.0f, 120.0f);
+    grid.rebuild(entities);
+
     for (size_t i = 0; i < entities.size(); ++i) {
         if (inGroup[i] || entities[i]->entityHealth <= 0.0f) continue;
 
@@ -330,26 +365,25 @@ std::vector<std::vector<Entity*>> getSocialGroups(std::vector<Entity*>& entities
         inGroup[i] = true;
 
         // Add people this entity has a social bond with
-        for (size_t j = 0; j < entities.size(); ++j) {
-            if (j == i || inGroup[j] || entities[j]->entityHealth <= 0.0f) continue;
-            if (entities[i]->searchConnSocial(entities[j]) > 5.0f && group.size() < 10) {
-                group.push_back(entities[j]);
-                inGroup[j] = true;
-            }
+        for (const auto& s : entities[i]->list_entityPointedSocial) {
+            if (group.size() >= 10) break;
+            Entity* other = s.pointedEntity;
+            if (!other || s.social <= 5.0f || other->entityHealth <= 0.0f) continue;
+            auto it = slotOf.find(other);
+            if (it == slotOf.end() || inGroup[it->second]) continue;
+            group.push_back(other);
+            inGroup[it->second] = true;
         }
 
         // Add entities within 120px (proximity encounters — no bond needed)
-        for (size_t j = 0; j < entities.size(); ++j) {
-            if (j == i || inGroup[j] || entities[j]->entityHealth <= 0.0f) continue;
-            if (group.size() >= 12) break;
-            float dx = entities[i]->posX - entities[j]->posX;
-            float dy = entities[i]->posY - entities[j]->posY;
-            float dist2 = dx * dx + dy * dy;
-            if (dist2 <= 120.0f * 120.0f) {
-                group.push_back(entities[j]);
-                inGroup[j] = true;
-            }
-        }
+        grid.forEachInRadius(entities[i]->posX, entities[i]->posY, 120.0f, [&](Entity* other) {
+            if (other == entities[i] || other->entityHealth <= 0.0f) return;
+            if (group.size() >= 12) return;
+            auto it = slotOf.find(other);
+            if (it == slotOf.end() || inGroup[it->second]) return;
+            group.push_back(other);
+            inGroup[it->second] = true;
+        });
 
         // Add 1-2 random strangers (chance encounters)
         for (int s = 0; s < 2 && group.size() < 12; ++s) {
@@ -476,10 +510,10 @@ std::string generateDeepMonologue(Entity* ent) {
     if (pool.empty())
         pool.push_back({"Just getting through the day, one moment at a time.", 1.0f});
 
-    // Weighted random selection
+    // Weighted random selection (deterministic stream, not CRT rand())
     float total = 0.0f;
     for (auto& t : pool) total += t.weight;
-    float roll = (float)rand() / (float)RAND_MAX * total;
+    float roll = BetterRand::genNrInInterval(0.0f, total);
     float cum = 0.0f;
     for (auto& t : pool) {
         cum += t.weight;
@@ -497,21 +531,26 @@ std::string generateDeepMonologue(Entity* ent) {
     for (Entity* neighbor : neighbors) {
         float score = 0.0f;
         MentalModelOfOther* model = self->getModelOf(neighbor);
+        // M4: a mental model only counts for as much as it's fresh — an
+        // impression formed 100 days ago barely moves the needle.
+        float conf = model ? model->effectiveConfidence((int)g_clock.day()) : 0.0f;
 
         if (action->name == "Socialize" || action->name == "GoodConnection") {
             score += self->searchConnSocial(neighbor) * 2.0f;
-            score += (model ? model->trustLevel : 0) * 1.5f;
+            score += (model ? model->trustLevel : 0) * 1.5f * conf;
             score -= self->searchConnAng(neighbor) * 3.0f;
         } else if (action->name == "Desire" || action->name == "Flirt") {
             score += self->searchConnDesire(neighbor) * 3.0f;
             score -= self->searchConnAng(neighbor) * 2.0f;
             // Attachment style affects target preference
             if (self->dv.attachmentStyle == ANXIOUS)
-                score += (model ? (1.0f - model->predictability) : 0) * 2.0f; // anxious drawn to unpredictable
+                score += (model ? (1.0f - model->predictability) : 0) * 2.0f * conf; // anxious drawn to unpredictable
         } else if (action->name == "AngerConnection" || action->name == "Murder") {
             score += self->searchConnAng(neighbor) * 3.0f;     // target enemies
         } else if (action->name == "HelpSupport") {
-            score += (model ? (100.0f - model->estimatedHappiness) : 50) * 0.02f; // help those suffering
+            // Blend the model's estimate with the neutral prior by confidence.
+            float estHappy = model ? (model->estimatedHappiness * conf + 50.0f * (1.0f - conf)) : 50.0f;
+            score += (100.0f - estHappy) * 0.02f; // help those suffering
             score += self->searchConnSocial(neighbor) * 1.0f;
         } else if (action->name == "Apologize") {
             score += self->searchConnAng(neighbor) * 2.0f;  // apologize to those angry at us
@@ -527,6 +566,16 @@ std::string generateDeepMonologue(Entity* ent) {
         float dist2 = dx * dx + dy * dy;
         float proximityBonus = std::max(0.0f, (180.0f - std::sqrt(dist2)) / 180.0f) * 2.5f;
         score += proximityBonus;
+
+        // M5 ostracism: a known bad reputation repels friendly approaches
+        // (this is what closes the sanction loop — the shunned stay shunned)
+        // while making the person a MORE likely target of hostility.
+        auto repIt = self->reputationMap.find(neighbor->entityId);
+        if (repIt != self->reputationMap.end() && repIt->second.negativeScore > 70.0f) {
+            bool hostile = (action->name == "AngerConnection" || action->name == "Murder" ||
+                            action->name == "Insult" || action->name == "Discrimination");
+            score *= hostile ? 1.5f : 0.25f;
+        }
 
         scores.push_back({neighbor, std::max(0.01f, score)});
     }
@@ -556,8 +605,10 @@ void implementRegion(){
 }
 
 Entity* weightedRandomSelect(std::vector<std::pair<Entity*, float>> scores){
+    if (scores.empty()) return nullptr;   // was UB: scores.back() on empty
     float total = 0.0f;
     for (auto& s : scores) total += s.second;
+    if (total <= 0.0f) return scores.front().first;
     float roll = BetterRand::genNrInInterval(0.0f, total);
     float cum = 0.0f;
     for (auto& s : scores) {
@@ -655,17 +706,79 @@ void tickRelationshipDecay(Entity* ent, float deltaTime) {
 }
 
 
+// M11: bumped at every ent_quad rebuild (init, deaths, births, load) so
+// updateMovement can cache its id/index lookup maps across the 60 frames of a
+// tick instead of re-hashing the whole population every frame.
+static uint64_t g_entQuadVersion = 0;
+
 // ── Force-based movement system ──────────────────────────────────────────────
 // Runs every frame (outside the UPDATE_FREQUENCY throttle).
 void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, int simDay) {
-    const float MAX_FORCE    = 0.9f;
+    const float MAX_FORCE    = 0.9f * g_liveConfig.moveForceMul;   // M10 live console
     const float PERSONAL_R   = 38.0f;
     const float PROX_REPEL_R = 130.0f;
 
-    for (Entity* ent : entities) {
+    // M4: spatial index + id lookup replace the three all-pairs inner scans
+    // (children, sick-avoidance, personal space). Rebuilt per call — entities
+    // move every frame, and a flat rebuild is O(n).
+    // M11: 48px cells — sized for the hot 38px personal-space query. At 130px
+    // (the old size) each dense cell held hundreds of agents and every query
+    // scanned ~7× more candidates than the radius actually needed.
+    static SpatialGrid grid;
+    grid.reset(worldW, worldH, 48.0f);
+    grid.rebuild(entities);
+
+    // M11: byId / idxOf only change when ent_quad is rebuilt (birth, death,
+    // load) — not every frame. Cache them behind the rebuild counter instead
+    // of re-hashing the whole population 60× per tick.
+    const int n = (int)entities.size();
+    static uint64_t cachedVersion = ~0ull;
+    static std::unordered_map<int, Entity*> byId;
+    static std::unordered_map<Entity*, int> idxOf;
+    if (cachedVersion != g_entQuadVersion) {
+        byId.clear();
+        byId.reserve(entities.size());
+        for (Entity* e : entities) byId[e->entityId] = e;
+        idxOf.clear();
+        idxOf.reserve(n);
+        for (int i = 0; i < n; ++i) idxOf[entities[i]] = i;
+        cachedVersion = g_entQuadVersion;
+    }
+
+    // M11: sick-avoidance inverted — iterate the FEW sick agents and push
+    // repulsion onto their healthy neighbors, instead of every healthy agent
+    // scanning a 130px disc that is almost always empty of disease. Same
+    // per-pair math; accumulated into scratch so the parallel force pass
+    // below stays write-local.
+    std::vector<std::pair<float, float>> sickRepel((size_t)n, {0.0f, 0.0f});
+    for (Entity* sick : entities) {
+        if (!sick || sick->entityDiseaseType == -1) continue;
+        grid.forEachInRadius(sick->posX, sick->posY, PROX_REPEL_R, [&](Entity* h) {
+            if (h == sick || h->entityDiseaseType != -1) return; // only the healthy flee
+            float dx = h->posX - sick->posX;
+            float dy = h->posY - sick->posY;
+            float dist = std::sqrt(dx * dx + dy * dy);
+            if (dist < PROX_REPEL_R && dist > 0.01f) {
+                float mag = (PROX_REPEL_R - dist) / PROX_REPEL_R * 0.6f;
+                auto& acc = sickRepel[(size_t)idxOf.at(h)];
+                acc.first  += (dx / dist) * mag;
+                acc.second += (dy / dist) * mag;
+            }
+        });
+    }
+
+    // M11: synchronous update (the master plan's phase-B snapshot). Pass 1
+    // computes every velocity from the CURRENT positions — nothing writes a
+    // position, so the pass parallelizes with no races and no RNG, and every
+    // agent reacts to the same world state instead of to whatever the agents
+    // earlier in the array already did this frame. Pass 2 applies positions.
+    #pragma omp parallel for schedule(static)
+    for (int ei = 0; ei < n; ++ei) {
+        Entity* ent = entities[ei];
         if (ent->entityHealth <= 0.0f) continue;
 
-        float fx = 0.0f, fy = 0.0f;
+        float fx = sickRepel[(size_t)ei].first;
+        float fy = sickRepel[(size_t)ei].second;
 
         // ── Couple attraction ─────────────────────────────────────────────────
         for (auto& cp : ent->list_entityPointedCouple) {
@@ -697,12 +810,11 @@ void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, 
         };
         familyPull(ent->parent1);
         familyPull(ent->parent2);
-        // Pull toward children (entities whose parent1 or parent2 is this entity)
-        for (Entity* other : entities) {
-            if (other == ent || other->entityHealth <= 0.0f) continue;
-            if (other->parent1 == ent || other->parent2 == ent) {
-                familyPull(other);
-            }
+        // Pull toward children — resolved via childrenIds instead of scanning
+        // every entity for a matching parent pointer.
+        for (int cid : ent->childrenIds) {
+            auto it = byId.find(cid);
+            if (it != byId.end() && it->second != ent) familyPull(it->second);
         }
 
         // ── Social bonds ──────────────────────────────────────────────────────
@@ -758,24 +870,11 @@ void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, 
             }
         }
 
-        // ── Sick entity avoidance ─────────────────────────────────────────────
-        if (ent->entityDiseaseType == -1) { // only healthy entities flee sick ones
-            for (Entity* other : entities) {
-                if (other == ent || other->entityDiseaseType == -1) continue;
-                float dx = ent->posX - other->posX;
-                float dy = ent->posY - other->posY;
-                float dist = std::sqrt(dx * dx + dy * dy);
-                if (dist < PROX_REPEL_R && dist > 0.01f) {
-                    float mag = (PROX_REPEL_R - dist) / PROX_REPEL_R * 0.6f;
-                    fx += (dx / dist) * mag;
-                    fy += (dy / dist) * mag;
-                }
-            }
-        }
+        // (Sick-avoidance was seeded into fx/fy above via the inverted pass.)
 
         // ── Personal space repulsion ──────────────────────────────────────────
-        for (Entity* other : entities) {
-            if (other == ent || other->entityHealth <= 0.0f) continue;
+        grid.forEachInRadius(ent->posX, ent->posY, PERSONAL_R, [&](Entity* other) {
+            if (other == ent || other->entityHealth <= 0.0f) return;
             float dx = ent->posX - other->posX;
             float dy = ent->posY - other->posY;
             float dist = std::sqrt(dx * dx + dy * dy);
@@ -784,7 +883,7 @@ void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, 
                 fx += (dx / dist) * mag;
                 fy += (dy / dist) * mag;
             }
-        }
+        });
 
         // ── Personality drift (sinusoidal wander) ────────────────────────────
         float phase  = (float)(ent->entityId) * 1.3f;
@@ -821,7 +920,11 @@ void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, 
 
         ent->velX = fx * speed;
         ent->velY = fy * speed;
+    }
 
+    // Pass 2: apply the synchronously computed velocities.
+    for (Entity* ent : entities) {
+        if (ent->entityHealth <= 0.0f) continue;
         ent->posX += ent->velX;
         ent->posY += ent->velY;
 
@@ -834,41 +937,28 @@ void updateMovement(std::vector<Entity*>& entities, float worldW, float worldH, 
 }
 
 void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentDay, CivilizationEngine* engineCivilization){
-    updateEnvironment(currentDay);   // advance season / harvest before agents act
+    updateEnvironment((int)g_clock.day());   // advance season / harvest before agents act
     EnvironmentalFactors env = generateEnvFactors(currentDay);
+
+    // M11 staggering: above 2,000 living agents, deliberation goes round-robin
+    // by entityId cohort — upkeep (needs, disease, grief) still ticks everyone
+    // every tick, but only 1/K of the population runs the expensive decision
+    // pipeline per tick. Deterministic (id- and day-keyed), and runs below the
+    // threshold are byte-identical to the unstaggered engine.
+    size_t totalPop = 0;
+    for (auto& g : entityGroups) totalPop += g.size();
+    const int staggerCohorts = totalPop > 6000 ? 4 : (totalPop > 2000 ? 2 : 1);
 
 
     // Process each group of close entities
     for(auto& group : entityGroups){
-
-        std::map<std::string, int> actionCounts;
-        int totalRecentActions = 0;
-
-        for(Entity* groupMember : group) {
-            if(groupMember->entityHealth <= 0.0f) continue;
-
-            const auto& history = groupMember->getFreeWill().getActionHistory();
-            int actionsToCheck = std::min(10, (int)history.size());
-            for(int i = 0; i < actionsToCheck; ++i) {
-                actionCounts[history[i].actionName]++;
-                totalRecentActions++;
-            }
-        }
-
-        // Calculate prevalence and define norms
-        if(totalRecentActions > 0) {
-            for(const auto& pair : actionCounts) {
-                float prevalence = (float)pair.second / totalRecentActions;
-                // Only consider it a norm if it's somewhat common (> 10%)
-                if(prevalence > 0.10f) {
-                    // Norm pressure scales with prevalence.
-                    //currentNorms[pair.first] = SocialNorm(pair.first, prevalence, prevalence);
-                    ;
-                }
-            }
-        }
-
         for(Entity* entity : group){
+            // The dead don't act. Grief propagation happens exactly once, in
+            // updateSimulationStep's removal pass, where the whole population
+            // is in scope (a group-only pass missed partners in other groups
+            // and double-counted murder grief).
+            if(entity->entityHealth <= 0.0f) continue;
+
             //on applique aussi les paramètres de maladies
             applyDisease(entity, group.size(), getNBSickClose(group));
 
@@ -880,16 +970,15 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 entity->pheromone.releasing_level -= BetterRand::genNrInInterval(3.0,6.0);
             }
 
-
-            if(entity->entityHealth <= 0.0f){
-                handleDeath(entity, group);
-            }
-
             // handle old people
             if (entity->entityAge > 100){
               entity->entityHealth -= BetterRand::genNrInInterval(0, 8);
               Disease d;
               d.checkInfamousDisease(entity);
+            }
+            if (entity->entityAge > 100){
+              // some entities lives up to 140 years need to refresh generation
+            entity->entityAge -= BetterRand::genNrInInterval(0, 3);
             }
 
 
@@ -1183,6 +1272,11 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
             }
 
+            // M11: not this entity's turn to deliberate — upkeep already ran.
+            if (staggerCohorts > 1 &&
+                (entity->entityId % staggerCohorts) != ((int)g_clock.day() % staggerCohorts))
+                continue;
+
             // Choose action based on needs, social environment, context, personality, grief, and env
             Action* chosenAction = sys.chooseAction(entity, neighbors, context);
 
@@ -1264,12 +1358,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             Entity* target = nullptr;
             if(isPointedAction && !neighbors.empty()){
-
-                //better neightboor selection
-                //int targetIndex = BetterRand::genNrInInterval(0, (int) neighbors.size() - 1);
-                //target = neighbors[targetIndex];
                 target = selectSocialTarget(entity, neighbors, chosenAction);
-
+            }
+            if(target != nullptr){
                 bool targetWasAlive = (target->entityHealth > 0.0f);
 
                 // Execute the action with the target
@@ -1283,6 +1374,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 }
                 //saving data
                 entity->saveEntityStats(chosenAction);
+                g_actionTally[chosenAction->name]++;
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, target->name, "targeted action");
 
                 // ── Romantic side-drive ───────────────────────────────────────
@@ -1323,9 +1415,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     }
                 }
 
-                // ── Narrative + inner monologue ───────────────────────────────
-                {
-                    int hour = (currentDay % 60) * 24 / 60;
+                // ── Narrative + inner monologue (GUI-only presentation) ──────
+                if (!g_headlessMode) {
+                    int hour = g_clock.hourOfDay();
                     entity->lastActionName = chosenAction->name;
                     entity->lastNarrative  = NarrativeEngine::actionToSentence(
                         entity, chosenAction->name, target, hour, "");
@@ -1349,30 +1441,21 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     // longer double-counts this body as both "murder" and
                     // "hardship".
                     target->pendingDeathCause = "murder by " + entity->name;
-                    for(Entity* other : group){
-                        if(other == target || other->entityHealth <= 0.0f) continue;
-                        bool hadBond = false;
-                        for(const auto& s : other->list_entityPointedSocial)
-                            if(s.pointedEntity == target && s.social > 8.0f){ hadBond = true; break; }
-                        if(!hadBond) for(const auto& d : other->list_entityPointedDesire)
-                            if(d.pointedEntity == target && d.desire > 8.0f){ hadBond = true; break; }
-                        if(!hadBond) for(const auto& c : other->list_entityPointedCouple)
-                            if(c.pointedEntity == target){ hadBond = true; break; }
-                        if(hadBond){
-                            float intensity = 0.65f + BetterRand::genNrInInterval(0, 25) / 100.0f;
-                            other->addGrief(target->entityId, intensity, true);
-                        }
-                    }
+                    // Grief propagation happens once, in the central removal
+                    // pass (handleDeath) — no per-group duplicate here.
+                    // M5: the group saw it happen — sanctions land immediately.
+                    sys.applySocialSanction(entity, target, neighbors, true, currentDay);
                 }
             } else {
                 // Execute self-directed action
                 sys.executeAction(entity, chosenAction, context);
                 entity->saveEntityStats(chosenAction);
+                g_actionTally[chosenAction->name]++;
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, "", "self-directed action");
 
-                // ── Narrative + inner monologue ───────────────────────────────
-                {
-                    int hour = (currentDay % 60) * 24 / 60;
+                // ── Narrative + inner monologue (GUI-only presentation) ──────
+                if (!g_headlessMode) {
+                    int hour = g_clock.hourOfDay();
                     entity->lastActionName = chosenAction->name;
                     entity->lastNarrative  = NarrativeEngine::actionToSentence(
                         entity, chosenAction->name, nullptr, hour, "");
@@ -1380,6 +1463,23 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     std::string entry = "[" + NarrativeEngine::formatHour(hour) + "] " + entity->lastNarrative;
                     globalNarrativeLog.push_back(entry);
                     if (globalNarrativeLog.size() > 200) globalNarrativeLog.pop_front();
+                }
+            }
+
+            // ── M6: social learning by observation ────────────────────────────
+            // Everyone in the group watched this action land (or flop). Notably
+            // good or bad outcomes nudge each observer's own value estimates —
+            // this is how a productive foraging technique or a disastrous
+            // brawl spreads through a community without anyone teaching it.
+            {
+                float observed = chosenAction->outcomeSuccess;
+                if (std::abs(observed - 0.5f) > 0.15f) {
+                    for (Entity* watcher : neighbors) {
+                        if (!watcher || watcher == entity || watcher->entityHealth <= 0.0f) continue;
+                        watcher->getFreeWill().learnByObservation(
+                            watcher, entity, chosenAction->name,
+                            observed, (int)neighbors.size());
+                    }
                 }
             }
 
@@ -1395,13 +1495,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
 
 
-void sync_clock_stats(Entity* ent, int neighboors){
-    FreeWillSystem fs;
-    fs.chooseAction(ent);
-}
-
-
 void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, bool isPaused, int width, int height, int& selectedEntityIndex, bool& showEntityWindow, CivilizationEngine* engineCivilization) {
+    // Keep the global clock in sync with the frame counter ("day" is,
+    // historically, a frame count — SimClock derives tick/day/year from it).
+    g_clock.frame = (uint64_t)day;
     // ── Safe dead-entity removal ──────────────────────────────────────────────
     // Raw Entity* pointers become dangling after erase() shifts the vector.
     // Strategy: snapshot old addresses, null pointers to dead entities, batch
@@ -1419,11 +1516,22 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
         for (Entity& e : entities) {
             if (e.entityHealth <= 0.0f) {
                 std::cout << "Entity " << e.entityId << " has died.\n";
+                // Single, population-wide grief pass (partners/kin in other
+                // groups included). Runs while all pointers are still valid.
+                handleDeath(&e, ent_quad);
                 // Single, authoritative attribution: killings carry an explicit
                 // cause (pendingDeathCause); everything else is resolved from the
                 // deceased's terminal state into a specific named cause rather
                 // than the old catch-all "hardship".
                 std::string cause = determineDeathCause(e);
+                // M9: in-memory ledger feeding the end-of-run realism report.
+                {
+                    std::string bucket = cause;
+                    if (cause.find("crime of passion") != std::string::npos ||
+                        cause.rfind("murder", 0) == 0)
+                        bucket = "homicide";
+                    g_deathLedger[bucket]++;
+                }
                 if (globalLogger) {
                     globalLogger->logDeath(e.entityId, e.name, (int)e.entityAge,
                                            cause, deathContext(e));
@@ -1462,6 +1570,27 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
                 for (auto& a : e.list_entityPointedAnger)   nullIfDead(a.pointedEntity);
                 for (auto& s : e.list_entityPointedSocial)  nullIfDead(s.pointedEntity);
                 for (auto& c : e.list_entityPointedCouple)  nullIfDead(c.pointedEntity);
+                nullIfDead(e.parent1);
+                nullIfDead(e.parent2);
+                for (auto* m : e.list_MentalModelOfOther)
+                    if (m) nullIfDead(m->entityPointed);
+                // Free models of the deceased — you stop modeling the dead,
+                // and stale null entries would clog the 16-slot ToM capacity.
+                // A dying entity's whole list goes too: the vector holds raw
+                // owning pointers, so erasing the Entity would leak them.
+                bool dying = deadIds.count(e.entityId) != 0;
+                if (dying) e.flushEntityStats();   // final CSV rows before erase
+                e.list_MentalModelOfOther.erase(
+                    std::remove_if(e.list_MentalModelOfOther.begin(), e.list_MentalModelOfOther.end(),
+                        [&](MentalModelOfOther* m) {
+                            if (!m) return true;
+                            if (dying || m->entityPointed == nullptr) {
+                                delete m;
+                                return true;
+                            }
+                            return false;
+                        }),
+                    e.list_MentalModelOfOther.end());
             }
 
             // 4. Batch erase — shifts surviving elements; pointers now stale
@@ -1473,6 +1602,7 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             // 5. Rebuild ent_quad
             ent_quad.clear();
             for (Entity& e : entities) ent_quad.push_back(&e);
+            ++g_entQuadVersion;   // invalidate movement lookup caches
 
             // 6. Repair surviving pointedEntity pointers (old addr → id → new addr)
             std::unordered_map<int, Entity*> idToNewPtr;
@@ -1489,6 +1619,10 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
                 for (auto& a : e.list_entityPointedAnger)   repairPtr(a.pointedEntity);
                 for (auto& s : e.list_entityPointedSocial)  repairPtr(s.pointedEntity);
                 for (auto& c : e.list_entityPointedCouple)  repairPtr(c.pointedEntity);
+                repairPtr(e.parent1);
+                repairPtr(e.parent2);
+                for (auto* m : e.list_MentalModelOfOther)
+                    if (m) repairPtr(m->entityPointed);
             }
 
             // 7. Fix selected entity index
@@ -1509,37 +1643,67 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
         if(frameCounter >= UPDATE_FREQUENCY){
             frameCounter = 0;
 
-            // Birthday: one year = 8 sim-ticks. Gated to fire exactly once per
-            // tick (this block runs once per UPDATE_FREQUENCY frames); otherwise
-            // it ran every frame and aged everyone decades per second, draining
-            // health past life expectancy and killing the whole population on entry.
-            if((day / UPDATE_FREQUENCY) % 8 == 0 && day > 0){
+            // Birthday: one year = SimClock::DAYS_PER_YEAR sim-ticks. Fires
+            // once per tick (this block runs once per UPDATE_FREQUENCY frames).
+            if(g_clock.isYearStartTick() && day > 0){
                 for(Entity& ent : entities){
                     ent.IncrementBDay();
                 }
             }
 
+            // M11: sub-phase profiler (ASHB_PROFILE=1) — prints a breakdown
+            // every 10 ticks so hotspots inside the tick pass are attributable.
+            static const bool s_profile = std::getenv("ASHB_PROFILE") != nullptr;
+            static double s_msGroups = 0, s_msWill = 0, s_msPersona = 0, s_msCiv = 0;
+            static int    s_profTicks = 0;
+            auto pf_now = std::chrono::steady_clock::now;
+            auto pfA = pf_now();
+
             // Recalculate entity groups based on current positions
             close_entity_together = getSocialGroups(ent_quad);
+            auto pfB = pf_now();
 
             // Apply free will to all entity groups with current day for context
             applyFreeWill(close_entity_together, day, engineCivilization);
+            auto pfC = pf_now();
 
             // PersonaSystem: update self-grounding every tick; consolidate memories every 10 ticks
             for (Entity& ent : entities) {
                 if (ent.entityHealth <= 0.0f) continue;
                 ent.updateSelfGrounding(day);
-                if (day % 10 == 0)
+                if (day % 10 == 0) {
+                    // Consolidate BEFORE pruning: an episode must get its shot
+                    // at becoming a core belief before it can be forgotten.
                     ent.consolidateMemories(day);
+                    if (ent.pruneLifeMemories(day))
+                        ent.semanticMemory.rebuildFromLifeMemories(&ent);
+                }
             }
+            auto pfD = pf_now();
 
-            // ── Civilization tick (every 5 FreeWill updates = ~1 in-game day) ──
-            if (globalCivEngine && (day / UPDATE_FREQUENCY) % 5 == 0) {
+            // ── Civilization tick (every TICKS_PER_CIV_TICK days) ──
+            if (globalCivEngine && g_clock.isCivTick()) {
                 globalCivEngine->tick(entities, day / UPDATE_FREQUENCY);
                 // Social order rides the same cadence: refresh classes, clientela
                 // and the debt cascade once per civ-day.
                 if (globalSocialOrder)
                     globalSocialOrder->tick(entities, globalCivEngine->getCurrentYear());
+            }
+            if (s_profile) {
+                auto pfE = pf_now();
+                auto ms = [](auto a, auto b) {
+                    return std::chrono::duration<double, std::milli>(b - a).count();
+                };
+                s_msGroups  += ms(pfA, pfB);
+                s_msWill    += ms(pfB, pfC);
+                s_msPersona += ms(pfC, pfD);
+                s_msCiv     += ms(pfD, pfE);
+                if (++s_profTicks % 10 == 0) {
+                    std::cout << "PROFILE-TICK avg over " << s_profTicks << ": groups="
+                              << s_msGroups / s_profTicks << " will=" << s_msWill / s_profTicks
+                              << " persona=" << s_msPersona / s_profTicks
+                              << " civ=" << s_msCiv / s_profTicks << " ms\n";
+                }
             }
 
             // ── Economy tick: supply, demand & prices for the whole market ─────
@@ -1568,54 +1732,57 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
 
             std::vector<Entity> new_borns = get_new_borns();
             if (!new_borns.empty()) {
-                // Reserve before push_back so the vector never reallocates —
-                // existing Entity* pointedEntity pointers stay valid.
-                entities.reserve(entities.size() + new_borns.size());
+                // 1. Snapshot old address → id while every pointer is still
+                //    valid. (The old code read entityId THROUGH stale pointers
+                //    after reallocation — undefined behaviour — and never
+                //    repaired parent or mental-model pointers at all.)
+                std::unordered_map<const Entity*, int> ptrToId;
+                ptrToId.reserve(entities.size());
+                for (const Entity& e : entities) ptrToId[&e] = e.entityId;
+
+                // 2. Grow geometrically so reallocation is rare; when it does
+                //    happen, step 4 repairs everything.
+                if (entities.capacity() < entities.size() + new_borns.size())
+                    entities.reserve(std::max(entities.size() * 2,
+                                              entities.size() + new_borns.size()));
                 for (Entity& ent : new_borns) entities.push_back(ent);
+
+                // 3. Rebuild ent_quad and id → new-address map.
+                ent_quad.clear();
+                std::unordered_map<int, Entity*> idToNewPtr;
+                idToNewPtr.reserve(entities.size());
+                for (Entity& e : entities) {
+                    ent_quad.push_back(&e);
+                    idToNewPtr[e.entityId] = &e;
+                }
+                ++g_entQuadVersion;   // invalidate movement lookup caches
+
+                // 4. Repair every Entity* field: old addr → id → new addr.
+                auto repairPtr = [&](Entity*& p) {
+                    if (!p) return;
+                    auto oldIt = ptrToId.find(p);
+                    if (oldIt == ptrToId.end()) { p = nullptr; return; }
+                    auto newIt = idToNewPtr.find(oldIt->second);
+                    p = (newIt != idToNewPtr.end()) ? newIt->second : nullptr;
+                };
+                for (Entity& e : entities) {
+                    for (auto& d : e.list_entityPointedDesire)  repairPtr(d.pointedEntity);
+                    for (auto& a : e.list_entityPointedAnger)   repairPtr(a.pointedEntity);
+                    for (auto& s : e.list_entityPointedSocial)  repairPtr(s.pointedEntity);
+                    for (auto& c : e.list_entityPointedCouple)  repairPtr(c.pointedEntity);
+                    repairPtr(e.parent1);
+                    repairPtr(e.parent2);
+                    for (auto* m : e.list_MentalModelOfOther)
+                        if (m) repairPtr(m->entityPointed);
+                }
             }
             FreeWillSystem::clear_new_borns();
 
-            // Rebuild ent_quad so new entities appear on map and pointers are fresh
-            if (!new_borns.empty()) {
-                ent_quad.clear();
-                for(int j = 0; j < (int)entities.size(); j++){
-                    ent_quad.push_back(&entities[j]);
-                }
-                // Repair all pointedEntity pointers
-                for(Entity& e : entities){
-                    for(auto& d : e.list_entityPointedDesire){
-                        if(d.pointedEntity){
-                            int id = d.pointedEntity->entityId;
-                            for(Entity& other : entities)
-                                if(other.entityId == id){ d.pointedEntity = &other; break; }
-                        }
-                    }
-                    for(auto& a : e.list_entityPointedAnger){
-                        if(a.pointedEntity){
-                            int id = a.pointedEntity->entityId;
-                            for(Entity& other : entities)
-                                if(other.entityId == id){ a.pointedEntity = &other; break; }
-                        }
-                    }
-                    for(auto& s : e.list_entityPointedSocial){
-                        if(s.pointedEntity){
-                            int id = s.pointedEntity->entityId;
-                            for(Entity& other : entities)
-                                if(other.entityId == id){ s.pointedEntity = &other; break; }
-                        }
-                    }
-                    for(auto& c : e.list_entityPointedCouple){
-                        if(c.pointedEntity){
-                            int id = c.pointedEntity->entityId;
-                            for(Entity& other : entities)
-                                if(other.entityId == id){ c.pointedEntity = &other; break; }
-                        }
-                    }
-                }
-            }
-
-            // Export current state to JSON lines for HTML viewer
-            exportTickHistory("./src/data/tick_history.jsonl", entities, day);
+            // Export state to JSON lines for the HTML viewer. Sampled every
+            // 5th tick: per-tick export of the whole population produced
+            // ~27 MB per 500 ticks and dominated I/O.
+            if (g_clock.isCivTick())
+                exportTickHistory("./src/data/tick_history.jsonl", entities, day);
         }
         day++;
     }
@@ -1650,6 +1817,67 @@ void initialiseSDL(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad
     } */
 
 
+// ── M9: red/green realism report ──────────────────────────────────────────────
+// Five falsifiable assertions about whether the run looks like a human world.
+// Printed after every headless run so a regression in social dynamics is
+// caught by eye (or by grepping "REALISM.*FAIL" in CI) instead of going
+// unnoticed for months the way the tribes-collapse bug did.
+static void printRealismReport(const std::vector<Entity>& entities,
+                               const CivilizationEngine* civ, int ticksRun) {
+    int totalDeaths = 0, homicides = 0;
+    for (const auto& [cause, n] : g_deathLedger) {
+        totalDeaths += n;
+        if (cause == "homicide") homicides = n;
+    }
+    long long totalActions = 0; int topCount = 0; std::string topAction = "-";
+    for (const auto& [name, n] : g_actionTally) {
+        totalActions += n;
+        if (n > topCount) { topCount = n; topAction = name; }
+    }
+    int births = civ ? civ->totalBirths : 0;
+    int tribesAlive = civ ? (int)civ->tribes.size() : 0;
+    int viableReligions = 0;
+    if (civ)
+        for (const auto& r : civ->religions)
+            if ((int)r.followerIds.size() >= 3) ++viableReligions;
+    float homicideShare = totalDeaths > 0 ? (float)homicides / totalDeaths : 0.0f;
+    float topShare      = totalActions > 0 ? (float)topCount / (float)totalActions : 0.0f;
+    // Wars scaled to the plan's target window of 1-5 per 1500 days.
+    float warsPer1500 = civ && ticksRun > 0
+                        ? (float)civ->totalWarsDeclared * 1500.0f / (float)ticksRun : 0.0f;
+
+    auto verdict = [](bool ok) { return ok ? "PASS" : "FAIL"; };
+    std::cout << "\n===== REALISM REPORT (" << ticksRun << " ticks) =====\n";
+    // Share-of-deaths misleads in young booming populations (nobody is old
+    // enough to die naturally, so the denominator is tiny). A world is
+    // non-violent if EITHER the share is low or killings are rare per capita
+    // (proxied per birth, which tracks population-years lived).
+    float homicidePerBirth = births > 0 ? (float)homicides / (float)births : 0.0f;
+    bool  homicideOk = homicideShare < 0.15f || homicidePerBirth < 0.04f;
+    std::cout << "1. Violence rare (share<15% or /birth<4%): " << (int)(homicideShare * 100)
+              << "% share, " << (int)(homicidePerBirth * 100)
+              << "%/birth  [" << verdict(homicideOk) << "]\n";
+    std::cout << "2. Population sustains (births>=deaths): " << births << " births / "
+              << totalDeaths << " deaths  [" << verdict(births >= totalDeaths) << "]\n";
+    // The 1-5 wars / 1500 days target is a CROSS-SEED statistic; a single short
+    // run legitimately sees zero. Only demand w>0 once the run is long enough
+    // that silence would itself be suspicious.
+    bool warsOk = (warsPer1500 <= 8.0f) && (ticksRun < 1000 || warsPer1500 > 0.0f);
+    std::cout << "3. Wars occur, world survives (w/1500d<=8"
+              << (ticksRun >= 1000 ? ", >0" : "") << "): " << warsPer1500
+              << "  [" << verdict(warsOk) << "]\n";
+    // Faith count scales with how many people there are to convert: 8 is the
+    // floor of the allowance, one more faith allowed per 60 living souls.
+    int faithAllowance = std::max(8, (int)entities.size() / 60 + 7);
+    std::cout << "4. Tribes persist, faiths stabilise (t>=2, 1<=r<=" << faithAllowance
+              << "): tribes=" << tribesAlive << " religions=" << viableReligions
+              << "  [" << verdict(tribesAlive >= 2 && viableReligions >= 1
+                                  && viableReligions <= faithAllowance) << "]\n";
+    std::cout << "5. No behavioral monoculture (top action < 25%): " << topAction << " "
+              << (int)(topShare * 100) << "%  [" << verdict(topShare < 0.25f) << "]\n";
+    std::cout << "==========================================\n\n";
+}
+
 int getRenderingChoice(){
     std::cout << "Choose your rendering method(1 or 2)\n  1-Simple Dots representing entities (=more statistics, less beautiful) \n  2-Graphic rendering with character moving(=less statistics, more beautiful)\n>";
     std::string input;
@@ -1661,10 +1889,85 @@ int getRenderingChoice(){
     }
 }
 
+// ── Command-line options ─────────────────────────────────────────────────────
+// Every startup question can be answered on the command line so runs are
+// scriptable/reproducible; anything not provided falls back to the interactive
+// prompt (or to a sane default in --headless mode, which must never block on
+// stdin).
+struct CliOptions {
+    int         headlessTicks = -1;   // >0 = run without a window for N ticks
+    std::string seedText;             // "" = ask (GUI) / random (headless)
+    bool        seedGiven = false;
+    int         entities  = -1;
+    int         region    = -1;       // 1..4
+    float       chaos     = -1.0f;
+    // M8: persistence — resume a world, or checkpoint one mid-run.
+    std::string loadFile;             // load this save instead of spawning founders
+    std::string saveFile = "src/data/saves/headless_save.txt"; // --save-at target
+    int         saveAtTick = -1;      // >0 = write saveFile at this headless tick
+};
 
-
+static CliOptions parseCli(int argc, char* argv[]) {
+    CliOptions o;
+    auto next = [&](int& i) -> const char* {
+        return (i + 1 < argc) ? argv[++i] : "";
+    };
+    for (int i = 1; i < argc; ++i) {
+        std::string a = argv[i];
+        if (a == "--headless")      { o.headlessTicks = std::atoi(next(i)); if (o.headlessTicks <= 0) o.headlessTicks = 500; }
+        else if (a == "--seed")     { o.seedText = next(i); o.seedGiven = true; }
+        else if (a == "--entities") { o.entities = std::atoi(next(i)); }
+        else if (a == "--region")   { o.region = std::atoi(next(i)); }
+        else if (a == "--chaos")    { o.chaos = (float)std::atof(next(i)); }
+        else if (a == "--load")     { o.loadFile = next(i); }
+        else if (a == "--save-at")  { o.saveAtTick = std::atoi(next(i)); }
+        else if (a == "--save-file"){ o.saveFile = next(i); }
+        // M10: scenario presets — curated parameter bundles. Applied in
+        // parse order, so any explicit flag AFTER --scenario overrides it.
+        else if (a == "--scenario") {
+            std::string s = next(i);
+            if (s == "eden") {          // gentle world: mild region, low chaos
+                o.entities = 150; o.region = 1; o.chaos = 0.5f;
+            } else if (s == "crucible") { // harsh world: disease region, high chaos
+                o.entities = 60;  o.region = 4; o.chaos = 2.2f;
+            } else if (s == "babel") {   // crowded world: many founders, factions
+                o.entities = 400; o.region = 2; o.chaos = 1.3f;
+            } else if (s == "dish") {    // petri dish: a handful of souls to watch
+                o.entities = 12;  o.region = 1; o.chaos = 1.0f;
+            } else {
+                std::cerr << "Unknown scenario '" << s
+                          << "' (eden|crucible|babel|dish) — ignored\n";
+            }
+        }
+        else if (a == "--help" || a == "-h") {
+            std::cout << "ASHB2 options:\n"
+                         "  --headless <ticks>   run N ticks without a window, then exit\n"
+                         "  --seed <text|num>    world seed (same seed = same history)\n"
+                         "  --entities <n>       founding population (default 40)\n"
+                         "  --region <1-4>       disease-climate region (default 1)\n"
+                         "  --chaos <0.3-2.5>    divergence level (default 1.3)\n"
+                         "  --load <file>        resume from a save instead of spawning founders\n"
+                         "  --save-at <tick>     write a save at this headless tick\n"
+                         "  --save-file <file>   where --save-at writes (default src/data/saves/headless_save.txt)\n"
+                         "  --scenario <name>    preset bundle: eden (gentle, 150 souls), crucible (harsh, 60),\n"
+                         "                       babel (crowded, 400), dish (petri dish, 12). Later flags override.\n";
+            std::exit(0);
+        }
+    }
+    return o;
+}
 
 int main(int argc, char* argv[]) {
+    CliOptions cli = parseCli(argc, argv);
+    // Environment variable kept as an alternative to --headless.
+    if (cli.headlessTicks <= 0) {
+        if (const char* hl = std::getenv("ASHB_HEADLESS")) {
+            cli.headlessTicks = std::atoi(hl);
+            if (cli.headlessTicks <= 0) cli.headlessTicks = 500;
+        }
+    }
+    const bool headless = (cli.headlessTicks > 0);
+    g_headlessMode = headless;
     std::cout << " \"I was meant to be perfect, ";
     std::cout << "I was meant to be beautiful\" \n\n";
    //// Initialize logger (this redirects std::cout to cmd_log.txt)
@@ -1683,30 +1986,48 @@ int main(int argc, char* argv[]) {
         std::cout << "error with file clearing! if it persist just reclone the repo!\n";
     }
 
-    // Clear tick history file
-    std::ofstream tick_history("./src/data/tick_history.json", std::ios::trunc);
+    // Clear tick history file. NOTE: must match the exporter's filename
+    // (exportTickHistory appends to tick_history.jsonl); the old ".json"
+    // truncation cleared a file nobody wrote, so the real one grew forever
+    // across runs (observed at 188 MB).
+    std::ofstream tick_history("./src/data/tick_history.jsonl", std::ios::trunc);
     tick_history.close();
 
     globalLogger->logCmd("done");
-    int entity_num;
     std::cout << "Welcome to Artificial Simulation of Human Behavior (ASHB)\n";
     std::cout << "complete simulation can be found at /data/complete_logs.txt\n";
     std::cout << "you can save and load simulation at any moment\n";
     std::cout << "@author: Komodo \n";
-    implementRegion();
-    std::cout << "enter entity number (default: 40): ";
-    std::cin >> entity_num;
-    if (!entity_num){
-        entity_num = 40;
+
+    // Region (disease climate)
+    if (cli.region >= 1 && cli.region <= 4) {
+        Disease::region = cli.region * 10;
+    } else if (headless) {
+        Disease::region = 10;                 // default: Paris/Oceanic
+    } else {
+        implementRegion();
     }
-    int renderingType = getRenderingChoice();
+
+    // Founding population
+    int entity_num = 40;
+    if (cli.entities > 0) {
+        entity_num = cli.entities;
+    } else if (!headless) {
+        std::cout << "enter entity number (default: 40): ";
+        std::cin >> entity_num;
+        if (!entity_num) entity_num = 40;
+    }
+
+    int renderingType = headless ? 1 : getRenderingChoice();
 
     // ── World seed (determines the whole planet & history; same seed = same run) ──
     {
-        std::string seedInput;
-        std::cout << "enter world seed (text or number, blank = random): ";
-        std::cin.ignore();
-        std::getline(std::cin, seedInput);
+        std::string seedInput = cli.seedText;
+        if (!cli.seedGiven && !headless) {
+            std::cout << "enter world seed (text or number, blank = random): ";
+            std::cin.ignore();
+            std::getline(std::cin, seedInput);
+        }
         if (seedInput.empty()) {
             g_worldSeed.master = std::random_device{}() ^
                 (static_cast<uint64_t>(std::random_device{}()) << 32);
@@ -1717,11 +2038,15 @@ int main(int argc, char* argv[]) {
         globalLogger->logCmd("world seed = " + std::to_string(g_worldSeed.master));
 
         // Divergence / chaos level: how wildly history varies between runs.
-        std::cout << "chaos level 0.5 (tame) .. 2.0 (wild) [default 1.3]: ";
-        std::string chaosInput;
-        std::getline(std::cin, chaosInput);
         float chaos = 1.3f;
-        if (!chaosInput.empty()) { try { chaos = std::stof(chaosInput); } catch (...) {} }
+        if (cli.chaos > 0.0f) {
+            chaos = cli.chaos;
+        } else if (!headless) {
+            std::cout << "chaos level 0.5 (tame) .. 2.0 (wild) [default 1.3]: ";
+            std::string chaosInput;
+            std::getline(std::cin, chaosInput);
+            if (!chaosInput.empty()) { try { chaos = std::stof(chaosInput); } catch (...) {} }
+        }
         chaos = std::max(0.3f, std::min(2.5f, chaos));
         g_worldSeed.divergence.butterfly       = chaos;
         g_worldSeed.divergence.innovationLuck  = 0.7f + chaos * 0.4f;
@@ -1733,7 +2058,6 @@ int main(int argc, char* argv[]) {
         BetterRand::reseed(splitmix64(g_worldSeed.master ^ STREAM_SPAWN));
     }
 
-    srand((unsigned)splitmix64(g_worldSeed.master));
     const int height = 1050;
     const int width = 1400;
 
@@ -1780,11 +2104,16 @@ int main(int argc, char* argv[]) {
         int count = 0;
         for (int y = 0; y < 1; ++y){
             for (int x = 0; x < entity_num; ++x){
-                int birthYear = -5000 - BetterRand::genNrInInterval(15, 30); // born in stone age
+                // M7: stagger founder ages (16-42). A uniform-age cohort hits
+                // the old-age hazard in the same handful of years — the whole
+                // founding generation died at once around year 50, hollowing
+                // every tribe below its dissolution threshold simultaneously.
+                int founderAge = BetterRand::genNrInInterval(16, 42);
+                int birthYear = -5000 - founderAge; // born in stone age
                 Entity entity = Entity(
-                    count, 15.0f, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
+                    count, (float)founderAge, BetterRand::genNrInInterval(80.0f, 100.0f), BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f)
                     , BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 20.0f),
-                    BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, nullptr, nullptr, nullptr, nullptr, "happiness", birthYear);
+                    BetterRand::genNrInInterval(0.0f, 40.0f), BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0, BetterRand::genNrInInterval(0.0f, 50.0f), -1, "happiness", birthYear);
 
                 entity.selected = false;
                 // Place into a cradle: each starting band clusters around its homeland,
@@ -1808,7 +2137,6 @@ int main(int argc, char* argv[]) {
                     entity.posX = BetterRand::genNrInInterval(80.0f, (float)(width - 80));
                     entity.posY = BetterRand::genNrInInterval(60.0f, (float)(height) * 0.60f - 60.0f);
                 }
-                Heritage::UnlinkedNode(&entity);
                 entity.salary = 200;
 
                 // --- Personality (Big Five, already randomized) ---
@@ -1955,12 +2283,27 @@ int main(int argc, char* argv[]) {
         // society into slaves, plebeians and patricians over the generations.
         globalSocialOrder = new SocialOrderSystem();
 
+        // ── M8: resume a saved world ─────────────────────────────────────────
+        // Replaces the freshly spawned founders with the saved population and
+        // macro state (tribes, religions, era, sim clock, shared RNG stream).
+        int loadedFrame = -1;
+        if (!cli.loadFile.empty()) {
+            int ld = 0, lf = 0;
+            if (loadGame(cli.loadFile, entities, ld, lf, globalCivEngine)) {
+                FreeWillSystem::day = ld;
+                loadedFrame = lf;
+            } else {
+                std::cerr << "LOAD FAILED (" << cli.loadFile << "): continuing with fresh founders\n";
+            }
+        }
+
         bool showEntityWindow = false;
         int selectedEntityIndex = -1;
         std::vector<Entity*> ent_quad;
         for(int i=0; i<entities.size(); i++){
             ent_quad.push_back(&entities[i]);
         }
+        ++g_entQuadVersion;   // initial build → invalidate movement lookup caches
 
         std::vector<std::vector<Entity*>> close_entity_together = getSocialGroups(ent_quad);
 
@@ -1971,8 +2314,52 @@ int main(int argc, char* argv[]) {
 
         int frameCounter = 0;
         int day = FreeWillSystem::day;
+        if (loadedFrame >= 0) frameCounter = loadedFrame;   // M8: resume mid-tick
 
         const int UPDATE_FREQUENCY = 60; // Update free will every 60 frames
+
+    // ── Headless mode ────────────────────────────────────────────────────────
+    // --headless <ticks> (or ASHB_HEADLESS=<ticks>) runs the full simulation
+    // loop without any window, so automated tests / experiments can exercise
+    // the engine (the GUI needs an interactive GL context CI doesn't have).
+    if (headless) {
+        int targetTicks = cli.headlessTicks;
+        std::cout << "HEADLESS: running " << targetTicks << " ticks ("
+                  << targetTicks * UPDATE_FREQUENCY << " frames)\n";
+        int ticksDone = 0;
+        // M11: coarse phase profiler (ASHB_PROFILE=1) — where does the tick go?
+        const bool profile = std::getenv("ASHB_PROFILE") != nullptr;
+        double msSim = 0.0, msMove = 0.0;
+        while (ticksDone < targetTicks && !entities.empty()) {
+            auto t0 = std::chrono::steady_clock::now();
+            updateSimulationStep(entities, ent_quad, close_entity_together, day,
+                                 frameCounter, UPDATE_FREQUENCY, false, width, height,
+                                 selectedEntityIndex, showEntityWindow, globalCivEngine);
+            auto t1 = std::chrono::steady_clock::now();
+            updateMovement(ent_quad, (float)width, (float)height, day);
+            auto t2 = std::chrono::steady_clock::now();
+            if (profile) {
+                msSim  += std::chrono::duration<double, std::milli>(t1 - t0).count();
+                msMove += std::chrono::duration<double, std::milli>(t2 - t1).count();
+            }
+            if (frameCounter == 0) {              // frameCounter wraps once per tick
+                ticksDone++;
+                // M8: checkpoint mid-run so long worlds survive a crash and
+                // the save→load path gets exercised by automated tests.
+                if (cli.saveAtTick > 0 && ticksDone == cli.saveAtTick)
+                    saveGame(cli.saveFile, entities, day, frameCounter, globalCivEngine);
+            }
+        }
+        if (profile && ticksDone > 0)
+            std::cout << "PROFILE: sim=" << (msSim / ticksDone) << " ms/tick, movement="
+                      << (msMove / ticksDone) << " ms/tick (x" << UPDATE_FREQUENCY << " frames)\n";
+        for (Entity& e : entities) e.flushEntityStats();  // drain buffered CSVs
+        std::cout << "HEADLESS: done. ticks=" << ticksDone
+                  << " population=" << entities.size() << "\n";
+        printRealismReport(entities, globalCivEngine, ticksDone);   // M9
+        return 0;
+    }
+
     if(renderingType == 1){
         if (!glfwInit()) return -1;
 
@@ -2004,21 +2391,39 @@ int main(int argc, char* argv[]) {
 
             updateSimulationStep(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, instanceUI.isSimulationPaused(), width, height, selectedEntityIndex, showEntityWindow, globalCivEngine);
 
+            // Force-based movement runs every frame (was orphaned: defined but
+            // never called, so all proximity mechanics ran on frozen positions).
+            if (!instanceUI.isSimulationPaused())
+                updateMovement(ent_quad, (float)width, (float)height, day);
+
             std::string saveFilename;
             int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename, day / 60 , entities.size(), UPDATE_FREQUENCY, {});
             if (saveLoadAction == 1) {
-                saveGame(saveFilename, entities, day, frameCounter);
+                saveGame(saveFilename, entities, day, frameCounter, globalCivEngine);
             } else if (saveLoadAction == 2) {
-                if (loadGame(saveFilename, entities, day, frameCounter)) {
+                if (loadGame(saveFilename, entities, day, frameCounter, globalCivEngine)) {
                     // Rebuild pointer vectors after loading
                     ent_quad.clear();
                     for (int j = 0; j < (int)entities.size(); j++) {
                         ent_quad.push_back(&entities[j]);
                     }
+                    ++g_entQuadVersion;   // invalidate movement lookup caches
                     close_entity_together = getSocialGroups(ent_quad);
                     showEntityWindow = false;
                     selectedEntityIndex = -1;
                 }
+            }
+
+            // M10: divine interventions (smite/bless/feast/famine/meteor/calm),
+            // possession, interviews, live world tunables.
+            {
+                Entity* chosen = (selectedEntityIndex >= 0 &&
+                                  selectedEntityIndex < (int)entities.size())
+                                 ? &entities[selectedEntityIndex] : nullptr;
+                instanceUI.ShowGodConsole(ent_quad, chosen, day / 60);
+                instanceUI.ShowPossessWindow(chosen, day / 60);
+                instanceUI.ShowInterviewWindow(chosen, ent_quad, day / 60);
+                instanceUI.ShowConfigConsole();
             }
 
             // Entity selection: click graph node OR mind board card

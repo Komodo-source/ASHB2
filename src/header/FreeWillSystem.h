@@ -203,9 +203,13 @@ private:
     std::deque<ActionMemory> actionHistory; // Last 50 actions
     static const int MAX_MEMORY = 50;
     std::map<std::string, Need> needs;
-    std::vector<Action> availableActions;
-    std::vector<Action> desireLinkedAction;
-    std::vector<Action> hatredLinkedAction;
+    // The action catalog is identical for every agent, but each Entity owns a
+    // FreeWillSystem by value — as instance members these vectors were copied
+    // per entity (hundreds of duplicate catalogs). Shared as statics; per-agent
+    // state (needs, habits, history, Q-tables) stays per-instance.
+    static std::vector<Action> availableActions;
+    static std::vector<Action> desireLinkedAction;
+    static std::vector<Action> hatredLinkedAction;
 
     std::vector<Habit> habits;
     int currentTime;
@@ -260,6 +264,15 @@ public:
     SocialNormSystem socialNormInstance;
     static std::vector<Entity> new_borns;
     static int day;
+
+    // M10 possess mode: while possessedEntityId matches an agent and a command
+    // index is queued, the whole decision pipeline is overridden — the player
+    // is steering that soul. -1 = nobody possessed / no command.
+    static int possessedEntityId;
+    static int possessedActionIdx;
+    // Stable snapshot of the shared action catalog names (for the possess UI).
+    static std::vector<std::string> actionNames();
+
     FreeWillSystem();
 
     void initializeNeeds();
@@ -268,7 +281,15 @@ public:
 
 
     Action* checkHabitTrigger(const ActionContext& context);
-    void updateHabits(int actionId, const ActionContext& context);
+    // M6: habit strength now tracks the OUTCOME — repetition alone no longer
+    // cements a habit that keeps failing (reward-modulated reinforcement).
+    void updateHabits(int actionId, const ActionContext& context, float outcomeSuccess);
+    // M6: social learning — the observer nudges their own action values toward
+    // the return they watched `model` collect (prestige- and openness-gated),
+    // and records the behavior in their cultural-transmission ledger.
+    void learnByObservation(Entity* observer, Entity* model,
+                            const std::string& actionName,
+                            float observedOutcome, int numPeopleNearby);
 
     Action* chooseAction(Entity* entity, const std::vector<Entity*>& neighbors = {}, const ActionContext& context = ActionContext());
     // New cognitive pipeline entry point (separate from legacy scoring)
@@ -287,6 +308,13 @@ public:
     std::string lastReflexReason    = "";  // human-readable trigger of last reflex
     void executeAction(Entity* entity, Action* &action, const ActionContext& context = ActionContext(), Entity* pointed=nullptr);
     void pointedAssimilation(Entity* pointer, Entity* pointed, Action* action, CivilizationEngine* engineCivilization);
+    // M5: community response to violence. Witnesses turn on the offender
+    // (vendetta anger, reputation collapse, trust craters, bonds cut), kin and
+    // partners of the victim are outraged hardest, and a same-tribe killing
+    // can get the offender exiled. `lethal` scales severity; call for assaults too.
+    void applySocialSanction(Entity* offender, Entity* victim,
+                             const std::vector<Entity*>& witnesses,
+                             bool lethal, int simDay);
     float calculateGoalAlignmentModifier(Entity* entity,  Action* action);
     bool isKnown(Entity* entity, Entity* target);
     Entity* selectSocialTarget(Entity* entity, const std::vector<Entity*>& neighbors, const Action* action);

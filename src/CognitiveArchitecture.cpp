@@ -1,4 +1,5 @@
 #include "./header/CognitiveArchitecture.h"
+#include "./header/BetterRand.h"
 #include "./header/Entity.h"
 #include <fstream>
 #include <cmath>
@@ -128,7 +129,7 @@ std::vector<std::string> CognitiveArchitecture::filterPerceptions(
         if (isNegative && entity->personality.neuroticism > 60.0f) {
             include = true;  // High neuroticism amplifies negative perception
         } else if (!isNegative && entity->personality.neuroticism > 70.0f) {
-            include = (rand() % 100) < 60;  // Miss some positive events
+            include = BetterRand::genNrInInterval(0, 99) < 60;  // Miss some positive events
         }
         
         // Confirmation bias: filter based on existing beliefs
@@ -137,7 +138,7 @@ std::vector<std::string> CognitiveArchitecture::filterPerceptions(
                 float beliefStrength = std::abs(belief) / 100.0f;
                 if ((belief > 0 && perception.find("negative") != std::string::npos) ||
                     (belief < 0 && perception.find("positive") != std::string::npos)) {
-                    include = (rand() % 100) > (beliefStrength * 50);
+                    include = BetterRand::genNrInInterval(0, 99) > (beliefStrength * 50);
                 }
             }
         }

@@ -43,6 +43,23 @@ public:
     GridPoint getGridPoint();
     // Returns: 0=nothing, 1=save pressed, 2=load pressed
     int showSaveLoadButtons(std::string& filename, int day, int num_entity, int tick, std::map<std::string, int> complementary_information);
+
+    // M10: God Console — divine interventions on the living world. `selected`
+    // may be nullptr (entity-targeted buttons grey out). Every act is also
+    // written to the event log so history remembers the meddling.
+    void ShowGodConsole(std::vector<Entity*>& entities, Entity* selected, int simDay);
+
+    // M10: Possess mode — take direct control of the selected entity: its next
+    // deliberations perform the commanded action instead of free will.
+    void ShowPossessWindow(Entity* selected, int simDay);
+
+    // M10: Interview mode — templated Q&A with the selected entity, answered
+    // from its real state, memories, beliefs and relationships.
+    void ShowInterviewWindow(Entity* selected, std::vector<Entity*>& entities, int simDay);
+
+    // M10: Live config console — world tunables (LiveConfig multipliers)
+    // adjustable while the simulation runs.
+    void ShowConfigConsole();
 private:
     char saveLoadFilename[256] = "savegame.txt";
     bool simulationPaused = false;

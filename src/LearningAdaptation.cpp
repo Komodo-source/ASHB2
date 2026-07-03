@@ -411,6 +411,20 @@ void LearningAdaptationSystem::observeAndLearn(Entity* observer,
     culture.learnFromObservation(model, behavior, observedOutcome);
 }
 
+void LearningAdaptationSystem::vicariousExperience(Entity* observer,
+                                                   const std::string& state,
+                                                   const std::string& action,
+                                                   float observedReward,
+                                                   float weight) {
+    if (!observer || weight <= 0.0f) return;
+    auto& qf = entityQFunctions[observer->getId()];
+    float currentQ = qf.getQValue(state, action);
+    // Small supervised step toward the observed return; no bootstrapping —
+    // the observer saw an outcome, not a full transition of their own.
+    qf.qValues[state][action] =
+        currentQ + qf.learningRate * weight * (observedReward - currentQ);
+}
+
 void LearningAdaptationSystem::teachBehavior(Entity* teacher,
                                               Entity* learner,
                                               const std::string& behavior) {

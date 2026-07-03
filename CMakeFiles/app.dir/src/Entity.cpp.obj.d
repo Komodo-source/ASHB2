@@ -266,4 +266,5 @@ CMakeFiles/app.dir/src/Entity.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
  C:/mingw64/include/c++/14.2.0/iostream \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/BetterRand.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/LiveConfig.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SocialNormSystem.h

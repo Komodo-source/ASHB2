@@ -57,10 +57,10 @@ enum AttachmentStyle {
 
 struct LifeMemory {
     std::string eventType;
-    int entityInvolvedId;         // qui était impliqué (-1 si personne)
-    float emotionalIntensity;
-    int simulationDay;
-    bool isFormative;             // change la personnalité de façon permanente
+    int entityInvolvedId = -1;    // qui était impliqué (-1 si personne)
+    float emotionalIntensity = 0.0f;
+    int simulationDay = 0;        // several push sites forgot to set this
+    bool isFormative = false;     // change la personnalité de façon permanente
     std::string internalNarrative;
 };
 
@@ -190,23 +190,31 @@ struct DevelopmentalHistory {
 };
 
 struct MentalModelOfOther {
-    Entity* entityPointed;
-    float perceivedExtraversion;
-    float perceivedAgreeableness;
-    float perceivedNeuroticism;
+    Entity* entityPointed = nullptr;
+    float perceivedExtraversion = 50.0f;
+    float perceivedAgreeableness = 50.0f;
+    float perceivedNeuroticism = 50.0f;
 
-    float estimatedHappiness;
-    float estimatedAnger;
-    float estimatedStress;
+    float estimatedHappiness = 50.0f;
+    float estimatedAnger = 0.0f;
+    float estimatedStress = 0.0f;
 
-    float trustLevel;          // accumulated from interactions
-    float predictability;      // how well I can predict their behavior
-    float lastInteractionDay;
+    float trustLevel = 50.0f;      // accumulated from interactions
+    float predictability = 0.5f;   // how well I can predict their behavior
+    float lastInteractionDay = 0.0f;
     std::string lastInteractionOutcome;
 
-    float perceivedIntentionality; // do I think they act deliberately?
+    float perceivedIntentionality = 0.5f; // do I think they act deliberately?
 
-    void updateFromObservation(Entity* observed, float observerAccuracy);
+    // M4: beliefs about people go stale. confidence grows with each direct
+    // observation and decays with time since the last one — decisions weight
+    // a model by effectiveConfidence, so an outdated impression of someone
+    // counts for less than a fresh one (and can simply be wrong meanwhile).
+    int   lastObservedDay = 0;
+    float confidence      = 0.1f;   // 0..1
+
+    void  updateFromObservation(Entity* observed, float observerAccuracy, int simDay);
+    float effectiveConfidence(int today) const;
 
 };
 
@@ -266,7 +274,7 @@ public:
     // single central death-handler can log it verbatim instead of guessing.
     // Empty = death (if any) should be attributed from the entity's own state.
     std::string pendingDeathCause = "";
-    LifeStage entityLifeStage;
+    LifeStage entityLifeStage = INFANT;   // was uninitialized until first birthday tick
     float posX = 0.0f;
     float posY = 0.0f;
     float velX = 0.0f;
@@ -332,15 +340,11 @@ public:
     std::vector<MentalModelOfOther*> list_MentalModelOfOther;
     SelfConcept SelfConcept;
     std::map<int, PerceivedReputation> reputationMap;
-    float Esteem;
-
-
-    int meetingCount;
-    // Optional attributes
-    entityPointedDesire pointedDesire;
-    entityPointedAnger pointedAnger;
-    entityPointedCouple pointedCouple;
-    entityPointedSocial social;
+    // NOTE: these were uninitialized for years. meetingCount gates stranger
+    // bonding (freewill:~2170), so entities built on recycled heap memory got
+    // garbage values — the main source of run-to-run nondeterminism.
+    float Esteem = 50.0f;
+    int meetingCount = 0;
 
     PheromoneRelease pheromone;
     Economic salary;
@@ -363,11 +367,6 @@ public:
            int bDay, //bday = jour de l'annee / 365
            int antiBody,
            int diseaseType,
-
-           entityPointedDesire*,
-           entityPointedAnger*,
-           entityPointedCouple*,
-           entityPointedSocial*,
            std::string goalType,
            int birthYear = -5000);
 
@@ -386,6 +385,10 @@ public:
 
     void IncrementBDay();
     void saveEntityStats(Action* act);
+    // M4 perf: saveEntityStats accumulates rows here; this writes them out.
+    void flushEntityStats();
+    std::string statsCsvBuffer;
+    std::string actsCsvBuffer;
     Entity* mostAngryConn();
     Entity* mostDesireConn();
     Entity* mostSocialConn();
@@ -493,6 +496,10 @@ public:
     void updateSelfGrounding(int simDay);
     // Phase 2: distil repeated life memories into core beliefs
     void consolidateMemories(int simDay);
+    // M4: forget — drop episodic memories whose decayed salience faded; formative
+    // memories survive forever. Returns true if anything was removed (the caller
+    // must then rebuild the semantic index, whose entries hold vector indices).
+    bool pruneLifeMemories(int simDay);
     // Phase 2: push a new significant event into working memory
     void addToWorkingMemory(const std::string& eventType,
                             const std::string& desc, float weight);

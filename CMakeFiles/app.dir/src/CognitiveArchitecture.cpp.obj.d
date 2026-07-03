@@ -149,15 +149,39 @@ CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/backward/auto_ptr.h \
  C:/mingw64/include/c++/14.2.0/pstl/glue_memory_defs.h \
  C:/mingw64/include/c++/14.2.0/pstl/execution_defs.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
- C:/mingw64/include/c++/14.2.0/optional \
- C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/BetterRand.h \
+ C:/mingw64/include/c++/14.2.0/random C:/mingw64/include/c++/14.2.0/cmath \
+ C:/mingw64/x86_64-w64-mingw32/include/math.h \
+ C:/mingw64/include/c++/14.2.0/bits/specfun.h \
+ C:/mingw64/include/c++/14.2.0/limits \
+ C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
+ C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
+ C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
+ C:/mingw64/include/c++/14.2.0/cstdint \
+ C:/mingw64/include/c++/14.2.0/bits/random.h \
+ C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
+ C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+ C:/mingw64/include/c++/14.2.0/bits/random.tcc \
+ C:/mingw64/include/c++/14.2.0/numeric \
+ C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
+ C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
  C:/mingw64/include/c++/14.2.0/algorithm \
  C:/mingw64/include/c++/14.2.0/bits/stl_algo.h \
  C:/mingw64/include/c++/14.2.0/bits/algorithmfwd.h \
  C:/mingw64/include/c++/14.2.0/bits/stl_heap.h \
- C:/mingw64/include/c++/14.2.0/bits/uniform_int_dist.h \
  C:/mingw64/include/c++/14.2.0/pstl/glue_algorithm_defs.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Entity.h \
+ C:/mingw64/include/c++/14.2.0/optional \
+ C:/mingw64/include/c++/14.2.0/bits/enable_special_members.h \
  C:/mingw64/include/c++/14.2.0/fstream \
  C:/mingw64/include/c++/14.2.0/istream C:/mingw64/include/c++/14.2.0/ios \
  C:/mingw64/include/c++/14.2.0/bits/ios_base.h \
@@ -185,29 +209,6 @@ CMakeFiles/app.dir/src/CognitiveArchitecture.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++io.h \
  C:/mingw64/include/c++/14.2.0/bits/fstream.tcc \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
- C:/mingw64/include/c++/14.2.0/random C:/mingw64/include/c++/14.2.0/cmath \
- C:/mingw64/x86_64-w64-mingw32/include/math.h \
- C:/mingw64/include/c++/14.2.0/bits/specfun.h \
- C:/mingw64/include/c++/14.2.0/limits \
- C:/mingw64/include/c++/14.2.0/tr1/gamma.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/special_function_util.h \
- C:/mingw64/include/c++/14.2.0/tr1/bessel_function.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/beta_function.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/ell_integral.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/exp_integral.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/hypergeometric.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/legendre_function.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/modified_bessel_func.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/poly_hermite.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/poly_laguerre.tcc \
- C:/mingw64/include/c++/14.2.0/tr1/riemann_zeta.tcc \
- C:/mingw64/include/c++/14.2.0/cstdint \
- C:/mingw64/include/c++/14.2.0/bits/random.h \
- C:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/opt_random.h \
- C:/mingw64/include/c++/14.2.0/bits/random.tcc \
- C:/mingw64/include/c++/14.2.0/numeric \
- C:/mingw64/include/c++/14.2.0/bits/stl_numeric.h \
- C:/mingw64/include/c++/14.2.0/pstl/glue_numeric_defs.h \
  C:/mingw64/include/c++/14.2.0/deque \
  C:/mingw64/include/c++/14.2.0/bits/stl_deque.h \
  C:/mingw64/include/c++/14.2.0/bits/deque.tcc \

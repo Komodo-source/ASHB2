@@ -22,6 +22,8 @@
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
+#include "./header/BetterRand.h"
+#include "./header/LiveConfig.h"
 
 // ShowEntityWindow implementation
 
@@ -223,6 +225,7 @@ void UI::showSystemInformation(){
 
         if(showActionInfo){
             ImGui::Begin("Action statistics", p_open, ImGuiWindowFlags_NoCollapse);
+            entity->flushEntityStats();   // stats are buffered in memory (M4 perf)
             std::ifstream statsFile("./src/data/act_" + std::to_string(entity->entityId) + ".csv");
             std::string line;
             int c = 1;
@@ -256,6 +259,7 @@ void UI::showSystemInformation(){
             std::vector<std::vector<float>> plot_data(labels.size());
             std::vector<float> x_axis;
 
+            entity->flushEntityStats();   // stats are buffered in memory (M4 perf)
             std::ifstream statsFile("./src/data/" + std::to_string(entity->entityId) + ".csv");
             std::string line;
             int rowCount = 0;
@@ -1097,5 +1101,342 @@ void UI::createPlayer(int& health, float& attackPower, char* playerName, char* m
         displayText.clear();
     }
 
+    ImGui::End();
+}
+
+// ── M10: God Console ──────────────────────────────────────────────────────────
+// Divine interventions for experimentation and storytelling. Each act writes
+// itself into the civilization event log so the Chronicle remembers exactly
+// when the world stopped being fair.
+void UI::ShowGodConsole(std::vector<Entity*>& entities, Entity* selected, int simDay) {
+    ImGui::Begin("God Console");
+    ImGui::TextDisabled("Interventions echo through the event log.");
+    ImGui::Separator();
+
+    // ── Acts upon one soul ───────────────────────────────────────────────────
+    ImGui::Text(selected ? "Chosen one: %s" : "Chosen one: (select an entity)",
+                selected ? selected->name.c_str() : "");
+    ImGui::BeginDisabled(selected == nullptr);
+    if (ImGui::Button("Smite") && selected) {
+        selected->entityHealth = 0.0f;
+        selected->pendingDeathCause = "divine wrath";
+        if (globalCivEngine) globalCivEngine->logEvent(simDay,
+            "The heavens struck down " + selected->name, "god");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Bless") && selected) {
+        selected->entityHealth = 100.0f;
+        selected->entityStress = 0.0f;
+        selected->entityMentalHealth = 100.0f;
+        if (globalCivEngine) globalCivEngine->logEvent(simDay,
+            selected->name + " was touched by grace", "god");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Torment") && selected) {
+        selected->entityStress = 100.0f;
+        selected->entityMentalHealth = std::max(0.0f, selected->entityMentalHealth - 40.0f);
+        if (globalCivEngine) globalCivEngine->logEvent(simDay,
+            "Dark visions haunt " + selected->name, "god");
+    }
+    ImGui::EndDisabled();
+
+    ImGui::Separator();
+
+    // ── Acts upon the world ──────────────────────────────────────────────────
+    if (ImGui::Button("Feast (all fed)")) {
+        for (Entity* e : entities) {
+            if (!e || e->entityHealth <= 0.0f) continue;
+            e->foodStore = std::min(20.0f, e->foodStore + 10.0f);
+            e->entityHunger = std::max(0.0f, e->entityHunger - 25.0f);
+        }
+        if (globalCivEngine) globalCivEngine->logEvent(simDay,
+            "A miraculous harvest feeds every mouth", "god");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Famine (larders emptied)")) {
+        for (Entity* e : entities) {
+            if (!e || e->entityHealth <= 0.0f) continue;
+            e->foodStore = 0.0f;
+            e->entityHunger = std::min(100.0f, e->entityHunger + 30.0f);
+        }
+        if (globalCivEngine) globalCivEngine->logEvent(simDay,
+            "The granaries turn to dust — famine grips the land", "god");
+    }
+    if (ImGui::Button("Meteor (random strike)")) {
+        if (!entities.empty()) {
+            int idx = BetterRand::genNrInInterval(0, (int)entities.size() - 1);
+            float cx = entities[idx]->posX, cy = entities[idx]->posY;
+            int slain = 0;
+            for (Entity* e : entities) {
+                if (!e || e->entityHealth <= 0.0f) continue;
+                float dx = e->posX - cx, dy = e->posY - cy;
+                if (dx * dx + dy * dy < 120.0f * 120.0f) {
+                    e->entityHealth = 0.0f;
+                    e->pendingDeathCause = "meteor strike";
+                    ++slain;
+                }
+            }
+            if (globalCivEngine) globalCivEngine->logEvent(simDay,
+                "A star fell from the sky, claiming " + std::to_string(slain) + " lives", "god");
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Great Calm (soothe all)")) {
+        for (Entity* e : entities) {
+            if (!e || e->entityHealth <= 0.0f) continue;
+            e->entityStress = std::max(0.0f, e->entityStress - 40.0f);
+            e->entityGeneralAnger = std::max(0.0f, e->entityGeneralAnger - 40.0f);
+            for (auto& a : e->list_entityPointedAnger) a.anger *= 0.4f;
+        }
+        if (globalCivEngine) globalCivEngine->logEvent(simDay,
+            "An unnatural peace settles over every heart", "god");
+    }
+
+    ImGui::End();
+}
+
+// ── M10: Possess mode ─────────────────────────────────────────────────────────
+void UI::ShowPossessWindow(Entity* selected, int simDay) {
+    ImGui::Begin("Possess");
+
+    const bool anyonePossessed = FreeWillSystem::possessedEntityId != -1;
+    if (anyonePossessed) {
+        ImGui::Text("Possessing entity #%d", FreeWillSystem::possessedEntityId);
+        static std::vector<std::string> names = FreeWillSystem::actionNames();
+        int& cmd = FreeWillSystem::possessedActionIdx;
+        ImGui::TextDisabled(cmd >= 0 && cmd < (int)names.size()
+                                ? "Command: they will keep doing this until told otherwise"
+                                : "No command queued: acting on free will");
+        const char* current = (cmd >= 0 && cmd < (int)names.size())
+                                  ? names[cmd].c_str() : "(choose an action)";
+        if (ImGui::BeginCombo("##possessAction", current)) {
+            for (int i = 0; i < (int)names.size(); ++i) {
+                if (ImGui::Selectable(names[i].c_str(), i == cmd)) {
+                    cmd = i;
+                    if (globalCivEngine) globalCivEngine->logEvent(simDay,
+                        "An unseen will commands entity #" +
+                        std::to_string(FreeWillSystem::possessedEntityId) +
+                        " to " + names[i], "god");
+                }
+            }
+            ImGui::EndCombo();
+        }
+        if (ImGui::Button("Free will (keep possession)")) cmd = -1;
+        ImGui::SameLine();
+        if (ImGui::Button("Release")) {
+            FreeWillSystem::possessedEntityId = -1;
+            FreeWillSystem::possessedActionIdx = -1;
+        }
+    } else {
+        ImGui::Text(selected ? "Target: %s" : "Target: (select an entity)",
+                    selected ? selected->name.c_str() : "");
+        ImGui::BeginDisabled(selected == nullptr);
+        if (ImGui::Button("Possess selected") && selected) {
+            FreeWillSystem::possessedEntityId = selected->entityId;
+            FreeWillSystem::possessedActionIdx = -1;
+            if (globalCivEngine) globalCivEngine->logEvent(simDay,
+                "Something else looks out from behind " + selected->name + "'s eyes", "god");
+        }
+        ImGui::EndDisabled();
+        ImGui::TextDisabled("Commands override reflex, habit and deliberation.");
+    }
+
+    ImGui::End();
+}
+
+// ── M10: Interview mode ───────────────────────────────────────────────────────
+// Templated Q&A: every answer is assembled from the entity's real state, so the
+// player can cross-examine a mind rather than read raw stat bars.
+void UI::ShowInterviewWindow(Entity* selected, std::vector<Entity*>& entities, int simDay) {
+    ImGui::Begin("Interview");
+    if (!selected) {
+        ImGui::TextDisabled("Select an entity to interview.");
+        ImGui::End();
+        return;
+    }
+
+    auto nameOf = [&](int id) -> std::string {
+        for (Entity* e : entities)
+            if (e && e->entityId == id) return e->name;
+        return "someone long gone";
+    };
+    auto feelWord = [](float v, const char* low, const char* mid, const char* high) {
+        return v < 33.0f ? low : (v < 66.0f ? mid : high);
+    };
+
+    ImGui::Text("Interviewing %s (age %.0f)", selected->name.c_str(), selected->entityAge);
+    ImGui::Separator();
+
+    static int question = 0;
+    const char* questions[] = {
+        "How are you feeling?",
+        "Who matters to you?",
+        "What do you believe?",
+        "What do you remember?",
+        "What do you want from life?",
+        "What do you think of the others?",
+    };
+    for (int i = 0; i < (int)(sizeof(questions) / sizeof(questions[0])); ++i) {
+        if (ImGui::RadioButton(questions[i], question == i)) question = i;
+    }
+    ImGui::Separator();
+
+    std::string ans;
+    switch (question) {
+    case 0: { // feelings
+        ans = "\"I feel " +
+              std::string(feelWord(selected->entityHapiness, "hollow", "alright, I suppose", "genuinely happy")) + ". ";
+        if (selected->entityStress > 60.0f)  ans += "The pressure never lets up. ";
+        if (selected->entityGeneralAnger > 50.0f) ans += "There is an anger in me I can barely hold down. ";
+        if (selected->entityLoneliness > 60.0f)   ans += "Mostly, I am alone. ";
+        if (selected->entityHunger > 60.0f)  ans += "And I am hungry — we all are, lately. ";
+        if (selected->entityHealth < 40.0f)  ans += "My body is failing me. ";
+        if (selected->entityDiseaseType != -1) ans += "This sickness... I try not to think about it. ";
+        ans += "\"";
+        if (!selected->innerMonologue.empty())
+            ans += "\n\n(under their breath) \"" + selected->innerMonologue + "\"";
+        break;
+    }
+    case 1: { // relationships
+        ans = "\"";
+        if (!selected->list_entityPointedCouple.empty()) {
+            const auto& c = selected->list_entityPointedCouple[0];
+            if (c.pointedEntity) {
+                ans += c.pointedEntity->name + " — " +
+                       std::to_string(c.daysTogether) + " days together. " +
+                       (c.satisfaction > 60.0f ? "They are my whole world. "
+                        : c.satisfaction > 35.0f ? "We manage, like anyone. "
+                                                 : "It has grown... difficult between us. ");
+                if (c.suspicion > 40.0f) ans += "Though lately I wonder where they go. ";
+            }
+        } else {
+            ans += "I have no partner. ";
+        }
+        auto socials = selected->list_entityPointedSocial;
+        std::sort(socials.begin(), socials.end(),
+                  [](const entityPointedSocial& a, const entityPointedSocial& b) {
+                      return a.social > b.social;
+                  });
+        int listed = 0;
+        for (const auto& s : socials) {
+            if (!s.pointedEntity || listed >= 3) break;
+            ans += (listed == 0 ? "I hold close " : ", and ") + s.pointedEntity->name;
+            ++listed;
+        }
+        if (listed > 0) ans += ". ";
+        if (!selected->list_entityPointedAnger.empty() &&
+            selected->list_entityPointedAnger[0].pointedEntity)
+            ans += "And " + selected->list_entityPointedAnger[0].pointedEntity->name +
+                   "... them, I have not forgiven.";
+        ans += "\"";
+        break;
+    }
+    case 2: { // beliefs
+        auto beliefs = selected->coreBeliefs;
+        std::sort(beliefs.begin(), beliefs.end(),
+                  [](const CoreBelief& a, const CoreBelief& b) { return a.strength > b.strength; });
+        if (beliefs.empty()) {
+            ans = "\"I am still working out what I believe. The world has not settled it for me yet.\"";
+        } else {
+            ans = "\"";
+            int listed = 0;
+            for (const auto& b : beliefs) {
+                if (listed >= 4) break;
+                ans += b.belief + (b.strength > 75.0f ? " — of this I am certain. " : ". ");
+                ++listed;
+            }
+            ans += "\"";
+        }
+        break;
+    }
+    case 3: { // memories
+        auto mems = selected->lifeMemories;
+        std::sort(mems.begin(), mems.end(),
+                  [](const LifeMemory& a, const LifeMemory& b) {
+                      return a.emotionalIntensity > b.emotionalIntensity;
+                  });
+        if (mems.empty()) {
+            ans = "\"Nothing has marked me yet. My story is still unwritten.\"";
+        } else {
+            ans = "";
+            int listed = 0;
+            for (const auto& m : mems) {
+                if (listed >= 3) break;
+                ans += "\"" + (m.internalNarrative.empty()
+                                   ? ("I remember the " + m.eventType +
+                                      (m.entityInvolvedId >= 0 ? " with " + nameOf(m.entityInvolvedId) : ""))
+                                   : m.internalNarrative) + "\"";
+                ans += " (day " + std::to_string(m.simulationDay) +
+                       (m.isFormative ? ", it changed me)\n\n" : ")\n\n");
+                ++listed;
+            }
+        }
+        break;
+    }
+    case 4: { // goals
+        auto goals = selected->m_goals;
+        std::sort(goals.begin(), goals.end(),
+                  [](const LifeGoal& a, const LifeGoal& b) { return a.priority > b.priority; });
+        if (goals.empty()) {
+            ans = "\"To survive the day. Ask me again when the winters are kinder.\"";
+        } else {
+            ans = "\"";
+            for (size_t i = 0; i < goals.size() && i < 3; ++i) {
+                const auto& g = goals[i];
+                std::string want =
+                    g.type == "find_partner" ? "to find someone to share this life with"
+                    : g.type == "build_family" ? "to raise a family"
+                    : g.type == "build_career" ? "to be good at what I do"
+                    : g.type == "make_friends" ? "to be surrounded by people I trust"
+                    : g.type == "happiness"    ? "to be content"
+                                               : "to understand myself";
+                ans += (i == 0 ? "Above all I want " : "And I want ") + want +
+                       " (" + std::to_string((int)g.progressToward) + "% of the way there";
+                ans += g.frustrationLevel > 50.0f ? ", though it keeps slipping away). " : "). ";
+            }
+            ans += "\"";
+        }
+        break;
+    }
+    case 5: { // mental models of others
+        auto models = selected->list_MentalModelOfOther;
+        std::sort(models.begin(), models.end(),
+                  [](const MentalModelOfOther* a, const MentalModelOfOther* b) {
+                      return a && b && std::fabs(a->trustLevel - 50.0f) > std::fabs(b->trustLevel - 50.0f);
+                  });
+        ans = "";
+        int listed = 0;
+        for (const auto* m : models) {
+            if (!m || !m->entityPointed || listed >= 4) continue;
+            float conf = m->effectiveConfidence(simDay);
+            ans += "\"" + m->entityPointed->name + "? " +
+                   std::string(m->trustLevel > 65.0f ? "I would trust them with my life"
+                               : m->trustLevel > 40.0f ? "They seem fair enough"
+                                                        : "I keep my distance from them") +
+                   std::string(conf < 0.25f ? " — though it has been a long time since we spoke." : ".") +
+                   "\"\n";
+            ++listed;
+        }
+        if (listed == 0)
+            ans = "\"Truthfully, I do not know anyone well enough to judge.\"";
+        break;
+    }
+    }
+
+    ImGui::TextWrapped("%s", ans.c_str());
+    ImGui::End();
+}
+
+// ── M10: Live config console ──────────────────────────────────────────────────
+void UI::ShowConfigConsole() {
+    ImGui::Begin("Config Console");
+    ImGui::TextDisabled("World tunables, applied live. 1.0 = untouched physics.");
+    ImGui::TextDisabled("(Determinism holds only while these stay at 1.0.)");
+    ImGui::Separator();
+    ImGui::SliderFloat("Movement force", &g_liveConfig.moveForceMul, 0.0f, 3.0f, "%.2fx");
+    ImGui::SliderFloat("Old-age mortality", &g_liveConfig.mortalityMul, 0.0f, 4.0f, "%.2fx");
+    ImGui::SliderFloat("Food yield", &g_liveConfig.foodYieldMul, 0.1f, 3.0f, "%.2fx");
+    ImGui::SliderFloat("Aggression", &g_liveConfig.aggressionMul, 0.0f, 4.0f, "%.2fx");
+    if (ImGui::Button("Reset all to 1.0")) g_liveConfig = LiveConfig{};
     ImGui::End();
 }

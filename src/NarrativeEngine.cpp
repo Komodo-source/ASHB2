@@ -1,5 +1,6 @@
 #include "header/NarrativeEngine.h"
 #include "header/Entity.h"
+#include "header/BetterRand.h"
 #include <map>
 #include <vector>
 #include <cstdlib>
@@ -13,7 +14,7 @@ static const int MAX_LOG_SIZE = 200;
 
 static std::string pick(const std::vector<std::string>& v) {
     if (v.empty()) return "";
-    return v[std::rand() % v.size()];
+    return v[BetterRand::genNrInInterval(0, (int)v.size() - 1)];
 }
 
 // Replace {name} and {target} tokens in a template string

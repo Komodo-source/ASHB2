@@ -1,0 +1,47 @@
+# M12: build + determinism + realism gate on every push/PR.
+# Mirrors the local workflow: scripts/validate.sh compiles the sim, runs two
+# identical-seed headless worlds, diffs their logs (timestamps stripped), and
+# checks the five realism assertions.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: >-
+            make
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-SDL2_image
+            mingw-w64-x86_64-glfw
+
+      # The repo vendors headers but not binaries (.a/.dll are gitignored).
+      # SDL2 libs resolve from /mingw64/lib via the toolchain's default search
+      # path, but CMakeLists links glfw by absolute vendored path — stage it.
+      - name: Stage glfw static lib into the vendored path
+        run: |
+          mkdir -p libs/glfw/lib-mingw-w64
+          cp /mingw64/lib/libglfw3.a libs/glfw/lib-mingw-w64/
+
+      - name: Validate (build + determinism pair + realism report)
+        env:
+          ASHB_CMAKE_GEN: MSYS Makefiles
+          ASHB_MAKE: make
+        run: bash scripts/validate.sh 400 ci

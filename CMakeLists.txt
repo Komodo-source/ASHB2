@@ -5,6 +5,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Default to an optimized build — the simulation was shipping at -O0, which
+# cost roughly an order of magnitude of tick throughput. Use
+# `cmake -DCMAKE_BUILD_TYPE=Debug` when you actually need a debugger.
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+
 # Enable OpenMP for parallelization if available
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
@@ -95,10 +103,8 @@ src/Logging.cpp
 ${IMGUI_SOURCES}
 src/implem_free_will.cpp
 src/SaveLoad.cpp
-src/Heritage.cpp
 src/Kinship.cpp
 src/SocialOrder.cpp
-src/Graph.cpp
 src/SDLEngine.cpp
 src/Image.cpp
 src/SemanticMemory.cpp

@@ -246,4 +246,7 @@ CMakeFiles/app.dir/src/SaveLoad.cpp.obj: \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Drive.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/JungianType.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/FreeWillSystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/CivilizationEngine.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/BetterRand.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\core/SimClock.h \
  C:/mingw64/include/c++/14.2.0/iostream

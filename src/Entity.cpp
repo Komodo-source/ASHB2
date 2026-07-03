@@ -15,8 +15,10 @@
 #include <time.h>
 #include <random>
 #include <algorithm>
+#include <cmath>
 #include "./header/FreeWillSystem.h"
 #include "header/BetterRand.h"
+#include "./header/LiveConfig.h"
 #include "./header/SocialNormSystem.h"
 #include "./header/ExternalData.h"
 
@@ -40,10 +42,7 @@ Entity::Entity(int id)
       entityDiseaseType(-1),
       posX(0.0f),
       posY(0.0f),
-      selected(false),
-      pointedDesire({}),
-      pointedAnger({}),
-      pointedCouple({})
+      selected(false)
 {
     // Rebuild semantic memory index from any existing life memories
     semanticMemory.rebuildFromLifeMemories(this);
@@ -65,10 +64,6 @@ Entity::Entity(int id,
                int bDay,
                int antiBody = 15,
                int diseaseType = -1,
-               entityPointedDesire* desire = nullptr,
-               entityPointedAnger* anger = nullptr,
-               entityPointedCouple* couple = nullptr,
-               entityPointedSocial* social = nullptr,
                std::string goalType = "happiness",
                int birthYear
                 )
@@ -92,18 +87,6 @@ Entity::Entity(int id,
       posY(0.0f),
       selected(false)
 {
-    if(desire != nullptr){
-        list_entityPointedDesire.push_back(*desire);
-    }else if(anger != nullptr){
-        list_entityPointedAnger.push_back(*anger);
-    }else if(couple != nullptr){
-        list_entityPointedCouple.push_back(*couple);
-    }else if(social != nullptr){
-        list_entityPointedSocial.push_back(*social);
-    }
-
-
-
     if(entitySex == 'A'){
         if(BetterRand::genNrInInterval(0,1)){
             entitySex = 'M';
@@ -120,10 +103,10 @@ Entity::Entity(int id,
         } else {
             int taille = male_name.size() - 1;
             if (entitySex == 'M') {
-                int index = (rand() % taille);
+                int index = BetterRand::genNrInInterval(0, taille - 1);
                 name = male_name.at(index);
             } else {
-                int index = (rand() % taille);
+                int index = BetterRand::genNrInInterval(0, taille - 1);
                 name = female_name.at(index);
             }
         }
@@ -197,6 +180,25 @@ void Entity::IncrementBDay(){
         if (entityAge > lifeExpectancy * 1.2f) {
             entityHealth -= 0.3f; // rapid decline past life expectancy
         }
+
+        // Gompertz mortality anchored on a MODAL adult death age, not raw life
+        // expectancy. (Historical life expectancy ~40 is dragged down by child
+        // mortality; adults who survived childhood mostly died in their 60s-80s.)
+        // Basing the hazard on lifeExpectancy made it ~70%/yr by elderhood, so
+        // the whole cohort died the year it turned 65 — a demographic cliff
+        // that dissolved every tribe at once around year 50.
+        float modalAge  = std::max(lifeExpectancy * 1.5f, 66.0f);
+        float yearsOver = entityAge - modalAge;
+        if (yearsOver > 0.0f) {
+            // ~5% at the modal age, doubling every 8 years, capped at 50%:
+            // deaths spread across a ~25-year window instead of one cliff.
+            float hazard = 0.05f * std::pow(2.0f, yearsOver / 8.0f);
+            hazard = std::min(0.50f, hazard) * g_liveConfig.mortalityMul;  // M10 live console
+            if (BetterRand::genNrInInterval<BetterRand::BERNOULI>(hazard)) {
+                entityHealth = 0.0f;
+                pendingDeathCause = "old age";
+            }
+        }
     }
 }
 
@@ -257,26 +259,43 @@ bool Entity::checkCouple(Entity* ent){
 }
 
 
+// Per-action stat history. Buffered in memory: the old version opened and
+// closed TWO files on every action of every entity, which at Windows file-
+// open latency dominated the whole tick (measured ~0.9 s/tick at only 100
+// agents). flushEntityStats() writes the accumulated rows out — called when
+// the buffer grows past a threshold, when the entity dies, and by the UI
+// right before it reads the CSVs, so readers still see current data.
 void Entity::saveEntityStats(Action* act) {
-    std::string file_name = "./src/data/" + std::to_string(this->entityId) + ".csv";
-    std::ofstream file(file_name, std::ios::app);
-
-    if (file.is_open()) {
-        file << this->entityAntiBody << ',' << this->entityBoredom << ',' << this->entityGeneralAnger << ',' << this->entityHapiness << ',' << this->entityHealth << ',' << this->entityHygiene << ',' << this->entityLoneliness << ',' << this->entityMentalHealth << ',' << this->entityStress << ',' << "\n";
-        file.close();
+    {
+        std::ostringstream row;
+        row << this->entityAntiBody << ',' << this->entityBoredom << ',' << this->entityGeneralAnger << ',' << this->entityHapiness << ',' << this->entityHealth << ',' << this->entityHygiene << ',' << this->entityLoneliness << ',' << this->entityMentalHealth << ',' << this->entityStress << ',' << "\n";
+        statsCsvBuffer += row.str();
     }
-
-
-    std::string changes;
-    for(StatChange s : act->statChanges){
-        changes += s.statName + " => " + std::to_string(s.changeValue) + " ";
+    {
+        std::string changes;
+        for (const StatChange& s : act->statChanges) {
+            changes += s.statName + " => " + std::to_string(s.changeValue) + " ";
+        }
+        actsCsvBuffer += ',' + act->name + ",category: " + act->needCategory
+                       + ",satisfaction: " + std::to_string(act->baseSatisfaction)
+                       + ", outcome: " + std::to_string(act->outcomeSuccess)
+                       + ',' + changes;
     }
-    std::string file_name2 = "./src/data/act_" + std::to_string(this->entityId) + ".csv";
-    std::ofstream file2(file_name2, std::ios::app);
+    if (statsCsvBuffer.size() + actsCsvBuffer.size() > 32768) {
+        flushEntityStats();
+    }
+}
 
-    if (file2.is_open()) {
-        file2 << ',' << act->name << ",category: " << act->needCategory << ",satisfaction: " << std::to_string(act->baseSatisfaction) << ", outcome: " << std::to_string(act->outcomeSuccess) << ',' << changes ;
-        file2.close();
+void Entity::flushEntityStats() {
+    if (!statsCsvBuffer.empty()) {
+        std::ofstream file("./src/data/" + std::to_string(this->entityId) + ".csv", std::ios::app);
+        if (file.is_open()) file << statsCsvBuffer;
+        statsCsvBuffer.clear();
+    }
+    if (!actsCsvBuffer.empty()) {
+        std::ofstream file2("./src/data/act_" + std::to_string(this->entityId) + ".csv", std::ios::app);
+        if (file2.is_open()) file2 << actsCsvBuffer;
+        actsCsvBuffer.clear();
     }
 }
 
@@ -743,7 +762,7 @@ float Entity::searchConnSocial(Entity* ent){
 
 
 
-void MentalModelOfOther::updateFromObservation(Entity* observed, float observerAccuracy) {
+void MentalModelOfOther::updateFromObservation(Entity* observed, float observerAccuracy, int simDay) {
     // Lerp perceived traits toward observed reality, dampened by observer accuracy
     perceivedExtraversion  += (observed->personality.extraversion  - perceivedExtraversion)  * observerAccuracy * 0.1f;
     perceivedAgreeableness += (observed->personality.agreeableness - perceivedAgreeableness) * observerAccuracy * 0.1f;
@@ -752,7 +771,17 @@ void MentalModelOfOther::updateFromObservation(Entity* observed, float observerA
     estimatedAnger     = observed->entityGeneralAnger * observerAccuracy + estimatedAnger * (1.0f - observerAccuracy);
     estimatedStress    = observed->entityStress * observerAccuracy + estimatedStress * (1.0f - observerAccuracy);
 
+    // Repeated observation makes the other more legible: confidence and
+    // predictability both rise, faster for a perceptive (accurate) observer.
+    lastObservedDay = simDay;
+    confidence      = std::min(1.0f, confidence + 0.15f * observerAccuracy);
+    predictability  = std::min(1.0f, predictability + 0.03f * observerAccuracy);
+    lastInteractionDay = (float)simDay;
+}
 
+float MentalModelOfOther::effectiveConfidence(int today) const {
+    float age = (float)std::max(0, today - lastObservedDay);
+    return confidence * std::exp(-age / 120.0f);   // ~half strength after ~83 days
 }
 
 MentalModelOfOther* Entity::getModelOf(Entity* ent) {
@@ -871,6 +900,53 @@ void Entity::consolidateMemories(int simDay) {
             [](const CoreBelief& a, const CoreBelief& b){ return a.strength > b.strength; });
         coreBeliefs.resize(5);
     }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// M4 – Episodic forgetting
+// Memories fade on the same exp(-age/300) curve the decision biases use, so a
+// memory is only dropped once it no longer influences behavior anyway. By then
+// consolidateMemories has had many chances to distil it into a core belief —
+// the event's *lesson* outlives its episode, which is how human memory works.
+// ─────────────────────────────────────────────────────────────────────────────
+bool Entity::pruneLifeMemories(int simDay) {
+    const float  MIN_SALIENCE = 0.05f;  // below the bias functions' noise floor
+    const int    GRACE_DAYS   = 60;     // nothing is forgotten while still fresh
+    const size_t HARD_CAP     = 48;     // absolute episodic capacity
+
+    const size_t before = lifeMemories.size();
+
+    auto salience = [simDay](const LifeMemory& m) {
+        float decay = std::exp(-(float)(simDay - m.simulationDay) / 300.0f);
+        return m.emotionalIntensity * decay;
+    };
+
+    lifeMemories.erase(
+        std::remove_if(lifeMemories.begin(), lifeMemories.end(),
+            [&](const LifeMemory& m) {
+                if (m.isFormative) return false;
+                if (simDay - m.simulationDay < GRACE_DAYS) return false;
+                return salience(m) < MIN_SALIENCE;
+            }),
+        lifeMemories.end());
+
+    // Capacity overflow: evict the faintest non-formative episodes first.
+    if (lifeMemories.size() > HARD_CAP) {
+        std::stable_sort(lifeMemories.begin(), lifeMemories.end(),
+            [&](const LifeMemory& a, const LifeMemory& b) {
+                if (a.isFormative != b.isFormative) return a.isFormative;
+                return salience(a) > salience(b);
+            });
+        lifeMemories.resize(HARD_CAP);
+        // Restore chronological order — narrative and consolidation code
+        // treats the vector as a life story.
+        std::stable_sort(lifeMemories.begin(), lifeMemories.end(),
+            [](const LifeMemory& a, const LifeMemory& b) {
+                return a.simulationDay < b.simulationDay;
+            });
+    }
+
+    return lifeMemories.size() != before;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

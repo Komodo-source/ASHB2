@@ -443,8 +443,6 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:/mingw64/include/c++/14.2.0/math.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/util/clear.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/SaveLoad.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/heritage.h \
- C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Graph.h \
  C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/Logging.h \
  C:/mingw64/include/c++/14.2.0/chrono \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\header/SDLEngine.h \
@@ -460,6 +458,9 @@ CMakeFiles/app.dir/src/main.cpp.obj: \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Lexicon.h \
  C:/mingw64/include/c++/14.2.0/unordered_set \
  C:/mingw64/include/c++/14.2.0/bits/unordered_set.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\core/SimClock.h \
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\core/SpatialGrid.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\environment/EnvironmentModel.h \
  C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/ResourceSystem.h \
- C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Ecosystem.h
+ C:\Users\LordN.NASHOU\Desktop\code\ASHB2\src\world/Ecosystem.h \
+ C:/Users/LordN.NASHOU/Desktop/code/ASHB2/src/header/LiveConfig.h

@@ -1,4 +1,5 @@
 #include "EnvironmentModel.h"
+#include "../header/BetterRand.h"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
@@ -290,7 +291,7 @@ void CulturalTransmissionSystem::transmitVertically(int parentId, int childId) {
         if (group.id == groupId) {
             for (const auto& trait : group.traits) {
                 // Child inherits trait with probability
-                if (static_cast<float>(rand()) / RAND_MAX < verticalTransmissionRate) {
+                if (BetterRand::genNrInInterval(0.0f, 1.0f) < verticalTransmissionRate) {
                     // Would add trait to child
                 }
             }
@@ -325,7 +326,7 @@ void CulturalTransmissionSystem::updateCulturalTraits(float deltaTime) {
         // Trait evolution
         for (auto& trait : group.traits) {
             // Mutation
-            if (static_cast<float>(rand()) / RAND_MAX < trait.mutationRate) {
+            if (BetterRand::genNrInInterval(0.0f, 1.0f) < trait.mutationRate) {
                 // Would mutate trait
             }
             

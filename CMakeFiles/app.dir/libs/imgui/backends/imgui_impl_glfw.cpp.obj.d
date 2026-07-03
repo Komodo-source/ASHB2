@@ -288,9 +288,4 @@ CMakeFiles/app.dir/libs/imgui/backends/imgui_impl_glfw.cpp.obj: \
  C:/mingw64/x86_64-w64-mingw32/include/sec_api/stralign_s.h \
  C:/mingw64/x86_64-w64-mingw32/include/winsvc.h \
  C:/mingw64/x86_64-w64-mingw32/include/mcx.h \
- C:/mingw64/x86_64-w64-mingw32/include/imm.h \
- C:/mingw64/x86_64-w64-mingw32/include/stdio.h \
- C:/mingw64/x86_64-w64-mingw32/include/corecrt_stdio_config.h \
- C:/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
- C:/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
- C:/mingw64/x86_64-w64-mingw32/include/sec_api/stdio_s.h
+ C:/mingw64/x86_64-w64-mingw32/include/imm.h
