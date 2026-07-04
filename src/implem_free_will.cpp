@@ -2176,7 +2176,16 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             float dThere = pointed->list_entityPointedDesire[pointed_desire_index].desire;
             // Conceiving on the spot now demands a genuinely strong mutual bond and
             // both partners being of fertile age — no more snap pregnancies.
-            if (dHere >= 35.0f && dThere >= 35.0f &&
+            // Returning-soldier effect: a tribe fresh out of a war enters a baby
+            // boom, so its couples conceive on a weaker spark for a while.
+            // https://en.wikipedia.org/wiki/Returning_soldier_effect
+            float boomBoost = 1.0f;
+            if (globalCivEngine) {
+                int boomTribe = (pointer->tribeId >= 0) ? pointer->tribeId : pointed->tribeId;
+                boomBoost = globalCivEngine->postWarBirthBoost(boomTribe, FreeWillSystem::day / 60);
+            }
+            float desireGate = 35.0f / boomBoost;   // 1.0 normally; <35 during a post-war boom
+            if (dHere >= desireGate && dThere >= desireGate &&
                 pointer->entityAge >= 18 && pointed->entityAge >= 18 &&
                 pointer->entityAge <= 55 && pointed->entityAge <= 55) {
                 static int nextBabyId2 = 5000;

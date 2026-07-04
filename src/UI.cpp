@@ -22,6 +22,7 @@
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
+#include <cmath>
 #include "./header/BetterRand.h"
 #include "./header/LiveConfig.h"
 
@@ -486,11 +487,46 @@ static ImU32 tribeColor(int tribeId, int alpha = 255) {
     return IM_COL32((int)(70 + r * 185), (int)(70 + g * 185), (int)(70 + b * 185), alpha);
 }
 
-// Shared pan offset for the social graph. Right-mouse-drag scrolls the whole
-// network on X/Y so clusters that sit off-screen can be brought into view.
-// Both DrawGrid and HandlePointMovement add this to every node position, so
-// click-detection stays aligned with what's drawn.
+// Shared pan/zoom state for the social graph.
+//   * Right-mouse-drag scrolls the whole network on X/Y so clusters that sit
+//     off-screen can be brought into view.
+//   * Mouse-wheel zooms in/out, anchored on the cursor so the point under the
+//     mouse stays put while you scale.
+// Every drawn or hit-tested node position goes through viewTransform() below,
+// so DrawGrid (what you see) and HandlePointMovement (what you click) always
+// agree, whatever the current pan/zoom.
 static ImVec2 g_graphPan(0.0f, 0.0f);
+static float  g_graphZoom = 1.0f;
+
+// The layout is built around this pivot (matches cx,cy in computeSocialLayout).
+// Zoom scales distances from the pivot, so zooming keeps the world centered.
+static const ImVec2 g_graphPivot(760.0f, 410.0f);
+
+// Map a raw layout position to its on-screen position for the current view.
+static inline ImVec2 viewTransform(const ImVec2& p) {
+    return ImVec2(g_graphPivot.x + (p.x - g_graphPivot.x) * g_graphZoom + g_graphPan.x,
+                  g_graphPivot.y + (p.y - g_graphPivot.y) * g_graphZoom + g_graphPan.y);
+}
+
+// Mouse-wheel zoom, kept anchored under the cursor. Call once per frame before
+// laying out the graph. Only zooms when the pointer isn't over an ImGui window.
+static void updateGraphZoom() {
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureMouse) return;
+    float wheel = io.MouseWheel;
+    if (wheel == 0.0f) return;
+
+    float oldZoom = g_graphZoom;
+    float newZoom = oldZoom * std::pow(1.12f, wheel);   // smooth exponential steps
+    newZoom = std::max(0.25f, std::min(6.0f, newZoom));  // clamp: 4x out .. 6x in
+    if (newZoom == oldZoom) return;
+
+    // Keep the layout point currently under the cursor fixed on screen.
+    ImVec2 m = io.MousePos;
+    g_graphPan.x = m.x - g_graphPivot.x - (m.x - g_graphPivot.x - g_graphPan.x) * (newZoom / oldZoom);
+    g_graphPan.y = m.y - g_graphPivot.y - (m.y - g_graphPivot.y - g_graphPan.y) * (newZoom / oldZoom);
+    g_graphZoom = newZoom;
+}
 
 // Cluster-by-tribe layout: entities of the same tribe sit together in their own
 // little ring; the tribes themselves are arranged on a big ring. This turns the
@@ -522,7 +558,10 @@ static void computeSocialLayout(const std::vector<Entity*>& entities,
     }
 
     int C = (int)clusters.size();
-    float bigR = (C <= 1) ? 0.0f : std::min(cx, cy) * 0.78f;
+    // Spread the tribes wide so clusters don't crowd into a hairball. The big
+    // ring grows with the number of tribes so neighbours keep their distance
+    // even with many tribes; zoom/pan bring any of them back into view.
+    float bigR = (C <= 1) ? 0.0f : std::min(cx, cy) * (1.35f + 0.05f * C);
     for (int k = 0; k < C; ++k) {
         float ca = (C <= 1) ? 0.0f : (2.0f * PI * k) / C - PI / 2.0f;
         ImVec2 center(cx + bigR * std::cos(ca), cy + bigR * std::sin(ca));
@@ -530,7 +569,8 @@ static void computeSocialLayout(const std::vector<Entity*>& entities,
         if (clusterTribe)   clusterTribe->push_back(tribeOrder[k]);
 
         int m = (int)clusters[k].size();
-        float sr = std::min(160.0f, 26.0f + m * 2.4f);
+        // Wider sub-rings so individuals within a tribe are easy to tell apart.
+        float sr = std::min(340.0f, 48.0f + m * 4.2f);
         for (int j = 0; j < m; ++j) {
             int idx = clusters[k][j];
             if (m == 1) { out[idx] = center; continue; }
@@ -554,9 +594,9 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
     std::vector<int>    clusterTribe;
     computeSocialLayout(entities, pos, &clusterCenters, &clusterTribe);
 
-    // Apply the user's pan offset to everything we draw.
-    for (auto& p : pos)            { p.x += g_graphPan.x; p.y += g_graphPan.y; }
-    for (auto& c : clusterCenters) { c.x += g_graphPan.x; c.y += g_graphPan.y; }
+    // Apply the user's pan + zoom to everything we draw.
+    for (auto& p : pos)            p = viewTransform(p);
+    for (auto& c : clusterCenters) c = viewTransform(c);
 
     std::map<int, int> idToIdx;
     for (int i = 0; i < n; ++i) idToIdx[entities[i]->entityId] = i;
@@ -613,15 +653,19 @@ void UI::DrawGrid(std::vector<Entity*>& entities, float pointSize) {
 
     for (int i = 0; i < n; ++i) drawFor(i);
 
+    // Dots scale with zoom, but stay within a legible range so they never
+    // vanish when zoomed far out or swamp the screen when zoomed all the way in.
+    float basePoint = std::max(3.0f, std::min(pointSize * g_graphZoom, pointSize * 2.5f));
+
     // ── Entity dots: filled by happiness, ringed by tribe color ──────────────
     for (int i = 0; i < n; ++i) {
         Entity* entity = entities[i];
         ImVec2  p      = pos[i];
         bool isSick    = (entity->entityDiseaseType != -1);
 
-        float size = pointSize;
+        float size = basePoint;
         ImU32 fill;
-        if (entity->selected)      { fill = IM_COL32(255, 100, 100, 255); size = pointSize + 2.5f; }
+        if (entity->selected)      { fill = IM_COL32(255, 100, 100, 255); size = basePoint + 2.5f; }
         else if (isSick)           fill = IM_COL32(170, 220, 60, 255);
         else {
             float h = std::max(0.0f, std::min(1.0f, entity->entityHapiness / 100.0f));
@@ -645,6 +689,9 @@ int UI::HandlePointMovement(std::vector<Entity*>& entities) {
     bool mouseClicked = ImGui::IsMouseClicked(0);
     static int selectedIndex = -1;
 
+    // Mouse-wheel zoom (anchored under the cursor) is handled here, once a frame.
+    updateGraphZoom();
+
     // Right-mouse drag pans the whole social graph on X and Y, so you can scroll
     // across all the tribes. Only pans when not hovering an ImGui window/widget.
     if (!ImGui::GetIO().WantCaptureMouse && ImGui::IsMouseDragging(1, 0.0f)) {
@@ -658,11 +705,14 @@ int UI::HandlePointMovement(std::vector<Entity*>& entities) {
         selectedIndex = -1;
         std::vector<ImVec2> pos;
         computeSocialLayout(entities, pos);
-        for (auto& p : pos) { p.x += g_graphPan.x; p.y += g_graphPan.y; }
+        for (auto& p : pos) p = viewTransform(p);
+        // Pick radius follows the zoom so dots stay just as easy to click.
+        float pickR = 12.0f * std::max(0.6f, std::min(g_graphZoom, 2.5f));
+        float pickR2 = pickR * pickR;
         for (int i = 0; i < n; ++i) {
             float dx = mousePos.x - pos[i].x;
             float dy = mousePos.y - pos[i].y;
-            if (dx * dx + dy * dy < 144.0f) {  // ~12px pick radius
+            if (dx * dx + dy * dy < pickR2) {
                 selectedIndex = i;
                 for (auto* e : entities) e->selected = false;
                 entities[i]->selected = true;

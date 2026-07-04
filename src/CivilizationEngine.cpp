@@ -1,4 +1,5 @@
 #include "header/CivilizationEngine.h"
+#include "header/Economics.h"
 #include "header/Entity.h"
 #include "world/Planet.h"
 #include "world/Lexicon.h"
@@ -10,6 +11,7 @@
 #include <cmath>
 #include <sstream>
 #include <numeric>
+#include <vector>
 
 CivilizationEngine* globalCivEngine = nullptr;
 
@@ -77,6 +79,7 @@ void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
     updateInnovations(entities, day);
     updateTribeRelations(entities, day);
     updateDiplomacy(entities, day);  // formal treaties: peace, alliance, trade, tribute
+    updateGovernment(entities, day); // legitimacy, coups, vassal upkeep & rebellion
     processWarTick(entities, day);   // NEW: war combat system
     updateCarryingCapacity(entities, day); // Phase 4: famine / migration / dark ages
     updateEra(entities);
@@ -359,6 +362,15 @@ bool CivilizationEngine::formTribe(std::vector<Entity*>& cluster, int day) {
              + " collectivism=" + std::to_string((int)tribe.collectivism)
              + " innovation=" + std::to_string((int)tribe.innovation));
     return true;
+}
+
+//collect taxes every week
+void CivilizationEngine::collectTaxes(Tribe& tribe, std::vector<Entity>& ent) {
+  for (int id_entity : tribe.memberIds) {
+    Entity* tribe_member = entityById(ent, id_entity);
+    tribe.economy.earnMoney(tribe_member->salary.token * tribe.taxeRate);
+    tribe_member->salary.token -= tribe_member->salary.token * tribe.taxeRate;
+  }
 }
 
 void CivilizationEngine::electLeader(Tribe& tribe, std::vector<Entity>& entities) {
@@ -1075,9 +1087,25 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                                  + " popB=" + std::to_string(B.population())
                                  + " relations=" + std::to_string((int)rel));
                     } else {
-                        logEvent(day, "The " + A.name + " declared war on the " + B.name, "war",
-                                 "kind=war_declared ethnic=0"
-                                 + std::string(" tribeA=\"") + A.name + "\" tribeAId=" + std::to_string(A.id)
+                        // Not every war is ethnic hatred: name the concrete grievance
+                        // (casus belli) that actually pushed relations over the line.
+                        WarReason reason;
+                        if ((A.granary < 5.0f && B.granary > 30.0f) ||
+                            (B.granary < 5.0f && A.granary > 30.0f)) {
+                            reason = WAR_RESOURCE;   // the hungry fall on the fat granary
+                        } else {
+                            float sA = calculateTribeMilitaryStrength(A, entities);
+                            float sB = calculateTribeMilitaryStrength(B, entities);
+                            float hi = std::max(sA, sB), lo = std::min(sA, sB);
+                            bool militaristic = (A.militarism > 60.0f || B.militarism > 60.0f);
+                            // A strong warlike tribe simply taking a weak neighbour's
+                            // land is conquest; anything else is ordinary border friction.
+                            reason = (hi > lo * 2.0f && militaristic) ? WAR_CONQUEST : WAR_BORDER;
+                        }
+                        std::string why = warReasonName(reason);
+                        logEvent(day, "The " + A.name + " and the " + B.name + " go to war — " + why, "war",
+                                 "kind=war_declared ethnic=0 reason=\"" + why + "\""
+                                 + " tribeA=\"" + A.name + "\" tribeAId=" + std::to_string(A.id)
                                  + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id)
                                  + " popA=" + std::to_string(A.population())
                                  + " popB=" + std::to_string(B.population())
@@ -1100,10 +1128,13 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                              + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id)
                              + " relations=" + std::to_string((int)rel));
                 }
-                // Leaving war: clear the ethnic-war marker.
+                // Leaving war: clear the ethnic-war marker and send the soldiers
+                // home — a post-war baby boom follows (returning-soldier effect).
                 if (prev == TS_AT_WAR && stance != TS_AT_WAR) {
                     A.ethnicWarWith.erase(B.id);
                     B.ethnicWarWith.erase(A.id);
+                    endWarFor(A, 0, day);
+                    endWarFor(B, 0, day);
                 }
             }
 
@@ -1509,9 +1540,341 @@ std::string CivilizationEngine::getEraSummary() const {
     return ss.str();
 }
 
-// ── War system ─────────────────────────────────────────────────d────────────────
+// ── War system ──────────────────────────────────────────────────────────────────
+
+// Combat value held in the armoury. A tribe that has poured its wealth into
+// swords, bows and trebuchets fields a stronger army than one fighting bare-
+// handed; shields, armour and battlements harden its defence. This is what makes
+// military strength "a function of the objects in storage".
+float CivilizationEngine::weaponAttackStrength(const Tribe& tribe) const {
+    float s = 0.0f;
+    for (const MarketProduct& w : tribe.weaponStorage) s += (float)w.atk_value;
+    return s;
+}
+float CivilizationEngine::weaponDefenseStrength(const Tribe& tribe) const {
+    float s = 0.0f;
+    for (const MarketProduct& w : tribe.weaponStorage) s += (float)w.def_value;
+    return s;
+}
+
+// 0..1 : how the tribe is faring across every war it is currently in. Compares
+// our combined strength to that of all our live enemies; 1 = dominant, 0 = being
+// overrun. Drives whether to press the attack (buy swords) or dig in (buy
+// shields), and feeds war-morale into government legitimacy.
+float CivilizationEngine::calculateAdvancementWar(const Tribe& tribe,
+                                                  std::vector<Entity>& entities) const {
+    float own = calculateTribeMilitaryStrength(tribe, entities);
+    float foe = 0.0f;
+    for (const auto& kv : tribe.stances) {
+        if (kv.second != TS_AT_WAR) continue;
+        Tribe* e = const_cast<CivilizationEngine*>(this)->findTribe(kv.first);
+        if (e && e->population() > 0) foe += calculateTribeMilitaryStrength(*e, entities);
+    }
+    if (foe <= 0.01f) return own > 0.01f ? 1.0f : 0.5f;   // no live enemy = winning
+    return std::max(0.0f, std::min(1.0f, own / (own + foe)));
+}
+
+// Buy attack or defence goods into the armoury, funded by the treasury and
+// wartime taxation. A tribe that's winning presses its edge with weapons; one
+// that's losing buys defences to survive. FIXED: takes the tribe by reference so
+// the purchase — and the raised tax — actually persist (the old by-value version
+// mutated a throwaway copy, so no tribe ever accumulated any arms at all).
+void CivilizationEngine::contributeToWarEffort(Tribe& tribe, std::vector<Entity>& entities) {
+    float adv = calculateAdvancementWar(tribe, entities);
+    // Wartime mobilisation raises taxes (heavier the worse the war goes). This
+    // fills the treasury but corrodes legitimacy — see updateGovernment().
+    tribe.taxeRate = std::min(0.6f, 0.15f + (1.0f - adv) * 0.45f);
+    if (tribe.economy.token < 40.0f) return;              // too poor to rearm
+    int want = (adv >= 0.5f) ? 0 : 1;                     // winning→attack, losing→defence
+    MarketProduct item = g_market.findExpensiveWarItem(want, (int)(tribe.economy.token / 2));
+    if (item.name.empty()) return;                        // nothing affordable in stock
+    tribe.economy.spendMoney(item.price);
+    tribe.weaponStorage.push_back(item);
+    // The armoury is finite: old kit is spent/rusts so it can't grow without bound.
+    if (tribe.weaponStorage.size() > 64)
+        tribe.weaponStorage.erase(tribe.weaponStorage.begin());
+}
+
+// ── Government forms & the returning-soldier effect ──────────────────────────────
+
+const char* governmentName(GovernmentType g) {
+    switch (g) {
+        case GOV_DEMOCRACY:       return "Democracy";
+        case GOV_AUTHORITARIAN:   return "Authoritarian Regime";
+        case GOV_DIVINE_MONARCHY: return "Divine-Right Monarchy";
+        case GOV_OLIGARCHY:       return "Oligarchy";
+    }
+    return "Council";
+}
+
+const char* warReasonName(WarReason r) {
+    switch (r) {
+        case WAR_ETHNIC:   return "ethnic/holy war";
+        case WAR_CONQUEST: return "war of conquest";
+        case WAR_RESOURCE: return "war over resources";
+        case WAR_TRIBUTE:  return "war of rebellion";
+        case WAR_BORDER:   return "border war";
+    }
+    return "war";
+}
+
+// Returning-soldier effect: peace brings a surge of births.
+// https://en.wikipedia.org/wiki/Returning_soldier_effect
+// Soldiers coming home, relief that the killing is over, and the drive to
+// replace the fallen combine into a sharp post-war fertility spike. We model it
+// as a temporary multiplier on conception odds, sampled by the reproduction code.
+float CivilizationEngine::postWarBirthBoost(int tribeId, int day) const {
+    if (tribeId < 0) return 1.0f;
+    const Tribe* t = nullptr;
+    for (const Tribe& tr : tribes) if (tr.id == tribeId) { t = &tr; break; }
+    if (!t) return 1.0f;
+    if (t->postWarBoomUntilDay < 0 || day > t->postWarBoomUntilDay) return 1.0f;
+    // Victors celebrate hardest; even the defeated rush to rebuild their numbers.
+    return t->recentWarResult >= 0 ? 1.8f : 1.5f;
+}
+
+// Open a post-war baby-boom window and remember how the war went (+1 win / 0 draw
+// / -1 loss) so morale, legitimacy and fertility all respond to the outcome.
+void CivilizationEngine::endWarFor(Tribe& tribe, int result, int day) {
+    tribe.postWarBoomUntilDay = day + 90;   // ~a season-and-a-half of raised fertility
+    tribe.recentWarResult     = result;
+}
+
+// Pick the member best suited to lead under a given government form. Each regime
+// crowns a different virtue: democracies the well-liked, autocracies the feared,
+// theocracies the devout, oligarchies the rich.
+int CivilizationEngine::chooseLeaderFor(const Tribe& tribe, GovernmentType gov,
+                                        std::vector<Entity>& entities) const {
+    int   best = -1;
+    float bestScore = -1.0f;
+    for (int mid : tribe.memberIds) {
+        Entity* e = const_cast<CivilizationEngine*>(this)->entityById(entities, mid);
+        if (!e || e->entityHealth <= 0.0f) continue;
+        float score = 0.0f;
+        switch (gov) {
+            case GOV_DEMOCRACY:
+                score = e->dominanceRank * 0.4f + e->personality.agreeableness * 0.4f
+                      + e->personality.extraversion * 0.2f; break;
+            case GOV_AUTHORITARIAN:
+                score = e->dominanceRank * 0.5f + (100.0f - e->personality.agreeableness) * 0.3f
+                      + e->entityGeneralAnger * 0.2f; break;
+            case GOV_DIVINE_MONARCHY:
+                score = e->dominanceRank * 0.3f + e->ValueSystem.spiritualNeed * 0.5f
+                      + (e->religionId >= 0 ? 20.0f : 0.0f); break;
+            case GOV_OLIGARCHY:
+                score = e->salary.token * 0.5f + e->dominanceRank * 0.3f; break;
+        }
+        if (score > bestScore) { bestScore = score; best = mid; }
+    }
+    return best;
+}
+
+// A revolution: legitimacy has collapsed, and the people overthrow the ruling
+// order. The new regime is chosen by the tribe's character, a fresh leader fit
+// for it is installed, and — where the old or new order rules by force — the
+// deposed ruler does not survive the turning.
+void CivilizationEngine::stageCoup(Tribe& tribe, std::vector<Entity>& entities, int day) {
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    tribe.lastCoupDay = day;
+    tribe.totalCoups++;
+    totalCoups++;
+
+    GovernmentType oldGov = tribe.government;
+    // The tribe's temperament decides what replaces the fallen order.
+    GovernmentType neo;
+    if      (tribe.militarism   > 65.0f)    neo = GOV_AUTHORITARIAN;   // warlike → strongman
+    else if (tribe.spiritualism > 65.0f)    neo = GOV_DIVINE_MONARCHY; // devout → god-king
+    else if (tribe.economy.token > 400.0f)  neo = GOV_OLIGARCHY;       // rich few → oligarchy
+    else                                    neo = GOV_DEMOCRACY;       // otherwise → the people
+    if (neo == oldGov)                       // a coup must actually change the order
+        neo = (GovernmentType)(((int)oldGov + 1) % 4);
+
+    Entity* oldLeader = entityById(entities, tribe.leaderId);
+    int neoLeaderId = chooseLeaderFor(tribe, neo, entities);
+    if (neoLeaderId >= 0) tribe.leaderId = neoLeaderId;
+    Entity* newLeader = entityById(entities, tribe.leaderId);
+
+    tribe.government      = neo;
+    tribe.govSatisfaction = 55.0f;   // the new order enjoys a honeymoon
+
+    // Authoritarian turns (into or out of tyranny) are bloody; the rest are not.
+    bool violent = (neo == GOV_AUTHORITARIAN || oldGov == GOV_AUTHORITARIAN);
+    if (violent && oldLeader && oldLeader != newLeader) {
+        oldLeader->entityHealth = 0.0f;  // the deposed ruler is put to the sword
+    }
+    // The upheaval rattles everyone.
+    for (int mid : tribe.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (!e) continue;
+        e->entityStress = std::min(100.0f, e->entityStress + (violent ? 12.0f : 5.0f));
+    }
+
+    std::string desc = "COUP in the " + tribe.name + ": the "
+        + std::string(governmentName(oldGov)) + " falls; a "
+        + std::string(governmentName(neo)) + " rises"
+        + (newLeader ? " under " + newLeader->name : "");
+    logEvent(day, desc, "tribe",
+             "kind=coup tribe=\"" + tribe.name + "\" tribeId=" + std::to_string(tribe.id)
+             + " oldGov=\"" + governmentName(oldGov) + "\""
+             + " newGov=\"" + governmentName(neo) + "\""
+             + " violent=" + std::string(violent ? "1" : "0"));
+}
+
+// Recompute every tribe's legitimacy from taxes, famine and war, stage coups
+// where it has collapsed, and run vassal upkeep / co-belligerence / rebellion.
+// Gated to once per civ-day (tick() fires many times per day).
+void CivilizationEngine::updateGovernment(std::vector<Entity>& entities, int day) {
+    if (day == lastGovDay) return;
+    lastGovDay = day;
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    auto clampf = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
+
+    for (Tribe& t : tribes) {
+        if (t.population() == 0) continue;
+
+        // How much hardship the regime's people will swallow before they seethe.
+        float taxTol, famineTol;
+        switch (t.government) {
+            case GOV_AUTHORITARIAN:   taxTol = 0.45f; famineTol = 1.6f; break; // fear keeps order
+            case GOV_DIVINE_MONARCHY: taxTol = 0.30f; famineTol = 1.8f; break; // faith soothes want
+            case GOV_OLIGARCHY:       taxTol = 0.25f; famineTol = 1.3f; break;
+            default: /* DEMOCRACY */  taxTol = 0.20f; famineTol = 1.5f; break; // low taxes, loud voice
+        }
+
+        // Ground the mood in the actual state of the tribe's members.
+        float avgHap = 0, avgHunger = 0, avgAnger = 0; int n = 0;
+        for (int mid : t.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (!e || e->entityHealth <= 0.0f) continue;
+            avgHap += e->entityHapiness; avgHunger += e->entityHunger;
+            avgAnger += e->entityGeneralAnger; n++;
+        }
+        if (n == 0) continue;
+        avgHap /= n; avgHunger /= n; avgAnger /= n;
+
+        float target = 45.0f
+                     + (avgHap - 50.0f) * 0.5f                                   // content people
+                     - std::max(0.0f, avgHunger - 40.0f) * (0.5f / famineTol)     // famine bites
+                     - std::max(0.0f, t.taxeRate - taxTol) * 120.0f               // over-taxation
+                     - std::max(0.0f, avgAnger - 45.0f) * 0.25f                   // simmering rage
+                     + t.recentWarResult * 12.0f;                                 // glory / shame
+        if (t.government == GOV_DIVINE_MONARCHY)
+            target += (t.spiritualism - 50.0f) * 0.2f;   // a devout people love their god-king
+        target = std::max(0.0f, std::min(100.0f, target));
+
+        // Democracies respond fast to the popular mood; autocracies lag.
+        float speed = (t.government == GOV_DEMOCRACY) ? 0.25f : 0.12f;
+        t.govSatisfaction = clampf(t.govSatisfaction + (target - t.govSatisfaction) * speed);
+
+        // The memory of a war's outcome fades once the boom window closes.
+        if (t.postWarBoomUntilDay >= 0 && day > t.postWarBoomUntilDay) t.recentWarResult = 0;
+
+        // ── Coup: legitimacy has collapsed → revolution ──────────────────────
+        if (t.govSatisfaction < 22.0f && (day - t.lastCoupDay) > 120 && t.population() >= 3) {
+            float chance = (22.0f - t.govSatisfaction) / 22.0f * 0.18f;
+            if (roll(rng) < chance) stageCoup(t, entities, day);
+        }
+    }
+
+    // ── Vassal upkeep, co-belligerence and rebellion ─────────────────────────
+    for (Tribe& t : tribes) {
+        if (t.overlordTribeId < 0 || t.population() == 0) continue;
+        Tribe* over = findTribe(t.overlordTribeId);
+        if (!over || over->population() == 0) { t.overlordTribeId = -1; continue; } // master gone → free
+
+        // Ongoing tribute: a tenth of the vassal's treasury flows to the overlord.
+        float tribute = t.economy.token * 0.10f;
+        t.economy.spendMoney(tribute);
+        over->economy.earnMoney(tribute);
+
+        // Co-belligerence: the vassal is dragged into its overlord's wars…
+        for (auto& kv : over->stances) {
+            if (kv.second != TS_AT_WAR || kv.first == t.id) continue;
+            if (kv.first == t.overlordTribeId) continue;
+            Tribe* foe = findTribe(kv.first);
+            if (foe && foe->overlordTribeId != over->id) {  // don't war a fellow vassal
+                t.stances[kv.first] = TS_AT_WAR;
+                foe->stances[t.id]  = TS_AT_WAR;
+            }
+        }
+
+        // …but a vassal that outgrows or comes to loathe its master rebels.
+        float vStr = calculateTribeMilitaryStrength(t, entities);
+        float oStr = calculateTribeMilitaryStrength(*over, entities);
+        float chance = (vStr > oStr * 1.10f ? 0.10f : 0.0f)
+                     + (t.govSatisfaction < 30.0f ? 0.05f : 0.0f);
+        if (chance > 0.0f && roll(rng) < chance)
+            rebelAgainstOverlord(t, *over, entities, day);
+    }
+}
+
+// A vassal casts off its overlord — freedom won at sword-point, so relations
+// crater and the war reignites (a WAR_TRIBUTE / rebellion casus belli).
+void CivilizationEngine::rebelAgainstOverlord(Tribe& vassal, Tribe& overlord,
+                                              std::vector<Entity>& entities, int day) {
+    totalRebellions++;
+    vassal.overlordTribeId = -1;
+    overlord.vassalTribeIds.erase(vassal.id);
+    vassal.vassalSinceDay = -1;
+
+    vassal.relations[overlord.id] = -80.0f; overlord.relations[vassal.id] = -80.0f;
+    vassal.stances[overlord.id]   = TS_AT_WAR; overlord.stances[vassal.id] = TS_AT_WAR;
+    totalWarsDeclared++;
+
+    for (int mid : vassal.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (!e) continue;
+        e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 15.0f);
+        e->entityHapiness     = std::min(100.0f, e->entityHapiness + 6.0f);  // hope of freedom
+    }
+    vassal.govSatisfaction = std::min(100.0f, vassal.govSatisfaction + 25.0f);
+
+    logEvent(day, "REBELLION: the " + vassal.name + " rise up against their overlords, the "
+                  + overlord.name, "war",
+             "kind=rebellion reason=\"" + std::string(warReasonName(WAR_TRIBUTE)) + "\""
+             + " vassal=\"" + vassal.name + "\" vassalId=" + std::to_string(vassal.id)
+             + " overlord=\"" + overlord.name + "\" overlordId=" + std::to_string(overlord.id));
+}
+
+// Subjugate rather than annihilate: the beaten tribe survives as a vassal — it
+// keeps its name and lands but forfeits a tenth of its wealth now (and each turn
+// after), marches to the victor's wars, and may one day rebel.
+void CivilizationEngine::vassalizeTribe(Tribe& victor, Tribe& loser,
+                                        std::vector<Entity>& entities, int day) {
+    totalVassalizations++;
+    victor.stances[loser.id] = TS_NEUTRAL; loser.stances[victor.id] = TS_NEUTRAL;
+    victor.ethnicWarWith.erase(loser.id);  loser.ethnicWarWith.erase(victor.id);
+
+    loser.overlordTribeId = victor.id;
+    loser.vassalSinceDay  = day;
+    victor.vassalTribeIds.insert(loser.id);
+
+    // Immediate spoils: a tenth of the vassal's treasury changes hands.
+    float spoils = loser.economy.token * 0.10f;
+    loser.economy.spendMoney(spoils);
+    victor.economy.earnMoney(spoils);
+
+    for (int mid : loser.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (!e) continue;
+        e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + 10.0f);
+        e->entityHapiness     = std::max(0.0f, e->entityHapiness - 8.0f);
+    }
+    loser.govSatisfaction = std::max(0.0f, loser.govSatisfaction - 20.0f);
+
+    endWarFor(victor, +1, day);
+    endWarFor(loser, -1, day);
+
+    logEvent(day, victor.name + " subjugated the " + loser.name
+                  + ", who bend the knee as vassals", "war",
+             "kind=vassalage victor=\"" + victor.name + "\" victorId=" + std::to_string(victor.id)
+             + " vassal=\"" + loser.name + "\" vassalId=" + std::to_string(loser.id)
+             + " spoils=" + std::to_string((int)spoils));
+}
+
 void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) {
     std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+
 
     for (size_t i = 0; i < tribes.size(); ++i) {
         for (size_t j = i + 1; j < tribes.size(); ++j) {
@@ -1521,11 +1884,15 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
             auto aIt = A.stances.find(B.id);
             if (aIt == A.stances.end() || aIt->second != TS_AT_WAR) continue;
 
+            contributeToWarEffort(A, entities);
+            contributeToWarEffort(B, entities);
+
             // War attrition: each tick, both sides suffer casualties
             float aStr = calculateTribeMilitaryStrength(A, entities);
             float bStr = calculateTribeMilitaryStrength(B, entities);
             float aDef = calculateTribeDefenseStrength(A, entities);
             float bDef = calculateTribeDefenseStrength(B, entities);
+
 
             // Battle resolution with randomness
             float aPower = (aStr * 0.7f + aDef * 0.3f) * (0.8f + roll(rng) * 0.4f);
@@ -1533,16 +1900,16 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
 
             bool ethnic = A.ethnicWarWith.count(B.id) > 0;
 
-            if (roll(rng) < (ethnic ? 0.18f : 0.09f)) { // ethnic wars erupt into battle twice as often
+            if (roll(rng) < (ethnic ? 0.34f : 0.20f)) { // wars now erupt into pitched battle far more often
                 executeBattle(A, B, entities, day);
             }
 
             // War exhaustion: both tribes lose health from attrition. Ethnic wars
             // grind down the civilian population, not just the front line.
-            float attrMul = ethnic ? 2.2f : 1.0f;
-            float aLossRate = (0.02f + (1.0f - aStr / std::max(1.0f, aStr + bStr)) * 0.04f) * attrMul;
-            float bLossRate = (0.02f + (1.0f - bStr / std::max(1.0f, aStr + bStr)) * 0.04f) * attrMul;
-            float attrDmg   = ethnic ? 4.0f : 1.5f;
+            float attrMul = ethnic ? 2.4f : 1.3f;
+            float aLossRate = (0.03f + (1.0f - aStr / std::max(1.0f, aStr + bStr)) * 0.05f) * attrMul;
+            float bLossRate = (0.03f + (1.0f - bStr / std::max(1.0f, aStr + bStr)) * 0.05f) * attrMul;
+            float attrDmg   = ethnic ? 6.0f : 3.0f;
 
             auto attrit = [&](Tribe& side, float rate) {
                 for (int mid : side.memberIds) {
@@ -1558,24 +1925,43 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
             attrit(A, aLossRate);
             attrit(B, bLossRate);
 
-            // Peace negotiations: if both sides exhausted, chance of peace
+            // Peace negotiations: if both sides exhausted, chance of peace. Peace
+            // sends the soldiers home — a baby boom follows (returning-soldier effect).
             if (A.relations[B.id] < -70.0f && aStr + bStr < 15.0f) {
                 if (roll(rng) < 0.15f) {
                     A.relations[B.id] = -20.0f;
                     B.relations[A.id] = -20.0f;
                     A.stances[B.id] = TS_NEUTRAL;
                     B.stances[A.id] = TS_NEUTRAL;
+                    A.ethnicWarWith.erase(B.id); B.ethnicWarWith.erase(A.id);
+                    endWarFor(A, 0, day); endWarFor(B, 0, day);   // a draw for both
                     logEvent(day, "Exhausted war ends: " + A.name + " and " + B.name + " agree to peace", "war",
                              "kind=peace tribeA=\"" + A.name + "\" tribeAId=" + std::to_string(A.id)
                              + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id));
+                    continue;   // the war is over this tick — skip the conquest checks
                 }
             }
 
-            // Conquest check: if one tribe is severely weakened
+            // ── War outcome: annihilation or subjugation ─────────────────────
+            // A tribe ground down to nothing is conquered outright (destroyed and
+            // absorbed). A tribe merely beaten — decisively out-powered and still
+            // hated — may instead be made a vassal, unless the war is an ethnic
+            // one, which tends toward extermination rather than mercy.
             if (A.population() < 2 && B.population() >= 2) {
                 conquerTribe(B, A, entities, day);
             } else if (B.population() < 2 && A.population() >= 2) {
                 conquerTribe(A, B, entities, day);
+            } else if (A.population() >= 2 && B.population() >= 2) {
+                Tribe& strong = (aStr >= bStr) ? A : B;
+                Tribe& weak   = (aStr >= bStr) ? B : A;
+                float  sStr   = (aStr >= bStr) ? aStr : bStr;
+                float  wStr   = (aStr >= bStr) ? bStr : aStr;
+                bool   crushed = (sStr > wStr * 3.0f)
+                                 && weak.relations[strong.id] < -50.0f
+                                 && weak.overlordTribeId < 0;
+                if (crushed && !ethnic && roll(rng) < 0.25f) {
+                    vassalizeTribe(strong, weak, entities, day);
+                }
             }
         }
     }
@@ -1616,23 +2002,30 @@ void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::ve
         desc = attacker.name + " and " + defender.name + " fought to a bloody stalemate";
     }
 
-    // Apply battle casualties. Ethnic wars draw real blood — soldiers actually
-    // fall, so populations shrink and the loss is felt across the society.
-    float castChance = ethnic ? 0.16f : 0.08f;
-    float castDmg    = ethnic ? 14.0f : 4.0f;
+    // Apply battle casualties. War is meant to kill — every pitched battle now
+    // thins the ranks of both sides, and ethnic/holy wars are an outright
+    // massacre. (Previously casualties were so light that "wars" barely dented
+    // the population; these rates make the battlefield the deadly place it should be.)
+    float castChance = ethnic ? 0.30f : 0.18f;
+    float castDmg    = ethnic ? 26.0f : 12.0f;
+    // The losing side is routed and cut down far harder than the victor.
+    float loserBonus = 1.9f;
     int   fallen     = 0;
-    auto strike = [&](Tribe& side) {
+    auto strike = [&](Tribe& side, float mult) {
         for (int mid : side.memberIds) {
             Entity* e = entityById(entities, mid);
-            if (!e || e->entityHealth <= 0.0f || roll(rng) >= castChance) continue;
+            if (!e || e->entityHealth <= 0.0f || roll(rng) >= castChance * mult) continue;
             float before = e->entityHealth;
-            e->entityHealth -= 1.0f + roll(rng) * castDmg;
+            e->entityHealth -= 1.0f + roll(rng) * castDmg * mult;
             e->entityStress = std::min(100.0f, e->entityStress + 6.0f);
             if (before > 0.0f && e->entityHealth <= 0.0f) { totalWarDeaths++; fallen++; }
         }
     };
-    strike(attacker);
-    strike(defender);
+    // The routed side is cut down harder than the victor; a stalemate bleeds both evenly.
+    bool aLost = (outcome == "defender_victory");
+    bool dLost = (outcome == "attacker_victory");
+    strike(attacker, aLost ? loserBonus : 1.0f);
+    strike(defender, dLost ? loserBonus : 1.0f);
 
     if (fallen > 0)
         desc += " — " + std::to_string(fallen) + " fell in the fighting";
@@ -1877,6 +2270,17 @@ void CivilizationEngine::conquerTribe(Tribe& victor, Tribe& loser, std::vector<E
     if (g_lexicon && victor.regionId >= 0 && loser.regionId >= 0)
         g_lexicon->blend(victor.regionId, loser.regionId, 0.25f);
 
+    // Sever any vassal bonds the destroyed tribe held (as overlord or as vassal).
+    if (loser.overlordTribeId >= 0)
+        if (Tribe* ov = findTribe(loser.overlordTribeId)) ov->vassalTribeIds.erase(loser.id);
+    for (int vid : loser.vassalTribeIds)
+        if (Tribe* v = findTribe(vid)) v->overlordTribeId = -1;
+    loser.vassalTribeIds.clear();
+    loser.overlordTribeId = -1;
+
+    // Victory sends the warriors home to a triumphant baby boom.
+    endWarFor(victor, +1, day);
+
     // Mark loser tribe as dissolved
     loser.memberIds.clear();
 }
@@ -1894,6 +2298,7 @@ float CivilizationEngine::calculateTribeMilitaryStrength(const Tribe& tribe, std
         if (e->specialization == "warrior") combat *= 1.6f;
         strength += combat;
     }
+
     // Tech bonus from emergent innovations …
     for (int tid : tribe.knownTechIds) {
         Innovation* inv = const_cast<CivilizationEngine*>(this)->findInnovation(tid);
@@ -1901,6 +2306,9 @@ float CivilizationEngine::calculateTribeMilitaryStrength(const Tribe& tribe, std
     }
     // … and from the deliberate tech tree (Bronze/Iron Working etc.).
     strength *= TechTreeSystem::militaryMultiplier(tribe);
+    // Arms in the storehouse: a stockpile of swords and bows turns willing bodies
+    // into a real army. Each held weapon adds its attack value to the tribe's might.
+    strength += weaponAttackStrength(tribe);
     return strength;
 }
 
@@ -1913,6 +2321,8 @@ float CivilizationEngine::calculateTribeDefenseStrength(const Tribe& tribe, std:
     }
     // Masonry / Fortification on the tech tree harden the tribe's defences.
     defense *= TechTreeSystem::defenseMultiplier(tribe);
+    // Shields, armour and battlements stockpiled in the armoury bolster defence.
+    defense += weaponDefenseStrength(tribe);
     return defense;
 }
 

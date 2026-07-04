@@ -92,7 +92,7 @@ const char* Disease::DISEASE_5_NAME = "Cancer";
     ent->entityHealth -= ent->entityDiseaseType * 0.10;
     ent->entityHygiene -= ent->entityDiseaseType * 0.15;
     ent->entityAntiBody += BetterRand::genNrInInterval(3, 14);
-    if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 10) > 90){
+    if(ent->entityAntiBody + BetterRand::genNrInInterval(0, 7) > 90){
       std::string dName = Disease::getDiseaseName(ent->entityDiseaseType);
       std::cout << "## " <<ent->getName() + " was cured from " + dName << " ##"<< std::endl;
       //we give a solid base of antibody to make him avoid getting sick again

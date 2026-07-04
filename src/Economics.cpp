@@ -71,11 +71,22 @@ const GoodDef CATALOG[] = {
     {"goat",         GoodCategory::FOOD,  70.0f, 140.0f,  true,  false},
     {"spices",       GoodCategory::FOOD, 120.0f, 320.0f,  true,  false},
 
+    // ── WAR Object ───────────────────────────────────────────────────────────
+    {"wooden_spear",    GoodCategory::ATK_OBJECT,  18.0f,  45.0f, false, true },
+    {"bow",             GoodCategory::ATK_OBJECT,  55.0f, 130.0f, false, true },
+    {"sword",           GoodCategory::ATK_OBJECT, 220.0f, 520.0f, false, true },
+    {"shield",          GoodCategory::DEF_OBJECT, 140.0f, 310.0f, false, true },
+    {"armor",           GoodCategory::DEF_OBJECT,  90.0f, 200.0f, false, false},
+    {"cannon",          GoodCategory::ATK_OBJECT,  260.0f, 500.0f, false, false},
+    {"battlements",     GoodCategory::DEF_OBJECT,  260.0f, 500.0f, false, false},
+    {"trebuchet",       GoodCategory::ATK_OBJECT,  300.0f, 550.0f, false, false},
+    {"human_trap",       GoodCategory::DEF_OBJECT,  300.0f, 550.0f, false, false},
+    {"crossbow",       GoodCategory::DEF_OBJECT,  300.0f, 550.0f, false, false},
+
     // ── OBJECTS ───────────────────────────────────────────────────────────
+    {"boat",            GoodCategory::OBJECT, 350.0f, 800.0f, false, false},
     {"flint_tool",      GoodCategory::OBJECT,  10.0f,  25.0f, false, false},
     {"stone_axe",       GoodCategory::OBJECT,  30.0f,  70.0f, false, false},
-    {"wooden_spear",    GoodCategory::OBJECT,  18.0f,  45.0f, false, true },
-    {"bow",             GoodCategory::OBJECT,  55.0f, 130.0f, false, true },
     {"clay_pot",        GoodCategory::OBJECT,  12.0f,  30.0f, false, false},
     {"basket",          GoodCategory::OBJECT,   8.0f,  20.0f, false, false},
     {"animal_hide",     GoodCategory::OBJECT,  25.0f,  60.0f, false, false},
@@ -84,8 +95,6 @@ const GoodDef CATALOG[] = {
     {"fur_coat",        GoodCategory::OBJECT, 110.0f, 260.0f, false, false},
     {"bronze_tool",     GoodCategory::OBJECT, 130.0f, 300.0f, false, false},
     {"iron_tool",       GoodCategory::OBJECT, 160.0f, 380.0f, false, false},
-    {"sword",           GoodCategory::OBJECT, 220.0f, 520.0f, false, true },
-    {"shield",          GoodCategory::OBJECT, 140.0f, 310.0f, false, true },
     {"jewelry",         GoodCategory::OBJECT, 180.0f, 500.0f, false, false},
     {"pottery",         GoodCategory::OBJECT,  35.0f,  85.0f, false, false},
     {"rope",            GoodCategory::OBJECT,   9.0f,  22.0f, false, false},
@@ -93,7 +102,6 @@ const GoodDef CATALOG[] = {
     {"candle",          GoodCategory::OBJECT,  14.0f,  32.0f, false, false},
     {"plough",          GoodCategory::OBJECT,  95.0f, 210.0f, true,  false},
     {"cart",            GoodCategory::OBJECT, 200.0f, 450.0f, false, false},
-    {"boat",            GoodCategory::OBJECT, 350.0f, 800.0f, false, false},
     {"medicine_herbs",  GoodCategory::OBJECT,  50.0f, 140.0f, false, false},
     {"parchment",       GoodCategory::OBJECT,  70.0f, 170.0f, false, false},
 };
@@ -120,6 +128,11 @@ void Market::init() {
         p.price               = g.basePrice;
         p.requiresAgriculture = g.farmed;
         p.isArmyRation        = g.ration;
+        // Martial goods carry a combat value proportional to their worth, so a
+        // tribe's military strength can be read off what its armoury actually
+        // holds (a stockpile of swords beats a stockpile of spears).
+        if (g.cat == GoodCategory::ATK_OBJECT) p.atk_value = (int)(g.basePrice / 10.0f) + 3;
+        if (g.cat == GoodCategory::DEF_OBJECT) p.def_value = (int)(g.basePrice / 10.0f) + 3;
         products.push_back(std::move(p));
     }
     initialized = true;
@@ -145,6 +158,20 @@ void Market::assignProducer(Entity& ent, bool agricultureUnlocked) {
         }
     }
     ent.salary.producedProduct = idx;
+}
+
+MarketProduct Market::findExpensiveWarItem(int item_type, int money_treshold){
+  MarketProduct best_product;
+  int cost_product = 0.0f;
+  for (MarketProduct war_prod : products) {
+    if(war_prod.price >= cost_product && war_prod.price <= money_treshold
+      && ((item_type == 0 && war_prod.category == GoodCategory::ATK_OBJECT) ||
+        (item_type == 1 && war_prod.category == GoodCategory::DEF_OBJECT)) ){
+      best_product = war_prod;
+      cost_product = war_prod.price;
+    }
+  }
+  return best_product;
 }
 
 void Market::update(std::vector<Entity>& entities, float warIntensity,

@@ -22,7 +22,7 @@ class Entity;
 //  and driving those prices up — exactly the kind of emergent scarcity we want.
 // ─────────────────────────────────────────────────────────────────────────────
 
-enum class GoodCategory { FOOD, OBJECT };
+enum class GoodCategory { FOOD, OBJECT, DEF_OBJECT, ATK_OBJECT };
 
 struct MarketProduct {
     std::string  name;
@@ -41,6 +41,8 @@ struct MarketProduct {
     bool  requiresAgriculture = false;
     // Staple rations armies stockpile in wartime.
     bool  isArmyRation        = false;
+    int def_value =0.0f;
+    int atk_value =0.0f;
 
     std::deque<float> priceHistory;  // rolling window for the UI trend line
 
@@ -87,6 +89,7 @@ public:
                 bool agricultureUnlocked);
 
     MarketProduct* find(const std::string& name);
+    MarketProduct findExpensiveWarItem(int item_type, int money_treshold);
 
 private:
     void assignProducer(Entity& ent, bool agricultureUnlocked);

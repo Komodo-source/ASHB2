@@ -7,6 +7,7 @@
 #include <set>
 #include <deque>
 #include <random>
+#include "Economics.h"
 #include "WorldSeed.h"
 
 class Entity;
@@ -50,12 +51,67 @@ struct Religion {
 // ── Tribe ─────────────────────────────────────────────────────────────────────
 enum TribeStance { TS_NEUTRAL, TS_ALLY, TS_RIVAL, TS_AT_WAR };
 
+// ── Government ──────────────────────────────────────────────────────────────────
+// How a tribe is led. The form shapes how much dissent it tolerates before a coup,
+// how taxes and famine bite into legitimacy, and which trait crowns the next
+// leader. A collapse of legitimacy (govSatisfaction hitting the floor) triggers a
+// coup that installs a *different* form — a revolution.
+enum GovernmentType {
+    GOV_DEMOCRACY,        // leader = broad approval; low unrest, coups are peaceful votes
+    GOV_AUTHORITARIAN,    // one strongman rules by fear; heavy taxes tolerated, coups bloody
+    GOV_DIVINE_MONARCHY,  // leader legitimated by the dominant faith; spiritualism stabilises
+    GOV_OLIGARCHY         // the wealthiest few rule; wealth buys the throne, poverty breeds revolt
+};
+const char* governmentName(GovernmentType g);
+
+// ── Why a war was declared (casus belli) ────────────────────────────────────────
+// Wars are no longer only ethnic/faith hatred; each declaration is tagged with the
+// grievance that actually tipped relations over the war line, which also colours
+// how bloody and how endable the war is.
+enum WarReason {
+    WAR_ETHNIC,     // clashing faiths / ancient hatreds (the old bloody kind)
+    WAR_CONQUEST,   // a strong militaristic tribe simply takes what a weak neighbour has
+    WAR_RESOURCE,   // a starving tribe fights a fat-granaried one for food/land
+    WAR_TRIBUTE,    // a vassal throws off its overlord, or an overlord punishes a defaulter
+    WAR_BORDER      // ordinary friction between mismatched cultures
+};
+const char* warReasonName(WarReason r);
+
 struct Tribe {
     int         id;
     std::string name;
     int         leaderId      = -1;
     int         foundedOnDay  = 0;
     std::vector<int> memberIds;
+
+    //Economics related
+    float taxeRate = 0.0f;
+    Economic economy;
+    std::vector<MarketProduct> weaponStorage;
+
+    // ── Government & legitimacy ──────────────────────────────────────────────
+    // The tribe's form of rule and how content the people are with it (0-100).
+    // Satisfaction erodes with heavy taxes, famine and lost wars; it recovers with
+    // victory, plenty and light taxes. When it collapses, the people rise up
+    // (see updateGovernment) and a coup installs a new — often different — regime.
+    GovernmentType government      = GOV_OLIGARCHY;
+    float          govSatisfaction = 60.0f;
+    int            lastCoupDay     = -100000;  // cooldown so revolts don't chain
+    int            totalCoups      = 0;        // how many times this tribe has revolted
+
+    // ── Vassalage ────────────────────────────────────────────────────────────
+    // A defeated-but-not-destroyed tribe becomes a vassal: it keeps its identity
+    // but siphons a share of its economy to the overlord, marches to the
+    // overlord's wars, and rebels when it grows strong or bitter.
+    int            overlordTribeId = -1;       // >=0 → we are this tribe's vassal
+    std::set<int>  vassalTribeIds;             // tribes that owe us fealty
+    int            vassalSinceDay  = -1;
+
+    // ── War aftermath (returning-soldier effect, war-outcome memory) ─────────
+    // Set when a war ends: a window during which this tribe's couples are far more
+    // fertile (the post-war "baby boom"), plus a decaying memory of the last result.
+    int   postWarBoomUntilDay = -1;   // day the baby-boom window closes
+    int   recentWarResult     = 0;    // +1 recent victory, -1 recent defeat, decays to 0
 
     // Collective cultural values (0-100), evolve from member averages + drift
     float militarism   = 50.0f;
@@ -189,6 +245,7 @@ public:
     int                 darkAgeCount    = 0;
     int                 lastCapacityDay = -1;  // famine effects apply once per civ-day
     int                 lastHistoryDay  = -1;  // history fingerprint logged once per day
+    int                 lastGovDay      = -1;  // government/coup logic runs once per civ-day
 
     // ── Running tallies for the report / big summary ─────────────────────────
     // Incremented from across the simulation so the History panel can show a
@@ -203,9 +260,20 @@ public:
     int  totalCouplesBroken= 0;   // couples torn apart by war between their tribes
     int  peakPopulation    = 0;
     int  totalTreatiesSigned = 0; // formal treaties ever concluded
+    int  totalCoups          = 0; // regime changes forced by popular revolt
+    int  totalVassalizations = 0; // wars ended by subjugation rather than slaughter
+    int  totalRebellions     = 0; // vassals that threw off their overlord
 
     // True when tribes a and b are currently in an open war.
     bool areTribesAtWar(int tribeIdA, int tribeIdB) const;
+
+    // ── Returning-soldier effect (post-war baby boom) ────────────────────────
+    // https://en.wikipedia.org/wiki/Returning_soldier_effect
+    // Returns a fertility multiplier (>=1.0) for a tribe that recently ended a war;
+    // 1.0 when the tribe is not in a post-war window. The reproduction decision in
+    // implem_free_will.cpp multiplies conception odds by this so peace brings a
+    // surge of births, exactly as observed after real wars.
+    float postWarBirthBoost(int tribeId, int day) const;
     // A multi-line cumulative report of the whole civilisation so far.
     std::string getBigSummary() const;
 
@@ -282,11 +350,37 @@ private:
     void removeDeadFromTribes(std::vector<Entity>& entities);
     void dissolveSmallTribes(std::vector<Entity>& entities, int day);
     void splitLargeTribes(std::vector<Entity>& entities, int day);
+    void collectTaxes(Tribe& tribe, std::vector<Entity>& ent);
+
+    // ── Government & coups ─────────────────────────────────────────────────────
+    // Recompute every tribe's legitimacy from taxes/famine/war and, where it has
+    // collapsed, stage a coup that installs a new leader and (often) a new regime.
+    void updateGovernment(std::vector<Entity>& entities, int day);
+    void stageCoup(Tribe& tribe, std::vector<Entity>& entities, int day);
+    // Pick the successor best suited to the (possibly new) government form.
+    int  chooseLeaderFor(const Tribe& tribe, GovernmentType gov,
+                         std::vector<Entity>& entities) const;
 
     // ── War system ───────────────────────────────────────────────────────────
     void processWarTick(std::vector<Entity>& entities, int day);
     void executeBattle(Tribe& attacker, Tribe& defender, std::vector<Entity>& entities, int day);
     void conquerTribe(Tribe& victor, Tribe& loser, std::vector<Entity>& entities, int day);
+    // Subjugate instead of annihilate: the loser survives as a tribute-paying,
+    // co-belligerent vassal that may later rebel.
+    void vassalizeTribe(Tribe& victor, Tribe& loser, std::vector<Entity>& entities, int day);
+    // A vassal throws off its overlord (regains independence, relations sour).
+    void rebelAgainstOverlord(Tribe& vassal, Tribe& overlord,
+                              std::vector<Entity>& entities, int day);
+    // Buy attack/defence goods into the tribe's armoury (fixed: mutates the tribe).
+    void contributeToWarEffort(Tribe& tribe, std::vector<Entity>& entities);
+    // 0..1 : how the tribe is faring across its current wars (1 = winning).
+    float calculateAdvancementWar(const Tribe& tribe, std::vector<Entity>& entities) const;
+    // Combat value stored in the armoury: summed attack / defence of held weapons.
+    float weaponAttackStrength(const Tribe& tribe) const;
+    float weaponDefenseStrength(const Tribe& tribe) const;
+    // Begin a post-war baby boom for a tribe (returning-soldier effect) & remember
+    // the result (+1 win / -1 loss) so morale and fertility respond to the outcome.
+    void  endWarFor(Tribe& tribe, int result, int day);
     // War sunders romances that cross enemy lines: members of two warring tribes
     // who were a couple are forced apart, breeding resentment instead of children.
     void breakCrossTribeCouples(Tribe& A, Tribe& B, std::vector<Entity>& entities, int day);
