@@ -274,6 +274,14 @@ public:
     // single central death-handler can log it verbatim instead of guessing.
     // Empty = death (if any) should be attributed from the entity's own state.
     std::string pendingDeathCause = "";
+    // ── Structured killer attribution (Improvement Plan 4.3, fixes DQ-3) ──────
+    // When the death is a killing, the aggressor's identity and motive are stashed
+    // here at the moment of the blow so the death log can emit machine-readable
+    // killer/victim fields (killer_id, tribes, motive) instead of only a prose
+    // cause. -1 / empty when the death had no killer.
+    int         pendingKillerId      = -1;
+    int         pendingKillerTribeId = -1;
+    std::string pendingKillMotive    = "";
     LifeStage entityLifeStage = INFANT;   // was uninitialized until first birthday tick
     float posX = 0.0f;
     float posY = 0.0f;

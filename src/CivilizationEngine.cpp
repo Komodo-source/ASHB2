@@ -6,6 +6,7 @@
 #include "world/ResourceSystem.h"   // per-region resource pools feed craftsmen
 #include "EnvironmentModel.h"   // previously-unused seasonal model, now driving famine cycles
 #include "header/TechTree.h"    // structured, prerequisite-gated technology tree
+#include "header/Kinship.h"     // family/dynasty registry (Plan 4.1)
 #include "header/Logging.h"     // persist civilization events to civilization_log.txt
 #include <algorithm>
 #include <cmath>
@@ -42,6 +43,8 @@ static const std::vector<InnovTemplate> CATALOG = {
     {"Bone Setting",      "medicine",   "Realigning broken bones to heal cleanly",   42, {"Wound Binding"}},
     {"Quarantine",        "medicine",   "Isolating the sick to stop contagion",      28, {}},
     {"Birthing Method",   "medicine",   "Structured support for safe childbirth",    48, {"Wound Binding"}},
+     {"Vaccine/Medication",   "medicine",   "Efficient method for helping to get better faster ",    50, {}},
+     {"Autophagy ",   "medicine",   "Method used in order to renew new cells",    75, {"Vaccine/Medication"}},
     // Social
     {"Trade Token",       "social",     "Objects used as agreed exchange value",     22, {}},
     {"Oral Record",       "social",     "Systematic memorised transmission of lore", 18, {}},
@@ -60,6 +63,34 @@ static const std::vector<InnovTemplate> CATALOG = {
     {"Dream Reading",     "spiritual",  "Interpreting dreams as guidance",           24, {}},
     {"Star Calendar",     "spiritual",  "Tracking time through celestial patterns",  48, {"Counting Method","Dream Reading"}},
     {"Ancestor Offering", "spiritual",  "Ritual gifts to honour the deceased",       22, {"Death Rite"}},
+
+    // ── Classical → Industrial ceiling extension (Improvement Plan 1.2) ─────────
+    // Raises the discoverable-tech ceiling from 31 to 53 and provides the
+    // prerequisite-gated "chokepoint" techs (Writing, Iron Smelting, Gunpowder,
+    // Scientific Method, Steam Power) that the era ladder now keys off, so a
+    // civilisation can actually climb past the Medieval plateau.
+    {"Writing",           "social",     "Recording language in durable symbols",     55, {"Oral Record","Counting Method"}},
+    {"Currency",          "social",     "Standardised money for exchange",           50, {"Trade Token","Counting Method"}},
+    {"Mathematics",       "social",     "Abstract calculation and geometry",         65, {"Counting Method","Writing"}},
+    {"Law Code",          "social",     "Codified rules binding a whole people",      60, {"Writing","Conflict Mediation"}},
+    {"Philosophy",        "social",     "Systematic reasoning about the world",       72, {"Writing"}},
+    {"Banking",           "social",     "Credit, loans and capital",                 74, {"Currency","Writing"}},
+    {"Printing",          "social",     "Mechanical reproduction of writing",         80, {"Writing","Masonry"}},
+    {"Scientific Method", "social",     "Systematic empirical inquiry",              92, {"Philosophy","Mathematics"}},
+    {"Masonry",           "tool",       "Dressed-stone construction",                58, {"Clay Shaping"}},
+    {"Wheel & Axle",      "tool",       "Rotational transport and machinery",        60, {"Handle Crafting"}},
+    {"Sailing",           "tool",       "Harnessing wind for water travel",          64, {"Rope Braiding"}},
+    {"Iron Smelting",     "tool",       "High-heat forging of iron",                 82, {"Metal Working"}},
+    {"Optics",            "tool",       "Lenses for sight and study",                84, {"Mathematics","Masonry"}},
+    {"Mechanical Clock",  "tool",       "Precise measurement of time",               78, {"Mathematics","Metal Working"}},
+    {"Steam Power",       "tool",       "Harnessing steam for mechanical work",      95, {"Scientific Method","Mechanical Clock"}},
+    {"Herbal Medicine",   "medicine",   "A systematic pharmacopoeia of remedies",    66, {"Fever Herb","Writing"}},
+    {"Sanitation",        "medicine",   "Clean water and waste management",          68, {"Quarantine","Masonry"}},
+    {"Cavalry",           "military",   "Mounted warfare",                           58, {"Animal Keeping","Weapon Sharpening"}},
+    {"Siege Craft",       "military",   "Engines and tactics to break fortifications",76,{"Fortification","Mathematics"}},
+    {"Steel Forging",     "military",   "Superior weapons and armour",               88, {"Iron Smelting"}},
+    {"Gunpowder",         "military",   "Explosive powder for war",                  90, {"Iron Smelting"}},
+    {"Astronomy",         "spiritual",  "Mapping the heavens for calendar and voyage",70,{"Star Calendar","Mathematics"}},
 };
 
 // ── Constructor ───────────────────────────────────────────────────────────────
@@ -82,10 +113,22 @@ void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
     updateGovernment(entities, day); // legitimacy, coups, vassal upkeep & rebellion
     processWarTick(entities, day);   // NEW: war combat system
     updateCarryingCapacity(entities, day); // Phase 4: famine / migration / dark ages
+    updateClimate(entities, day);          // Plan 12: droughts, floods, quakes, eruptions
     updateEra(entities);
     applyEffectsToEntities(entities, day);
     updateDivisionOfLabour(entities, day);   // surplus → specialists; famine → back to the fields
     updateTechTree(entities, day);           // research accrues; tribes climb the tech tree
+    updateEconomyResources(entities, day);   // Plan 6: materials/metals/luxury/knowledge + forts
+    updateCulture(entities, day);            // Plan 7: artists produce culture; dark ages erode it
+    updateTechDiffusion(entities, day);      // Plan 1.4: techs spread tribe→tribe
+    // Once-per-civ-day social passes (dynasties, classes, colonisation, sagas).
+    if (day != lastDynastyDay) {
+        lastDynastyDay = day;
+        updateSocialClasses(entities, day);  // Plan 4.2: emergent wealth classes
+        updateDynasties(entities, day);      // Plan 4.1: family prestige & great families
+        updateColonization(entities, day);   // Plan 13: found colonies in empty land
+        updateNarrativeChains(entities, day);// Plan 14: redemption / golden-age sagas
+    }
 
     // Languages slowly drift (sound change over generations).
     if (g_lexicon && g_lexicon->regionCount() > 0 && (day % 40 == 0)) {
@@ -123,6 +166,39 @@ void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
            << " battles=" << totalBattles
            << " conquests=" << totalConquests
            << " treatiesSigned=" << totalTreatiesSigned;
+        // Plan 6/7 metrics for the post-mortem: wealth inequality, mean cultural
+        // vitality, total great works, and mean fortification level.
+        {
+            float culSum = 0.0f, fortSum = 0.0f; int works = 0;
+            for (const auto& t : tribes) {
+                culSum += t.cultureScore; fortSum += t.fortificationLevel;
+                works  += t.culturalAchievements;
+            }
+            int nt = std::max(1, (int)tribes.size());
+            sd << " wealthGini=" << wealthGini(entities)
+               << " avgCulture=" << (int)(culSum / nt)
+               << " culturalWorks=" << works
+               << " avgFortification=" << (int)(fortSum / nt)
+               << " disasters=" << totalDisasters
+               << " civilWars=" << totalCivilWars
+               << " colonies=" << totalColonies
+               << " greatFamilies=" << totalGreatFamilies
+               << " sagas=" << totalSagas
+               << " techSpreads=" << totalTechSpreads
+               << " classElite=" << eliteCount
+               << " classMiddle=" << middleCount
+               << " classOutcast=" << outcastCount;
+            // Genetic/behavioural drift (Plan 23-lite): mean population personality,
+            // so a post-mortem can chart how the gene pool shifts over the run.
+            double oSum = 0, nSum = 0; int living = 0;
+            for (const auto& e : entities) {
+                if (e.entityHealth <= 0.0f) continue;
+                oSum += e.personality.openness; nSum += e.personality.neuroticism; ++living;
+            }
+            if (living > 0)
+                sd << " meanOpenness=" << (int)(oSum / living)
+                   << " meanNeuroticism=" << (int)(nSum / living);
+        }
         logEvent(day, ss.str(), "history", sd.str());
     }
 }
@@ -528,7 +604,10 @@ void CivilizationEngine::splitLargeTribes(std::vector<Entity>& entities, int day
     // engine — every growing tribe fissioned within a generation, the map hit
     // ~48 micro-tribes, and with O(pairs) war checks the war rate exploded.
     for (size_t idx = 0; idx < tribes.size(); ++idx) {
-        if (tribes[idx].population() <= 24) continue;
+        // A tribe splits either from sheer size, or — Plan 8, civil war — when its
+        // legitimacy has collapsed and a sizeable faction breaks away in revolt.
+        bool civilWar = (tribes[idx].govSatisfaction < 25.0f && tribes[idx].population() > 10);
+        if (tribes[idx].population() <= 24 && !civilWar) continue;
 
         std::vector<Entity*> members;
         for (int mid : tribes[idx].memberIds) {
@@ -573,7 +652,17 @@ void CivilizationEngine::splitLargeTribes(std::vector<Entity>& entities, int day
         }
 
         formTribe(groupB, day); // may push_back to tribes; idx still valid (no erase)
-        logEvent(day, "The " + splitName + " has split -- a faction broke away", "tribe");
+        if (civilWar) {
+            ++totalCivilWars;
+            // The mother tribe, having purged its malcontents, regains some calm.
+            tribes[idx].govSatisfaction = std::min(100.0f, tribes[idx].govSatisfaction + 20.0f);
+            logEvent(day, "CIVIL WAR: the " + splitName
+                     + " tore itself apart — a faction seceded in revolt", "tribe",
+                     "kind=civil_war tribe=\"" + splitName + "\""
+                     + " seceders=" + std::to_string(groupB.size()));
+        } else {
+            logEvent(day, "The " + splitName + " has split -- a faction broke away", "tribe");
+        }
     }
 }
 
@@ -683,11 +772,121 @@ void CivilizationEngine::updateReligions(std::vector<Entity>& entities, int day)
             }),
         religions.end());
 
-    // Update influence
+    // Religious syncretism: let mutually-tolerant faiths merge (Plan 3.1.B) —
+    // an alternative to the extinction churn, run before influence is recomputed.
+    trySyncretism(entities, day);
+
+    // Update influence and grow religious institutions (Plan 3.1.C).
     for (auto& rel : religions) {
+        int alive = 0;
+        for (int fid : rel.followerIds)
+            if (Entity* f = entityById(entities, fid))
+                if (f->entityHealth > 0.0f) ++alive;
         rel.influence = std::min(100.0f,
-            (float)rel.followerIds.size() / std::max(1.0f, (float)entities.size()) * 100.0f);
+            (float)alive / std::max(1.0f, (float)entities.size()) * 100.0f);
+
+        // Congregation size unlocks ever-grander institutions. They only ratchet
+        // UP, so a faith keeps the cathedral it built even through a lean decade;
+        // they vanish only when the faith itself dies (its Religion is erased).
+        int lvl = 0;
+        if      (alive >= 400) lvl = 6;   // Religious Center
+        else if (alive >= 250) lvl = 5;   // Holy Order
+        else if (alive >= 150) lvl = 4;   // Cathedral
+        else if (alive >=  80) lvl = 3;   // Monastery
+        else if (alive >=  35) lvl = 2;   // Temple
+        else if (alive >=  12) lvl = 1;   // Shrine
+        if (lvl > rel.institutionLevel) {
+            rel.institutionLevel = lvl;
+            logEvent(day, "The " + rel.name + " raised a " + rel.institutionName(), "religion",
+                     "kind=religion_institution religionId=" + std::to_string(rel.id)
+                     + " level=" + std::to_string(lvl)
+                     + " institution=\"" + rel.institutionName() + "\""
+                     + " followers=" + std::to_string(alive));
+        }
     }
+}
+
+int CivilizationEngine::trySyncretism(std::vector<Entity>& entities, int day) {
+    if (religions.size() < 2) return 0;
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+
+    // One O(N) pass: living tribe of every entity, so the pair scan below never
+    // calls the O(N) entityById in a hot loop.
+    std::map<int,int> tribeOf;        // entityId -> tribeId (living only)
+    for (const Entity& e : entities)
+        if (e.entityHealth > 0.0f) tribeOf[e.entityId] = e.tribeId;
+
+    auto liveFollowers = [&](const Religion& r, std::set<int>& tribes) {
+        int a = 0;
+        for (int fid : r.followerIds) {
+            auto it = tribeOf.find(fid);
+            if (it == tribeOf.end()) continue;   // dead / gone
+            ++a;
+            if (it->second >= 0) tribes.insert(it->second);
+        }
+        return a;
+    };
+
+    for (size_t i = 0; i < religions.size(); ++i) {
+        for (size_t j = i + 1; j < religions.size(); ++j) {
+            Religion& A = religions[i];
+            Religion& B = religions[j];
+            // Only mutually-tolerant faiths reconcile; the exclusive ones war.
+            if (A.tolerance < 55.0f || B.tolerance < 55.0f) continue;
+
+            std::set<int> aTribes, bTribes;
+            int aAlive = liveFollowers(A, aTribes);
+            int bAlive = liveFollowers(B, bTribes);
+            if (aAlive < 3 || bAlive < 3) continue;
+
+            // They must actually rub shoulders — share at least one tribe.
+            bool shareTribe = false;
+            for (int t : aTribes) if (bTribes.count(t)) { shareTribe = true; break; }
+            if (!shareTribe) continue;
+
+            // A deliberate, rare cultural event, not a constant churn.
+            if (roll(rng) > 0.10f) continue;
+
+            bool aBigger = (aAlive >= bAlive);
+            size_t bigIdx = aBigger ? i : j, smallIdx = aBigger ? j : i;
+            Religion& big   = religions[bigIdx];
+            Religion& small = religions[smallIdx];
+            float wb = (float)std::max(1, aBigger ? aAlive : bAlive);
+            float ws = (float)std::max(1, aBigger ? bAlive : aAlive);
+            auto blend = [&](float x, float y){ return (x * wb + y * ws) / (wb + ws); };
+            big.militarism     = blend(big.militarism,     small.militarism);
+            big.tolerance      = blend(big.tolerance,      small.tolerance);
+            big.asceticism     = blend(big.asceticism,     small.asceticism);
+            big.authority      = blend(big.authority,      small.authority);
+            big.afterlifeFocus = blend(big.afterlifeFocus, small.afterlifeFocus);
+
+            int bigId = big.id, smallId = small.id;
+            std::string bigName = big.name, smallName = small.name;
+
+            // Fold the smaller congregation into the larger faith.
+            for (int fid : small.followerIds) {
+                Entity* e = entityById(entities, fid);
+                if (e && e->entityHealth > 0.0f && e->religionId == smallId) {
+                    e->religionId = bigId;
+                    big.followerIds.push_back(fid);
+                }
+            }
+            for (auto& t : tribes)
+                if (t.dominantReligionId == smallId) t.dominantReligionId = bigId;
+
+            logEvent(day, "The faiths of \"" + smallName + "\" and \"" + bigName
+                     + "\" reconciled and merged into a single tradition", "religion",
+                     "kind=religion_syncretism absorbedId=" + std::to_string(smallId)
+                     + " absorbedName=\"" + smallName + "\""
+                     + " intoId=" + std::to_string(bigId) + " intoName=\"" + bigName + "\"");
+
+            // Remove the absorbed faith. `big`/`small` references die here, but we
+            // return immediately, so nothing dangles.
+            religions.erase(religions.begin() + smallIdx);
+            return 1;   // at most one merge per tick keeps this cheap & legible
+        }
+    }
+    return 0;
 }
 
 bool CivilizationEngine::foundReligion(Entity* prophet, int day) {
@@ -720,18 +919,43 @@ bool CivilizationEngine::foundReligion(Entity* prophet, int day) {
     rel.isPolytheistic  = (prophet->personality.openness > 55.0f);
     rel.spiritualDemand = prophet->ValueSystem.spiritualNeed;
 
-    // Generate sacred principle from prophet's life
     bool hasGrief = false;
     for (const auto& g : prophet->griefStates) if (g.intensity > 0.3f) { hasGrief = true; break; }
 
-    if (hasGrief)
-        rel.holyPrinciple = "Those who are lost shall be remembered forever.";
-    else if (prophet->entityStress > 60.0f)
-        rel.holyPrinciple = "Order is the shield against suffering.";
-    else if (prophet->personality.openness > 70.0f)
-        rel.holyPrinciple = "All things are connected in the great weave.";
-    else
-        rel.holyPrinciple = "Live rightly, and the world shall be good.";
+    // ── Doctrinal axes from the founder (Plan 3.1.A) ─────────────────────────
+    auto clamp01 = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
+    const auto& P = prophet->personality;
+    rel.militarism     = clamp01((100.0f - P.agreeableness) * 0.6f + P.neuroticism * 0.4f);
+    rel.tolerance      = clamp01(P.openness * 0.7f + P.agreeableness * 0.3f);
+    rel.asceticism     = clamp01(rel.spiritualDemand * 0.6f + P.conscientiousness * 0.4f);
+    rel.authority      = clamp01(P.conscientiousness * 0.6f + (100.0f - P.openness) * 0.4f);
+    rel.afterlifeFocus = clamp01(rel.spiritualDemand * 0.5f + prophet->entityStress * 0.3f
+                                 + (hasGrief ? 25.0f : 0.0f));
+
+    // ── Unique creed generated from the dominant axis (Plan 3.1.D) ───────────
+    // The axis that deviates furthest from the neutral 50 defines the faith's
+    // voice — so a crusader faith preaches conquest and a syncretic one preaches
+    // coexistence, instead of every religion sharing one bland motto.
+    struct AxisCreed { float dev; std::string creed; };
+    std::vector<AxisCreed> creeds = {
+        { rel.militarism    - 50.0f, "The sword purifies; the faithful shall conquer." },
+        { 50.0f - rel.militarism,    "Blessed are the peacemakers, for they inherit the earth." },
+        { rel.tolerance     - 50.0f, "The divine wears many faces; embrace them all." },
+        { 50.0f - rel.tolerance,     "There is one truth, and all other paths are shadow." },
+        { rel.asceticism    - 50.0f, "Flesh is illusion; only the spirit endures." },
+        { 50.0f - rel.asceticism,    "The world is a gift; take joy in its abundance." },
+        { rel.authority     - 50.0f, "Order reflects the divine hierarchy; obey the anointed." },
+        { 50.0f - rel.authority,     "No crown stands between a soul and the sacred." },
+        { rel.afterlifeFocus- 50.0f, "This world is a trial; the next is the reward." },
+        { 50.0f - rel.afterlifeFocus,"Heaven is the life we build with our own hands." },
+    };
+    auto strongest = std::max_element(creeds.begin(), creeds.end(),
+        [](const AxisCreed& a, const AxisCreed& b){ return a.dev < b.dev; });
+    // Fall back to a neutral creed only when no axis is meaningfully pronounced.
+    rel.holyPrinciple = (strongest->dev > 12.0f)
+        ? strongest->creed
+        : (hasGrief ? "Those who are lost shall be remembered forever."
+                    : "Live rightly, and the world shall be good.");
 
     rel.name = religionName(prophet);
     religions.push_back(rel);
@@ -879,6 +1103,16 @@ bool CivilizationEngine::discoverInnovation(Entity* inventor, Tribe* tribe, int 
         ? candidates[std::uniform_int_distribution<int>(0, (int)candidates.size()-1)(rng)]
         : preferred [std::uniform_int_distribution<int>(0, (int)preferred.size()-1)(rng)];
 
+    // Complexity gates the pace of progress: a simple trick (~18) almost always
+    // lands once attempted, but odds fall off with the square of complexity —
+    // Metal Working (78) fizzles ~95% of attempts, Gunpowder (90) ~96%. Without
+    // this the whole 53-tech catalog emptied within a few decades because a
+    // prereq-met tech was discovered on the first eureka regardless of difficulty.
+    float odds = 18.0f / std::max(18.0f, chosen->complexity);
+    odds *= odds;
+    std::uniform_real_distribution<float> attemptRoll(0.0f, 1.0f);
+    if (attemptRoll(rng) > odds) return false;   // the insight slips away
+
     Innovation inv;
     inv.id                   = nextInnovId++;
     inv.name                 = chosen->name;
@@ -893,7 +1127,10 @@ bool CivilizationEngine::discoverInnovation(Entity* inventor, Tribe* tribe, int 
     innovations.push_back(inv);
 
     inventor->knownTechIds.push_back(inv.id);
-    if (tribe) tribe->knownTechIds.insert(inv.id);
+    if (tribe){
+      tribe->knownTechIds.insert(inv.id);
+      tribe->knownTechName.insert(inv.name);
+    }
 
     logEvent(day, inventor->name + " discovered \"" + inv.name + "\" (" + inv.category + ")"
              + (tribe ? " for the " + tribe->name : ""), "innovation");
@@ -1022,7 +1259,7 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
             // (a) Faith friction: rival dominant religions chafe continuously.
             if (A.dominantReligionId != -1 && B.dominantReligionId != -1 &&
                 A.dominantReligionId != B.dominantReligionId)
-                rel -= 0.35f;
+                rel -= 0.5f;
             // (b) Hunger envy: a starving tribe eyes a fat neighbour's granary,
             // and desperation makes it warlike.
             if (A.granary < 5.0f && B.granary > 30.0f) {
@@ -1033,6 +1270,13 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                 rel -= 0.6f;
                 B.militarism = std::min(100.0f, B.militarism + 0.25f);
             }
+            // (c) Conquest opportunism: a warlike tribe towering over a much
+            // smaller neighbour smells easy land, and covets it. Uses population
+            // as a cheap strength proxy — the real strength math runs only at
+            // the moment of declaration.
+            int popA = A.population(), popB = B.population();
+            if (A.militarism > 55.0f && popB > 0 && popA > popB * 2) rel -= 0.45f;
+            if (B.militarism > 55.0f && popA > 0 && popB > popA * 2) rel -= 0.45f;
 
             if (valDiff < 22.0f)
                 rel = std::min(100.0f, rel + 1.0f);
@@ -1044,9 +1288,14 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
             rel = std::max(-100.0f, std::min(100.0f, rel));
             B.relations[A.id] = rel;
 
-            // War line climbs toward 0 with militarism: very warlike tribes go to
-            // war at merely cool relations (-25), peaceful ones only when hated.
-            float warLine   = -45.0f + aggression * 20.0f;
+            // War line climbs toward 0 with militarism. Plan 2.1's floor (-62..-48)
+            // overcorrected the endemic ~860-war run to nearly zero wars: with
+            // similar cultures warming at +1.0/tick, relations could never grind
+            // that low. Raised so warlike pairs tip at ~-34 and even peaceful
+            // ones at -52, while war-weary tribes (high exhaustion) still hold
+            // back for a generation after a fight.
+            float warLine   = -52.0f + aggression * 18.0f
+                              - std::max(A.warExhaustion, B.warExhaustion) * 0.15f;
             float rivalLine = -15.0f;
 
             TribeStance stance;
@@ -1060,57 +1309,64 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                 A.stances[B.id] = stance;
                 B.stances[A.id] = stance;
                 if (stance == TS_AT_WAR) {
-                    // Ethnic / hate war: rooted in clashing faiths or deep mutual
-                    // loathing between two warlike peoples, not mere border friction.
-                    // These burn hotter — more rage, more blood, harder to end.
-                    bool faithClash = (A.dominantReligionId != -1 && B.dominantReligionId != -1
-                                       && A.dominantReligionId != B.dominantReligionId);
-                    bool deepHatred = (rel < -75.0f) && (aggression > 0.55f);
-                    bool ethnic = faithClash || deepHatred;
+                    // ── Casus belli first, faith second (Plan 2.1.C) ─────────────
+                    // The reference run was 98.8% "holy war" because ANY faith
+                    // difference lit a war of religion. Now a holy war demands real
+                    // zealotry on BOTH sides — two intolerant faiths, at least one
+                    // of them a crusading creed. Every other war is fought over the
+                    // concrete thing that actually pushed relations over the edge:
+                    // hunger, a power imbalance, a rebellious vassal, or plain
+                    // border friction. Holy war becomes the exception, not the rule.
+                    Religion* ra = findReligion(A.dominantReligionId);
+                    Religion* rb = findReligion(B.dominantReligionId);
+                    bool faithsDiffer = (A.dominantReligionId != -1 && B.dominantReligionId != -1
+                                         && A.dominantReligionId != B.dominantReligionId);
+                    float tolA = ra ? ra->tolerance  : 50.0f, tolB = rb ? rb->tolerance  : 50.0f;
+                    float milA = ra ? ra->militarism : 0.0f,  milB = rb ? rb->militarism : 0.0f;
+                    bool holyWar   = faithsDiffer && tolA < 45.0f && tolB < 45.0f
+                                     && std::max(milA, milB) > 55.0f;
+                    bool deepHatred = (rel < -80.0f) && (aggression > 0.6f);
 
+                    bool hungry = (A.granary < 8.0f && B.granary > 25.0f)
+                                  || (B.granary < 8.0f && A.granary > 25.0f);
+                    float sA = calculateTribeMilitaryStrength(A, entities);
+                    float sB = calculateTribeMilitaryStrength(B, entities);
+                    float hi = std::max(sA, sB), lo = std::max(1.0f, std::min(sA, sB));
+                    bool imbalance   = (hi > lo * 1.8f);
+                    bool militaristic = (A.militarism > 58.0f || B.militarism > 58.0f);
+                    bool vassalSpat  = (A.overlordTribeId == B.id || B.overlordTribeId == A.id);
+
+                    WarReason reason;
+                    if      (holyWar)                    reason = WAR_ETHNIC;
+                    else if (vassalSpat)                 reason = WAR_TRIBUTE;
+                    else if (hungry)                     reason = WAR_RESOURCE;
+                    else if (imbalance && militaristic)  reason = WAR_CONQUEST;
+                    else if (deepHatred)                 reason = WAR_ETHNIC;   // ancient hatred
+                    else                                 reason = WAR_BORDER;
+
+                    bool ethnic = (reason == WAR_ETHNIC);
                     A.ethnicWarWith.insert(ethnic ? B.id : -999);
                     B.ethnicWarWith.insert(ethnic ? A.id : -999);
                     A.ethnicWarWith.erase(-999);
                     B.ethnicWarWith.erase(-999);
 
                     totalWarsDeclared++;
-                    if (ethnic) {
-                        totalEthnicWars++;
-                        std::string why = faithClash ? "a holy war of faiths"
-                                                     : "a war of ancient hatreds";
-                        logEvent(day, "ETHNIC WAR: the " + A.name + " and the " + B.name
-                                 + " plunge into " + why, "war",
-                                 "kind=war_declared ethnic=1 reason=\"" + why + "\""
-                                 + " tribeA=\"" + A.name + "\" tribeAId=" + std::to_string(A.id)
-                                 + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id)
-                                 + " popA=" + std::to_string(A.population())
-                                 + " popB=" + std::to_string(B.population())
-                                 + " relations=" + std::to_string((int)rel));
-                    } else {
-                        // Not every war is ethnic hatred: name the concrete grievance
-                        // (casus belli) that actually pushed relations over the line.
-                        WarReason reason;
-                        if ((A.granary < 5.0f && B.granary > 30.0f) ||
-                            (B.granary < 5.0f && A.granary > 30.0f)) {
-                            reason = WAR_RESOURCE;   // the hungry fall on the fat granary
-                        } else {
-                            float sA = calculateTribeMilitaryStrength(A, entities);
-                            float sB = calculateTribeMilitaryStrength(B, entities);
-                            float hi = std::max(sA, sB), lo = std::min(sA, sB);
-                            bool militaristic = (A.militarism > 60.0f || B.militarism > 60.0f);
-                            // A strong warlike tribe simply taking a weak neighbour's
-                            // land is conquest; anything else is ordinary border friction.
-                            reason = (hi > lo * 2.0f && militaristic) ? WAR_CONQUEST : WAR_BORDER;
-                        }
-                        std::string why = warReasonName(reason);
-                        logEvent(day, "The " + A.name + " and the " + B.name + " go to war — " + why, "war",
-                                 "kind=war_declared ethnic=0 reason=\"" + why + "\""
-                                 + " tribeA=\"" + A.name + "\" tribeAId=" + std::to_string(A.id)
-                                 + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id)
-                                 + " popA=" + std::to_string(A.population())
-                                 + " popB=" + std::to_string(B.population())
-                                 + " relations=" + std::to_string((int)rel));
-                    }
+                    if (ethnic) totalEthnicWars++;
+                    std::string why = holyWar ? "a holy war of faiths"
+                                   : (reason == WAR_ETHNIC) ? "a war of ancient hatreds"
+                                   : warReasonName(reason);
+                    std::string head = ethnic
+                        ? ("ETHNIC WAR: the " + A.name + " and the " + B.name + " plunge into " + why)
+                        : ("The " + A.name + " and the " + B.name + " go to war — " + why);
+                    logEvent(day, head, "war",
+                             "kind=war_declared ethnic=" + std::string(ethnic ? "1" : "0")
+                             + " reason=\"" + why + "\""
+                             + " tribeA=\"" + A.name + "\" tribeAId=" + std::to_string(A.id)
+                             + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id)
+                             + " popA=" + std::to_string(A.population())
+                             + " popB=" + std::to_string(B.population())
+                             + " relations=" + std::to_string((int)rel));
+
                     float rage = ethnic ? 22.0f : 8.0f;
                     for (int mid : A.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + rage); }
                     for (int mid : B.memberIds) { Entity* e = entityById(entities, mid); if (e) e->entityGeneralAnger = std::min(100.0f, e->entityGeneralAnger + rage); }
@@ -1245,35 +1501,51 @@ void CivilizationEngine::updateEra(const std::vector<Entity>& entities) {
     int innCount = (int)innovations.size();
     int tribeCount = (int)tribes.size();
 
+    // Key foundational technologies gate each era. Extended (Plan 1.2) so the
+    // enlarged CATALOG can actually carry a civilisation to the Renaissance and
+    // beyond — previously ERA_RENNAISSANCE was unreachable and the ladder capped
+    // out around innCount 18.
     bool hasAgriculture = false, hasMetal = false, hasFort = false;
+    bool hasIronSmelt = false, hasWriting = false, hasGunpowder = false;
+    bool hasScientific = false, hasSteam = false;
     bool hasReligion = !religions.empty();
     for (const auto& inv : innovations) {
         if (inv.category == "agriculture") hasAgriculture = true;
-        if (inv.name == "Metal Working") hasMetal = true;
-        if (inv.name == "Fortification") hasFort = true;
+        if (inv.name == "Metal Working")   hasMetal       = true;
+        if (inv.name == "Fortification")   hasFort        = true;
+        if (inv.name == "Iron Smelting")   hasIronSmelt   = true;
+        if (inv.name == "Writing")         hasWriting     = true;
+        if (inv.name == "Gunpowder")       hasGunpowder   = true;
+        if (inv.name == "Scientific Method") hasScientific = true;
+        if (inv.name == "Steam Power")     hasSteam       = true;
     }
 
     CivilizationEra prevEra = era;
     int year = getCurrentYear();
 
-    if (innCount >= 18 && tribeCount >= 4 && pop >= 30 && hasMetal && hasFort)
-        era = ERA_MODERN;
-    else if (innCount >= 14 && tribeCount >= 3 && pop >= 25 && hasMetal)
-        era = ERA_EARLY_MODERN;
-    else if (innCount >= 12 && tribeCount >= 3 && pop >= 20 && hasFort)
-        era = ERA_MEDIEVAL;
-    else if (innCount >= 9 && tribeCount >= 3 && pop >= 18 && hasMetal)
-        era = ERA_CLASSICAL;
-    else if (innCount >= 7 && tribeCount >= 2 && pop >= 15)
-        era = ERA_IRON_AGE;
-    else if (innCount >= 5 && tribeCount >= 2 && pop >= 12 && hasMetal)
-        era = ERA_BRONZE_AGE;
-    else if (innCount >= 3 && (hasAgriculture || hasReligion) && tribeCount >= 2)
-        era = ERA_EARLY_AGRICULTURE;
-    else if (tribeCount >= 2 && innCount >= 1)
-        era = ERA_TRIBAL;
-    else
-        era = ERA_STONE_AGE;
+    if      (innCount >= 44 && hasSteam)                    era = ERA_MODERN;
+    else if (innCount >= 38 && hasScientific)               era = ERA_EARLY_MODERN;
+    else if (innCount >= 32 && hasGunpowder)                era = ERA_RENNAISSANCE;
+    else if (innCount >= 26 && hasFort && hasWriting)       era = ERA_MEDIEVAL;
+    else if (innCount >= 20 && hasIronSmelt)                era = ERA_CLASSICAL;
+    else if (innCount >= 14 && hasIronSmelt)                era = ERA_IRON_AGE;
+    else if (innCount >=  9 && hasMetal)                    era = ERA_BRONZE_AGE;
+    else if (innCount >=  5 && (hasAgriculture || hasReligion) && tribeCount >= 2)
+                                                            era = ERA_EARLY_AGRICULTURE;
+    else if (tribeCount >= 2 && innCount >= 1)              era = ERA_TRIBAL;
+    else                                                    era = ERA_STONE_AGE;
+
+    // ── Institutional memory floor (Plan 1.1, Option D) ──────────────────────
+    // A civilisation carries the memory of its golden age: the live era can slip
+    // at most ONE step below the highest era ever achieved. This is what turns a
+    // catastrophic Medieval→Stone-Age cascade into a recoverable single-step
+    // regression, ending the endless oscillation loop.
+    if ((int)maxEraAchieved > (int)ERA_STONE_AGE) {
+        CivilizationEra floorEra =
+            (CivilizationEra)std::max((int)ERA_STONE_AGE, (int)maxEraAchieved - 1);
+        if ((int)era < (int)floorEra) era = floorEra;
+    }
+    if ((int)era > (int)maxEraAchieved) maxEraAchieved = era;
 
     if (era != prevEra) {
         logEvent(0, "The world enters a new era: " + getEraName()
@@ -1339,6 +1611,13 @@ void CivilizationEngine::applyEffectsToEntities(std::vector<Entity>& entities, i
             // High-demand religion → stronger community bond
             if (religion->spiritualDemand > 65.0f)
                 ent.entityLoneliness = clamp(ent.entityLoneliness - 2.0f, 0.0f, 100.0f);
+            // Religious institutions (Plan 3.1.C): the grander the faith's works,
+            // the more solace and belonging they give their congregation.
+            if (religion->institutionLevel > 0) {
+                float instBonus = 0.3f * (float)religion->institutionLevel;
+                ent.entityHapiness    = clamp(ent.entityHapiness    + instBonus,       0.0f, 100.0f);
+                ent.entityMentalHealth = clamp(ent.entityMentalHealth + instBonus * 0.5f, 0.0f, 100.0f);
+            }
         }
 
         // ── Innovation / specialization effects ──────────────────────────────
@@ -1507,6 +1786,451 @@ void CivilizationEngine::updateTechTree(std::vector<Entity>& entities, int day) 
     TechTreeSystem::tick(*this, entities, day);
 }
 
+// ── Resource economy & fortifications (Improvement Plan 6.1 / 2.3) ─────────────
+// Specialists no longer just exist — they produce distinct stockpiles: craftsmen
+// work materials (and, once metalworking exists, ore); traders amass luxuries;
+// scholars accumulate knowledge. Those stockpiles then do concrete work: knowledge
+// speeds research, luxuries lift spirits, and materials are spent raising
+// fortifications toward the ceiling the current era allows.
+void CivilizationEngine::updateEconomyResources(std::vector<Entity>& entities, int day) {
+    (void)day;
+    auto clamp = [](float v, float lo, float hi) { return std::max(lo, std::min(hi, v)); };
+
+    bool hasMetalTech = false, hasWriting = false, hasPrinting = false;
+    for (const auto& inv : innovations) {
+        if (inv.name == "Metal Working" || inv.name == "Iron Smelting") hasMetalTech = true;
+        if (inv.name == "Writing")  hasWriting  = true;
+        if (inv.name == "Printing") hasPrinting = true;
+    }
+
+    // Era sets how grand a tribe's defensive works may become.
+    float fortCap;
+    switch (era) {
+        case ERA_STONE_AGE: case ERA_TRIBAL: case ERA_EARLY_AGRICULTURE: fortCap = 10.0f; break; // palisade
+        case ERA_BRONZE_AGE: case ERA_IRON_AGE:                          fortCap = 25.0f; break; // walls
+        case ERA_CLASSICAL: case ERA_MEDIEVAL:                           fortCap = 50.0f; break; // castle
+        case ERA_RENNAISSANCE:                                           fortCap = 75.0f; break; // star fort
+        default:                                                         fortCap = 100.0f; break;
+    }
+
+    for (Tribe& t : tribes) {
+        int pop = 0, crafts = 0, scholars = 0, traders = 0;
+        for (int mid : t.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (!e || e->entityHealth <= 0.0f) continue;
+            ++pop;
+            if (!e->isSpecialist) continue;
+            const std::string& s = e->specialization;
+            if      (s == "craftsman") ++crafts;
+            else if (s == "scholar")   ++scholars;
+            else if (s == "trader")    ++traders;
+        }
+        if (pop == 0) continue;
+
+        // Abstract land holdings relax toward population — this is what a decisive
+        // battle then carves a slice out of.
+        t.territory += ((float)pop - t.territory) * 0.05f;
+
+        // Production.
+        t.matStock       += crafts * 0.8f;
+        if (hasMetalTech) t.metalStock += crafts * 0.3f;
+        t.luxuryStock    += traders * 0.5f;
+        t.knowledgeStock += scholars * 0.6f;
+
+        // Upkeep / spoilage.
+        t.matStock    *= 0.99f;
+        t.metalStock  *= 0.995f;
+        t.luxuryStock *= 0.98f;
+
+        // Education & knowledge transmission (Plan 11): an illiterate people forgets
+        // — oral knowledge decays each tick. Writing preserves it; printing makes it
+        // near-permanent and even compounds. This is what lets a literate society
+        // hold its gains through a dark age instead of relearning from scratch.
+        if (hasPrinting)      t.knowledgeStock *= 1.002f;   // knowledge begets knowledge
+        else if (hasWriting)  { /* preserved — no decay */ }
+        else                  t.knowledgeStock *= 0.98f;    // oral tradition fades
+
+        // Effects. Knowledge speeds the tech-tree climb…
+        t.researchPoints += t.knowledgeStock * 0.02f;
+        // …luxuries lift the mood of the whole tribe…
+        if (t.luxuryStock > 1.0f) {
+            float lux = std::min(1.5f, t.luxuryStock * 0.02f);
+            for (int mid : t.memberIds) {
+                Entity* e = entityById(entities, mid);
+                if (e && e->entityHealth > 0.0f)
+                    e->entityHapiness = clamp(e->entityHapiness + lux, 0.0f, 100.0f);
+            }
+            t.luxuryStock *= 0.9f;   // consumed in the enjoying
+        }
+        // …and materials are spent raising fortifications toward the era ceiling.
+        if (t.matStock > 5.0f && t.fortificationLevel < fortCap) {
+            float build = std::min(0.5f, (fortCap - t.fortificationLevel) * 0.05f);
+            t.fortificationLevel = clamp(t.fortificationLevel + build, 0.0f, fortCap);
+            t.matStock -= build * 4.0f;
+        }
+        // Works crumble down to what the (possibly regressed) era can maintain.
+        if (t.fortificationLevel > fortCap)
+            t.fortificationLevel = std::max(fortCap, t.fortificationLevel - 0.2f);
+    }
+}
+
+// Gini coefficient of individual wealth across the living population (Plan 6.2).
+float CivilizationEngine::wealthGini(const std::vector<Entity>& entities) const {
+    std::vector<float> w;
+    for (const auto& e : entities)
+        if (e.entityHealth > 0.0f) w.push_back(std::max(0.0f, e.salary.token));
+    if (w.size() < 2) return 0.0f;
+    std::sort(w.begin(), w.end());
+    double sum = 0.0;
+    for (float x : w) sum += x;
+    if (sum <= 0.0) return 0.0f;
+    double n = (double)w.size(), wsum = 0.0;
+    for (size_t i = 0; i < w.size(); ++i) wsum += (double)(i + 1) * (double)w[i];
+    double g = (2.0 * wsum) / (n * sum) - (n + 1.0) / n;
+    return (float)std::max(0.0, std::min(1.0, g));
+}
+
+// ── Culture & arts (Improvement Plan 7) ───────────────────────────────────────
+// Content scholar/artisan specialists turn leisure and inspiration (faith,
+// prosperity) into a tribal culture score, which lifts happiness and eases
+// boredom; occasionally a great work is produced. Dark ages erode culture — the
+// library burns with the granary.
+void CivilizationEngine::updateCulture(std::vector<Entity>& entities, int day) {
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    auto clamp = [](float v, float lo, float hi) { return std::max(lo, std::min(hi, v)); };
+
+    for (Tribe& t : tribes) {
+        int pop = 0, artists = 0;
+        for (int mid : t.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (!e || e->entityHealth <= 0.0f) continue;
+            ++pop;
+            if (e->isSpecialist && (e->specialization == "scholar" || e->specialization == "craftsman")
+                && e->entityStress < 50.0f)
+                ++artists;
+        }
+        if (pop == 0) { t.cultureScore *= 0.98f; continue; }
+
+        // Inspiration flows from artists, luxury (patronage) and a living faith.
+        float inspiration = artists * 0.5f + t.luxuryStock * 0.02f
+                            + (t.dominantReligionId >= 0 ? 0.3f : 0.0f);
+        t.cultureScore = clamp(t.cultureScore + inspiration * 0.1f - 0.05f, 0.0f, 100.0f);
+
+        // A great work: rare, needs a vibrant culture and at least one artist.
+        if (artists > 0 && t.cultureScore > 40.0f
+            && roll(rng) < 0.01f * (t.cultureScore / 100.0f)) {
+            ++t.culturalAchievements;
+            t.cultureScore = clamp(t.cultureScore + 5.0f, 0.0f, 100.0f);
+            logEvent(day, "The " + t.name + " produced a great work of culture", "culture",
+                     "kind=cultural_achievement tribe=\"" + t.name + "\""
+                     + " tribeId=" + std::to_string(t.id)
+                     + " cultureScore=" + std::to_string((int)t.cultureScore)
+                     + " total=" + std::to_string(t.culturalAchievements));
+        }
+
+        // Culture lifts the spirit and stirs the mind of the whole people.
+        if (t.cultureScore > 10.0f) {
+            float c = t.cultureScore * 0.01f;
+            for (int mid : t.memberIds) {
+                Entity* e = entityById(entities, mid);
+                if (!e || e->entityHealth <= 0.0f) continue;
+                e->entityHapiness = clamp(e->entityHapiness + c * 0.3f, 0.0f, 100.0f);
+                e->entityBoredom  = clamp(e->entityBoredom  - c * 0.3f, 0.0f, 100.0f);
+            }
+        }
+    }
+
+    // A collapse this very day scorches the cultural institutions too.
+    if (lastCollapseDay == day)
+        for (Tribe& t : tribes) t.cultureScore *= 0.9f;
+}
+
+// ── Climate & natural disasters (Improvement Plan 12) ─────────────────────────
+// Beyond the seasonal famine cycle, the land itself occasionally turns violent:
+// droughts and floods are common, earthquakes rarer, volcanoes and meteors rare
+// and devastating. Each strikes one region — harming its people, and (for the
+// tectonic kinds) toppling fortifications and spilling granaries. Scaled by the
+// world's catastropheRate divergence knob so seeds differ in how cruel nature is.
+void CivilizationEngine::updateClimate(std::vector<Entity>& entities, int day) {
+    if (!g_planet) return;
+    if (day == lastClimateDay) return;      // once per civ-day (tick fires repeatedly)
+    lastClimateDay = day;
+
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    float cata = g_worldSeed.divergence.catastropheRate;
+
+    // regionPopulation was refreshed by updateCarryingCapacity earlier this tick.
+    for (const auto& kv : regionPopulation) {
+        int rid = kv.first, pop = kv.second;
+        if (pop <= 0) continue;
+        if (roll(rng) >= 0.015f * cata) continue;   // disasters are rare
+
+        float r = roll(rng);
+        std::string type; float severity;
+        if      (r < 0.40f) { type = "drought";           severity = 0.3f + roll(rng) * 0.4f; }
+        else if (r < 0.70f) { type = "flood";             severity = 0.3f + roll(rng) * 0.4f; }
+        else if (r < 0.90f) { type = "earthquake";        severity = 0.4f + roll(rng) * 0.4f; }
+        else if (r < 0.98f) { type = "volcanic eruption"; severity = 0.6f + roll(rng) * 0.4f; }
+        else                { type = "meteor strike";     severity = 0.8f + roll(rng) * 0.2f; }
+        bool tectonic = (type != "drought" && type != "flood");
+
+        int killed = 0;
+        for (Entity& e : entities) {
+            if (e.entityHealth <= 0.0f) continue;
+            const Tile* t = g_planet->tileAtWorld(e.posX, e.posY);
+            int erid = (t && t->regionId >= 0) ? t->regionId : e.originRegionId;
+            if (erid != rid) continue;
+            float before = e.entityHealth;
+            if (type == "drought") {
+                e.entityHunger = std::min(100.0f, e.entityHunger + severity * 40.0f);
+                e.foodStore    = std::max(0.0f,   e.foodStore    - severity * 10.0f);
+                e.entityHealth = std::max(0.0f,   e.entityHealth - severity * 8.0f);
+            } else if (type == "flood") {
+                e.entityHealth = std::max(0.0f,   e.entityHealth - severity * 18.0f);
+                e.entityStress = std::min(100.0f, e.entityStress + severity * 20.0f);
+            } else if (type == "earthquake") {
+                e.entityHealth = std::max(0.0f,   e.entityHealth - severity * 22.0f);
+            } else {  // volcano / meteor
+                e.entityHealth = std::max(0.0f,   e.entityHealth - severity * 40.0f);
+                e.entityStress = std::min(100.0f, e.entityStress + severity * 30.0f);
+            }
+            e.entityHapiness = std::max(0.0f, e.entityHapiness - severity * 15.0f);
+            if (before > 0.0f && e.entityHealth <= 0.0f) { e.pendingDeathCause = type; ++killed; }
+        }
+
+        // Tectonic disasters wreck the built environment too.
+        if (tectonic) {
+            for (Tribe& tb : tribes) {
+                if (tb.regionId != rid) continue;
+                tb.fortificationLevel *= (1.0f - severity * 0.4f);
+                tb.matStock           *= (1.0f - severity * 0.3f);
+                tb.granary            *= (1.0f - severity * 0.2f);
+            }
+        }
+
+        ++totalDisasters;
+        logEvent(day, "DISASTER: a " + type + " struck the land", "environment",
+                 "kind=natural_disaster type=\"" + type + "\" region=" + std::to_string(rid)
+                 + " severity=" + std::to_string((int)(severity * 100))
+                 + " killed=" + std::to_string(killed)
+                 + " population=" + std::to_string(pop));
+    }
+}
+
+// ── Technology diffusion between tribes (Improvement Plan 1.4) ─────────────────
+// Knowledge no longer stays siloed in the tribe that invented it: neighbours in
+// contact, and especially allies and co-religionists, gradually learn each
+// other's techs. This spreads innovation across the map (raising each tech's
+// knowerCount, which also makes it harder to lose in a dark age — ties to 1.1).
+void CivilizationEngine::updateTechDiffusion(std::vector<Entity>& entities, int day) {
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    for (size_t i = 0; i < tribes.size(); ++i) {
+        for (size_t j = i + 1; j < tribes.size(); ++j) {
+            Tribe& A = tribes[i];
+            Tribe& B = tribes[j];
+            bool ally = (A.stances.count(B.id) && A.stances[B.id] == TS_ALLY);
+            bool contact = ally || (A.regionId == B.regionId && A.regionId != -1);
+            if (!contact) continue;
+            if (A.stances.count(B.id) && A.stances[B.id] == TS_AT_WAR) continue; // enemies hoard secrets
+
+            bool sameFaith = (A.dominantReligionId != -1 && A.dominantReligionId == B.dominantReligionId);
+            float chance = (ally ? 0.15f : 0.05f) + (sameFaith ? 0.05f : 0.0f);
+            if (roll(rng) >= chance) continue;
+
+            Tribe& donor = (A.knownTechIds.size() >= B.knownTechIds.size()) ? A : B;
+            Tribe& recv  = (A.knownTechIds.size() >= B.knownTechIds.size()) ? B : A;
+            int learned = -1;
+            for (int tid : donor.knownTechIds)
+                if (!recv.knownTechIds.count(tid)) { learned = tid; break; }
+            if (learned < 0) continue;
+
+            recv.knownTechIds.insert(learned);
+            if (Innovation* inv = findInnovation(learned)) inv->knowerCount++;
+            for (int mid : recv.memberIds) {   // seed one carrier so it can spread onward
+                Entity* e = entityById(entities, mid);
+                if (e && e->entityHealth > 0.0f) {
+                    if (std::find(e->knownTechIds.begin(), e->knownTechIds.end(), learned) == e->knownTechIds.end())
+                        e->knownTechIds.push_back(learned);
+                    break;
+                }
+            }
+            ++totalTechSpreads;
+            std::string tn = "a technique";
+            if (Innovation* inv = findInnovation(learned)) tn = inv->name;
+            logEvent(day, "The " + recv.name + " learned " + tn + " from the " + donor.name, "innovation",
+                     "kind=tech_spread tech=\"" + tn + "\""
+                     + " from=\"" + donor.name + "\" to=\"" + recv.name + "\""
+                     + (ally ? " via=alliance" : (sameFaith ? " via=faith" : " via=contact")));
+        }
+    }
+}
+
+// ── Emergent social classes (Improvement Plan 4.2) ────────────────────────────
+// Wealth (each person's salary.token) sorts the living into elite/upper/middle/
+// lower/outcast strata by percentile. Class shapes life: the elite gain esteem
+// and influence, the outcasts slide toward despair and unrest. No per-entity
+// field is stored — the census is recomputed each civ-day for effects & report.
+void CivilizationEngine::updateSocialClasses(std::vector<Entity>& entities, int day) {
+    (void)day;
+    auto clamp = [](float v, float lo, float hi) { return std::max(lo, std::min(hi, v)); };
+    std::vector<float> w;
+    w.reserve(entities.size());
+    for (const auto& e : entities)
+        if (e.entityHealth > 0.0f) w.push_back(std::max(0.0f, e.salary.token));
+    if (w.size() < 5) return;
+    std::vector<float> s = w;
+    std::sort(s.begin(), s.end());
+    auto pct = [&](float p) { return s[std::min(s.size() - 1, (size_t)(p * s.size()))]; };
+    float p10 = pct(0.10f), p30 = pct(0.30f), p70 = pct(0.70f), p90 = pct(0.90f);
+
+    eliteCount = upperCount = middleCount = lowerCount = outcastCount = 0;
+    for (Entity& e : entities) {
+        if (e.entityHealth <= 0.0f) continue;
+        float tok = std::max(0.0f, e.salary.token);
+        if (tok >= p90 && e.isSpecialist) {
+            ++eliteCount;
+            e.Esteem = clamp(e.Esteem + 0.6f, 0.0f, 100.0f);
+            e.entityHapiness = clamp(e.entityHapiness + 0.2f, 0.0f, 100.0f);
+        } else if (tok >= p70) {
+            ++upperCount;
+            e.Esteem = clamp(e.Esteem + 0.3f, 0.0f, 100.0f);
+        } else if (tok >= p30) {
+            ++middleCount;
+        } else if (tok >= p10) {
+            ++lowerCount;
+            e.entityStress = clamp(e.entityStress + 0.4f, 0.0f, 100.0f);
+        } else {
+            ++outcastCount;
+            e.entityStress = clamp(e.entityStress + 0.8f, 0.0f, 100.0f);
+            e.entityMentalHealth = clamp(e.entityMentalHealth - 0.5f, 0.0f, 100.0f);  // despair risk
+        }
+    }
+}
+
+// ── Family dynasties & prestige (Improvement Plan 4.1) ────────────────────────
+// Leaders, the wealthy and the devout raise their family's standing; when a
+// family's prestige crosses a high bar it is proclaimed a "great family" and its
+// living members carry that pride (an esteem bonus). Prestige decays gently so
+// dynasties must keep earning their place.
+void CivilizationEngine::updateDynasties(std::vector<Entity>& entities, int day) {
+    if (!globalKinship) return;
+    // Gentle universal decay.
+    for (auto& fam : globalKinship->families) fam.prestige *= 0.999f;
+
+    for (Tribe& t : tribes) {
+        for (int mid : t.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (!e || e->entityHealth <= 0.0f || e->familyId < 0) continue;
+            Family* fam = globalKinship->findFamily(e->familyId);
+            if (!fam) continue;
+            float gain = 0.0f;
+            if (t.leaderId == e->entityId) gain += 0.5f;            // a ruling house
+            gain += std::min(0.4f, e->salary.token * 0.0005f);      // wealth
+            if (e->religionId >= 0) {
+                Religion* r = findReligion(e->religionId);
+                if (r && r->founderEntityId == e->entityId) gain += 0.6f;  // founded a faith
+            }
+            fam->prestige = std::min(100.0f, fam->prestige + gain);
+        }
+    }
+
+    for (auto& fam : globalKinship->families) {
+        if (!fam.prominent && fam.prestige > 80.0f) {
+            fam.prominent = true;
+            ++totalGreatFamilies;
+            for (Entity& e : entities)
+                if (e.entityHealth > 0.0f && e.familyId == fam.id)
+                    e.Esteem = std::min(100.0f, e.Esteem + 8.0f);
+            logEvent(day, "A great family rises: the line of " + fam.name
+                     + " has become a power in the land", "dynasty",
+                     "kind=great_family family=\"" + fam.name + "\""
+                     + " familyId=" + std::to_string(fam.id)
+                     + " prestige=" + std::to_string((int)fam.prestige));
+        }
+    }
+}
+
+// ── Colonization (Improvement Plan 13) ────────────────────────────────────────
+// When a homeland is badly overcrowded and empty habitable land exists elsewhere,
+// adventurous (high-openness) volunteers strike out to found a colony tribe in
+// the new region — deliberate expansion rather than mere overflow drift.
+void CivilizationEngine::updateColonization(std::vector<Entity>& entities, int day) {
+    if (!g_planet) return;
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    if (roll(rng) > 0.06f) return;   // a rare, deliberate undertaking
+
+    int src = -1; float worst = 1.4f;
+    for (auto& kv : regionPopulation) {
+        float cap = regionCapacity.count(kv.first) ? regionCapacity[kv.first] : 0.0f;
+        if (cap > 0.0f) {
+            float over = kv.second / cap;
+            if (over > worst) { worst = over; src = kv.first; }
+        }
+    }
+    if (src < 0) return;
+
+    int tgt = -1;
+    for (const auto& r : g_planet->regions) {
+        if (!r.habitable || r.id == src) continue;
+        int pop = regionPopulation.count(r.id) ? regionPopulation[r.id] : 0;
+        if (pop < 5) { tgt = r.id; break; }
+    }
+    if (tgt < 0) return;
+    const RegionInfo* tr = g_planet->regionById(tgt);
+    if (!tr) return;
+    float tgx, tgy; g_planet->gridToWorld((int)tr->centerGX, (int)tr->centerGY, tgx, tgy);
+
+    std::vector<Entity*> colonists;
+    for (Entity& e : entities) {
+        if (colonists.size() >= 14) break;
+        if (e.entityHealth <= 0.0f || e.personality.openness < 45.0f) continue;
+        const Tile* t = g_planet->tileAtWorld(e.posX, e.posY);
+        int erid = (t && t->regionId >= 0) ? t->regionId : e.originRegionId;
+        if (erid != src) continue;
+        colonists.push_back(&e);
+    }
+    if (colonists.size() < 6) return;
+
+    for (Entity* e : colonists) {
+        e->posX = tgx + (roll(rng) * 20.0f - 10.0f);
+        e->posY = tgy + (roll(rng) * 20.0f - 10.0f);
+        e->originRegionId = tgt;
+        e->tribeId = -1;
+    }
+    if (formTribe(colonists, day)) {
+        ++totalColonies;
+        logEvent(day, "COLONISATION: " + std::to_string(colonists.size())
+                 + " pioneers set out and founded a colony in open land", "migration",
+                 "kind=colonization settlers=" + std::to_string(colonists.size())
+                 + " fromRegion=" + std::to_string(src) + " toRegion=" + std::to_string(tgt));
+    }
+}
+
+// ── Narrative chains / sagas (Improvement Plan 14) ────────────────────────────
+// Lightweight "history book" arcs: a people that loses a war and later wins one
+// has a redemption saga; a tribe of great culture and prosperity enters a golden
+// age. Rare rolls keep these as memorable, occasional chronicle entries.
+void CivilizationEngine::updateNarrativeChains(std::vector<Entity>& entities, int day) {
+    (void)entities;
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    for (Tribe& t : tribes) {
+        if (t.population() < 6) continue;
+        // Redemption: recently victorious after a defeat still fresh in memory.
+        if (t.recentWarResult > 0 && t.postWarBoomUntilDay >= day && roll(rng) < 0.02f) {
+            ++totalSagas;
+            logEvent(day, "SAGA: the " + t.name + " rose from defeat to triumph — a redemption remembered", "saga",
+                     "kind=saga arc=\"redemption\" tribe=\"" + t.name + "\"");
+        }
+        // Golden age: a prosperous, cultured, peaceful people.
+        else if (t.cultureScore > 75.0f && t.warExhaustion < 20.0f && roll(rng) < 0.015f) {
+            ++totalSagas;
+            logEvent(day, "SAGA: the " + t.name + " entered a golden age of art and plenty", "saga",
+                     "kind=saga arc=\"golden_age\" tribe=\"" + t.name + "\""
+                     + " culture=" + std::to_string((int)t.cultureScore));
+        }
+    }
+}
+
 // ── Era / Summary ─────────────────────────────────────────────────────────────
 std::string CivilizationEngine::getEraName() const {
     switch (era) {
@@ -1517,6 +2241,7 @@ std::string CivilizationEngine::getEraName() const {
         case ERA_IRON_AGE:           return "Iron Age";
         case ERA_CLASSICAL:          return "Classical Era";
         case ERA_MEDIEVAL:           return "Medieval Era";
+        case ERA_RENNAISSANCE:       return "Renaissance";
         case ERA_EARLY_MODERN:       return "Early Modern";
         case ERA_MODERN:             return "Modern Era";
     }
@@ -1875,6 +2600,11 @@ void CivilizationEngine::vassalizeTribe(Tribe& victor, Tribe& loser,
 void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) {
     std::uniform_real_distribution<float> roll(0.0f, 1.0f);
 
+    // War weariness bleeds off slowly in peacetime (Plan 2.1.B). Tribes at war
+    // re-accumulate it below faster than this decay, so it climbs while the war
+    // drags on and recovers once the fighting stops.
+    for (auto& t : tribes)
+        t.warExhaustion = std::max(0.0f, t.warExhaustion - 0.2f);
 
     for (size_t i = 0; i < tribes.size(); ++i) {
         for (size_t j = i + 1; j < tribes.size(); ++j) {
@@ -1886,6 +2616,12 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
 
             contributeToWarEffort(A, entities);
             contributeToWarEffort(B, entities);
+
+            bool ethnicWear = A.ethnicWarWith.count(B.id) > 0;
+            // Weariness climbs every tick at war — faster in bitter ethnic wars.
+            float dExh = 0.5f + (ethnicWear ? 0.4f : 0.0f);
+            A.warExhaustion = std::min(100.0f, A.warExhaustion + dExh);
+            B.warExhaustion = std::min(100.0f, B.warExhaustion + dExh);
 
             // War attrition: each tick, both sides suffer casualties
             float aStr = calculateTribeMilitaryStrength(A, entities);
@@ -1925,19 +2661,32 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
             attrit(A, aLossRate);
             attrit(B, bLossRate);
 
-            // Peace negotiations: if both sides exhausted, chance of peace. Peace
-            // sends the soldiers home — a baby boom follows (returning-soldier effect).
-            if (A.relations[B.id] < -70.0f && aStr + bStr < 15.0f) {
-                if (roll(rng) < 0.15f) {
+            // Peace negotiations. Two roads to peace now (Plan 2.1.B): the armies
+            // are spent (little military strength left), OR the people are simply
+            // war-weary — a thoroughly exhausted society sues for peace even while
+            // still armed, which is what breaks the endless ritual-war pattern.
+            // Peace sends the soldiers home — a baby boom follows (returning-
+            // soldier effect).
+            float maxExh    = std::max(A.warExhaustion, B.warExhaustion);
+            bool armiesSpent = (A.relations[B.id] < -70.0f && aStr + bStr < 15.0f);
+            bool warWeary    = (maxExh > 70.0f);
+            if (armiesSpent || warWeary) {
+                float peaceChance = armiesSpent ? 0.15f : 0.0f;
+                if (warWeary)
+                    peaceChance = std::max(peaceChance,
+                                           0.20f + (maxExh - 70.0f) / 30.0f * 0.50f); // →0.70
+                if (roll(rng) < peaceChance) {
                     A.relations[B.id] = -20.0f;
                     B.relations[A.id] = -20.0f;
                     A.stances[B.id] = TS_NEUTRAL;
                     B.stances[A.id] = TS_NEUTRAL;
                     A.ethnicWarWith.erase(B.id); B.ethnicWarWith.erase(A.id);
+                    A.warExhaustion *= 0.3f; B.warExhaustion *= 0.3f;  // relief of peace
                     endWarFor(A, 0, day); endWarFor(B, 0, day);   // a draw for both
                     logEvent(day, "Exhausted war ends: " + A.name + " and " + B.name + " agree to peace", "war",
                              "kind=peace tribeA=\"" + A.name + "\" tribeAId=" + std::to_string(A.id)
-                             + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id));
+                             + " tribeB=\"" + B.name + "\" tribeBId=" + std::to_string(B.id)
+                             + " warExhaustion=" + std::to_string((int)maxExh));
                     continue;   // the war is over this tick — skip the conquest checks
                 }
             }
@@ -1947,19 +2696,25 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
             // absorbed). A tribe merely beaten — decisively out-powered and still
             // hated — may instead be made a vassal, unless the war is an ethnic
             // one, which tends toward extermination rather than mercy.
-            if (A.population() < 2 && B.population() >= 2) {
+            // Wars must END, not grind on for centuries as bloodless ritual
+            // (Plan 2.1): a gutted tribe is absorbed, and a merely-beaten one is
+            // far more readily vassalised than before — so the map consolidates
+            // and the endless-war count collapses toward a realistic handful.
+            if (A.population() < 4 && B.population() >= 4) {
                 conquerTribe(B, A, entities, day);
-            } else if (B.population() < 2 && A.population() >= 2) {
+            } else if (B.population() < 4 && A.population() >= 4) {
                 conquerTribe(A, B, entities, day);
-            } else if (A.population() >= 2 && B.population() >= 2) {
+            } else if (A.population() >= 4 && B.population() >= 4) {
                 Tribe& strong = (aStr >= bStr) ? A : B;
                 Tribe& weak   = (aStr >= bStr) ? B : A;
                 float  sStr   = (aStr >= bStr) ? aStr : bStr;
-                float  wStr   = (aStr >= bStr) ? bStr : aStr;
-                bool   crushed = (sStr > wStr * 3.0f)
-                                 && weak.relations[strong.id] < -50.0f
+                float  wStr   = std::max(1.0f, (aStr >= bStr) ? bStr : aStr);
+                bool   crushed = (sStr > wStr * 2.0f)
+                                 && weak.relations[strong.id] < -45.0f
                                  && weak.overlordTribeId < 0;
-                if (crushed && !ethnic && roll(rng) < 0.25f) {
+                if (crushed && roll(rng) < 0.45f) {
+                    // Even a holy war can now end in subjugation rather than an
+                    // eternal stalemate (the victor imposes their faith as tribute).
                     vassalizeTribe(strong, weak, entities, day);
                 }
             }
@@ -1975,8 +2730,15 @@ void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::ve
     float aStr = calculateTribeMilitaryStrength(attacker, entities);
     float dStr = calculateTribeMilitaryStrength(defender, entities);
 
-    float aBonus = (attacker.militarism / 100.0f) * 1.5f;
-    float dBonus = (defender.militarism / 100.0f) * 0.8f + (defender.collectivism / 100.0f) * 0.7f;
+    // Tech, fortifications and war-weariness shape the odds (Plan 2.2/2.3).
+    float fort   = defender.fortificationLevel;
+    float aBonus = (attacker.militarism / 100.0f) * 1.5f
+                   * TechTreeSystem::militaryMultiplier(attacker)
+                   * (1.0f - attacker.warExhaustion / 250.0f);          // exhaustion saps offense
+    float dBonus = ((defender.militarism / 100.0f) * 0.8f + (defender.collectivism / 100.0f) * 0.7f)
+                   * TechTreeSystem::defenseMultiplier(defender)
+                   * (1.0f + fort / 100.0f * 0.8f)                       // works add up to +80% defense
+                   * (1.0f - defender.warExhaustion / 250.0f);
 
     float aResult = aStr * (0.6f + roll(rng) * 0.8f) * aBonus;
     float dResult = dStr * (0.6f + roll(rng) * 0.8f) * dBonus;
@@ -1986,52 +2748,80 @@ void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::ve
     std::string winner = "none";
     std::string loser  = "none";
     if (aResult > dResult * 1.3f) {
-        // Attacker decisive victory
         defender.relations[attacker.id] = std::max(-100.0f, defender.relations[attacker.id] - 18.0f);
         attacker.relations[defender.id] = std::min(100.0f, attacker.relations[defender.id] + 8.0f);
         desc = attacker.name + " won a decisive battle against " + defender.name;
         outcome = "attacker_victory"; winner = attacker.name; loser = defender.name;
     } else if (dResult > aResult * 1.3f) {
-        // Defender decisive victory
         attacker.relations[defender.id] = std::max(-100.0f, attacker.relations[defender.id] - 18.0f);
         defender.relations[attacker.id] = std::min(100.0f, defender.relations[attacker.id] + 8.0f);
         desc = defender.name + " repelled " + attacker.name + "'s assault with a decisive victory";
         outcome = "defender_victory"; winner = defender.name; loser = attacker.name;
     } else {
-        // Draw — both sides exhausted
         desc = attacker.name + " and " + defender.name + " fought to a bloody stalemate";
     }
 
-    // Apply battle casualties. War is meant to kill — every pitched battle now
-    // thins the ranks of both sides, and ethnic/holy wars are an outright
-    // massacre. (Previously casualties were so light that "wars" barely dented
-    // the population; these rates make the battlefield the deadly place it should be.)
-    float castChance = ethnic ? 0.30f : 0.18f;
-    float castDmg    = ethnic ? 26.0f : 12.0f;
-    // The losing side is routed and cut down far harder than the victor.
-    float loserBonus = 1.9f;
-    int   fallen     = 0;
-    auto strike = [&](Tribe& side, float mult) {
+    // ── Casualty distribution (Plan 2.2) ─────────────────────────────────────
+    // Sample a bloodiness tier instead of the old "99% bloodless" flat roll, so
+    // most battles now cost lives and a rare few are massacres. Ethnic/holy wars
+    // skew hard toward blood; superior military tech makes every tier deadlier.
+    float r = roll(rng);
+    float pBloodless  = ethnic ? 0.12f : 0.30f;
+    float pSkirmish   = ethnic ? 0.33f : 0.40f;
+    float pEngagement = ethnic ? 0.30f : 0.20f;
+    float pDecisive   = ethnic ? 0.17f : 0.08f;   // remainder → slaughter
+    float loserFrac, winnerFrac; std::string tier;
+    if      (r < pBloodless)                                      { loserFrac=0.00f; winnerFrac=0.00f; tier="bloodless"; }
+    else if (r < pBloodless+pSkirmish)                           { loserFrac=0.04f; winnerFrac=0.02f; tier="skirmish"; }
+    else if (r < pBloodless+pSkirmish+pEngagement)               { loserFrac=0.11f; winnerFrac=0.05f; tier="engagement"; }
+    else if (r < pBloodless+pSkirmish+pEngagement+pDecisive)     { loserFrac=0.24f; winnerFrac=0.09f; tier="decisive"; }
+    else                                                         { loserFrac=0.42f; winnerFrac=0.14f; tier="slaughter"; }
+    float lethalMul = 0.7f + 0.3f * std::max(TechTreeSystem::militaryMultiplier(attacker),
+                                             TechTreeSystem::militaryMultiplier(defender));
+    loserFrac  *= lethalMul;
+    winnerFrac *= lethalMul;
+
+    int fallen = 0;
+    auto killFrac = [&](Tribe& side, float frac, bool isDefender) {
+        if (frac <= 0.0f) return;
+        if (isDefender) frac *= (1.0f - std::min(0.5f, fort / 200.0f)); // walls shelter the defenders
+        std::vector<Entity*> alive;
         for (int mid : side.memberIds) {
             Entity* e = entityById(entities, mid);
-            if (!e || e->entityHealth <= 0.0f || roll(rng) >= castChance * mult) continue;
-            float before = e->entityHealth;
-            e->entityHealth -= 1.0f + roll(rng) * castDmg * mult;
-            e->entityStress = std::min(100.0f, e->entityStress + 6.0f);
-            if (before > 0.0f && e->entityHealth <= 0.0f) { totalWarDeaths++; fallen++; }
+            if (e && e->entityHealth > 0.0f) alive.push_back(e);
         }
+        int kills = (int)std::round(alive.size() * frac);
+        for (int k = 0; k < kills && !alive.empty(); ++k) {
+            int idx = std::min((int)alive.size() - 1, (int)(roll(rng) * alive.size()));
+            Entity* e = alive[idx]; alive.erase(alive.begin() + idx);
+            e->entityHealth = 0.0f;
+            if (e->pendingDeathCause.empty()) e->pendingDeathCause = "fallen in battle";
+            totalWarDeaths++; fallen++;
+        }
+        // The survivors are shaken.
+        for (Entity* e : alive) e->entityStress = std::min(100.0f, e->entityStress + 6.0f);
     };
-    // The routed side is cut down harder than the victor; a stalemate bleeds both evenly.
-    bool aLost = (outcome == "defender_victory");
-    bool dLost = (outcome == "attacker_victory");
-    strike(attacker, aLost ? loserBonus : 1.0f);
-    strike(defender, dLost ? loserBonus : 1.0f);
+    if (outcome == "attacker_victory") { killFrac(defender, loserFrac, true);  killFrac(attacker, winnerFrac, false); }
+    else if (outcome == "defender_victory") { killFrac(attacker, loserFrac, false); killFrac(defender, winnerFrac, true); }
+    else { killFrac(attacker, loserFrac * 0.6f, false); killFrac(defender, loserFrac * 0.6f, true); }
+
+    // ── Territorial stakes (Plan 2.1.A-lite) ─────────────────────────────────
+    // A decisive assault doesn't just bleed the enemy — it takes their land and
+    // plunders their stores, so victory finally moves the map and pays off.
+    if (outcome == "attacker_victory" && (tier == "decisive" || tier == "slaughter")) {
+        float land    = std::max(0.0f, defender.territory) * 0.15f;
+        float plunder = std::max(0.0f, defender.granary)   * 0.20f;
+        defender.territory -= land;    attacker.territory += land;
+        defender.granary   -= plunder; attacker.granary   += plunder;
+        desc += " and seized their land and stores";
+    }
 
     if (fallen > 0)
         desc += " — " + std::to_string(fallen) + " fell in the fighting";
 
     logEvent(day, desc, "war",
-             "kind=battle outcome=" + outcome + " ethnic=" + std::string(ethnic ? "1" : "0")
+             "kind=battle outcome=" + outcome + " tier=" + tier
+             + " ethnic=" + std::string(ethnic ? "1" : "0")
              + " attacker=\"" + attacker.name + "\" attackerId=" + std::to_string(attacker.id)
              + " defender=\"" + defender.name + "\" defenderId=" + std::to_string(defender.id)
              + " winner=\"" + winner + "\" loser=\"" + loser + "\""
@@ -2054,23 +2844,73 @@ float CivilizationEngine::regionAgTechMultiplier(int regionId, std::vector<Entit
     return 1.0f + 0.6f * (float)agTechs;   // each agri tech raises capacity
 }
 
-void CivilizationEngine::loseTechnology(int day, const std::string& regionName) {
-    // A collapse erases fragile, rarely-known innovations -> a dark age.
+// ── Institutional resilience (Plan 1.1, Option D) ──────────────────────────────
+// How well the civilisation preserves knowledge through a collapse. Grows with the
+// current era (schools, writing, specialists) and with political/economic
+// stability (treaties over wars, a broad specialist class). 0 = a fragile band
+// that forgets easily; ~0.95 = an advanced society that barely notices a shock.
+float CivilizationEngine::darkAgeResistance(const std::vector<Entity>& entities) const {
+    (void)entities;
+    // Era contributes the bulk: a Medieval society is structurally far more
+    // shock-resistant than a Stone-Age one.
+    float eraFrac = (float)era / (float)ERA_MODERN;            // 0..1
+    float resist  = eraFrac * 0.70f;
+
+    // Diplomatic stability: a world knit together by treaties, not consumed by
+    // war, keeps its knowledge alive.
+    int treaties = activeTreatyCount();
+    int warring  = 0;
+    for (const auto& t : tribes)
+        for (const auto& s : t.stances)
+            if (s.second == TS_AT_WAR) { warring++; break; }
+    float diploStab = (float)treaties / (float)std::max(1, treaties + warring);
+    resist += diploStab * 0.15f;
+
+    // A society that can spare scholars/artisans from the fields preserves lore.
+    int specialists = 0, pop = 0;
+    for (const auto& t : tribes) { specialists += t.specialistCount; pop += t.population(); }
+    if (pop > 0) resist += std::min(1.0f, (float)specialists / (float)pop) * 0.15f;
+
+    return std::min(0.95f, std::max(0.0f, resist));
+}
+
+void CivilizationEngine::loseTechnology(int day, const std::string& regionName, float resistance) {
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+
+    // A collapse erases fragile, rarely-known innovations -> a dark age. But an
+    // advanced, resilient civilisation shields its era-critical foundations
+    // (Metal/Iron/Fortification/Writing) so a single bad harvest cannot cascade
+    // it back down the era ladder.
     std::vector<int> fragile;
-    for (size_t i = 0; i < innovations.size(); ++i)
-        if (innovations[i].knowerCount <= 2 && innovations[i].complexity > 45.0f)
+    for (size_t i = 0; i < innovations.size(); ++i) {
+        const auto& inv = innovations[i];
+        if (inv.knowerCount <= 2 && inv.complexity > 45.0f) {
+            bool critical = (inv.name == "Metal Working" || inv.name == "Iron Smelting"
+                             || inv.name == "Fortification" || inv.name == "Writing"
+                             || inv.name == "Gunpowder"     || inv.name == "Scientific Method"
+                             || inv.name == "Steam Power");
+            if (critical && roll(rng) < resistance) continue;   // shielded by institutions
             fragile.push_back((int)i);
-    if (fragile.empty()) return;
+        }
+    }
+
+    // The dark age still happened (a hardship for the people), but a resilient
+    // society may weather it with no loss of knowledge at all.
+    darkAgeCount++;
+    lastCollapseDay = day;
+    if (fragile.empty() || roll(rng) < resistance) {
+        logEvent(day, "A dark age gripped " + regionName
+                 + ", but its institutions preserved their knowledge", "innovation",
+                 "kind=dark_age_weathered region=\"" + regionName + "\"");
+        return;
+    }
+
     std::uniform_int_distribution<int> pickD(0, (int)fragile.size() - 1);
     int idx = fragile[pickD(rng)];
     std::string lost = innovations[idx].name;
-    int lostId = innovations[idx].id;
     innovations.erase(innovations.begin() + idx);
     // Strip it from every entity who knew it.
     logEvent(day, "Knowledge of " + lost + " was lost in the collapse of " + regionName, "innovation");
-    darkAgeCount++;
-    lastCollapseDay = day;
-    (void)lostId;
 }
 
 void CivilizationEngine::migrateOverflow(int fromRegion, int livingPop, float capacity,
@@ -2185,17 +3025,21 @@ void CivilizationEngine::updateCarryingCapacity(std::vector<Entity>& entities, i
             // Pressure release: migration toward open land.
             migrateOverflow(rid, pop, K, entities, day);
 
-            // Severe, sustained overshoot can trigger a collapse & dark age.
+            // Severe, sustained overshoot can trigger a collapse & dark age. The
+            // odds fall as the civilisation grows more resilient (Plan 1.1): an
+            // advanced, peaceful, specialist-rich society rarely tips into a dark
+            // age at all, and preserves its knowledge when it does.
             if (ratio > 1.8f) {
                 std::uniform_real_distribution<float> roll(0.0f, 1.0f);
-                if (roll(rng) < 0.05f * cata) {
+                float resist = darkAgeResistance(entities);
+                if (roll(rng) < 0.05f * cata * (1.0f - resist)) {
                     std::string rn = "region " + std::to_string(rid);
                     logEvent(day, "Famine and collapse struck " + rn, "famine",
                              "kind=famine region=" + std::to_string(rid)
                              + " population=" + std::to_string(pop)
                              + " capacity=" + std::to_string((int)K)
                              + " overshootRatio=" + std::to_string(ratio));
-                    loseTechnology(day, rn);
+                    loseTechnology(day, rn, resist);
                 }
             }
         }

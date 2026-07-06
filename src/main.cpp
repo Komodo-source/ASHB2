@@ -35,6 +35,7 @@
 #include "world/PlanetView.h"
 #include "world/Lexicon.h"
 #include <unordered_map>
+#include <array>
 #include <unordered_set>
 #include <cstdlib>
 #include <cstdint>
@@ -120,16 +121,17 @@ int main(){
 
 */
 
-void applyDisease(Entity* ent, int neighSize, int sickClose){
+void applyDisease(Entity* ent, int neighSize, int sickClose, int leprosyCLose){
     //si est seul la proba de tombé malade est null
     Disease d;
     if(ent->entityDiseaseType != -1){
         //already sick we manage it
         d.manageSickness(ent);
+
     }
     if(neighSize >= 3){
         d.reduceAntiBody(ent);
-        int disease = d.calculateDisease(neighSize, ent, sickClose);
+        int disease = d.calculateDisease(neighSize, ent, sickClose, leprosyCLose);
         if(disease != -1){
             std::stringstream ss;
             ss << "Entity contaminated: " << ent->getId() << " " << ent->getName()
@@ -141,14 +143,16 @@ void applyDisease(Entity* ent, int neighSize, int sickClose){
     }
 }
 
-int getNBSickClose(std::vector<Entity*> grp){
-    int c =0;
-    for(Entity* ent : grp){
-        if(ent->entityDiseaseType != -1){
-            c++;
+std::array<int, 2> getNBSickClose(std::vector<Entity*> grp){
+  std::array<int, 2> disease_close;
+  for(Entity* ent : grp){
+        if(ent->entityDiseaseType == 6){
+          disease_close[0] ++;
+        }else if(ent->entityDiseaseType != -1){
+            disease_close[1] ++;
         }
     }
-    return c;
+    return disease_close;
 }
 
 // Generate simple pseudo-random EnvironmentalFactors that shift slowly over time
@@ -335,6 +339,18 @@ static std::string deathContext(const Entity& e) {
        << " mental=" << i(e.entityMentalHealth)
        << " hygiene=" << i(e.entityHygiene)
        << " fatigue=" << i(e.fatigueLevel);
+    // Structured killer attribution for homicides (Plan 4.3, fixes DQ-3). Lets a
+    // post-mortem join victims to killers, map inter-tribe violence, and tell
+    // same-tribe from cross-tribe killings without parsing the prose cause.
+    if (e.pendingKillerId >= 0) {
+        ss << " killer_id=" << e.pendingKillerId
+           << " killer_tribe=" << e.pendingKillerTribeId
+           << " victim_tribe=" << e.tribeId
+           << " same_tribe=" << ((e.pendingKillerTribeId == e.tribeId
+                                  && e.tribeId >= 0) ? 1 : 0)
+           << " motivation=" << (e.pendingKillMotive.empty() ? "unknown" : e.pendingKillMotive)
+           << " region=" << e.originRegionId;
+    }
     return ss.str();
 }
 
@@ -960,7 +976,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
             if(entity->entityHealth <= 0.0f) continue;
 
             //on applique aussi les paramètres de maladies
-            applyDisease(entity, group.size(), getNBSickClose(group));
+            std::array<int, 2> peopleCloseDisease = getNBSickClose(group);
+            applyDisease(entity, group.size(), peopleCloseDisease[0], peopleCloseDisease[1]);
 
             // Tick grief recovery
             entity->tickGrief(1.0f);
@@ -1441,6 +1458,10 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     // longer double-counts this body as both "murder" and
                     // "hardship".
                     target->pendingDeathCause = "murder by " + entity->name;
+                    // Structured attribution (Plan 4.3): killer identity & motive.
+                    target->pendingKillerId      = entity->entityId;
+                    target->pendingKillerTribeId = entity->tribeId;
+                    target->pendingKillMotive    = "aggression";
                     // Grief propagation happens once, in the central removal
                     // pass (handleDeath) — no per-group duplicate here.
                     // M5: the group saw it happen — sanctions land immediately.
@@ -1859,11 +1880,14 @@ static void printRealismReport(const std::vector<Entity>& entities,
               << "%/birth  [" << verdict(homicideOk) << "]\n";
     std::cout << "2. Population sustains (births>=deaths): " << births << " births / "
               << totalDeaths << " deaths  [" << verdict(births >= totalDeaths) << "]\n";
-    // The 1-5 wars / 1500 days target is a CROSS-SEED statistic; a single short
-    // run legitimately sees zero. Only demand w>0 once the run is long enough
-    // that silence would itself be suspicious.
-    bool warsOk = (warsPer1500 <= 8.0f) && (ticksRun < 1000 || warsPer1500 > 0.0f);
-    std::cout << "3. Wars occur, world survives (w/1500d<=8"
+    // Rebalanced alongside the raised war line: with ~150 micro-tribes a war
+    // somewhere every few weeks is the intent, so the ceiling now guards only
+    // against the old 860-war endemic (~260/1500d), not against war happening.
+    // It's still a CROSS-SEED statistic; a single short run legitimately sees
+    // zero, so only demand w>0 once the run is long enough that silence would
+    // itself be suspicious.
+    bool warsOk = (warsPer1500 <= 90.0f) && (ticksRun < 1000 || warsPer1500 > 0.0f);
+    std::cout << "3. Wars occur, world survives (w/1500d<=90"
               << (ticksRun >= 1000 ? ", >0" : "") << "): " << warsPer1500
               << "  [" << verdict(warsOk) << "]\n";
     // Faith count scales with how many people there are to convert: 8 is the

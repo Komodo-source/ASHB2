@@ -43,9 +43,36 @@ struct Religion {
     float      spiritualDemand    = 40.0f; // 0-100: how much commitment it asks
     std::string holyPrinciple     = "";    // a generated core belief statement
 
+    // ── Doctrinal axes (Improvement Plan 3.1.A), each 0-100 ──────────────────
+    // Generated from the founder's personality; they give faiths *meaningfully
+    // different* behaviour instead of the near-identical creeds of the reference
+    // run. Two pacifist/tolerant faiths coexist; two crusader/exclusive ones war.
+    float militarism    = 50.0f; // 0 Pacifist            ←→ 100 Crusader
+    float tolerance     = 50.0f; // 0 Exclusive           ←→ 100 Syncretic
+    float asceticism    = 50.0f; // 0 Material            ←→ 100 Spiritual
+    float authority     = 50.0f; // 0 Egalitarian         ←→ 100 Hierarchical
+    float afterlifeFocus= 50.0f; // 0 This-world          ←→ 100 Next-world
+
+    // ── Institutions (Improvement Plan 3.1.C) ────────────────────────────────
+    // Grows with the living congregation: 0 none · 1 Shrine · 2 Temple ·
+    // 3 Monastery · 4 Cathedral · 5 Holy Order · 6 Religious Center. A higher
+    // level gives followers a larger happiness/mental bonus — real stakes that a
+    // conquest or extinction then destroys.
+    int   institutionLevel = 0;
+
     std::vector<int> followerIds;
     int parentReligionId = -1; // -1 = original; >=0 = schism from parent
+    int absorbedIntoId   = -1; // >=0 → this faith was merged into another (syncretism)
     float influence      = 0.0f;
+
+    const char* institutionName() const {
+        switch (institutionLevel) {
+            case 1: return "Shrine";        case 2: return "Temple";
+            case 3: return "Monastery";     case 4: return "Cathedral";
+            case 5: return "Holy Order";    case 6: return "Religious Center";
+            default: return "none";
+        }
+    }
 };
 
 // ── Tribe ─────────────────────────────────────────────────────────────────────
@@ -113,6 +140,40 @@ struct Tribe {
     int   postWarBoomUntilDay = -1;   // day the baby-boom window closes
     int   recentWarResult     = 0;    // +1 recent victory, -1 recent defeat, decays to 0
 
+    // ── War weariness (Improvement Plan 2.1.B) ───────────────────────────────
+    // Accumulates every tick a tribe spends at war (faster in ethnic/holy wars),
+    // decays slowly in peacetime. When it grows high enough a people will sue for
+    // peace even while still armed — this is what ends the "endless ritual war"
+    // pathology seen in the report (860 wars, 11 deaths). Reset toward 0 on peace.
+    float warExhaustion = 0.0f;       // 0-100
+
+    // ── Fortifications (Improvement Plan 2.3) ────────────────────────────────
+    // Defensive works the tribe raises over time (Palisade→Wall→Castle→Star Fort,
+    // gated by era). Adds to defensive strength in battle and forces attackers to
+    // grind through a siege before they can storm — so a dug-in people is costly
+    // to crack and wars gain a spatial, attritional shape.
+    float fortificationLevel = 0.0f;  // 0-100
+    // Abstract land holdings (Plan 2.1.A-lite). Grows with population; a decisive
+    // victory transfers a slice of the loser's territory to the victor, so war
+    // finally moves the map instead of being pure ritual.
+    float territory = 0.0f;
+
+    // ── Resource economy (Improvement Plan 6.1) ──────────────────────────────
+    // Beyond the food granary, specialists now generate distinct stockpiles that
+    // feed concrete effects: materials (building/defense), metals (military),
+    // luxury (happiness/prestige) and knowledge (research). Depleted by use and
+    // war, replenished by the relevant specialists each civ tick.
+    float matStock       = 0.0f;   // worked timber & stone
+    float metalStock     = 0.0f;   // smelted ore
+    float luxuryStock    = 0.0f;   // fine crafts & trade goods
+    float knowledgeStock = 0.0f;   // accumulated learning (does not spoil)
+
+    // ── Culture & arts (Improvement Plan 7) ──────────────────────────────────
+    // Artists turn leisure and inspiration into culture. A tribe's cultural score
+    // lifts happiness and unity and marks great works; dark ages erode it.
+    float cultureScore          = 0.0f;   // 0-100 cultural vitality
+    int   culturalAchievements  = 0;      // great works produced over the run
+
     // Collective cultural values (0-100), evolve from member averages + drift
     float militarism   = 50.0f;
     float spiritualism = 50.0f;
@@ -135,6 +196,7 @@ struct Tribe {
 
     // Known technologies (by innovation id) — emergent innovation diffusion.
     std::set<int> knownTechIds;
+    std::set<std::string> knownTechName;
 
     // ── Structured technology tree (see TechTree.h) ──────────────────────────
     // Distinct from the emergent `knownTechIds` above: this is a deliberate,
@@ -209,6 +271,7 @@ enum CivilizationEra {
     ERA_IRON_AGE,             // 0-500 AD: iron, fortifications, empires
     ERA_CLASSICAL,            // 500-1200 AD: complex societies, philosophy
     ERA_MEDIEVAL,             // 1200-1700 AD: kingdoms, organized religion
+    ERA_RENNAISSANCE,
     ERA_EARLY_MODERN,         // 1700-1900 AD: science, industry, exploration
     ERA_MODERN                 // 1900+ AD: advanced civilization
 };
@@ -243,9 +306,27 @@ public:
     std::map<int,float> regionCapacity;
     int                 lastCollapseDay = -1;
     int                 darkAgeCount    = 0;
+
+    // ── Institutional memory (Improvement Plan 1.1, Option D) ────────────────
+    // The highest era the civilisation has ever reached. updateEra() will never
+    // let the live era fall more than ONE step below this floor, so a dark age
+    // can bruise progress but never cascade a Medieval society back to the Stone
+    // Age. Combined with darkAgeResistance() this breaks the endless era-
+    // regression loop that trapped the reference run below modernity.
+    CivilizationEra     maxEraAchieved  = ERA_STONE_AGE;
     int                 lastCapacityDay = -1;  // famine effects apply once per civ-day
     int                 lastHistoryDay  = -1;  // history fingerprint logged once per day
     int                 lastGovDay      = -1;  // government/coup logic runs once per civ-day
+    int                 lastClimateDay  = -1;  // climate / natural-disaster roll once per civ-day
+    int                 totalDisasters  = 0;   // natural disasters that have struck (Plan 12)
+    int                 totalCivilWars  = 0;   // tribes torn apart by internal revolt (Plan 8)
+    int                 totalColonies   = 0;   // colony tribes founded in new land (Plan 13)
+    int                 totalGreatFamilies = 0;// dynasties that rose to prominence (Plan 4.1)
+    int                 totalSagas      = 0;   // narrative chains recorded (Plan 14)
+    int                 totalTechSpreads= 0;   // tribe→tribe tech transfers (Plan 1.4)
+    int                 lastDynastyDay  = -1;  // dynasty/class passes run once per civ-day
+    // Live social-class census (Plan 4.2), refreshed each civ-day for the report.
+    int eliteCount=0, upperCount=0, middleCount=0, lowerCount=0, outcastCount=0;
 
     // ── Running tallies for the report / big summary ─────────────────────────
     // Incremented from across the simulation so the History panel can show a
@@ -332,12 +413,57 @@ private:
     // gated tech nodes that grant stacking bonuses. Runs once per civ tick.
     void updateTechTree(std::vector<Entity>& entities, int day);
 
+    // Resource economy (Plan 6): specialists produce materials/metals/luxury/
+    // knowledge into tribal stockpiles; those stockpiles then feed defense,
+    // military, happiness and research. Also grows fortifications. Once/civ tick.
+    void updateEconomyResources(std::vector<Entity>& entities, int day);
+
+    // Culture & arts (Plan 7): artists convert leisure + inspiration into cultural
+    // score, occasionally producing great works; dark ages erode it. Once/civ tick.
+    void updateCulture(std::vector<Entity>& entities, int day);
+
+    // Climate & natural disasters (Plan 12): droughts, floods, earthquakes and
+    // rarer volcanoes/meteors strike regions, harming people and works. Once/civ tick.
+    void updateClimate(std::vector<Entity>& entities, int day);
+
+    // Tech diffusion (Plan 1.4): technologies spread tribe→tribe through contact,
+    // alliance, shared faith and conquest — knowledge no longer stays siloed.
+    void updateTechDiffusion(std::vector<Entity>& entities, int day);
+
+    // Social classes (Plan 4.2): derive an emergent elite/upper/middle/lower/outcast
+    // class from each living person's wealth percentile and apply class effects.
+    void updateSocialClasses(std::vector<Entity>& entities, int day);
+
+    // Family dynasties (Plan 4.1): accrue prestige to the families of leaders,
+    // the wealthy and the devout; announce the rise of "great families".
+    void updateDynasties(std::vector<Entity>& entities, int day);
+
+    // Migration & colonization (Plan 13): send surplus population from a crowded
+    // homeland to found a colony tribe in empty habitable land.
+    void updateColonization(std::vector<Entity>& entities, int day);
+
+    // Narrative chains (Plan 14): detect multi-step story arcs (plague years, a
+    // dynasty's rise-and-fall, war→recovery) and record them as sagas.
+    void updateNarrativeChains(std::vector<Entity>& entities, int day);
+
+    // Gini coefficient of individual wealth (0 equal … 1 maximally unequal), for
+    // the History panel / report (Plan 6.2).
+    float wealthGini(const std::vector<Entity>& entities) const;
+
     // ── Phase 4: carrying capacity, famine, migration, dark ages ─────────────
     void updateCarryingCapacity(std::vector<Entity>& entities, int day);
     float regionAgTechMultiplier(int regionId, std::vector<Entity>& entities) const;
     void migrateOverflow(int fromRegion, int livingPop, float capacity,
                          std::vector<Entity>& entities, int day);
-    void loseTechnology(int day, const std::string& regionName);
+    // `resistance` (0..1) is the civilisation's institutional resilience this tick:
+    // it both shields era-critical foundations and can preserve all knowledge
+    // through the shock entirely (see darkAgeResistance).
+    void loseTechnology(int day, const std::string& regionName, float resistance = 0.0f);
+
+    // How well the civilisation weathers a collapse without losing knowledge
+    // (0 = fragile Stone-Age band, up to ~0.95 = resilient advanced society).
+    // Scales with the current era plus diplomatic and economic stability.
+    float darkAgeResistance(const std::vector<Entity>& entities) const;
 
     // ── Tribe operations ──────────────────────────────────────────────────────
     bool formTribe(std::vector<Entity*>& cluster, int day);
@@ -391,6 +517,11 @@ private:
     bool foundReligion(Entity* prophet, int day);
     void spreadReligions(std::vector<Entity>& entities, int day);
     void checkSchisms(std::vector<Entity>& entities, int day);
+    // Religious syncretism (Plan 3.1.B): two mutually-tolerant faiths that share
+    // congregations merge into one (the smaller folded into the larger, doctrine
+    // averaged) instead of endlessly splintering and going extinct. Returns the
+    // number of merges performed this tick.
+    int  trySyncretism(std::vector<Entity>& entities, int day);
 
     // ── Innovation operations ─────────────────────────────────────────────────
     bool discoverInnovation(Entity* inventor, Tribe* tribe, int day);

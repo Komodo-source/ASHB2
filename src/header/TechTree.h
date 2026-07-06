@@ -36,6 +36,7 @@ struct TechNode {
     float              defenseBonus  = 0.0f;
     float              researchBonus = 0.0f;
     std::string        desc;
+
 };
 
 namespace TechTreeSystem {

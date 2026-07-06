@@ -20,13 +20,17 @@ class Disease{
     static const char* DISEASE_4_NAME;
     static const int DISEASE_5;
     static const char* DISEASE_5_NAME;
+    static const int DISEASE_6;
+    static const char* DISEASE_6_NAME;
+    static const int DISEASE_7;
+    static const char* DISEASE_7_NAME;
 
 
     static int region; // la region indique un pourcentage plus fort ou faible d'obtenir une maladie
 
     static const char* getDiseaseName(int pick);
     static int pickDisease();
-    int calculateDisease(int neighboorsSize, Entity* ent, int nbSickClose);
+    int calculateDisease(int neighboorsSize, Entity* ent, int nbSickClose, int leprosyClose);
     void reduceAntiBody(Entity* ent);
     void manageSickness(Entity* ent);
     void checkInfamousDisease(Entity* ent);

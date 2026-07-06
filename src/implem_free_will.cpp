@@ -4137,7 +4137,13 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
                 // Attribute the cause; the central death-handler writes the single
                 // death line, so a jealous killing is no longer also tallied as
                 // generic "hardship".
-                if (lethal) victim->pendingDeathCause = "crime of passion by " + e->name;
+                if (lethal) {
+                    victim->pendingDeathCause = "crime of passion by " + e->name;
+                    // Structured attribution (Plan 4.3): who, from where, and why.
+                    victim->pendingKillerId      = e->entityId;
+                    victim->pendingKillerTribeId = e->tribeId;
+                    victim->pendingKillMotive    = "jealousy";
+                }
                 // M5: the community answers — vendetta, reputation, possible exile.
                 applySocialSanction(e, victim, group, lethal, simDay);
                 // Grief ripples out to everyone who was bonded to the victim.

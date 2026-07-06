@@ -1,0 +1,1440 @@
+# ASHB2 COMPREHENSIVE IMPROVEMENT PLAN
+
+## Based on Simulation Report Analysis (Seed 4610587950459374529)
+
+---
+
+# PART I: EXISTING FEATURE IMPROVEMENTS
+
+---
+
+## 1. TECHNOLOGY & ERA PROGRESSION SYSTEM
+
+### 1.1 Fix the Era-Regression Loop (CRITICAL - R-001/R-002)
+
+**Current Problem:**
+- Technology caps at ~31
+- 181 dark ages subtract technology
+- Civilisation oscillates Medieval↔Modern permanently
+- Zero net progress after day ~1,250
+
+**Proposed Solutions:**
+
+#### Option A: Soft Dark Age Model
+```
+CURRENT:  dark_age → tech -= N (subtractive, can undo progress)
+PROPOSED: dark_age → tech_growth_rate *= 0.3 for DURATION (rate-limited)
+
+Implementation:
+- Dark ages no longer DELETE technology
+- Instead, they suppress innovation rate for a duration
+- Previously researched techs remain known
+- Recovery period scales with dark age severity
+```
+
+#### Option B: Era Floor Locking
+```
+CURRENT:  dark_age → era = era - 1 (can regress multiple eras)
+PROPOSED: dark_age → era = max(era - 1, FLOOR_ERA)
+         where FLOOR_ERA = highest era ever achieved - 1
+
+Implementation:
+- Civilisation can only regress ONE era below peak
+- Prevents Medieval→Stone Age cascades
+- "Institutional memory" preserves some progress
+```
+
+#### Option C: Progressive Dark Age Resistance
+```
+PROPOSED: Each era reached permanently reduces dark_age_trigger_threshold
+
+ERA           | Dark Age Base Threshold | Reduction
+--------------|-------------------------|------------
+Stone Age     | 100                     | 0%
+Tribal        | 95                      | 5%
+Early Agric.  | 85                      | 15%
+Iron Age      | 70                      | 30%
+Medieval      | 50                      | 50%
+Modern        | 30                      | 70%
+Early Modern  | 15                      | 85%
+Industrial    | 5                       | 95%
+
+Implementation:
+- Higher eras = more institutional resilience
+- Dark ages become rarer as civilisation advances
+- Prevents the endless oscillation loop
+```
+
+#### Option D: Conditional Regression (RECOMMENDED)
+```
+COMBINE: B + C
+
+1. Era floor = max_era_achieved - 1 (can only drop one era)
+2. Dark age probability scales inversely with:
+   - Current era level
+   - Treaty stability (treaties_last_100_days / wars_last_100_days)
+   - Population stability (pop_variance_last_500_days)
+   - Specialist ratio (specialists / population)
+
+3. Technology loss on dark age:
+   - 0% tech lost if dark_age_resistance > 70%
+   - Scaled loss: tech_lost = (1 - resistance) * base_loss
+```
+
+### 1.2 Extend Technology Tree Beyond 31
+
+**Current State:** Hard cap at ~31 technologies
+
+**Proposed Extension:**
+
+```
+TECHNOLOGY TREE RESTRUCTURE
+
+ERA              | BASE TECHS | GATED TECHS | UNLOCK CONDITIONS
+-----------------|------------|-------------|--------------------
+Stone Age        | 4          | 0           | -
+Tribal Age       | 6          | 0           | Stone Age complete
+Early Agriculture| 8          | 2           | Population > 100
+Iron Age         | 10         | 3           | Population > 300
+Medieval         | 12         | 5           | Pop > 800, Treaties > 50
+Renaissance ★NEW | 0          | 8           | Pop > 1500, Alliances > Rivalries
+Early Modern     | 8          | 6           | Renaissance complete
+Industrial ★NEW  | 0          | 10          | Pop > 2000, Trade routes > 20
+Modern           | 10         | 8           | Industrial complete
+Post-Modern ★NEW | 0          | 12          | Pop > 3000, Global peace > 500 days
+
+TOTAL POSSIBLE: 58 base + 54 gated = 112 technologies
+```
+
+### 1.3 Add Technology Prerequisites and Branching
+
+```
+CURRENT:  Linear tech acquisition (research next in list)
+PROPOSED: Tree-based with prerequisites and branches
+
+Example Branch Structure (Medieval Era):
+
+                    [Printing Press]
+                    /              \
+        [Paper Making]          [Literacy]
+              |                      |
+      [Bookkeeping]          [Philosophy]
+              |                      |
+      [Banking]              [Scientific Method] ← KEY RENAISSANCE GATE
+              \                      /
+               \                    /
+                [Renaissance Core Tech]
+
+Benefits:
+- Different civilisation paths each run
+- Tech variety creates replayability
+- Prerequisites create natural "chokepoints" that feel earned
+- Branches allow specialisation (trade vs. science vs. military)
+```
+
+### 1.4 Add Technology Diffusion Between Tribes
+
+```
+CURRENT:  Each tribe researches independently
+PROPOSED: Tech spreads through contact
+
+DIFFUSION MECHANICS:
+- Trade contact: 5% chance per 25-day tick to acquire known tech
+- Alliance: 15% chance per tick
+- Same religion: +10% bonus to diffusion
+- Conquest: Instant transfer of ALL conquered tribe's tech
+- Specialist migration: Carries 1-2 techs to new tribe
+
+Implementation:
+tech_diffusion_chance = BASE + ALLIANCE_BONUS + RELIGION_BONUS + SPECIALIST_BONUS
+if (random() < tech_diffusion_chance):
+    acquire_tech_from_contact(tribe, contact_tribe)
+```
+
+---
+
+## 2. WAR & CONFLICT SYSTEM
+
+### 2.1 Add Meaningful War Consequences (CRITICAL)
+
+**Current Problem:**
+- 860 wars, 11 deaths, 0 conquests
+- War is "performative ritual" with no territorial impact
+- No stakes = no narrative tension
+
+**Proposed Solutions:**
+
+#### A. Territorial Conquest System
+```
+NEW: Territory grid system
+
+Each region divided into TERRITORY CELLS (e.g., 10x10 grid per region)
+Each cell has:
+  - owner_tribe (null = unclaimed)
+  - resources (food, materials, strategic value)
+  - fortification_level (0-100)
+  - population_density
+
+CONQUEST MECHANICS:
+1. War declared → attacker selects target territory
+2. Battle resolution:
+   - attacker_strength = troops * tech_military_bonus * morale * terrain_bonus
+   - defender_strength = troops * fortification * tech_defense_bonus * terrain_bonus
+   - outcome = compare strengths with randomness
+
+3. If attacker wins:
+   - Territory transfers ownership
+   - Defending tribe members:
+     - 30% assimilate (join attacker tribe)
+     - 50% become refugees (migrate to allied territory)
+     - 20% resist (guerilla unrest events for 100 days)
+
+4. If defender wins:
+   - Attacker loses troops
+   - Defender gains "valor" morale bonus
+   - Possible counter-attack option
+
+CASUALTY SCALING:
+battle_deaths = BASE_DEATHS * (battle_intensity) * (tech_level / 10)
+where battle_intensity scales with:
+  - Territory strategic value
+  - Religious fervor difference
+  - Population pressure
+```
+
+#### B. War Exhaustion System
+```
+NEW: War weariness mechanic
+
+war_exhaustion += (
+    days_at_war * 0.1 +
+    war_deaths * 5 +
+    resources_spent * 0.01 +
+    battles_lost * 2
+) / population
+
+EFFECTS OF HIGH EXHAUSTION (>70):
+- Treaty acceptance chance: +50%
+- Military effectiveness: -30%
+- Civil unrest events: +200%
+- Leader replacement chance: +10% per tick
+- Forced peace at 100% exhaustion
+
+Prevents endless ritual wars without stakes
+```
+
+#### C. War Goals System
+```
+CURRENT:  All wars are "holy war of faiths"
+PROPOSED: Multiple casus belli with different goals
+
+CASUS BELLI TYPES:
+| Type              | Frequency Weight | Goal                    | Peace Terms          |
+|-------------------|------------------|-------------------------|----------------------|
+| Holy War          | 40%              | Convert/conquer         | Religious concession |
+| Territorial       | 25%              | Seize territory         | Land transfer        |
+| Resource          | 15%              | Access to resources     | Trade agreement      |
+| Prestige          | 10%              | Demonstrate strength    | Tribute              |
+| Defensive         | 8%               | Repel attacker          | Status quo + reparations|
+| Liberation        | 2%               | Free oppressed co-relig | Alliance + tribute   |
+
+Each type changes:
+- What battles are fought over
+- What peace treaties look like
+- How victory/defeat is evaluated
+- Population reaction to outcome
+```
+
+### 2.2 Make Battles More Impactful
+
+```
+CURRENT:  10 of 1,157 battles had casualties (0.86%)
+PROPOSED: Casualty distribution overhaul
+
+BATTLE OUTCOMES (redistributed):
+| Outcome          | Current | Proposed | Rationale                    |
+|------------------|---------|----------|------------------------------|
+| Bloodless win    | 99%     | 30%      | Some battles should be decisive|
+| Skirmish (<5% losses) | 0.8% | 40%      | Most real battles are small   |
+| Engagement (5-15%) | 0.1%  | 20%      | Significant but not decisive  |
+| Decisive (15-30%) | 0%    | 8%       | Major battles, rare           |
+| Slaughter (>30%) | 0%     | 2%       | Catastrophic, very rare       |
+
+Implementation:
+casualty_rate = sample_from_distribution(
+    bloodless=0.30,
+    skirmish=0.40,
+    engagement=0.20,
+    decisive=0.08,
+    slaughter=0.02
+) * tech_modifier * terrain_modifier * morale_modifier
+```
+
+### 2.3 Add Siege and Fortification Mechanics
+
+```
+NEW: Fortification system
+
+TRIBE CAN BUILD:
+- Palisades (Stone Age, +10 defense)
+- Walls (Iron Age, +25 defense)
+- Castles (Medieval, +50 defense)
+- Star Forts (Renaissance, +75 defense)
+
+SIEGE MECHANICS:
+- Attacker must besiege for N days before assault
+- Siege duration = fortification_level / 5 days
+- During siege:
+  - Defender: -food supply, -morale over time
+  - Attacker: -supplies, disease risk +50%
+- Siege outcome options:
+  - Storm (assault) - high casualties
+  - Starve out - low casualties, long duration
+  - Negotiate surrender - no casualties, conditional terms
+```
+
+---
+
+## 3. RELIGION SYSTEM
+
+### 3.1 Add Religious Depth Beyond "Holy War" (CRITICAL)
+
+**Current Problem:**
+- 98.8% of wars are holy wars
+- 168 religions founded, 162 extinct
+- All religions have near-identical creeds
+- No doctrinal variation affects behaviour
+
+**Proposed Solutions:**
+
+#### A. Doctrinal Axes System
+```
+NEW: Each religion has positions on 5 doctrinal axes:
+
+AXIS               | VALUES                | EFFECTS
+-------------------|-----------------------|--------------------------------
+Militarism         | Pacifist ←→ Crusader  | War eagerness, battle morale
+Tolerance          | Exclusive ←→ Syncretic| Conversion vs. coexistence
+Asceticism         | Material ←→ Spiritual | Economic focus, specialist rates
+Authority          | Hierarchical ←→ Egalitarian | Political structure
+Afterlife Focus    | This World ←→ Next World | Risk tolerance, birth rates
+
+EXAMPLE RELIGIONS:
+"Servants of Greothwosism" might be:
+  Militarism: 70 (Crusader)
+  Tolerance: 20 (Exclusive)
+  Asceticism: 40 (Balanced)
+  Authority: 80 (Hierarchical)
+  Afterlife: 60 (Slightly otherworldly)
+
+This creates MEANINGFUL religious variation:
+- Two pacifist religions would rarely war
+- A syncretic religion could absorb others peacefully
+- Hierarchical religions create different politics
+```
+
+#### B. Religious Syncretism Mechanic
+```
+NEW: Religions can merge instead of only going extinct
+
+SYNCRETISM CONDITIONS:
+- Two religions coexist in same tribe for >500 days
+- Both have Tolerance > 50
+- Combined followers > minimum threshold
+
+SYNCRETISM OUTCOME:
+- New religion created with averaged doctrines
+- Followers of both parent religions convert
+- Parent religions marked "absorbed" (not extinct)
+- Cultural achievement unlocked
+
+This gives an ALTERNATIVE to holy war for religious interaction
+```
+
+#### C. Religious Institutions
+```
+NEW: Religions can build institutions as they grow
+
+INSTITUTION UNLOCKS (by follower count):
+| Followers | Institution        | Effect                              |
+|-----------|--------------------|-------------------------------------|
+| 50        | Shrine             | +5% happiness for followers         |
+| 200       | Temple             | +10% conversion rate                |
+| 500       | Monastery          | +specialist generation rate         |
+| 1000      | Cathedral          | +20% morale in battles              |
+| 2000      | Holy Order         | Military unit available             |
+| 5000      | Religious Center   | Era progress bonus                  |
+
+Institutions are DESTROYED on conquest or religious suppression
+This creates STAKES for religious conflict
+```
+
+#### D. Unique Religious Creeds
+```
+CURRENT:  All creeds are "Live rightly, and the world shall be good"
+PROPOSED: Creed generation from doctrinal axes
+
+CREED TEMPLATES BY DOCTRINE:
+
+Militarism > 70:
+  "The sword purifies; the faithful conquer."
+  "Peace is weakness; strength is divine."
+
+Tolerance > 70:
+  "All paths lead to truth; judge not thy neighbor."
+  "The divine wears many faces; embrace them all."
+
+Asceticism > 70:
+  "Flesh is illusion; spirit is eternal."
+  "Possessions bind the soul; release them."
+
+Authority > 70:
+  "Order reflects the divine hierarchy."
+  "Obey the anointed; they speak for heaven."
+
+Afterlife > 70:
+  "This world is a trial; the next is reward."
+  "Death is beginning; life is preparation."
+
+COMBINATIONS create unique creeds:
+  High Militarism + High Authority:
+    "The divine chain of command demands conquest."
+
+  High Tolerance + High Asceticism:
+    "All spirits seek release; help them find it."
+```
+
+---
+
+## 4. POPULATION & DEMOGRAPHICS
+
+### 4.1 Add Family Lineages and Dynasties
+
+```
+NEW: Persistent family tracking
+
+FAMILY DATA STRUCTURE:
+{
+  family_id: "F_0042",
+  founder: entity_id,
+  generation: 3,
+  living_members: [entity_ids],
+  total_descendants: 47,
+  prestige: 156,
+  traits: ["fertile", "long-lived"],  // inherited tendencies
+  holdings: [territory_ids],
+  allies: [family_ids],
+  rivals: [family_ids]
+}
+
+MECHANICS:
+- Children inherit family from father (patrilineal) or mother (matrilineal) based on culture
+- Family prestige increases with:
+  - High-position descendants (leaders, specialists)
+  - Military victories
+  - Religious founder
+  - Wealth accumulation
+- Family prestige affects:
+  - Marriage proposals (high prestige families intermarry)
+  - Political influence
+  - Specialist chances for children
+- Family extinction when no living members
+- "Great Families" emerge with multi-generational influence
+
+REPORTING: Enable dynasty analysis, inheritance patterns, nepotism tracking
+```
+
+### 4.2 Add Social Classes
+
+```
+NEW: Class system emerging from economy
+
+CLASSES (emergent, not assigned):
+| Class           | Conditions                        | Effects                    |
+|-----------------|-----------------------------------|----------------------------|
+| Elite           | Wealth > 90th %ile, specialist    | Political power, luxury    |
+| Upper           | Wealth > 70th %ile                | Influence, better mates    |
+| Middle          | Wealth 30-70th %ile               | Stable, moderate influence |
+| Lower           | Wealth 10-30th %ile               | Hardship events more likely|
+| Outcast         | Wealth < 10th %ile, criminal      | Despair risk, rebellion    |
+
+CLASS MOBILITY:
+- Specialist promotion → class up
+- Business success → class up
+- War losses → class down
+- Famine → class down
+- Marriage to higher class → gradual class up
+
+ENables analysis of:
+- Social mobility rates
+- Class-based mortality
+- Wealth inequality (Gini coefficient)
+- Revolution/civil war triggers
+```
+
+### 4.3 Improve Death Context and Attribution
+
+```
+CURRENT:  No killer attribution in death log (DQ-3)
+PROPOSED: Full death context recording
+
+DEATH LOG ENHANCEMENT:
+{
+  "timestamp": "...",
+  "day": 4950,
+  "victim_id": 12345,
+  "victim_name": "Glothros",
+  "cause": "violence",
+  "subcause": "crime_of_passion",
+  "killer_id": 67890,           // NEW
+  "killer_name": "Moshryseth",  // NEW
+  "killer_tribe": 42,           // NEW
+  "victim_tribe": 43,           // NEW
+  "same_tribe": false,          // NEW
+  "relationship": "lover_of_ex", // NEW
+  "motivation": "jealousy",     // NEW
+  "weapon_tech": "iron_sword",  // NEW
+  "location": {"x": 83, "y": 92, "region": 3}, // NEW
+  "witnesses": [entity_ids],    // NEW
+  "legal_outcome": "exile"      // NEW
+}
+
+Enables:
+- Serial killer identification
+- Inter-tribe violence tracking
+- Justice system analysis
+- Violence network mapping
+```
+
+---
+
+## 5. DISEASE & HEALTH SYSTEM
+
+### 5.1 Add Disease Variety and Progression
+
+```
+CURRENT:  4 diseases, perfectly balanced (25% each), 96.6% cure rate
+PROPOSED: Varied disease profiles
+
+DISEASE REDESIGN:
+| Disease    | Lethality | Transmission | Duration | Cure Difficulty | Special        |
+|------------|-----------|--------------|----------|-----------------|----------------|
+| Cold       | 0.1%      | Very High    | 5-10 days| Easy            | Minor effects  |
+| Fever      | 1%        | High         | 10-20   | Easy            | -              |
+| Typhus     | 5%        | Medium       | 20-40   | Moderate        | Crowding bonus |
+| Malaria    | 8%        | Low (region) | Chronic  | Moderate        | Region-locked  |
+| Plague     | 30%       | High         | 15-30   | Hard            | Pandemic risk  |
+| Leprosy ★  | 2%        | Very Low     | Chronic  | Very Hard       | Social exile   |
+| Smallpox ★ | 40%       | Medium       | 20-40   | Hard            | Scarring       |
+
+NEW MECHANICS:
+- Disease SEVERITY scales with era (plagues emerge in Medieval+)
+- IMMUNITY is disease-specific (not universal)
+- PANDEMICS: When plague spreads to >30% of population, triggers crisis events
+- QUARANTINE: Tribes can implement quarantine (reduces transmission, economic cost)
+- VACCINATION: Unlocked with specific tech, provides permanent immunity
+```
+
+### 5.2 Add Mental Health Depth
+
+```
+CURRENT:  Mental health is a single value (mean 4.8-16.1 at death)
+PROPOSED: Multi-dimensional mental health
+
+MENTAL HEALTH DIMENSIONS:
+| Dimension      | Affects                    | Recovery Methods          |
+|----------------|----------------------------|---------------------------|
+| Happiness      | Birth rate, productivity   | Social contact, success   |
+| Anxiety        | Jealousy events, mistakes  | Safety, routine, medicine |
+| Depression     | Despair deaths, inactivity | Social support, purpose   |
+| Trauma         | Post-violence dysfunction  | Time, community, ritual   |
+| Purpose        | Specialist productivity    | Religion, family, work    |
+
+TRAUMA SYSTEM:
+- Witnessing violence → trauma +20
+- Losing family member → trauma +30
+- Losing war → trauma +15 (all tribe members)
+- Exile → trauma +50
+- Trauma > 80 → PTSD events (reduced effectiveness, flashbacks)
+- Trauma decays slowly without intervention
+- Religious rituals can reduce trauma
+
+Enables:
+- War veteran analysis
+- Generational trauma tracking
+- Mental health crisis identification
+```
+
+---
+
+## 6. ECONOMY & RESOURCES
+
+### 6.1 Add Resource Types Beyond Food
+
+```
+CURRENT:  Only food (harvests) tracked
+PROPOSED: Multi-resource economy
+
+RESOURCES:
+| Resource     | Source                    | Uses                      | Storage     |
+|--------------|---------------------------|---------------------------|-------------|
+| Food         | Farming, hunting, fishing | Survival, trade           | Perishable  |
+| Materials    | Mining, forestry          | Building, crafting        | Stable      |
+| Metals ★     | Mining (Iron Age+)        | Weapons, tools, buildings | Stable      |
+| Luxury Goods | Crafting, trade           | Happiness, prestige       | Stable      |
+| Knowledge ★  | Scholars, libraries       | Tech research speed       | Accumulates |
+
+RESOURCE CHAINS:
+Food + Materials → Buildings → Fortifications
+Metals + Knowledge → Advanced Weapons → Military
+Luxury Goods → Happiness → Birth Rate
+Knowledge + Scholars → Technology → Era Progression
+
+TRADE SYSTEM:
+- Tribes can trade surplus for deficit
+- Trade routes form between allied tribes
+- Trade increases syncretism chance
+- Blockade as war tactic
+```
+
+### 6.2 Add Property and Wealth Accumulation
+
+```
+NEW: Individual and tribal wealth
+
+INDIVIDUAL WEALTH:
+- Accumulated from specialist work
+- Used for:
+  - Better dwelling (happiness bonus)
+  - Marriage dowry (attracts better mates)
+  - Political influence
+  - Religious donations (prestige)
+- Inherited by family on death
+
+TRIBAL WEALTH:
+- Sum of individual wealth + treasury
+- Treasury funded by:
+  - Taxes (configurable rate)
+  - Trade surplus
+  - War spoils
+- Treasury spent on:
+  - Public buildings
+  - Military
+  - Festivals (happiness)
+  - Religious institutions
+
+REPORTING: Gini coefficient, wealth distribution, class analysis
+```
+
+---
+
+# PART II: NEW FEATURES TO IMPLEMENT
+
+---
+
+## 7. CULTURE & ARTS SYSTEM (NEW)
+
+```
+NEW SUBSYSTEM: Cultural Production
+
+CULTURE GENERATION:
+- Artists emerge as specialist type (like scholars, traders)
+- Art requires: leisure time, materials, inspiration
+- Inspiration sources: religion, nature, love, war, death
+
+ART TYPES:
+| Type        | Inspiration Source | Effect                    |
+|-------------|--------------------|---------------------------|
+| Oral Tradition | Stories         | Unity, identity           |
+| Music       | Emotion, religion  | Happiness, morale         |
+| Visual Art  | Nature, wealth     | Prestige, tourism         |
+| Literature  | Scholar culture    | Knowledge preservation    |
+| Architecture| Wealth, religion   | Prestige, defense         |
+| Philosophy  | Knowledge, time    | Tolerance, tech bonus     |
+
+CULTURAL ACHIEVEMENTS:
+- Epic poems (after major war)
+- Sacred texts (large religion)
+- Philosophical schools (knowledge threshold)
+- Artistic movements (multiple artists)
+
+CULTURAL DECAY:
+- Dark ages destroy cultural institutions
+- Conquest can destroy or absorb culture
+- Time erases oral traditions without writing
+
+METRICS:
+- Cultural Score (per tribe, per civilisation)
+- Cultural Diversity Index
+- Cultural Influence (spread to other tribes)
+```
+
+---
+
+## 8. POLITICAL SYSTEM DEPTH (NEW)
+
+```
+NEW: Governance structures beyond tribes
+
+GOVERNMENT TYPES (emergent based on conditions):
+| Government      | Emergence Conditions        | Effects                    |
+|-----------------|----------------------------|----------------------------|
+| Chiefdom        | Default (tribal age)        | Leader decides all         |
+| Council         | Population > 200            | Moderated decisions        |
+| Monarchy        | Single powerful family      | Fast decisions, succession risk|
+| Republic        | High middle class           | Stable, slow               |
+| Theocracy       | Dominant religion > 60%     | Religious laws, holy wars  |
+| Oligarchy       | Few wealthy families        | Elite-focused, unstable    |
+
+LEADERSHIP MECHANICS:
+- Leaders have: authority, popularity, competence
+- Authority affects: decision speed, rebellion chance
+- Popularity affects: succession, civil war risk
+- Competence affects: economic bonus, war outcomes
+
+SUCCESSION:
+- Hereditary (monarchy, chiefdom)
+- Election (republic, council)
+- Appointment (theocracy, oligarchy)
+- Violent overthrow (any, if unpopular)
+
+CIVIL WAR:
+- Triggered by: succession crisis, extreme inequality, religious schism
+- Factions form within tribe
+- Can split tribe into two
+- Resolution: victory, compromise, foreign intervention
+```
+
+---
+
+## 9. DIPLOMACY SYSTEM EXPANSION (NEW)
+
+```
+CURRENT:  Alliances, rivalries, treaties (simple)
+PROPOSED: Full diplomatic system
+
+DIPLOMATIC RELATION TYPES:
+| Relation    | Effects                          | Formation                |
+|-------------|----------------------------------|--------------------------|
+| Alliance    | Military aid, trade bonus        | Mutual interest, religion|
+| Federation  | Shared defense, free trade       | Long alliance + trust    |
+| Vassalage   | Tribute, military service        | Conquest or threat       |
+| Tributary   | Pays tribute for protection      | Weak neighbor            |
+| Non-aggression | No war between                 | Border agreement         |
+| Trade Pact  | Trade bonus only                 | Economic interest        |
+| Rivalry     | War more likely                  | Competition, religion    |
+| Cold War    | Sabotage, proxy wars             | Ideological opposition   |
+| Embargo     | No trade                         | Punishment, hostility    |
+
+DIPLOMATIC ACTIONS:
+- Gift sending (improve relations)
+- Royal marriage (bind families)
+- Demands (backed by threat)
+- Threats (escalate or submit)
+- Mediation (third party)
+- Summit (multi-party negotiation)
+
+FEDERATION MECHANICS (end-game goal):
+- Multiple tribes form federation
+- Shared military, free trade, coordinated research
+- Can achieve "United Civilisation" victory condition
+- Requires: high trust, similar values, external threat
+```
+
+---
+
+## 10. MAP AND TERRITORY SYSTEM (NEW)
+
+```
+CURRENT:  Cradles have coordinates but no spatial gameplay
+PROPOSED: Full territorial system
+
+MAP STRUCTURE:
+- Each region: 20x20 grid of TERRITORY CELLS
+- Each cell: 400x400 area units
+- Cell properties:
+  - terrain_type: plains, forest, hills, mountains, coast, river, swamp
+  - resources: food_potential, materials_potential, metal_potential
+  - infrastructure: roads, buildings, fortifications
+  - owner: tribe_id or null
+  - population: count
+
+TERRAIN EFFECTS:
+| Terrain  | Food | Materials | Movement | Defense | Special        |
+|----------|------|-----------|----------|---------|----------------|
+| Plains   | High | Low       | Fast     | Low     | Cavalry bonus  |
+| Forest   | Med  | High      | Slow     | Med     | Ambush bonus   |
+| Hills    | Low  | Med       | Slow     | High    | Archery bonus  |
+| Mountains| Very Low| Med     | Very Slow| Very High| Mining only   |
+| Coast    | Med  | Low       | Fast     | Low     | Trade bonus    |
+| River    | High | Low       | Fast     | Low     | Irrigation     |
+| Swamp    | Low  | Low       | Very Slow| Med     | Disease risk   |
+
+INFRASTRUCTURE:
+- Roads: +movement, +trade
+- Farms: +food (requires plains/river)
+- Mines: +materials/metals (requires hills/mountains)
+- Markets: +trade income
+- Walls: +defense
+- Ports: +sea trade (coast only)
+- Libraries: +knowledge accumulation
+```
+
+---
+
+## 11. EDUCATION AND KNOWLEDGE SYSTEM (NEW)
+
+```
+NEW: Knowledge as separate from technology
+
+KNOWLEDGE TYPES:
+| Type           | Source                    | Effect                    |
+|----------------|---------------------------|---------------------------|
+| Practical      | Craftsmen, farmers        | Efficiency bonus          |
+| Military       | Veterans, training        | Combat bonus              |
+| Religious      | Priests, rituals          | Conversion, unity         |
+| Philosophical  | Scholars, debate          | Tolerance, innovation     |
+| Historical     | Bards, records            | Culture, identity         |
+
+KNOWLEDGE TRANSMISSION:
+- Parent → Child: 50% of parent's knowledge
+- Master → Apprentice: 80% transfer
+- Written → Reader: 100% (requires writing tech)
+- Lost if: no transmission for 2 generations
+
+INSTITUTIONS:
+- Apprenticeship system (Tribal Age+)
+- Schools (Medieval+, requires writing)
+- Universities (Renaissance+, requires philosophy)
+- Academies (Industrial+, requires scientific method)
+
+KNOWLEDGE DECAY:
+- Without institutions: knowledge decays 5% per generation
+- Dark ages: knowledge decay 20% per generation
+- With writing: decay reduced to 1% per generation
+- With printing: near-zero decay
+
+METRICS:
+- Literacy rate
+- Knowledge preservation index
+- Education coverage
+```
+
+---
+
+## 12. CLIMATE AND ENVIRONMENT DYNAMICS (NEW)
+
+```
+CURRENT:  Static "famine/bountiful/ordinary" events
+PROPOSED: Dynamic climate system
+
+CLIMATE VARIABLES:
+- Temperature (regional, seasonal)
+- Rainfall (regional, seasonal)
+- Natural disasters (random, scaled by region)
+
+SEASONS (if world supports):
+| Season  | Effects                              |
+|---------|--------------------------------------|
+| Spring  | Planting, birth rate bonus           |
+| Summer  | Growth, disease risk +               |
+| Autumn  | Harvest, migration period            |
+| Winter  | Famine risk, movement penalty, cold  |
+
+NATURAL DISASTERS:
+| Disaster     | Frequency | Effects                          |
+|--------------|-----------|----------------------------------|
+| Earthquake   | Rare      | Building destruction, casualties |
+| Flood        | Uncommon  | Crop destruction, displacement   |
+| Drought      | Uncommon  | Extended famine                  |
+| Volcanic     | Very Rare | Regional devastation             |
+| Meteor ★     | Extremely Rare | Civilization-level event    |
+
+LONG-TERM CLIMATE:
+- Climate can shift over centuries
+- Desertification risk
+- Ice age possibility (very long runs)
+- Adaptable civilizations survive better
+
+INTERACTION WITH OTHER SYSTEMS:
+- Deforestation → climate change → droughts
+- Over-farming → soil depletion → famine
+- Urbanization → local warming → disease
+```
+
+---
+
+## 13. MIGRATION AND EXPANSION AI (NEW)
+
+```
+CURRENT:  2,740 migration events, no clear logic
+PROPOSED: Intentional migration system
+
+MIGRATION DRIVERS (weighted):
+| Driver              | Weight | Conditions                    |
+|---------------------|--------|-------------------------------|
+| Overpopulation      | High   | Local pop > 90% carrying cap  |
+| Resource scarcity   | High   | Local food < needs            |
+| Conflict avoidance  | Medium | Recent war losses             |
+| Economic opportunity| Medium | Better resources nearby       |
+| Religious persecution| Medium| Minority religion, intolerant|
+| Environmental push  | Medium | Disaster, climate change      |
+| Family ties         | Low    | Relatives in target location  |
+| Adventure ★         | Low    | High openness personality     |
+
+MIGRATION TYPES:
+| Type         | Size    | Trigger                   | Risk    |
+|--------------|---------|---------------------------|---------|
+| Individual   | 1       | Personal reasons          | Low     |
+| Family       | 2-6     | Economic/opportunity      | Low     |
+| Group        | 10-50   | Conflict, disaster        | Medium  |
+| Mass Exodus  | 50+     | War, famine, persecution  | High    |
+| Colonization | 20-100  | Overpopulation, planned   | Medium  |
+
+COLONIZATION:
+- Requires: surplus population, resources, knowledge of target
+- Establishes new settlement in empty territory
+- Creates new tribe (colony) or extends existing
+- Can fail (turn back, die, assimilate)
+- Success creates expansion
+```
+
+---
+
+## 14. EVENT CHAIN AND NARRATIVE SYSTEM (NEW)
+
+```
+NEW: Emergent narrative generation
+
+EVENT CHAINS:
+Linked sequences that create story arcs
+
+EXAMPLE CHAINS:
+1. "The Great Migration"
+   Overpopulation → Group Migration → New Settlement →
+   Conflict with Natives → War → Treaty → Integrated Society
+
+2. "The Religious Schism"
+   Doctrinal Dispute → Religious Split → New Religion →
+   Holy War → Persecution → Exodus → Martyrdom →
+   New Holy Site → Pilgrimage Tradition
+
+3. "The Plague Years"
+   Disease Outbreak → Pandemic → Quarantine →
+   Economic Collapse → Social Unrest →
+   Medical Innovation → Recovery → Memorial Tradition
+
+4. "The Dynasty"
+   Talented Leader → Military Victory → Political Reform →
+   Wealth Accumulation → Family Prestige →
+   Succession Crisis → Civil War →
+   Restoration or Collapse
+
+NARRATIVE LOG:
+- Major event chains recorded as narratives
+- Key figures identified and tracked
+- Turning points marked
+- "History books" generated per civilization
+
+REPORTING:
+- "Story of this simulation" section
+- Key characters gallery
+- Major events timeline
+- Turning points analysis
+```
+
+---
+
+# PART III: TECHNICAL & INFRASTRUCTURE IMPROVEMENTS
+
+---
+
+## 15. LOGGING SYSTEM OVERHAUL (CRITICAL - DQ-1, DQ-2, DQ-3)
+
+### 15.1 Canonical Time System
+
+```
+CURRENT PROBLEM: Three different clocks (day, frame, clock_frame)
+PROPOSED: Single canonical time
+
+IMPLEMENTATION:
+class CanonicalTime:
+    frame: int           # Master clock (never reset)
+    day: int             # Derived: frame / FRAMES_PER_DAY
+    year: int            # Derived: day / DAYS_PER_YEAR
+    era_day: int         # Days since last era change
+
+    def to_string(self):
+        return f"Y{self.year}D{self.day}F{self.frame}"
+
+ALL LOG ENTRIES MUST INCLUDE:
+{
+    "t": {
+        "frame": 298136,
+        "day": 4950,
+        "year": 13,
+        "era": "Medieval",
+        "era_day": 234
+    },
+    "event": "...",
+    ...
+}
+```
+
+### 15.2 Structured Logging Format
+
+```
+CURRENT:  Unstructured text logs, inconsistent formats
+PROPOSED: JSONL format with schema validation
+
+LOG SCHEMA:
+{
+    "$schema": "ashb2_event_v3",
+    "t": { "frame": int, "day": int, "year": int },
+    "type": "birth|death|war|treaty|... (enum)",
+    "data": { ... type-specific fields ... },
+    "entities": {
+        "primary": { "id": int, "name": str, "tribe": int },
+        "secondary": { "id": int, "name": str, "tribe": int }  // optional
+    },
+    "context": {
+        "population": int,
+        "era": str,
+        "region": int
+    }
+}
+
+TYPE-SPECIFIC SCHEMAS:
+birth: { "parent1": id, "parent2": id, "gender": str, "health": float }
+death: { "cause": str, "killer_id": int, "age": int, "location": {} }
+war:   { "attacker_tribe": int, "defender_tribe": int, "casus_belli": str }
+```
+
+### 15.3 Log Sampling and Compression
+
+```
+CURRENT:  1.5 GB+ of logs per 5-hour run
+PROPOSED: Tiered logging
+
+LOG TIERS:
+| Tier  | Content                   | Retention | Format    |
+|-------|---------------------------|-----------|-----------|
+| 0     | Every event               | Full run  | JSONL     |
+| 1     | Snapshots every 25 days   | Full run  | JSONL     |
+| 2     | Aggregates per 100 days   | Full run  | JSON      |
+| 3     | Summaries per era change  | Permanent | JSON      |
+| 4     | Final state               | Permanent | SAVE      |
+
+COMPRESSION:
+- Tier 0: Compress with zstd after run
+- Tier 1: Keep uncompressed for analysis
+- Tiers 2-4: Small, keep uncompressed
+
+OPTIONAL: Real-time Tier 0 → disk, post-run compression
+
+EXPECTED REDUCTION: 1.5 GB → ~400 MB (with Tier 0 compressed)
+```
+
+### 15.4 Personality Record Fix (DQ-1)
+
+```
+CURRENT:  68,711 personality records for 13,520 entities
+PROPOSED: Single personality record per entity at birth
+
+RULES:
+1. Personality emitted ONCE at birth
+2. Personality change events (if any) use:
+   {
+       "type": "personality_change",
+       "entity_id": 12345,
+       "changes": { "openness": +5, "neuroticism": -3 },
+       "reason": "trauma_recovery"
+   }
+3. No redundant personality dumps
+4. Personality queries use entity_id lookup, not log parsing
+```
+
+---
+
+## 16. PERFORMANCE OPTIMIZATIONS
+
+### 16.1 Disease Subsystem Optimization
+
+```
+CURRENT:  135,039 disease log lines (highest volume subsystem)
+PROPOSED: Batch processing
+
+OPTIMIZATION:
+- Process disease ticks in batches, not per-entity
+- Only log disease EVENTS (contraction, recovery, death), not status
+- Use bitfield for disease state (4 bits = 4 diseases)
+- Reduce log volume by 90%+
+
+PSEUDOCODE:
+for entity in population:
+    old_diseases = entity.disease_bitfield
+    new_diseases = simulate_disease_tick(entity)
+    if old_diseases != new_diseases:
+        log_disease_change(entity, old_diseases, new_diseases)
+        # Only logs when something CHANGES
+```
+
+### 16.2 Spatial Indexing for Proximity Checks
+
+```
+CURRENT:  O(N²) for all proximity-based interactions
+PROPOSED: Spatial partitioning
+
+IMPLEMENTATION:
+- Divide map into grid cells
+- Each entity indexed by cell
+- Proximity checks only within cell + neighbors
+- Reduces O(N²) → O(N) for most operations
+
+AFFECTED SYSTEMS:
+- Disease transmission
+- Jealousy detection
+- Trade partner finding
+- War target selection
+- Migration destination
+```
+
+### 16.3 Parallel Processing
+
+```
+PROPOSED: Multi-threaded simulation
+
+PARALLELIZABLE:
+- Disease simulation (per-region)
+- Economic calculations (per-tribe)
+- AI decisions (per-entity or per-tribe)
+- Log writing (async I/O thread)
+
+NOT PARALLELIZABLE:
+- Entity interactions (cross-thread dependencies)
+- Era/technology changes (global state)
+- RNG (must be sequential or use thread-local RNG)
+
+EXPECTED SPEEDUP: 2-4x on 4-core machine
+```
+
+---
+
+## 17. SAVE SYSTEM IMPROVEMENTS
+
+### 17.1 Incremental Saves
+
+```
+CURRENT:  Full state save (ASHB2_SAVE_V2)
+PROPOSED: Incremental + full hybrid
+
+SAVE TYPES:
+| Type       | Size   | Speed  | Use Case              |
+|------------|--------|--------|-----------------------|
+| Full       | Large  | Slow   | Every 1000 days, exit  |
+| Incremental| Small  | Fast   | Every 100 days        |
+| Snapshot   | Medium | Medium | Every 250 days (analysis) |
+
+INCREMENTAL FORMAT:
+{
+    "base_save": "save_298136.full",
+    "from_frame": 298136,
+    "to_frame": 298236,
+    "changes": [
+        { "entity": 12345, "field": "health", "old": 80, "new": 75 },
+        ...
+    ]
+}
+```
+
+### 17.2 Save Inspection Tools
+
+```
+NEW: Built-in save analyzer
+
+COMMANDS:
+ashb2-inspect save.bin --population
+ashb2-inspect save.bin --top-families 10
+ashb2-inspect save.bin --tech-tree
+ashb2-inspect save.bin --religion-distribution
+ashb2-inspect save.bin --territory-map
+
+OUTPUT: Formatted tables and ASCII maps
+```
+
+---
+
+# PART IV: ANALYSIS AND REPORTING IMPROVEMENTS
+
+---
+
+## 18. BUILT-IN ANALYTICS ENGINE
+
+```
+NEW: Runtime statistics collection
+
+METRICS COLLECTED:
+- Population: count, growth_rate, age_distribution (per tick)
+- Technology: count, research_rate, tech_tree_completion
+- Economy: gdp, gini, resource_levels, trade_volume
+- Military: wars_active, troops, casualties_cumulative
+- Religion: followers_per_faith, conversion_rate, institutions
+- Politics: government_types, stability_index, rebellion_risk
+- Health: disease_prevalence, avg_health, mental_health_avg
+- Territory: controlled_cells, borders, infrastructure_level
+
+STATISTICS OUTPUT:
+- Per-snapshot (every 25 days): full metrics dump
+- Per-era: aggregated statistics
+- End-of-run: final report data
+
+FORMAT: JSON, directly parseable by report generator
+```
+
+---
+
+## 19. REAL-TIME VISUALIZATION
+
+```
+NEW: Live simulation monitoring
+
+DASHBOARD COMPONENTS:
+1. Population graph (real-time line chart)
+2. Territory map (colored by tribe)
+3. Tech tree (highlighted researched nodes)
+4. Religion pie chart (follower distribution)
+5. War timeline (active conflicts)
+6. Key events feed (scrolling log)
+
+IMPLEMENTATION:
+- WebSocket server in simulation engine
+- Web-based dashboard (React/Vue)
+- Optional: connects to running simulation
+- Also: post-run replay mode
+
+TECHNOLOGY:
+- Backend: WebSocket + JSON streaming
+- Frontend: Chart.js or D3.js for graphs
+- Map: Canvas or SVG rendering
+```
+
+---
+
+## 20. AUTOMATED REPORT GENERATOR
+
+```
+NEW: Integrated report generation
+
+TRIGGER: End of simulation (or manual)
+
+PROCESS:
+1. Load all log files
+2. Parse into structured data
+3. Run statistical analysis
+4. Generate graphics (matplotlib/plotly)
+5. Fill report template
+6. Output: Markdown + PDF + HTML
+
+REPORT SECTIONS (auto-generated):
+- Executive Summary (AI-generated narrative)
+- Population Analysis
+- Technology Progress
+- War & Conflict
+- Religion & Culture
+- Economy & Resources
+- Health & Disease
+- Political Structure
+- Territorial Analysis
+- Key Characters
+- Event Timeline
+- Statistical Tables
+- Graphics Gallery
+- Comparison to Previous Runs
+- Anomalies & Issues
+- Recommendations
+
+OUTPUT FORMATS:
+- Markdown (version control friendly)
+- PDF (formal report)
+- HTML (interactive, with embedded charts)
+- JSON (machine-readable)
+```
+
+---
+
+# PART V: EXPERIMENTAL AND RESEARCH FEATURES
+
+---
+
+## 21. PARAMETER SWEEP SYSTEM
+
+```
+NEW: Automated parameter exploration
+
+DEFINITION:
+parameter_sweep:
+  name: "habitable_regions_effect"
+  base_config: "default_3cradle"
+  variables:
+    - parameter: "habitable_regions"
+      values: [1, 2, 3, 4, 5]
+      runs_per_value: 5
+    - parameter: "dark_age_threshold"
+      values: [50, 70, 90, 110]
+      runs_per_value: 3
+  metrics_to_collect:
+    - final_population
+    - peak_population
+    - max_era_reached
+    - tech_count_final
+    - war_death_rate
+    - dark_age_count
+    - simulation_duration
+  output:
+    format: "csv"
+    path: "sweeps/habitable_regions_effect/"
+
+EXECUTION:
+- Runs simulations in sequence or parallel
+- Collects specified metrics
+- Generates comparison tables and plots
+- Statistical analysis (ANOVA, correlation)
+```
+
+---
+
+## 22. MULTIVERSE COMPARISON
+
+```
+NEW: Compare multiple simulation runs
+
+FEATURES:
+- Side-by-side metric comparison
+- Normalized timelines (align by era, not day)
+- Statistical difference testing
+- "What changed?" analysis between seeds
+- Best/worst run identification
+- Parameter sensitivity ranking
+
+USE CASES:
+- "Which seed produced the most advanced civilization?"
+- "What's the effect of 1 vs 3 vs 5 regions?"
+- "Is there a correlation between religion count and war frequency?"
+```
+
+---
+
+## 23. GENETIC AND EVOLUTIONARY TRACKING
+
+```
+NEW: Track genetic/behavioral evolution
+
+FEATURES:
+- Personality heritability analysis
+- Value transmission across generations
+- "Nature vs nurture" decomposition
+- Evolutionary pressure identification
+- Behavioral drift over time
+
+METRICS:
+- Personality change per generation
+- Value stability index
+- Trait selection pressure (which traits increase survival?)
+- Family trait clustering
+- Founder effect magnitude
+
+REPORTING:
+- "Personality drift" graphs
+- "Survival by personality type" analysis
+- "Value evolution" timelines
+```
+
+---
+
+# IMPLEMENTATION ROADMAP
+
+---
+
+## PHASE 1: CRITICAL FIXES (Week 1-2)
+| Priority | Task | Effort | Impact |
+|----------|------|--------|--------|
+| P0 | Fix dark-age/era-regression loop | 3 days | Breaks stagnation |
+| P0 | Canonical time system | 2 days | Data quality |
+| P0 | Personality record fix (DQ-1) | 1 day | Data quality |
+| P0 | Add killer attribution (DQ-3) | 1 day | Analysis capability |
+
+## PHASE 2: CORE IMPROVEMENTS (Week 3-6)
+| Priority | Task | Effort | Impact |
+|----------|------|--------|--------|
+| P1 | Extend tech tree to 50+ | 5 days | Enables progress |
+| P1 | War consequences (conquest) | 5 days | Meaningful conflict |
+| P1 | Doctrinal religion system | 4 days | Religious depth |
+| P1 | Structured logging | 3 days | Analysis quality |
+| P1 | Log compression | 2 days | Performance |
+
+## PHASE 3: NEW SYSTEMS (Week 7-12)
+| Priority | Task | Effort | Impact |
+|----------|------|--------|--------|
+| P2 | Territory/map system | 7 days | Spatial gameplay |
+| P2 | Resource economy | 5 days | Economic depth |
+| P2 | Government types | 4 days | Political depth |
+| P2 | Disease variety | 3 days | Health realism |
+| P2 | Family lineages | 3 days | Social depth |
+
+## PHASE 4: ADVANCED FEATURES (Week 13-18)
+| Priority | Task | Effort | Impact |
+|----------|------|--------|--------|
+| P3 | Culture/arts system | 5 days | Narrative richness |
+| P3 | Diplomacy expansion | 4 days | Political options |
+| P3 | Education/knowledge | 4 days | Tech progression |
+| P3 | Event chain system | 5 days | Narrative generation |
+| P3 | Climate dynamics | 4 days | Environmental challenge |
+
+## PHASE 5: INFRASTRUCTURE (Week 19-22)
+| Priority | Task | Effort | Impact |
+|----------|------|--------|--------|
+| P3 | Real-time visualization | 7 days | Monitoring |
+| P3 | Built-in analytics | 5 days | Auto-reporting |
+| P3 | Parameter sweep system | 4 days | Research |
+| P3 | Performance optimizations | 5 days | Speed |
+
+## PHASE 6: RESEARCH TOOLS (Week 23-26)
+| Priority | Task | Effort | Impact |
+|----------|------|--------|--------|
+| P4 | Multiverse comparison | 4 days | Analysis |
+| P4 | Genetic tracking | 3 days | Research |
+| P4 | Automated report gen | 5 days | Usability |
+| P4 | Save inspection tools | 2 days | Debugging |
+
+---
+
+# SUCCESS METRICS
+
+## For Next Run Validation:
+
+| Metric | Current Run | Target After Phase 1-2 |
+|--------|-------------|------------------------|
+| Max era reached | Early Modern | Industrial+ |
+| Technology count | 31 (capped) | 45+ |
+| Dark ages | 181 | <20 |
+| War deaths | 11 | 50-500 (meaningful) |
+| Conquests | 0 | 5+ |
+| Data quality issues | 2 | 0 |
+| Log volume | 1.5 GB | <500 MB |
+
+## Long-term Targets:
+
+| Metric | Target After Full Implementation |
+|--------|----------------------------------|
+| Max era | Post-Modern |
+| Technology count | 80+ |
+| Meaningful war outcomes | 30%+ of wars |
+| Religious variety | Doctrinally distinct faiths |
+| Political systems | 3+ government types |
+| Territory control | Full map coverage |
+| Replayability | Different outcomes per seed |
+| Analysis capability | Full automated reports |
+
+---
+
+*This improvement plan addresses all identified issues from the simulation report while expanding ASHB2's capabilities to create deeper, more meaningful, and more analyzable civilization simulations.*

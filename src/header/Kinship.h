@@ -21,6 +21,9 @@ struct Family {
     std::vector<int> memberIds;             // all members ever (living + dead) by id
     float            reputation     = 50.0f; // 0-100: marriage prospects / influence
     int              births         = 0;     // children born into the family
+    float            prestige       = 0.0f;  // Plan 4.1: dynastic standing (leaders/wealth/faith)
+    bool             prominent      = false; // has risen to "great family" status (announced once)
+    int              generation     = 1;     // dynastic depth
 };
 
 // ── KinshipSystem ──────────────────────────────────────────────────────────────

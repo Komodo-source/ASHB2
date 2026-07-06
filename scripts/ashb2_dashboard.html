@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASHB2 Dashboard</title>
+<style>
+  :root{--bg:#0f1115;--panel:#181b22;--ink:#e7e9ee;--mut:#9aa3b2;--line:#2a2f3a;
+        --a:#5aa9ff;--b:#8f6dff;--c:#ff8f5a;--d:#5ad1a0;--e:#ff5a7a;--f:#f2c14e;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
+  header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  h1{font-size:18px;margin:0;font-weight:650}
+  .mut{color:var(--mut)}
+  main{padding:22px;max-width:1100px;margin:0 auto}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card .n{font-size:22px;font-weight:680}
+  .card .l{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px;overflow-x:auto}
+  .panel h2{font-size:14px;margin:0 0 12px;font-weight:620}
+  canvas{max-width:100%}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--mut)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:12px;height:3px;border-radius:2px;display:inline-block}
+  input[type=file]{color:var(--mut)}
+  .empty{color:var(--mut);padding:40px;text-align:center}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  td,th{padding:5px 10px;border-bottom:1px solid var(--line);text-align:left}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏛️ ASHB2 Dashboard</h1>
+  <span class="mut">post-run replay — load a <code>civilization_log.txt</code></span>
+  <input id="file" type="file" accept=".txt,.log">
+</header>
+<main id="main">
+  <div class="empty" id="empty">Drop or choose a <b>civilization_log.txt</b> to chart the run.</div>
+  <div id="content" style="display:none">
+    <div class="cards" id="cards"></div>
+    <div class="panel"><h2>Population &amp; peak</h2><canvas id="cPop" width="1040" height="220"></canvas></div>
+    <div class="panel"><h2>Technology &amp; dark ages</h2><canvas id="cTech" width="1040" height="220"></canvas></div>
+    <div class="panel"><h2>Cumulative war (declared · battles · war deaths)</h2><canvas id="cWar" width="1040" height="220"></canvas></div>
+    <div class="panel"><h2>War casus belli</h2><div id="reasons"></div></div>
+  </div>
+</main>
+<script>
+const F = (b,k)=>{const m=b.match(new RegExp(k+'=(?:"([^"]*)"|(\\S+))'));return m?(m[1]??m[2]):null;};
+const N = (b,k)=>{const v=F(b,k);return v==null?null:parseFloat(v);};
+
+function parse(text){
+  const snaps=[], reasons={};
+  for(const line of text.split(/\r?\n/)){
+    if(line.includes('kind=snapshot')){
+      snaps.push({
+        day:N(line,'day'), era:F(line,'era'), pop:N(line,'population'), peak:N(line,'peakPopulation'),
+        tribes:N(line,'tribes'), religions:N(line,'religions'), techs:N(line,'innovations'),
+        dark:N(line,'darkAges'), wars:N(line,'warsDeclared'), ethnic:N(line,'ethnicWars'),
+        battles:N(line,'battles'), warDeaths:N(line,'warDeaths'), conquests:N(line,'conquests'),
+        gini:N(line,'wealthGini'), culture:N(line,'avgCulture'), disasters:N(line,'disasters'),
+        colonies:N(line,'colonies'), sagas:N(line,'sagas')
+      });
+    } else if(line.includes('kind=war_declared')){
+      const r=F(line,'reason')||'unknown'; reasons[r]=(reasons[r]||0)+1;
+    }
+  }
+  return {snaps, reasons};
+}
+
+const COL=['--a','--b','--c','--d','--e','--f'].map(v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim());
+
+function line(canvas, snaps, series){
+  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height, P=38;
+  ctx.clearRect(0,0,W,H);
+  const xs=snaps.map(s=>s.day), xmin=Math.min(...xs), xmax=Math.max(...xs)||1;
+  let ymax=0; series.forEach(se=>snaps.forEach(s=>{if(s[se.k]!=null)ymax=Math.max(ymax,s[se.k]);}));
+  ymax=ymax||1;
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--line');
+  ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=P+(H-2*P)*i/4;ctx.beginPath();ctx.moveTo(P,y);ctx.lineTo(W-8,y);ctx.stroke();
+    ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--mut');ctx.font='11px sans-serif';
+    ctx.fillText(Math.round(ymax*(1-i/4)),4,y+3);}
+  const X=d=>P+(W-P-8)*(d-xmin)/(xmax-xmin||1), Y=v=>P+(H-2*P)*(1-v/ymax);
+  series.forEach((se,i)=>{
+    ctx.strokeStyle=COL[i%COL.length];ctx.lineWidth=2;ctx.beginPath();let started=false;
+    snaps.forEach(s=>{if(s[se.k]==null)return;const x=X(s.day),y=Y(s[se.k]);
+      if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);});
+    ctx.stroke();
+  });
+}
+
+function legend(id,series){
+  const el=document.createElement('div');el.className='legend';
+  series.forEach((se,i)=>{const s=document.createElement('span');
+    s.innerHTML=`<span class="sw" style="background:${COL[i%COL.length]}"></span>${se.label}`;el.appendChild(s);});
+  document.getElementById(id).parentElement.appendChild(el);
+}
+
+function render({snaps,reasons}){
+  if(!snaps.length){alert('No snapshot lines found in that file.');return;}
+  document.getElementById('empty').style.display='none';
+  document.getElementById('content').style.display='';
+  const f=snaps[snaps.length-1];
+  const cards=[['Final era',f.era],['Population',f.pop],['Peak',f.peak],['Tribes',f.tribes],
+    ['Techs',f.techs],['Dark ages',f.dark],['Wars',f.wars],['War deaths',f.warDeaths],
+    ['Conquests',f.conquests],['Disasters',f.disasters],['Colonies',f.colonies],['Sagas',f.sagas]];
+  document.getElementById('cards').innerHTML=cards.filter(c=>c[1]!=null)
+    .map(c=>`<div class="card"><div class="n">${c[1]}</div><div class="l">${c[0]}</div></div>`).join('');
+  line(cPop,snaps,[{k:'pop',label:'population'},{k:'peak',label:'peak'}]);legend('cPop',[{label:'population'},{label:'peak'}]);
+  line(cTech,snaps,[{k:'techs',label:'techs'},{k:'dark',label:'dark ages'},{k:'tribes',label:'tribes'}]);legend('cTech',[{label:'techs'},{label:'dark ages'},{label:'tribes'}]);
+  line(cWar,snaps,[{k:'wars',label:'declared'},{k:'battles',label:'battles'},{k:'warDeaths',label:'war deaths'}]);legend('cWar',[{label:'declared'},{label:'battles'},{label:'war deaths'}]);
+  const tot=Object.values(reasons).reduce((a,b)=>a+b,0)||1;
+  document.getElementById('reasons').innerHTML='<table><tr><th>Reason</th><th>Count</th><th>Share</th></tr>'+
+    Object.entries(reasons).sort((a,b)=>b[1]-a[1]).map(([r,c])=>
+      `<tr><td>${r}</td><td>${c}</td><td>${(100*c/tot).toFixed(1)}%</td></tr>`).join('')+'</table>';
+}
+
+document.getElementById('file').addEventListener('change',e=>{
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();r.onload=()=>render(parse(r.result));r.readAsText(file);
+});
+</script>
+</body>
+</html>
