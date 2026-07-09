@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHB2 — The Petri Dish</title>
+  <meta name="description" content="ASHB2 is a deterministic, agent-based civilization simulator. 40 founders enter. History emerges.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ Navigation ═══════════════════════════════════════ -->
+  <nav>
+    <div class="logo">
+      ASHB2.exe<span class="cursor"></span>
+    </div>
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="engine.html">Engine</a></li>
+      <li><a href="chronicle.html">Chronicle</a></li>
+      <li><a href="experience.html">Experience</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ Main ═════════════════════════════════════════════ -->
+  <main>
+
+    <!-- ── Hero ──────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="tag-group">
+        <span class="tag amber">ALPHA v2.0</span>
+        <span class="tag mint">DETERMINISTIC</span>
+        <span class="tag crimson">AGENT-BASED</span>
+      </div>
+      <h1>The Petri Dish.</h1>
+      <p class="sub" style="font-size:1.05rem; max-width:75ch;">
+        ASHB2 is a deterministic, agent-based civilization simulator. 40 founders enter. History emerges.
+      </p>
+    </section>
+
+    <!-- ── Simulation Canvas ─────────────────────────────── -->
+    <div class="canvas-placeholder">
+      <canvas id="simCanvas"></canvas>
+      <div class="dots"></div>
+      <div class="overlay-text">
+        <div class="tick-counter">
+          <span class="label">Simulation Tick</span>
+          <span id="tickDisplay">0000000000</span>
+        </div>
+        <p class="mono muted" style="margin-top:0.75rem; font-size:0.7rem;">
+          [ AGENTS ACTIVE: <span class="mint">40</span> ] &nbsp;·&nbsp; [ MEMORY SLOTS: <span class="amber">2,847</span> ] &nbsp;·&nbsp; [ CULTURES: <span class="crimson">3</span> ]
+        </p>
+      </div>
+    </div>
+
+    <!-- ── The Core Concept ──────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">The Core Concept</p>
+      <h2>Two layers. One engine.</h2>
+      <p class="lede">
+        Every simulation runs on two scales simultaneously. What happens in the micro
+        reverberates into the macro. What emerges in the macro constrains the micro.
+        Neither is scripted.
+      </p>
+      <div class="grid-2 mt-2">
+        <div class="card">
+          <div class="card-label">Micro</div>
+          <h3>Individual Agents</h3>
+          <p>
+            Each entity carries a Big Five personality profile, an attachment style,
+            a working memory budget, and a dynamic emotional state. They do not follow
+            decision trees — they calculate. Every action is scored against competing
+            drives: hunger, curiosity, fear, belonging.
+          </p>
+          <div class="data-row" style="margin-top:1rem;">
+            <span class="key">personality.openness</span>
+            <span class="val amber">0.73</span>
+          </div>
+          <div class="data-row">
+            <span class="key">personality.neuroticism</span>
+            <span class="val crimson">0.41</span>
+          </div>
+          <div class="data-row">
+            <span class="key">attachment.style</span>
+            <span class="val mint">"anxious"</span>
+          </div>
+          <div class="data-row">
+            <span class="key">memory.working.capacity</span>
+            <span class="val">7 units</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Macro</div>
+          <h3>Emergent Civilizations</h3>
+          <p>
+            From individual drives, tribes form. From tribes, religions crystallize.
+            From resource pressure, wars ignite. No script defines a "religion system"
+            or a "war declaration." These patterns emerge because the agents' incentives
+            align — or collide.
+          </p>
+          <div class="data-row" style="margin-top:1rem;">
+            <span class="key">tribes.active</span>
+            <span class="val amber">3</span>
+          </div>
+          <div class="data-row">
+            <span class="key">wars.active</span>
+            <span class="val crimson">1</span>
+          </div>
+          <div class="data-row">
+            <span class="key">belief.systems</span>
+            <span class="val mint">2</span>
+          </div>
+          <div class="data-row">
+            <span class="key">tech.inventions</span>
+            <span class="val">12</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── The Hook ───────────────────────────────────────── -->
+    <section class="section text-center">
+      <p class="section-label">Determinism</p>
+      <h2>Same seed. Same history.<br>Until you change one variable.</h2>
+      <p class="lede" style="margin: 1rem auto 0 auto;">
+        ASHB2 is fully deterministic. Given the same seed and the same initial conditions,
+        the simulation produces the exact same history — every time. Change one gene,
+        one personality score, one resource node, and the entire timeline diverges.
+        You are not watching a simulation. You are exploring a possibility space.
+      </p>
+      <div class="btn-group" style="justify-content: center;">
+        <a href="engine.html" class="btn amber">Read the Architecture</a>
+        <a href="chronicle.html" class="btn">View the Chronicles</a>
+      </div>
+    </section>
+
+    <!-- ── Simulation Log ────────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">Live Feed</p>
+      <h3 class="mono" style="font-size:0.85rem; color:var(--text-muted);">
+        $ tail -f /var/log/ashb2/simulation.log
+      </h3>
+      <div class="log-scroller">
+        <div class="log-content">
+          <div class="log-content-inner">
+            <div class="log-line event">[TICK 004192] Agent 07 bonded with Agent 12 — pair-bond established</div>
+            <div class="log-line info">[TICK 004193] Agent 31 gathered 2.4 units of food</div>
+            <div class="log-line warn">[TICK 004195] Agent 08 is below hunger threshold (0.12)</div>
+            <div class="log-line event">[TICK 004198] Tribe "Delta" formed — 5 members, territory (142, 87)</div>
+            <div class="log-line error">[TICK 004202] Agent 04 died: starvation</div>
+            <div class="log-line info">[TICK 004203] Agent 22 discovered recipe: sharpened stone</div>
+            <div class="log-line event">[TICK 004207] Agent 07 gave birth — offspring carries mutated genome</div>
+            <div class="log-line warn">[TICK 004210] Resource depletion in sector (88, 44) — migration pressure</div>
+            <div class="log-line info">[TICK 004211] Agent 15 shared food with Agent 16 — reciprocity recorded</div>
+            <div class="log-line error">[TICK 004215] Tribe "Alpha" declared war on Tribe "Beta"</div>
+            <div class="log-line event">[TICK 004218] Agent 33 achieved status: tribal elder</div>
+            <div class="log-line info">[TICK 004220] Agent 27 explored new sector (201, 156)</div>
+            <div class="log-line warn">[TICK 004223] Agent 41 memory decay: forgotten dangerous location</div>
+            <div class="log-line event">[TICK 004225] Religion "The Great Hunger" — 3 adherents</div>
+            <div class="log-line info">[TICK 004228] Agent 09 crafted tool from flint + wood</div>
+            <div class="log-line error">[TICK 004230] Battle at (120, 95): 2 casualties</div>
+            <div class="log-line event">[TICK 004233] Agent 19 migrated to Tribe "Gamma"</div>
+            <div class="log-line info">[TICK 004235] Agent 44 learned recipe from Agent 12</div>
+            <div class="log-line warn">[TICK 004238] Famine conditions detected in northern region</div>
+            <div class="log-line event">[TICK 004240] Agent 50 born — genome: [0.82, 0.45, 0.91, 0.33, 0.67]</div>
+            <div class="log-line info">[TICK 004242] Agent 03 reached age 200 — longevity record</div>
+          </div>
+          <div class="log-content-inner">
+            <div class="log-line event">[TICK 004192] Agent 07 bonded with Agent 12 — pair-bond established</div>
+            <div class="log-line info">[TICK 004193] Agent 31 gathered 2.4 units of food</div>
+            <div class="log-line warn">[TICK 004195] Agent 08 is below hunger threshold (0.12)</div>
+            <div class="log-line event">[TICK 004198] Tribe "Delta" formed — 5 members, territory (142, 87)</div>
+            <div class="log-line error">[TICK 004202] Agent 04 died: starvation</div>
+            <div class="log-line info">[TICK 004203] Agent 22 discovered recipe: sharpened stone</div>
+            <div class="log-line event">[TICK 004207] Agent 07 gave birth — offspring carries mutated genome</div>
+            <div class="log-line warn">[TICK 004210] Resource depletion in sector (88, 44) — migration pressure</div>
+            <div class="log-line info">[TICK 004211] Agent 15 shared food with Agent 16 — reciprocity recorded</div>
+            <div class="log-line error">[TICK 004215] Tribe "Alpha" declared war on Tribe "Beta"</div>
+            <div class="log-line event">[TICK 004218] Agent 33 achieved status: tribal elder</div>
+            <div class="log-line info">[TICK 004220] Agent 27 explored new sector (201, 156)</div>
+            <div class="log-line warn">[TICK 004223] Agent 41 memory decay: forgotten dangerous location</div>
+            <div class="log-line event">[TICK 004225] Religion "The Great Hunger" — 3 adherents</div>
+            <div class="log-line info">[TICK 004228] Agent 09 crafted tool from flint + wood</div>
+            <div class="log-line error">[TICK 004230] Battle at (120, 95): 2 casualties</div>
+            <div class="log-line event">[TICK 004233] Agent 19 migrated to Tribe "Gamma"</div>
+            <div class="log-line info">[TICK 004235] Agent 44 learned recipe from Agent 12</div>
+            <div class="log-line warn">[TICK 004238] Famine conditions detected in northern region</div>
+            <div class="log-line event">[TICK 004240] Agent 50 born — genome: [0.82, 0.45, 0.91, 0.33, 0.67]</div>
+            <div class="log-line info">[TICK 004242] Agent 03 reached age 200 — longevity record</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ Footer ═══════════════════════════════════════════ -->
+  <footer>
+    ASHB2 <span class="dot">◆</span> Autonomous Simulation of Human Behavior &nbsp;|&nbsp; Scientific Terminal
+  </footer>
+
+  <script>
+    // ── Live tick counter animation ──────────────────────
+    (function() {
+      const display = document.getElementById('tickDisplay');
+      let tick = 4192;
+      setInterval(function() {
+        tick += Math.floor(Math.random() * 3) + 1;
+        display.textContent = String(tick).padStart(10, '0');
+      }, 800);
+    })();
+
+    // ── Animated canvas particles ───────────────────────
+    (function() {
+      const canvas = document.getElementById('simCanvas');
+      if (!canvas) return;
+      const container = canvas.parentElement;
+      const ctx = canvas.getContext('2d');
+
+      function resize() {
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const agents = [];
+      const COLORS = ['#f59e0b', '#34d399', '#d62828', '#3b82f6', '#a78bfa', '#e8e6e3'];
+
+      for (let i = 0; i < 40; i++) {
+        agents.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          r: 1.5 + Math.random() * 2,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          trail: []
+        });
+      }
+
+      function drawTriangles() {
+        for (let i = 0; i < agents.length; i++) {
+          for (let j = i + 1; j < agents.length; j++) {
+            const dx = agents[i].x - agents[j].x;
+            const dy = agents[i].y - agents[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 60) {
+              ctx.beginPath();
+              ctx.moveTo(agents[i].x, agents[i].y);
+              ctx.lineTo(agents[j].x, agents[j].y);
+              ctx.strokeStyle = 'rgba(68, 68, 68, ' + (1 - dist / 60) * 0.4 + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawTriangles();
+
+        for (const a of agents) {
+          a.x += a.vx;
+          a.y += a.vy;
+
+          if (a.x < 0) { a.x = 0; a.vx *= -1; }
+          if (a.x > canvas.width)  { a.x = canvas.width;  a.vx *= -1; }
+          if (a.y < 0) { a.y = 0; a.vy *= -1; }
+          if (a.y > canvas.height) { a.y = canvas.height; a.vy *= -1; }
+
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+          ctx.fillStyle = a.color;
+          ctx.globalAlpha = 0.7;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+
+          // Glow
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, a.r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = a.color;
+          ctx.globalAlpha = 0.06;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      loop();
+    })();
+  </script>
+
+</body>
+</html>

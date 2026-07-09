@@ -16,6 +16,10 @@
 #include "SocialOrder.h"   // SocialClass enum + clientela/class fields
 #include "Drive.h"         // bipolar homeostatic/novelty drives (0 -> setpoint <- 1)
 #include "JungianType.h"   // Jung's 8 functions in Beebe's 8-archetype stack
+#include "Genome.h"        // heritable traits: speed/sight/metabolism/fertility/resilience
+#include "../ai/EpisodicMap.h"     // spatial event memory: food here, danger there
+#include "../items/ItemSystem.h"   // tag/property items, Inventory, ActionRule ids
+#include "../ai/neat/Neat.h"       // optional evolved neural brain (NEAT)
 
 class Entity;
 class Action;
@@ -357,6 +361,24 @@ public:
     PheromoneRelease pheromone;
     Economic salary;
 
+    // ── Emergence upgrade (Steps 2–5): data-driven items, spatial memory,
+    // heritable genome, optional NEAT brain. All default-initialized so
+    // pre-upgrade spawn paths keep working unchanged.
+    Inventory        inventory;         // tag/property item stacks
+    std::vector<int> knownRecipeIds;    // ActionRules this agent can perform
+    Genome           genome;            // multipliers ×1.0 by default
+    EpisodicMap      episodicMap;       // where food/danger was seen
+    bool             useNeatBrain = false;
+    neat::Genome     neatGenome;        // empty unless useNeatBrain
+
+    bool knowsRecipe(int ruleId) const {
+        for (int r : knownRecipeIds) if (r == ruleId) return true;
+        return false;
+    }
+    void learnRecipe(int ruleId) {
+        if (!knowsRecipe(ruleId)) knownRecipeIds.push_back(ruleId);
+    }
+
 
     // Constructors
     Entity(int id);
@@ -482,9 +504,11 @@ public:
     // patronage of many clients) that, with wealth, governs class mobility.
     SocialClass socialClass = CLASS_PLEBEIAN;
     float       auctoritas  = 10.0f; // 0-100+ standing in the eyes of society
+    float       integrity   = 50.0f; // 0-100 honesty/resistance to corruption (personality-derived)
 
-    std::string specialization = ""; // "scholar"|"craftsman"|"trader"|"healer"|"warrior" (latent talent)
+    std::string specialization = "farmer"; // "farmer"|"scholar"|"craftsman"|"trader"|"healer"|"warrior"|"priest"
     bool  isSpecialist = false;      // released from subsistence farming, fed from the tribe granary
+    int   roleSinceDay = -1;         // civ-day the current role was assigned (-1 = never)
     std::vector<int> knownTechIds;   // IDs of discovered/learned innovations
 
     // Temporary storage for IDs during loading (before pointer resolution)

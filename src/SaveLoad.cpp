@@ -4,6 +4,8 @@
 #include "./header/CivilizationEngine.h"
 #include "./header/BetterRand.h"
 #include "core/SimClock.h"
+#include "items/ItemSystem.h"      // Step 5b: emergence save section
+#include "world/PheromoneField.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -42,6 +44,112 @@ static void parseFloatMap(const std::string& s, std::map<int, float>& out) {
         size_t c = tok.find(':');
         if (c != std::string::npos)
             out[std::stoi(tok.substr(0, c))] = std::stof(tok.substr(c + 1));
+    }
+}
+
+// ── Emergence save section (Upgrade Plan, Step 5b) ───────────────────────────
+// Appended AFTER the legacy save body under its own marker, so old saves load
+// unchanged (loader seeks the marker; absence = defaults). Covers: invented
+// item defs/rules, the pheromone field, and per-entity genome / NEAT brain /
+// inventory / known recipes / episodic memories.
+static void saveEmergence(std::ofstream& file, const std::vector<Entity>& entities) {
+    file << "EMERGENCE_V1\n";
+    g_itemManager.saveTo(file);
+    g_pheromoneField.saveTo(file);
+    file << "EMERGENT_ENTITIES:" << entities.size() << "\n";
+    for (const Entity& e : entities) {
+        file << "EM|" << e.entityId << '|'
+             << e.genome.speed << ' ' << e.genome.sightRange << ' '
+             << e.genome.metabolism << ' ' << e.genome.fertility << ' '
+             << e.genome.resilience << '|' << (e.useNeatBrain ? 1 : 0) << '|';
+        for (size_t i = 0; i < e.inventory.stacks.size(); ++i)
+            file << (i ? "," : "") << e.inventory.stacks[i].defId << '='
+                 << e.inventory.stacks[i].qty;
+        file << '|';
+        for (size_t i = 0; i < e.knownRecipeIds.size(); ++i)
+            file << (i ? "," : "") << e.knownRecipeIds[i];
+        file << '|';
+        const auto& nodes = e.episodicMap.nodes();
+        for (size_t i = 0; i < nodes.size(); ++i)
+            file << (i ? "," : "") << nodes[i].x << ' ' << nodes[i].y << ' '
+                 << (int)nodes[i].kind << ' ' << nodes[i].day << ' ' << nodes[i].strength;
+        file << "\n";
+        if (e.useNeatBrain) e.neatGenome.saveTo(file);
+    }
+}
+
+static std::vector<std::string> splitOn(const std::string& s, char sep) {
+    std::vector<std::string> out;
+    size_t pos = 0;
+    while (true) {
+        size_t p = s.find(sep, pos);
+        out.push_back(s.substr(pos, p == std::string::npos ? std::string::npos : p - pos));
+        if (p == std::string::npos) break;
+        pos = p + 1;
+    }
+    return out;
+}
+
+static void loadEmergence(std::ifstream& file, std::vector<Entity>& entities) {
+    std::streampos at = file.tellg();
+    std::string line;
+    file >> std::ws;
+    if (!std::getline(file, line) || line != "EMERGENCE_V1") {
+        file.clear();
+        file.seekg(at);           // pre-upgrade save: leave defaults in place
+        return;
+    }
+    g_itemManager.loadFrom(file);
+    g_pheromoneField.loadFrom(file);
+    std::map<int, Entity*> byId;
+    for (Entity& e : entities) byId[e.entityId] = &e;
+    file >> std::ws;
+    if (!std::getline(file, line) || line.rfind("EMERGENT_ENTITIES:", 0) != 0) return;
+    int count = std::stoi(line.substr(18));
+    for (int i = 0; i < count; ++i) {
+        file >> std::ws;
+        if (!std::getline(file, line) || line.rfind("EM|", 0) != 0) return;
+        std::vector<std::string> f = splitOn(line, '|');
+        if (f.size() < 7) continue;
+        Entity* e = byId.count(std::stoi(f[1])) ? byId[std::stoi(f[1])] : nullptr;
+        bool wantsNeat = false;
+        if (e) {
+            std::stringstream gs(f[2]);
+            gs >> e->genome.speed >> e->genome.sightRange >> e->genome.metabolism
+               >> e->genome.fertility >> e->genome.resilience;
+            wantsNeat = (f[3] == "1");
+            e->inventory.stacks.clear();
+            if (!f[4].empty())
+                for (const std::string& kv : splitOn(f[4], ',')) {
+                    size_t eq = kv.find('=');
+                    if (eq != std::string::npos)
+                        e->inventory.add(std::stoi(kv.substr(0, eq)),
+                                         (float)atof(kv.substr(eq + 1).c_str()));
+                }
+            e->knownRecipeIds.clear();
+            if (!f[5].empty())
+                for (const std::string& r : splitOn(f[5], ','))
+                    e->knownRecipeIds.push_back(std::stoi(r));
+            std::vector<EpisodicNode> nodes;
+            if (!f[6].empty())
+                for (const std::string& ns : splitOn(f[6], ',')) {
+                    std::stringstream nss(ns);
+                    EpisodicNode n; int kind;
+                    nss >> n.x >> n.y >> kind >> n.day >> n.strength;
+                    n.kind = (uint8_t)kind;
+                    nodes.push_back(n);
+                }
+            e->episodicMap.setNodes(std::move(nodes), 0);
+        } else {
+            wantsNeat = (f.size() > 3 && f[3] == "1");
+        }
+        if (wantsNeat) {
+            neat::Genome g;
+            if (g.loadFrom(file) && e) {
+                e->neatGenome = std::move(g);
+                e->useNeatBrain = true;
+            }
+        }
     }
 }
 
@@ -86,6 +194,8 @@ void saveGame(const std::string& filepath, const std::vector<Entity>& entities,
     for (const Entity& entity : entities) {
         entity.saveTo(file);
     }
+
+    saveEmergence(file, entities);   // Step 5b: versioned emergence section
 
     file.close();
     std::cout << "Game saved to " << filepath << " (V2, " << entities.size()
@@ -193,6 +303,8 @@ bool loadGame(const std::string& filepath, std::vector<Entity>& entities,
     for (Entity& entity : entities) {
         entity.resolvePointers(entities);
     }
+
+    loadEmergence(file, entities);   // Step 5b: tolerant of pre-upgrade saves
 
     file.close();
     std::cout << "Game loaded from " << filepath << (v2 ? " (V2)" : " (legacy)")

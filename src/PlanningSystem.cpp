@@ -1,5 +1,7 @@
 #include "./header/PlanningSystem.h"
 #include "./header/Entity.h"
+#include "./ai/GoapPlanner.h"     // Step 3: A* over ActionRules
+#include "./items/ItemSystem.h"
 #include "./header/FreeWillSystem.h"
 #include "./header/WorldSeed.h"
 #include <algorithm>
@@ -148,7 +150,27 @@ PlanStep PlanningSystem::createSelfImprovementStep(Entity* entity) {
 
 PlanStep PlanningSystem::createSurvivalStep(Entity* entity) {
     PlanStep step;
-    
+
+    // GOAP first (Step 3): when hunger is the dominant pressure, plan over the
+    // agent's known ActionRules with A* and surface the chain in the step's
+    // rationale. The template ladder below remains the fallback for goals the
+    // rule table can't reach (rest, socializing, general upkeep).
+    if (entity->entityHunger > 55.0f && g_itemManager.seeded()) {
+        goap::WorldState st = goap::captureState(*entity, g_itemManager);
+        std::vector<goap::Step> gplan =
+            goap::plan(*entity, g_itemManager, goap::reduceHungerGoal(), st);
+        if (!gplan.empty()) {
+            step.actionName = "EatMeal";
+            step.targetType = "self";
+            step.priority = 0.95f;
+            step.expectedDuration = 4;
+            std::string chain;
+            for (size_t i = 0; i < gplan.size(); ++i)
+                chain += (i ? " -> " : "") + gplan[i].describe(g_itemManager);
+            step.rationale = "GOAP: " + chain;
+            return step;
+        }
+    }
     // Check what's most urgent
     if (entity->entityHealth < 30.0f) {
         step.actionName = "heal";

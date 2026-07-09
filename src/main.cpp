@@ -41,6 +41,9 @@
 #include <cstdint>
 #include "core/SimClock.h"
 #include "core/SpatialGrid.h"
+#include "items/ItemSystem.h"      // Step 2: data-driven items/rules/invention
+#include "world/PheromoneField.h"  // Step 4: environmental stigmergy
+#include "./header/LiveConfig.h"
 #include "environment/EnvironmentModel.h"
 #include "world/ResourceSystem.h"
 #include "world/Ecosystem.h"
@@ -602,16 +605,16 @@ std::string generateDeepMonologue(Entity* ent) {
 void implementRegion(){
     std::cout << "\n";
     std::cout << "Choose a world region (h to help): \n";
-    std::cout << "1 /// Paris, France | 48 51' 24'' north, 2 21' 07'' east /// Oceanic\n";
-    std::cout << "2 /// Philadelphia, United States | 39 57' 10'' north, 75 09' 49'' west /// Continental\n";
-    std::cout << "3 /// Guangzhou, China | 23 07' 48'' north, 113 15' 36'' east /// monsoon\n";
-    std::cout << "4 /// Addis-Abeba, Ethiopia | 9 1' 48'' north, 38 44' 24'' east /// arid\n";
+    std::cout << "1 Paris, France               | 48 51' 24'' north, 2 21' 07'' east   /// Oceanic\n";
+    std::cout << "2 Philadelphia, United States | 39 57' 10'' north, 75 09' 49'' west  /// Continental\n";
+    std::cout << "3 Guangzhou, China            | 23 07' 48'' north, 113 15' 36'' east /// monsoon\n";
+    std::cout << "4 Addis-Abeba, Ethiopia       | 9 1' 48'' north, 38 44' 24'' east    /// arid\n";
     std::cout << ">";
 
     char choice;
     std::cin >> choice;
     if(choice == 'h'){
-        std::cout << "This feature is principally implemented for disease spreading, it barely affects the simulation links or its global functionning\n";
+        std::cout << "This feature is principally implemented for disease spreading, it barely affects the simulation links or its global functionning of the siulation\n";
         implementRegion();
     }else{
         // Multiply by 10 so region values are 10/20/30/40 — the formula was designed
@@ -1074,7 +1077,8 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 // Cold seasons raise the calorie cost of staying alive.
                 float coldFactor = (g_seasonTemperature < 45.0f)
                                  ? 1.0f + (45.0f - g_seasonTemperature) / 100.0f : 1.0f;
-                float burn = 0.08f * deltaTime * coldFactor;
+                // Genome read site (Step 4): fast metabolisms burn rations quicker.
+                float burn = 0.08f * deltaTime * coldFactor * entity->genome.metabolism;
                 if (entity->foodStore > burn) {
                     entity->foodStore -= burn;
                     entity->entityHunger = pdclamp(entity->entityHunger - 0.8f, 0.0f, 100.0f);
@@ -1702,6 +1706,19 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             }
             auto pfD = pf_now();
 
+            // ── Emergence layer (Upgrade Plan Steps 2-5): item foraging and
+            // eating, combinatorial invention, recipe diffusion, episodic-
+            // memory- and pheromone-guided displacement, NEAT brains. Runs
+            // once per sim-day, before the civ tick so freshly invented
+            // recipes are visible to the same day's diffusion/economy passes.
+            if (!g_pheromoneField.ready())
+                g_pheromoneField.reset((float)width, (float)height);
+            if (!g_itemManager.seeded()) g_itemManager.seed();
+            g_itemManager.tickAgents(entities, day / UPDATE_FREQUENCY,
+                                     (float)width, (float)height,
+                                     &g_pheromoneField, globalCivEngine);
+            g_pheromoneField.decay(g_liveConfig.pheromoneDecayMul);
+
             // ── Civilization tick (every TICKS_PER_CIV_TICK days) ──
             if (globalCivEngine && g_clock.isCivTick()) {
                 globalCivEngine->tick(entities, day / UPDATE_FREQUENCY);
@@ -1992,6 +2009,7 @@ int main(int argc, char* argv[]) {
     }
     const bool headless = (cli.headlessTicks > 0);
     g_headlessMode = headless;
+    std::cout << "Client version 2.64.0\n";
     std::cout << " \"I was meant to be perfect, ";
     std::cout << "I was meant to be beautiful\" \n\n";
    //// Initialize logger (this redirects std::cout to cmd_log.txt)
@@ -2018,9 +2036,8 @@ int main(int argc, char* argv[]) {
     tick_history.close();
 
     globalLogger->logCmd("done");
-    std::cout << "Welcome to Artificial Simulation of Human Behavior (ASHB)\n";
-    std::cout << "complete simulation can be found at /data/complete_logs.txt\n";
-    std::cout << "you can save and load simulation at any moment\n";
+    std::cout << "Welcome to Artificial Simulation of Human Behavior 2 (ASHB2)\n";
+    std::cout << "Complete simulation can be found at /data/complete_logs.txt\n";
     std::cout << "@author: Komodo \n";
 
     // Region (disease climate)
@@ -2177,6 +2194,11 @@ int main(int argc, char* argv[]) {
                 entity.ValueSystem.spiritualNeed      = vc(vd(rng_spawn) - (entity.personality.openness - 50.0f) * 0.2f);
                 entity.ValueSystem.hedonism           = vc(vd(rng_spawn) + (entity.personality.extraversion - 50.0f) * 0.3f - (entity.personality.conscientiousness - 50.0f) * 0.2f);
                 entity.ValueSystem.collectivism       = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.35f - (entity.personality.openness - 50.0f) * 0.1f);
+
+                // Integrity: honesty grows from conscientiousness + agreeableness
+                entity.integrity = vc(0.4f * entity.personality.conscientiousness
+                                    + 0.4f * entity.personality.agreeableness
+                                    + static_cast<float>(BetterRand::genNrInInterval(-15.0f, 15.0f)));
 
                 // --- Developmental History: childhood shapes the adult ---
                 float traumaRoll   = vc(static_cast<float>(BetterRand::genNrInInterval(0, 50)));
@@ -2346,6 +2368,12 @@ int main(int argc, char* argv[]) {
     // --headless <ticks> (or ASHB_HEADLESS=<ticks>) runs the full simulation
     // loop without any window, so automated tests / experiments can exercise
     // the engine (the GUI needs an interactive GL context CI doesn't have).
+    // ASHB_NEAT_SHARE=<0..1>: fraction of newborns wired with a NEAT brain.
+    // Lets headless runs bootstrap a neuroevolution population without the
+    // GUI slider (the config console is unreachable in automated runs).
+    if (const char* ns = std::getenv("ASHB_NEAT_SHARE"))
+        g_liveConfig.neatBrainShare = std::min(1.0f, std::max(0.0f, (float)atof(ns)));
+
     if (headless) {
         int targetTicks = cli.headlessTicks;
         std::cout << "HEADLESS: running " << targetTicks << " ticks ("
@@ -2397,6 +2425,7 @@ int main(int argc, char* argv[]) {
         // Initialize ImGui
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+        ImPlot::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         ImGui::StyleColorsDark();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -2448,6 +2477,7 @@ int main(int argc, char* argv[]) {
                 instanceUI.ShowPossessWindow(chosen, day / 60);
                 instanceUI.ShowInterviewWindow(chosen, ent_quad, day / 60);
                 instanceUI.ShowConfigConsole();
+                instanceUI.ShowEmergencePanel(ent_quad, day / UPDATE_FREQUENCY);
             }
 
             // Entity selection: click graph node OR mind board card
@@ -2464,7 +2494,7 @@ int main(int argc, char* argv[]) {
             }
 
             // ── Civilization panel ────────────────────────────────────────────
-            instanceUI.ShowCivilizationPanel(day / 60);
+            instanceUI.ShowCivilizationPanel(day / 60, ent_quad);
 
             // ── Market panel (supply & demand) ────────────────────────────────
             instanceUI.ShowMarketPanel();
@@ -2487,6 +2517,7 @@ int main(int argc, char* argv[]) {
 
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
+        ImPlot::DestroyContext();
         ImGui::DestroyContext();
         glfwTerminate();
     }else{// sdl rendering

@@ -116,6 +116,12 @@ src/TechTree.cpp
 src/Diplomacy.cpp
 src/Economics.cpp
 
+# Emergence upgrade (Steps 2-5): data-driven items, GOAP, stigmergy, NEAT
+src/items/ItemSystem.cpp
+src/ai/GoapPlanner.cpp
+src/ai/neat/Neat.cpp
+src/world/PheromoneField.cpp
+
 # New AI / cognitive simulation source files
 src/Action.cpp
 src/CognitiveArchitecture.cpp

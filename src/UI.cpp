@@ -1,3 +1,5 @@
+#include "items/ItemSystem.h"      // Step 5b: emergence telemetry
+#include "world/PheromoneField.h"
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -166,7 +168,8 @@ void UI::showSystemInformation(){
                                entity->specialization.empty() ? "artisan" : entity->specialization.c_str());
         } else {
             std::string role = "subsistence farmer";
-            if (!entity->specialization.empty()) role += " (latent " + entity->specialization + ")";
+            if (!entity->specialization.empty() && entity->specialization != "farmer")
+                role += " (latent " + entity->specialization + ")";
             ImGui::TextColored(ImVec4(0.7f, 0.85f, 0.7f, 1.0f), "Role: %s", role.c_str());
         }
         if (g_resources.valid(entity->originRegionId)) {
@@ -249,7 +252,6 @@ void UI::showSystemInformation(){
         }
 
         if (showDetailedInfo) {
-            ImPlot::CreateContext();
             try
             {
                 std::vector<std::string> labels = {
@@ -726,7 +728,7 @@ int UI::HandlePointMovement(std::vector<Entity*>& entities) {
 
 
 // ── ShowCivilizationPanel ─────────────────────────────────────────────────────
-void UI::ShowCivilizationPanel(int simDay) {
+void UI::ShowCivilizationPanel(int simDay, std::vector<Entity*>& entities) {
     if (!globalCivEngine) return;
     CivilizationEngine& civ = *globalCivEngine;
 
@@ -786,6 +788,25 @@ void UI::ShowCivilizationPanel(int simDay) {
             char id3[32]; snprintf(id3,32,"##inn%d",tribe.id);
             ImGui::ProgressBar(tribe.innovation/100.0f, ImVec2(60,8), id3);
             ImGui::PopStyleColor();
+
+            // Role breakdown: who does what in this tribe
+            {
+                int farmers = 0, craftsmen = 0, traders = 0, scholars = 0,
+                    healers = 0, warriors = 0, priests = 0;
+                for (Entity* e : entities) {
+                    if (!e || e->tribeId != tribe.id || e->entityHealth <= 0.0f) continue;
+                    const std::string& r = e->specialization;
+                    if      (r == "craftsman") craftsmen++;
+                    else if (r == "trader")    traders++;
+                    else if (r == "scholar")   scholars++;
+                    else if (r == "healer")    healers++;
+                    else if (r == "warrior")   warriors++;
+                    else if (r == "priest")    priests++;
+                    else                       farmers++;
+                }
+                ImGui::TextDisabled("    Roles: %d farm | %d craft | %d trade | %d schol | %d heal | %d war | %d priest",
+                                    farmers, craftsmen, traders, scholars, healers, warriors, priests);
+            }
 
             // Known tech count (emergent innovations)
             if (!tribe.knownTechIds.empty())
@@ -1017,6 +1038,12 @@ void UI::ShowMarketPanel() {
     if (ImGui::CollapsingHeader("OBJECT MARKET", ImGuiTreeNodeFlags_DefaultOpen))
         DrawMarketRows(GoodCategory::OBJECT);
 
+    if (ImGui::CollapsingHeader("ATK MILITARY MARKET", ImGuiTreeNodeFlags_DefaultOpen))
+        DrawMarketRows(GoodCategory::ATK_OBJECT);
+
+    if (ImGui::CollapsingHeader("DEF MILITARY MARKET", ImGuiTreeNodeFlags_DefaultOpen))
+        DrawMarketRows(GoodCategory::DEF_OBJECT);
+
     ImGui::End();
 }
 
@@ -1061,6 +1088,11 @@ int UI::ShowMindBoard(std::vector<Entity*>& entities) {
 
         // Name + age line
         ImGui::Text("%s, %d", ent->name.c_str(), (int)ent->entityAge);
+
+        // Role + tenure + integrity
+        ImGui::TextDisabled("Role: %s (since day %d) | Int %.0f",
+                            ent->specialization.empty() ? "farmer" : ent->specialization.c_str(),
+                            ent->roleSinceDay, ent->integrity);
 
         // Last action
         if (!ent->lastActionName.empty())
@@ -1487,6 +1519,159 @@ void UI::ShowConfigConsole() {
     ImGui::SliderFloat("Old-age mortality", &g_liveConfig.mortalityMul, 0.0f, 4.0f, "%.2fx");
     ImGui::SliderFloat("Food yield", &g_liveConfig.foodYieldMul, 0.1f, 3.0f, "%.2fx");
     ImGui::SliderFloat("Aggression", &g_liveConfig.aggressionMul, 0.0f, 4.0f, "%.2fx");
+    ImGui::Separator();
+    ImGui::TextDisabled("Emergence (Steps 2-5)");
+    ImGui::SliderFloat("Mutation rate",   &g_liveConfig.mutationRateMul,   0.0f, 4.0f, "%.2fx");
+    ImGui::SliderFloat("Pheromone decay", &g_liveConfig.pheromoneDecayMul, 0.1f, 4.0f, "%.2fx");
+    ImGui::SliderFloat("Invention rate",  &g_liveConfig.inventionRateMul,  0.0f, 4.0f, "%.2fx");
+    ImGui::SliderFloat("NEAT newborn share", &g_liveConfig.neatBrainShare, 0.0f, 1.0f, "%.2f");
+    ImGui::Checkbox("Density heatmap",  &g_liveConfig.showDensityHeatmap); ImGui::SameLine();
+    ImGui::Checkbox("Pheromones",       &g_liveConfig.showPheromones);     ImGui::SameLine();
+    ImGui::Checkbox("Genetic tint",     &g_liveConfig.showGeneticTint);
     if (ImGui::Button("Reset all to 1.0")) g_liveConfig = LiveConfig{};
+    ImGui::End();
+}
+
+
+// ── Emergence panel (Upgrade Plan, Step 5b) ───────────────────────────────────
+// Live telemetry: population, mean age, genetic diversity, invented content.
+// Below the plots, an overlay map of the WORLD (not the social layout): agent
+// density heatmap, the three pheromone channels, and agents tinted by genome.
+void UI::ShowEmergencePanel(std::vector<Entity*>& entities, int simDay) {
+    ImGui::Begin("Emergence");
+
+    // ── Sample telemetry once per sim-day ────────────────────────────────────
+    static std::vector<float> tDay, tPop, tAge, tDiv, tDefs, tRules, tSpreads, tNeat;
+    static int lastDay = -1;
+    if (simDay != lastDay) {
+        lastDay = simDay;
+        int alive = 0, neatN = 0;
+        float ageSum = 0.0f;
+        Genome mean; mean.speed = mean.sightRange = mean.metabolism = mean.fertility = mean.resilience = 0.0f;
+        for (Entity* e : entities) {
+            if (!e || e->entityHealth <= 0.0f) continue;
+            ++alive; ageSum += e->entityAge;
+            if (e->useNeatBrain) ++neatN;
+            mean.speed += e->genome.speed;           mean.sightRange += e->genome.sightRange;
+            mean.metabolism += e->genome.metabolism; mean.fertility  += e->genome.fertility;
+            mean.resilience += e->genome.resilience;
+        }
+        float div = 0.0f;
+        if (alive > 0) {
+            mean.speed /= alive; mean.sightRange /= alive; mean.metabolism /= alive;
+            mean.fertility /= alive; mean.resilience /= alive;
+            for (Entity* e : entities)
+                if (e && e->entityHealth > 0.0f) div += e->genome.distanceTo(mean);
+            div /= alive;
+        }
+        tDay.push_back((float)simDay);
+        tPop.push_back((float)alive);
+        tAge.push_back(alive ? ageSum / alive : 0.0f);
+        tDiv.push_back(div);
+        tDefs.push_back((float)g_itemManager.inventedDefCount());
+        tRules.push_back((float)g_itemManager.inventedRuleCount());
+        tSpreads.push_back((float)g_itemManager.recipeSpreadCount());
+        tNeat.push_back((float)neatN);
+        if (tDay.size() > 4096) {   // bound memory on very long runs
+            for (auto* v : {&tDay,&tPop,&tAge,&tDiv,&tDefs,&tRules,&tSpreads,&tNeat})
+                v->erase(v->begin(), v->begin() + 2048);
+        }
+    }
+
+    if (!tDay.empty() && ImPlot::BeginPlot("Population & Brains", ImVec2(-1, 180))) {
+        ImPlot::SetupAxes("day", "count");
+        ImPlot::PlotLine("population", tDay.data(), tPop.data(), (int)tDay.size());
+        ImPlot::PlotLine("NEAT brains", tDay.data(), tNeat.data(), (int)tDay.size());
+        ImPlot::EndPlot();
+    }
+    if (!tDay.empty() && ImPlot::BeginPlot("Age & Genetic diversity", ImVec2(-1, 180))) {
+        ImPlot::SetupAxes("day", "value");
+        ImPlot::PlotLine("mean age", tDay.data(), tAge.data(), (int)tDay.size());
+        ImPlot::PlotLine("gene diversity x100", tDay.data(), tDiv.data(), (int)tDiv.size());
+        ImPlot::EndPlot();
+    }
+    if (!tDay.empty() && ImPlot::BeginPlot("Invented culture", ImVec2(-1, 180))) {
+        ImPlot::SetupAxes("day", "count");
+        ImPlot::PlotLine("item defs", tDay.data(), tDefs.data(), (int)tDay.size());
+        ImPlot::PlotLine("recipes",   tDay.data(), tRules.data(), (int)tRules.size());
+        ImPlot::PlotLine("recipe spreads", tDay.data(), tSpreads.data(), (int)tSpreads.size());
+        ImPlot::EndPlot();
+    }
+    ImGui::Text("Items: %d defs (%d invented) | Rules: %d (%d invented) | Spreads: %d",
+                (int)g_itemManager.defs().size(),  g_itemManager.inventedDefCount(),
+                (int)g_itemManager.rules().size(), g_itemManager.inventedRuleCount(),
+                g_itemManager.recipeSpreadCount());
+
+    // ── World overlay map ─────────────────────────────────────────────────────
+    ImGui::Separator();
+    ImGui::TextDisabled("World overlays (toggle in Config Console)");
+    const float mapW = ImGui::GetContentRegionAvail().x, mapH = 240.0f;
+    ImVec2 origin = ImGui::GetCursorScreenPos();
+    ImGui::InvisibleButton("##emap", ImVec2(std::max(mapW, 50.0f), mapH));
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    dl->AddRectFilled(origin, ImVec2(origin.x + mapW, origin.y + mapH), IM_COL32(12, 12, 18, 255));
+
+    float worldW = g_pheromoneField.ready()
+                 ? g_pheromoneField.cols() * g_pheromoneField.cellSize() : 1280.0f;
+    float worldH = g_pheromoneField.ready()
+                 ? g_pheromoneField.rows() * g_pheromoneField.cellSize() : 720.0f;
+    auto toMap = [&](float wx, float wy) {
+        return ImVec2(origin.x + wx / worldW * mapW, origin.y + wy / worldH * mapH);
+    };
+
+    if (g_liveConfig.showPheromones && g_pheromoneField.ready()) {
+        float cw = mapW / g_pheromoneField.cols(), ch = mapH / g_pheromoneField.rows();
+        for (int cy = 0; cy < g_pheromoneField.rows(); ++cy) {
+            for (int cx = 0; cx < g_pheromoneField.cols(); ++cx) {
+                float fo = g_pheromoneField.cellValue(cx, cy, PheromoneField::FOOD);
+                float da = g_pheromoneField.cellValue(cx, cy, PheromoneField::DANGER);
+                float so = g_pheromoneField.cellValue(cx, cy, PheromoneField::SOCIAL);
+                if (fo + da + so < 1.0f) continue;
+                ImVec2 a(origin.x + cx * cw, origin.y + cy * ch);
+                ImVec2 b(a.x + cw, a.y + ch);
+                int r = (int)std::min(255.0f, da * 2.5f);
+                int g = (int)std::min(255.0f, fo * 2.5f);
+                int bl = (int)std::min(255.0f, so * 2.5f);
+                dl->AddRectFilled(a, b, IM_COL32(r, g, bl, 110));
+            }
+        }
+    }
+
+    if (g_liveConfig.showDensityHeatmap) {
+        const int BX = 32, BY = 20;
+        static std::vector<int> bins; bins.assign(BX * BY, 0);
+        int peak = 1;
+        for (Entity* e : entities) {
+            if (!e || e->entityHealth <= 0.0f) continue;
+            int bx = std::min(BX - 1, std::max(0, (int)(e->posX / worldW * BX)));
+            int by = std::min(BY - 1, std::max(0, (int)(e->posY / worldH * BY)));
+            peak = std::max(peak, ++bins[by * BX + bx]);
+        }
+        float cw = mapW / BX, ch = mapH / BY;
+        for (int by = 0; by < BY; ++by)
+            for (int bx = 0; bx < BX; ++bx) {
+                int cnt = bins[by * BX + bx];
+                if (!cnt) continue;
+                float t = (float)cnt / peak;
+                ImVec2 a(origin.x + bx * cw, origin.y + by * ch);
+                dl->AddRectFilled(a, ImVec2(a.x + cw, a.y + ch),
+                                  IM_COL32(255, (int)(180 * (1 - t)), 40, (int)(30 + 120 * t)));
+            }
+    }
+
+    // Agent dots — genetic tint maps (speed, sight, metabolism) onto RGB, so
+    // families and diverging lineages literally show as color families.
+    for (Entity* e : entities) {
+        if (!e || e->entityHealth <= 0.0f) continue;
+        ImU32 col;
+        if (g_liveConfig.showGeneticTint) {
+            auto ch = [](float g){ return (int)std::min(255.0f, std::max(0.0f, (g - 0.4f) / 1.4f * 255.0f)); };
+            col = IM_COL32(ch(e->genome.speed), ch(e->genome.sightRange), ch(e->genome.metabolism), 220);
+        } else {
+            col = e->useNeatBrain ? IM_COL32(120, 220, 255, 220) : IM_COL32(200, 200, 200, 160);
+        }
+        dl->AddCircleFilled(toMap(e->posX, e->posY), 2.0f, col);
+    }
+
     ImGui::End();
 }

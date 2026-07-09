@@ -28,6 +28,37 @@
 #include <string>
 #include <vector>
 
+// ── Emergence upgrade (Steps 4/5a): heritable genome + NEAT brain at birth ────
+// One deterministic gene stream shared by every birth path (same makeStream
+// discipline as the civ streams; fresh salt so existing streams are untouched).
+static void inheritEmergenceTraits(Entity& baby, Entity* pa, Entity* pb) {
+    static std::mt19937_64 s_geneRng = makeStream(g_worldSeed.master, 0xB5297A4D3F84D5B5ull);
+    baby.genome = Genome::combine(pa->genome, pb->genome, s_geneRng,
+                                  g_liveConfig.mutationRateMul);
+    std::uniform_real_distribution<float> integrityNoise(-10.0f, 10.0f);
+    baby.integrity = std::max(0.0f, std::min(100.0f,
+        (pa->integrity + pb->integrity) * 0.5f + integrityNoise(s_geneRng)));
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+    if (pa->useNeatBrain && pb->useNeatBrain
+        && !pa->neatGenome.empty() && !pb->neatGenome.empty()) {
+        // Both parents carry evolved brains: innovation-aligned crossover with
+        // the healthier parent treated as fitter, then mutation. This IS the
+        // genetic algorithm - no backprop anywhere.
+        Entity* fit   = (pa->entityHealth >= pb->entityHealth) ? pa : pb;
+        Entity* other = (fit == pa) ? pb : pa;
+        baby.neatGenome = neat::Genome::crossover(fit->neatGenome, other->neatGenome, s_geneRng);
+        baby.neatGenome.mutate(s_geneRng, g_liveConfig.mutationRateMul);
+        baby.useNeatBrain = true;
+    } else if (roll(s_geneRng) < g_liveConfig.neatBrainShare) {
+        // Seed fraction: some newborns get a fresh minimal network so a NEAT
+        // population can bootstrap even from zero carriers.
+        baby.neatGenome = neat::Genome::minimal(s_geneRng);
+        baby.neatGenome.mutate(s_geneRng, g_liveConfig.mutationRateMul);
+        baby.useNeatBrain = true;
+    }
+}
+
+
 std::vector<Entity> FreeWillSystem::new_borns;
 int FreeWillSystem::day;
 std::vector<Action> FreeWillSystem::availableActions;
@@ -2160,6 +2191,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             float avg_extraversion_parent = (pointed->personality.extraversion + pointer->personality.extraversion) / 2;
             baby.personality.openness = avg_openness_parent;
             baby.personality.extraversion = avg_extraversion_parent;
+            inheritEmergenceTraits(baby, pointer, pointed);
             if (globalKinship) globalKinship->registerBirth(baby, pointed, pointer,
                 globalCivEngine ? globalCivEngine->getCurrentYear() : 0);
 
@@ -2205,6 +2237,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                 baby.personality.extraversion = (pointed->personality.extraversion + pointer->personality.extraversion) / 2;
                 baby.dv.hadSecureAttachment = true;
                 baby.addOrBoostGoal("self", 100.0f);
+                inheritEmergenceTraits(baby, pointer, pointed);
                 if (globalKinship) globalKinship->registerBirth(baby, pointed, pointer,
                     globalCivEngine ? globalCivEngine->getCurrentYear() : 0);
                 if (globalCivEngine) {
@@ -3147,6 +3180,18 @@ void FreeWillSystem::learnByObservation(Entity* observer, Entity* model,
     const std::string st = rlStateSignature(observer, numPeopleNearby);
     rlSystem.vicariousExperience(observer, st, actionName, observedOutcome * 100.0f, weight);
     rlSystem.observeAndLearn(observer, model, actionName, observedOutcome);
+
+    // Cultural transmission of invented recipes (Step 4): watching a skilled,
+    // prestigious model can also hand over one technique the observer lacks.
+    // Deterministic gate - openness times prestige must clear a bar.
+    if ((observer->personality.openness / 100.0f) * prestige > 0.45f) {
+        for (int rid : model->knownRecipeIds) {
+            if (!observer->knowsRecipe(rid)) {
+                observer->learnRecipe(rid);
+                break;   // at most one technique per observation
+            }
+        }
+    }
 }
 
 void SocialNormSystem::update(const std::vector<Entity*>& allEntities) {
@@ -4207,6 +4252,7 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
                 baby.dv.hadSecureAttachment = (cp.satisfaction > 40.0f && cp.trust > 40.0f);
                 baby.dv.childhoodNurturingScore = cp.satisfaction / 25.0f;
                 baby.addOrBoostGoal("self", 100.0f);
+                inheritEmergenceTraits(baby, e, P);
                 if (globalKinship) globalKinship->registerBirth(baby, P, e,
                     globalCivEngine ? globalCivEngine->getCurrentYear() : 0);
                 cp.commitment   = std::min(100.0f, cp.commitment + 6.0f);  // a child deepens the bond

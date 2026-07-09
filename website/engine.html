@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHB2 — Under the Hood</title>
+  <meta name="description" content="The ASHB2 engine architecture: FreeWillSystem, Theory of Mind, and validation realism reports.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ Navigation ═══════════════════════════════════════ -->
+  <nav>
+    <div class="logo">
+      ASHB2.exe<span class="cursor"></span>
+    </div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="engine.html" class="active">Engine</a></li>
+      <li><a href="chronicle.html">Chronicle</a></li>
+      <li><a href="experience.html">Experience</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ Main ═════════════════════════════════════════════ -->
+  <main>
+
+    <section class="hero">
+      <div class="tag-group">
+        <span class="tag amber">Technical Dossier</span>
+        <span class="tag mint">v2.0</span>
+      </div>
+      <h1>Under the Hood.</h1>
+      <p class="sub">The architecture behind autonomous, unscripted civilization. This is not a game engine. It is a behavioral simulation kernel.</p>
+    </section>
+
+    <!-- ── FreeWillSystem ────────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">Pillar 01</p>
+      <h2>The Mind of an Agent</h2>
+      <p class="lede">
+        Every decision passes through a four-stage pipeline. There is no if-statement.
+        There is a weighted cascade from reflex to deliberation.
+      </p>
+
+      <div class="card mt-2">
+        <div class="card-label">Stage 1</div>
+        <h3>Reflex</h3>
+        <p>
+          The fastest path. If an agent's hunger exceeds a critical threshold, or
+          a predator is within striking distance, the reflex layer fires before any
+          cognitive process. This is not a script — it is a weighted urgency signal
+          that gates higher-level processing.
+        </p>
+        <div class="data-row">
+          <span class="key">threshold.hunger.critical</span>
+          <span class="val amber">0.85</span>
+        </div>
+        <div class="data-row">
+          <span class="key">threshold.threat.proximity</span>
+          <span class="val crimson">3.0 units</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Stage 2</div>
+        <h3>Value Alignment</h3>
+        <p>
+          The agent's personality profile (Big Five) and attachment style filter
+          the available action set. A high-neuroticism agent weights safety over
+          exploration. A high-agreeableness agent weights social harmony over
+          personal gain. Values are not labels — they are mathematical weights
+          in the utility function.
+        </p>
+        <div class="data-row">
+          <span class="key">filter.openness.weight</span>
+          <span class="val">×1.2</span>
+        </div>
+        <div class="data-row">
+          <span class="key">filter.conscientiousness.weight</span>
+          <span class="val">×0.9</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Stage 3</div>
+        <h3>Habit</h3>
+        <p>
+          Repeated actions form procedural memory. If an agent has successfully
+          performed an action sequence 20+ times, it enters a "habit buffer" and
+          executes without full deliberation. This frees working memory for novel
+          situations. Habits can be broken when they stop producing results.
+        </p>
+        <div class="data-row">
+          <span class="key">habit.threshold</span>
+          <span class="val mint">20 repetitions</span>
+        </div>
+        <div class="data-row">
+          <span class="key">habit.decay.rate</span>
+          <span class="val">0.04 / tick</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Stage 4</div>
+        <h3>Cognitive Deliberation</h3>
+        <p>
+          For novel or high-stakes decisions, the GOAP planner runs an A* search
+          over the agent's known action rules. The planner projects possible futures
+          and scores them against the agent's current drives. This is where invention
+          happens — an agent discovers that combining two known actions produces a
+          new capability.
+        </p>
+        <div class="data-row">
+          <span class="key">planner.depth</span>
+          <span class="val amber">5 steps</span>
+        </div>
+        <div class="data-row">
+          <span class="key">planner.branching.factor</span>
+          <span class="val">3.2 avg</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Theory of Mind ─────────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">Pillar 02</p>
+      <h2>Theory of Mind</h2>
+      <p class="lede">
+        Agents build mental models of other agents — and they get it wrong.
+        A misattributed intention can spark a blood feud. An accurate read
+        can forge an alliance that lasts generations.
+      </p>
+      <div class="grid-2 mt-2">
+        <div class="card">
+          <div class="card-label">Signal</div>
+          <h3>Observing Behavior</h3>
+          <p>
+            Agents infer intent from observed actions. When Agent A shares food
+            with Agent B, Agent B updates its model: "A has a high agreeableness
+            score and low neuroticism." This inference may be accurate — or it
+            may be projection based on B's own personality.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-label">Noise</div>
+          <h3>The Misread</h3>
+          <p>
+            An agent with high neuroticism interprets neutral actions as hostile.
+            An agent with low openness fails to recognize cooperative signals.
+            These misreadings are not bugs — they are the engine of tragic narratives.
+            Tribal feuds, holy wars, and betrayals all originate here.
+          </p>
+          <div class="data-row mt-1">
+            <span class="key">attribution.error.rate</span>
+            <span class="val amber">0.17</span>
+          </div>
+        </div>
+      </div>
+      <div class="terminal-panel mt-2">
+        <span class="prompt">$</span> <span class="timestamp">[TICK 004315]</span> Agent 07 internal model of Agent 12:<br>
+        &nbsp;&nbsp;{ "trust": 0.82, "hostility": 0.03, "predicted_action": "share_food", "confidence": 0.74 }<br>
+        <span class="prompt">$</span> <span class="timestamp">[TICK 004315]</span> <span class="error">Agent 12 actual action: "hoard_food" — model mismatch detected</span>
+      </div>
+    </section>
+
+    <!-- ── Realism Reports ────────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">Pillar 03</p>
+      <h2>Realism Reports</h2>
+      <p class="lede">
+        Every simulation run is validated against real-world anthropological and
+        criminological data. The engine does not just generate plausible histories —
+        it generates statistically valid ones.
+      </p>
+      <div class="grid-2 mt-2">
+        <div class="card">
+          <div class="card-label">Validation Metric</div>
+          <h3>Homicide Share</h3>
+          <p>
+            Cross-cultural homicide rates fall within 0.5–4.0 per 100,000 for stable
+            populations. ASHB2 runs consistently produce 1.2–3.8, aligning with
+            ethnographic baselines. Spikes occur only during resource collapse — which
+            matches real-world data.
+          </p>
+          <div class="data-row">
+            <span class="key">baseline.rate</span>
+            <span class="val mint">1.8 / 100k</span>
+          </div>
+          <div class="data-row">
+            <span class="key">famine.spike</span>
+            <span class="val amber">4.2 / 100k</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Validation Metric</div>
+          <h3>Demographic Sustainability</h3>
+          <p>
+            Populations stabilize between 30–120 agents depending on carrying capacity.
+            Extinction events occur in ~22% of runs, consistent with real-world
+            hunter-gatherer extinction rates for small founding populations.
+          </p>
+          <div class="data-row">
+            <span class="key">stability.rate</span>
+            <span class="val mint">78%</span>
+          </div>
+          <div class="data-row">
+            <span class="key">extinction.rate</span>
+            <span class="val crimson">22%</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Validation Metric</div>
+          <h3>Cultural Stability</h3>
+          <p>
+            Belief systems persist for 80–400 ticks before splitting or dissolving.
+            The mean cultural half-life is 185 ticks, which maps to ~3–5 generations
+            in real-world small-scale societies before significant drift occurs.
+          </p>
+          <div class="data-row">
+            <span class="key">half.life.mean</span>
+            <span class="val amber">185 ticks</span>
+          </div>
+          <div class="data-row">
+            <span class="key">split.threshold</span>
+            <span class="val">12 adherents</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Validation Metric</div>
+          <h3>Technological Progression</h3>
+          <p>
+            Invention rates follow a logarithmic curve: rapid early discoveries,
+            then a plateau. This matches the observed pattern in real archaeological
+            records, where tool complexity increases quickly in the first 500
+            generations and then stabilizes.
+          </p>
+          <div class="data-row">
+            <span class="key">inventions.by.tick.1000</span>
+            <span class="val">8 avg</span>
+          </div>
+          <div class="data-row">
+            <span class="key">inventions.by.tick.5000</span>
+            <span class="val mint">16 avg</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ Footer ═══════════════════════════════════════════ -->
+  <footer>
+    ASHB2 <span class="dot">◆</span> Autonomous Simulation of Human Behavior &nbsp;|&nbsp; Scientific Terminal
+  </footer>
+
+</body>
+</html>

@@ -430,6 +430,18 @@ void Entity::saveTo(std::ofstream& file) const {
     // Save PlanningSystem
     planner.saveTo(file);
 
+    // Society layer: tribe/religion/family membership, role and standing.
+    // Appended at the very end so older loaders simply never reach these lines.
+    file << "TRIBEID:" << tribeId << "\n";
+    file << "RELIGIONID:" << religionId << "\n";
+    file << "FAMILYID:" << familyId << "\n";
+    file << "SPECIALIZATION:" << specialization << "\n";
+    file << "ISSPEC:" << (isSpecialist ? 1 : 0) << "\n";
+    file << "ROLESINCE:" << roleSinceDay << "\n";
+    file << "AUCTORITAS:" << auctoritas << "\n";
+    file << "INTEGRITY:" << integrity << "\n";
+    file << "DOMRANK:" << dominanceRank << "\n";
+
     file << "--- END ENTITY ---\n";
 }
 
@@ -569,6 +581,26 @@ void Entity::loadFrom(std::ifstream& file) {
 
     // Load PlanningSystem
     planner.loadFrom(file);
+
+    // Society layer: tolerant of older saves that predate these lines — peek
+    // one line, and if it isn't a TRIBEID record, rewind so the end marker is
+    // read normally (same guard idiom as SALARY above).
+    std::streampos beforeSociety = file.tellg();
+    std::getline(file, line);
+    if (line.rfind("TRIBEID:", 0) == 0) {
+        tribeId = std::stoi(line.substr(8));
+        std::getline(file, line); religionId     = std::stoi(line.substr(11));
+        std::getline(file, line); familyId       = std::stoi(line.substr(9));
+        std::getline(file, line); specialization = line.substr(15);
+        std::getline(file, line); isSpecialist   = (std::stoi(line.substr(7)) != 0);
+        std::getline(file, line); roleSinceDay   = std::stoi(line.substr(10));
+        std::getline(file, line); auctoritas     = std::stof(line.substr(11));
+        std::getline(file, line); integrity      = std::stof(line.substr(10));
+        std::getline(file, line); dominanceRank  = std::stof(line.substr(8));
+        if (specialization.empty()) specialization = "farmer";
+    } else {
+        file.seekg(beforeSociety); // old save — no society block
+    }
 
     // Read end marker
     std::getline(file, line); // "--- END ENTITY ---"

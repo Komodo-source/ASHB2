@@ -2,6 +2,7 @@
 #include "header/Economics.h"
 #include "header/Entity.h"
 #include "world/Planet.h"
+#include "world/PheromoneField.h"   // Step 4: battles poison the ground with danger scent
 #include "world/Lexicon.h"
 #include "world/ResourceSystem.h"   // per-region resource pools feed craftsmen
 #include "EnvironmentModel.h"   // previously-unused seasonal model, now driving famine cycles
@@ -567,6 +568,7 @@ void CivilizationEngine::updateTribeTech(Tribe& tribe, std::vector<Entity>& enti
 void CivilizationEngine::absorbEntityIntoTribe(Tribe& tribe, Entity* ent) {
     ent->tribeId = tribe.id;
     tribe.memberIds.push_back(ent->entityId);
+    if (ent->specialization.empty()) ent->specialization = "farmer";
     // Give entity access to tribe's known technologies
     for (int tid : tribe.knownTechIds)
         if (std::find(ent->knownTechIds.begin(), ent->knownTechIds.end(), tid) == ent->knownTechIds.end())
@@ -1589,18 +1591,11 @@ void CivilizationEngine::applyEffectsToEntities(std::vector<Entity>& entities, i
                 ent.Esteem       = clamp(ent.Esteem       + 2.5f, 0.0f, 100.0f);
             }
 
-            // Assign specialization based on dominant personality
+            // Every tribe member holds an explicit role; field work is the
+            // default — crafts are assigned on promotion in updateDivisionOfLabour.
             if (ent.specialization.empty()) {
-                float maxTrait = std::max({ ent.personality.extraversion,
-                                            ent.personality.agreeableness,
-                                            ent.personality.conscientiousness,
-                                            ent.personality.openness,
-                                            100.0f - ent.personality.agreeableness });
-                if (maxTrait == ent.personality.openness             ) ent.specialization = "scholar";
-                else if (maxTrait == ent.personality.conscientiousness) ent.specialization = "craftsman";
-                else if (maxTrait == ent.personality.extraversion     ) ent.specialization = "trader";
-                else if (maxTrait == ent.personality.agreeableness    ) ent.specialization = "healer";
-                else                                                    ent.specialization = "warrior";
+                ent.specialization = "farmer";
+                ent.roleSinceDay   = day;
             }
         }
 
@@ -1670,11 +1665,14 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
         }
         if (members.empty()) { tribe.granary *= 0.95f; tribe.specialistCount = 0; continue; }
 
-        // 1. Farmers tithe their surplus into the granary (keep a comfort buffer).
+        // 1. Farmers tithe their surplus into the granary (keep a comfort buffer)
+        //    and draw the humblest wage in the tribe.
         const float comfort = 12.0f;
         float deposited = 0.0f;
         for (Entity* e : members) {
-            if (!e->isSpecialist && e->foodStore > comfort) {
+            if (e->isSpecialist) continue;
+            e->salary.earnMoney(1.0f);
+            if (e->foodStore > comfort) {
                 float give = (e->foodStore - comfort) * 0.5f;
                 e->foodStore -= give;
                 deposited += give;
@@ -1707,8 +1705,24 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
             for (Entity* e : members) {
                 if (current >= target) break;
                 if (e->isSpecialist) continue;
+                if (e->roleSinceDay >= 0 && day - e->roleSinceDay < 3) continue;
                 e->isSpecialist = true;
-                if (e->specialization.empty()) e->specialization = "craftsman";
+                // Careers are chosen at promotion, from the dominant trait.
+                if (e->specialization.empty() || e->specialization == "farmer") {
+                    float maxTrait = std::max({ e->personality.extraversion,
+                                                e->personality.agreeableness,
+                                                e->personality.conscientiousness,
+                                                e->personality.openness,
+                                                100.0f - e->personality.agreeableness,
+                                                e->ValueSystem.spiritualNeed });
+                    if (maxTrait == e->ValueSystem.spiritualNeed           ) e->specialization = "priest";
+                    else if (maxTrait == e->personality.openness           ) e->specialization = "scholar";
+                    else if (maxTrait == e->personality.conscientiousness  ) e->specialization = "craftsman";
+                    else if (maxTrait == e->personality.extraversion       ) e->specialization = "trader";
+                    else if (maxTrait == e->personality.agreeableness      ) e->specialization = "healer";
+                    else                                                     e->specialization = "warrior";
+                }
+                e->roleSinceDay = day;
                 current++;
                 logEvent(day, e->name + " is freed from the fields to serve as a "
                               + e->specialization + " of " + tribe.name, "labour",
@@ -1726,7 +1740,10 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
             for (Entity* e : members) {
                 if (toDemote <= 0) break;
                 if (!e->isSpecialist) continue;
+                if (e->roleSinceDay >= 0 && day - e->roleSinceDay < 3) continue;
                 e->isSpecialist = false;
+                e->specialization = "farmer";
+                e->roleSinceDay = day;
                 toDemote--;
             }
         }
@@ -1741,6 +1758,8 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
                 e->foodStore = std::min(20.0f, e->foodStore + ration);
             } else {
                 e->isSpecialist = false;
+                e->specialization = "farmer";
+                e->roleSinceDay = day;
                 continue;
             }
             tribe.specialistCount++;
@@ -1755,14 +1774,37 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
                 g_resources.extract(tribe.regionId, RES_WOOD,  0.4f);
                 g_resources.extract(tribe.regionId, RES_METAL, 0.2f);
                 tribe.innovation = clamp(tribe.innovation + 0.05f, 0.0f, 100.0f);
+                e->salary.earnMoney(5.0f);
             } else if (s == "scholar") {
                 tribe.innovation = clamp(tribe.innovation + 0.08f, 0.0f, 100.0f);
+                e->salary.earnMoney(8.0f);
             } else if (s == "trader") {
                 e->salary.earnMoney(20.0f);
             } else if (s == "warrior") {
                 tribe.militarism = clamp(tribe.militarism + 0.04f, 0.0f, 100.0f);
+                e->salary.earnMoney(3.0f);
+            } else if (s == "healer") {
+                // Healers tend the sickest and most burdened of their kin.
+                int treated = 0;
+                for (Entity* p : members) {
+                    if (treated >= 3) break;
+                    if (p == e) continue;
+                    if (p->entityDiseaseType != -1 || p->entityStress > 55.0f) {
+                        p->entityStress = clamp(p->entityStress - 0.8f, 0.0f, 100.0f);
+                        if (p->entityDiseaseType != -1)
+                            p->entityAntiBody = clamp(p->entityAntiBody + 0.6f, 0.0f, 100.0f);
+                        treated++;
+                    }
+                }
+                e->salary.earnMoney(4.0f);
+            } else if (s == "priest") {
+                tribe.spiritualism = clamp(tribe.spiritualism + 0.04f, 0.0f, 100.0f);
+                for (Entity* p : members)
+                    if (p->religionId >= 0)
+                        p->entityHapiness = clamp(p->entityHapiness + 0.05f, 0.0f, 100.0f);
+                e->salary.earnMoney(4.0f);
             }
-            // "healer" / priests: cohesion handled below as a tribe-wide effect.
+            // "farmer": tithes to the granary in step 1 above (lowest wage there).
         }
 
         // 6. Priests & healers bind the community: their presence eases everyone's
@@ -2725,6 +2767,14 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
 void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::vector<Entity>& entities, int day) {
     std::uniform_real_distribution<float> roll(0.0f, 1.0f);
     totalBattles++;
+    // Stigmergy (Step 4): battle sites reek of danger - agents route around
+    // them for days until the field decays.
+    if (g_pheromoneField.ready()) {
+        g_pheromoneField.deposit(defender.centerX, defender.centerY,
+                                 PheromoneField::DANGER, 30.0f);
+        g_pheromoneField.deposit(attacker.centerX, attacker.centerY,
+                                 PheromoneField::DANGER, 12.0f);
+    }
     // Ethnic / hate wars are far bloodier than ordinary border skirmishes.
     bool ethnic = attacker.ethnicWarWith.count(defender.id) > 0;
     float aStr = calculateTribeMilitaryStrength(attacker, entities);

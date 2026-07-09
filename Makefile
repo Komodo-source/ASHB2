@@ -920,6 +920,54 @@ src/WorldSeed.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/WorldSeed.cpp.s
 .PHONY : src/WorldSeed.cpp.s
 
+src/ai/GoapPlanner.obj: src/ai/GoapPlanner.cpp.obj
+.PHONY : src/ai/GoapPlanner.obj
+
+# target to build an object file
+src/ai/GoapPlanner.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/GoapPlanner.cpp.obj
+.PHONY : src/ai/GoapPlanner.cpp.obj
+
+src/ai/GoapPlanner.i: src/ai/GoapPlanner.cpp.i
+.PHONY : src/ai/GoapPlanner.i
+
+# target to preprocess a source file
+src/ai/GoapPlanner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/GoapPlanner.cpp.i
+.PHONY : src/ai/GoapPlanner.cpp.i
+
+src/ai/GoapPlanner.s: src/ai/GoapPlanner.cpp.s
+.PHONY : src/ai/GoapPlanner.s
+
+# target to generate assembly for a file
+src/ai/GoapPlanner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/GoapPlanner.cpp.s
+.PHONY : src/ai/GoapPlanner.cpp.s
+
+src/ai/neat/Neat.obj: src/ai/neat/Neat.cpp.obj
+.PHONY : src/ai/neat/Neat.obj
+
+# target to build an object file
+src/ai/neat/Neat.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/neat/Neat.cpp.obj
+.PHONY : src/ai/neat/Neat.cpp.obj
+
+src/ai/neat/Neat.i: src/ai/neat/Neat.cpp.i
+.PHONY : src/ai/neat/Neat.i
+
+# target to preprocess a source file
+src/ai/neat/Neat.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/neat/Neat.cpp.i
+.PHONY : src/ai/neat/Neat.cpp.i
+
+src/ai/neat/Neat.s: src/ai/neat/Neat.cpp.s
+.PHONY : src/ai/neat/Neat.s
+
+# target to generate assembly for a file
+src/ai/neat/Neat.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/neat/Neat.cpp.s
+.PHONY : src/ai/neat/Neat.cpp.s
+
 src/environment/EnvironmentModel.obj: src/environment/EnvironmentModel.cpp.obj
 .PHONY : src/environment/EnvironmentModel.obj
 
@@ -1015,6 +1063,30 @@ src/implem_free_will.s: src/implem_free_will.cpp.s
 src/implem_free_will.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/implem_free_will.cpp.s
 .PHONY : src/implem_free_will.cpp.s
+
+src/items/ItemSystem.obj: src/items/ItemSystem.cpp.obj
+.PHONY : src/items/ItemSystem.obj
+
+# target to build an object file
+src/items/ItemSystem.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/items/ItemSystem.cpp.obj
+.PHONY : src/items/ItemSystem.cpp.obj
+
+src/items/ItemSystem.i: src/items/ItemSystem.cpp.i
+.PHONY : src/items/ItemSystem.i
+
+# target to preprocess a source file
+src/items/ItemSystem.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/items/ItemSystem.cpp.i
+.PHONY : src/items/ItemSystem.cpp.i
+
+src/items/ItemSystem.s: src/items/ItemSystem.cpp.s
+.PHONY : src/items/ItemSystem.s
+
+# target to generate assembly for a file
+src/items/ItemSystem.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/items/ItemSystem.cpp.s
+.PHONY : src/items/ItemSystem.cpp.s
 
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
@@ -1208,6 +1280,30 @@ src/world/Noise.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/Noise.cpp.s
 .PHONY : src/world/Noise.cpp.s
 
+src/world/PheromoneField.obj: src/world/PheromoneField.cpp.obj
+.PHONY : src/world/PheromoneField.obj
+
+# target to build an object file
+src/world/PheromoneField.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/PheromoneField.cpp.obj
+.PHONY : src/world/PheromoneField.cpp.obj
+
+src/world/PheromoneField.i: src/world/PheromoneField.cpp.i
+.PHONY : src/world/PheromoneField.i
+
+# target to preprocess a source file
+src/world/PheromoneField.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/PheromoneField.cpp.i
+.PHONY : src/world/PheromoneField.cpp.i
+
+src/world/PheromoneField.s: src/world/PheromoneField.cpp.s
+.PHONY : src/world/PheromoneField.s
+
+# target to generate assembly for a file
+src/world/PheromoneField.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/world/PheromoneField.cpp.s
+.PHONY : src/world/PheromoneField.cpp.s
+
 src/world/Planet.obj: src/world/Planet.cpp.obj
 .PHONY : src/world/Planet.obj
 
@@ -1388,6 +1484,12 @@ help:
 	@echo ... src/WorldSeed.obj
 	@echo ... src/WorldSeed.i
 	@echo ... src/WorldSeed.s
+	@echo ... src/ai/GoapPlanner.obj
+	@echo ... src/ai/GoapPlanner.i
+	@echo ... src/ai/GoapPlanner.s
+	@echo ... src/ai/neat/Neat.obj
+	@echo ... src/ai/neat/Neat.i
+	@echo ... src/ai/neat/Neat.s
 	@echo ... src/environment/EnvironmentModel.obj
 	@echo ... src/environment/EnvironmentModel.i
 	@echo ... src/environment/EnvironmentModel.s
@@ -1400,6 +1502,9 @@ help:
 	@echo ... src/implem_free_will.obj
 	@echo ... src/implem_free_will.i
 	@echo ... src/implem_free_will.s
+	@echo ... src/items/ItemSystem.obj
+	@echo ... src/items/ItemSystem.i
+	@echo ... src/items/ItemSystem.s
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
@@ -1424,6 +1529,9 @@ help:
 	@echo ... src/world/Noise.obj
 	@echo ... src/world/Noise.i
 	@echo ... src/world/Noise.s
+	@echo ... src/world/PheromoneField.obj
+	@echo ... src/world/PheromoneField.i
+	@echo ... src/world/PheromoneField.s
 	@echo ... src/world/Planet.obj
 	@echo ... src/world/Planet.i
 	@echo ... src/world/Planet.s

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASHB2 — The 0-Player Game</title>
+  <meta name="description" content="You are not the player. You are the seed. Submit your psyche and watch your clone live, love, suffer, and die in the ASHB2 simulation.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ Navigation ═══════════════════════════════════════ -->
+  <nav>
+    <div class="logo">
+      ASHB2.exe<span class="cursor"></span>
+    </div>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="engine.html">Engine</a></li>
+      <li><a href="chronicle.html">Chronicle</a></li>
+      <li><a href="experience.html" class="active">Experience</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ Main ═════════════════════════════════════════════ -->
+  <main>
+
+    <section class="hero">
+      <div class="tag-group">
+        <span class="tag amber">0-PLAYER GAME</span>
+        <span class="tag mint">WAITLIST OPEN</span>
+      </div>
+      <h1>You are not the player.<br>You are the seed.</h1>
+      <p class="sub" style="font-size:1.05rem; max-width:75ch;">
+        This is a zero-player game. You don't control your avatar. You birth it — and then you watch it live, love, suffer, and die based entirely on your real-world psychological profile.
+      </p>
+    </section>
+
+    <!-- ── Live Counter ───────────────────────────────────── -->
+    <div class="text-center" style="padding: 2rem 0; border-bottom: 1px solid var(--border);">
+      <div class="tick-counter">
+        <span class="label">Simulation Running Since</span>
+        <span id="uptimeDisplay">0000:00:00:00</span>
+        <p class="mono muted" style="font-size:0.65rem; margin-top:0.3rem;">days : hours : minutes : seconds</p>
+      </div>
+      <p class="mono muted mt-1" style="font-size:0.7rem;">
+        [ ENTITIES: <span class="mint">40</span> ] &nbsp;·&nbsp; [ MEMORY POOL: <span class="amber">2,847 SLOTS</span> ] &nbsp;·&nbsp; [ NEXT SCHEDULED CHECKPOINT: <span class="crimson">TICK 006,000</span> ]
+      </p>
+    </div>
+
+    <!-- ── The Pitch ──────────────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">The Concept</p>
+      <h2>You are not the player. You are the seed.</h2>
+      <p class="lede">
+        Most games ask you to control a character. This one asks you to donate your psyche.
+        You complete a clinical questionnaire. Your answers are compiled into an entity data
+        block. That data block is injected into a running simulation. Your clone lives the
+        life your psychology dictates — without you touching a single key.
+      </p>
+      <div class="terminal-panel mt-1">
+        <span class="prompt">$</span> <span class="timestamp">[TICK 004512]</span> New entity detected — origin: <span class="highlight">external_submission</span><br>
+        <span class="prompt">$</span> <span class="timestamp">[TICK 004512]</span> Injecting psyche profile... <span class="mint">OK</span><br>
+        <span class="prompt">$</span> <span class="timestamp">[TICK 004512]</span> Agent 51 born. Genome: [0.73, 0.41, 0.88, 0.22, 0.65] &nbsp; <span class="highlight">[user_provided]</span><br>
+        <span class="prompt">$</span> <span class="timestamp">[TICK 004512]</span> <span class="mint">Agent 51 is now live. No further input accepted.</span>
+      </div>
+    </section>
+
+    <!-- ── The Flow ───────────────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">The Process</p>
+      <h2>Three steps from submission to legacy.</h2>
+
+      <div class="process-step mt-2">
+        <div class="step-num">Step 01 — The Intake</div>
+        <div class="step-title">What is your attachment style?</div>
+        <p>
+          You complete a brutalist, clinical questionnaire. No gamification. No progress
+          bars. Raw questions designed to index your personality onto the simulation's
+          parameter space.
+        </p>
+        <div class="grid-2 mt-1">
+          <div class="card">
+            <div class="card-label">Sample Questions</div>
+            <div class="data-row"><span class="key">How do you score on neuroticism?</span><span class="val amber">1–10 scale</span></div>
+            <div class="data-row"><span class="key">How quickly do you trust strangers?</span><span class="val">1–10 scale</span></div>
+            <div class="data-row"><span class="key">What is your memory decay rate for trauma?</span><span class="val mint">select duration</span></div>
+            <div class="data-row"><span class="key">What is your preferred social distance?</span><span class="val">1–10 scale</span></div>
+            <div class="data-row"><span class="key">Rate your exploratory drive:</span><span class="val amber">1–10 scale</span></div>
+          </div>
+          <div class="json-block">{
+  "subject": "ANONYMOUS",
+  "timestamp": "2026-07-09T14:22:00Z",
+  "profile": {
+    "personality": {
+      "openness": 0.73,
+      "conscientiousness": 0.58,
+      "extraversion": 0.41,
+      "agreeableness": 0.82,
+      "neuroticism": 0.35
+    },
+    "attachment_style": "secure",
+    "memory": {
+      "decay_rate": 0.03,
+      "trauma_retention": 0.67
+    },
+    "drives": {
+      "exploration": 0.71,
+      "social": 0.84,
+      "safety": 0.47
+    }
+  }
+}</div>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="step-num">Step 02 — The Injection</div>
+        <div class="step-title">Released into the live ecosystem.</div>
+        <p>
+          Your profile is compiled into an entity data block and injected into the
+          headless simulation. From this moment, you have zero control. The engine's
+          GOAP planner, episodic memory, and personality scaffolding take over.
+          Your clone is now an autonomous agent among 40+ others — it will forge
+          bonds, invent tools, start fights, and die on its own terms.
+        </p>
+        <div class="terminal-panel mt-1" style="background:var(--bg-deepest);">
+          <span class="prompt">$</span> ./inject --profile ./submissions/subject_042.json --world live.sim<br>
+          <span class="mint">>> Injecting entity into live simulation...</span><br>
+          <span class="mint">>> Agent 52 spawned at sector (204, 87)</span><br>
+          <span class="amber">>> Control surrendered. Entity is now autonomous.</span><br>
+          <span class="prompt">$</span> <span class="timestamp">[TICK 004613]</span> Agent 52 exploring. Hunger: 0.32. Threat: none.<br>
+          <span class="prompt">$</span> <span class="error">>> No further input accepted from user. Observing only.</span>
+        </div>
+      </div>
+
+      <div class="process-step">
+        <div class="step-num">Step 03 — The Observation</div>
+        <div class="step-title">Read the chronicle of your clone.</div>
+        <p>
+          Days or weeks later, you return. The simulation has logged every tick of
+          your clone's existence. You cannot change it. You can only read the record.
+          The interview output, the social network map, the chain-of-thought hesitations —
+          everything is preserved.
+        </p>
+        <div class="terminal-panel mt-1">
+          <span class="prompt">$</span> <span class="timestamp">[TICK 004900]</span> Interview with Agent 52 — Day 40<br>
+          <span class="prompt">&gt;</span> Are you afraid?<br>
+          <span class="highlight">&nbsp;&nbsp;"I was. There is a predator near the river. But I know where the food is."</span><br>
+          <span class="prompt">&gt;</span> Do you trust anyone?<br>
+          <span class="highlight">&nbsp;&nbsp;"Agent 12 shared food with me twice. I would die for Agent 12."</span><br>
+          <span class="timestamp">[TICK 005300]</span> Agent 52 died: malnutrition<br>
+          <span class="prompt">$</span> <span class="error">R.I.P. Agent 52 — spawned from psyche profile subject_042</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Case Study ─────────────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">Case Study</p>
+      <h2>Subject A: High Agreeableness, Anxious Attachment</h2>
+      <div class="grid-2 mt-2">
+        <div class="card">
+          <div class="card-label">Profile</div>
+          <div class="data-row"><span class="key">agreeableness</span><span class="val mint">0.91</span></div>
+          <div class="data-row"><span class="key">neuroticism</span><span class="val amber">0.62</span></div>
+          <div class="data-row"><span class="key">attachment</span><span class="val crimson">"anxious"</span></div>
+          <div class="data-row"><span class="key">exploration</span><span class="val">0.33</span></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Outcome</div>
+          <p>
+            Subject A spent 200 ticks attempting to appease a hostile tribal leader,
+            ignoring their own hunger meter. The clone's agreeableness drove it to
+            seek social harmony at all costs. Its anxious attachment interpreted the
+            leader's indifference as rejection — and tried harder.
+          </p>
+          <p class="mt-1 crimson">
+            Subject A died of malnutrition at Tick 4,712. Their memory was preserved
+            in the tribe's semantic index — a cautionary example taught to subsequent
+            generations.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Dashboard Mockup ──────────────────────────────── -->
+    <section class="section">
+      <p class="section-label">Coming Soon</p>
+      <h2>The Observation Dashboard</h2>
+      <p class="lede">
+        When the platform goes live, this is what you will see. A terminal interface
+        into your clone's life — every bond, every invention, every moment of hesitation.
+      </p>
+
+      <div class="dashboard-mockup mt-2">
+        <div class="db-header">
+          <span class="title">Entity Dashboard — Agent 52</span>
+          <span class="tag amber">LIVE</span>
+        </div>
+        <div class="db-grid">
+          <div class="db-panel">
+            <h4>Timeline</h4>
+            <div class="data-row"><span class="key">Tick 4,512</span><span class="val">Spawned</span></div>
+            <div class="data-row"><span class="key">Tick 4,600</span><span class="val mint">First bond formed</span></div>
+            <div class="data-row"><span class="key">Tick 4,800</span><span class="val amber">Invented tool</span></div>
+            <div class="data-row"><span class="key">Tick 5,100</span><span class="val crimson">Injured in conflict</span></div>
+            <div class="data-row"><span class="key">Tick 5,300</span><span class="val">Death</span></div>
+          </div>
+          <div class="db-panel">
+            <h4>Social Network</h4>
+            <p class="mono muted" style="font-size:0.7rem;">
+              Agent 52 — 7 connections<br>
+              ┣━ Agent 12 (trust: 0.91)<br>
+              ┣━ Agent 07 (trust: 0.45)<br>
+              ┣━ Agent 31 (hostility: 0.67)<br>
+              ┣━ Agent 44 (trade partner)<br>
+              ┗━ Tribe Alpha (19 members)
+            </p>
+          </div>
+          <div class="db-panel">
+            <h4>Chain of Thought (Last Tick)</h4>
+            <p class="mono muted" style="font-size:0.7rem;">
+              [WEIGH] action: approach_agent_12<br>
+              &nbsp; utility: 0.82 (social_bond_reinforcement)<br>
+              [WEIGH] action: forage<br>
+              &nbsp; utility: 0.45 (hunger_threshold_not_critical)<br>
+              [SELECT] approach_agent_12<br>
+              [EXECUTE] moving to (88, 44)
+            </p>
+          </div>
+          <div class="db-panel">
+            <h4>Memory Map</h4>
+            <p class="mono muted" style="font-size:0.7rem;">
+              [FOOD] sector (88, 44) — strength: 0.82<br>
+              [DANGER] sector (120, 95) — strength: 0.91<br>
+              [SOCIAL] sector (75, 33) — strength: 0.70<br>
+              [DECAY] forgotten: sector (201, 56) — expired
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Waitlist CTA ───────────────────────────────────── -->
+    <section class="section text-center">
+      <p class="section-label">The Next Step</p>
+      <h2>Submit your psyche.<br>Join the next simulation.</h2>
+      <p class="lede" style="margin: 1rem auto 0 auto; max-width:60ch;">
+        The 0-Player Game is currently in active development. Join the waitlist to
+        be notified when the first intake window opens. You will be assigned a
+        simulation slot and given a unique identifier to track your clone's life.
+      </p>
+      <form class="waitlist-form" style="justify-content: center; max-width:500px; margin: 1.5rem auto 0;" onsubmit="alert('Waitlist simulation launched. You will receive a confirmation token shortly.'); return false;">
+        <input type="email" placeholder="your@email.com" aria-label="Email address" required>
+        <button type="submit" class="btn amber">Submit Psyche</button>
+      </form>
+      <p class="mono muted" style="font-size:0.65rem; margin-top:0.75rem;">
+        Your data is never stored. Only your personality profile is compiled and injected.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- ═══ Footer ═══════════════════════════════════════════ -->
+  <footer>
+    ASHB2 <span class="dot">◆</span> Autonomous Simulation of Human Behavior &nbsp;|&nbsp; Scientific Terminal
+  </footer>
+
+  <script>
+    // ── Live uptime counter ──────────────────────────────
+    (function() {
+      const display = document.getElementById('uptimeDisplay');
+      let seconds = 0;
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function update() {
+        seconds += 1;
+        const d = Math.floor(seconds / 86400);
+        const h = Math.floor((seconds % 86400) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        display.textContent = pad(d) + ':' + pad(h) + ':' + pad(m) + ':' + pad(s);
+      }
+
+      setInterval(update, 1000);
+    })();
+  </script>
+
+</body>
+</html>

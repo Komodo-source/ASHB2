@@ -34,7 +34,7 @@ public:
     int ShowMindBoard(std::vector<Entity*>& entities);
 
     // Civilization overview panel
-    void ShowCivilizationPanel(int simDay);
+    void ShowCivilizationPanel(int simDay, std::vector<Entity*>& entities);
 
     // Supply & demand market panel
     void ShowMarketPanel();
@@ -60,6 +60,11 @@ public:
     // M10: Live config console — world tunables (LiveConfig multipliers)
     // adjustable while the simulation runs.
     void ShowConfigConsole();
+
+    // Emergence upgrade (Step 5b): live telemetry (ImPlot) for population,
+    // mean age, genetic diversity, items/recipes, plus a world overlay map
+    // with density heatmap, pheromone trails, and genetic-similarity tint.
+    void ShowEmergencePanel(std::vector<Entity*>& entities, int simDay);
 private:
     char saveLoadFilename[256] = "savegame.txt";
     bool simulationPaused = false;
