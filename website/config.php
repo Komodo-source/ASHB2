@@ -6,6 +6,24 @@
  * Sensible defaults for local development.
  */
 
+// ── .env loader (KEY=value lines; real env vars always win) ────
+$__envFile = __DIR__ . '/.env';
+if (is_file($__envFile)) {
+    foreach (file($__envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $__line) {
+        $__line = trim($__line);
+        if ($__line === '' || $__line[0] === '#' || strpos($__line, '=') === false) {
+            continue;
+        }
+        [$__key, $__value] = explode('=', $__line, 2);
+        $__key = trim($__key);
+        $__value = trim(trim($__value), "\"'");
+        if ($__key !== '' && getenv($__key) === false) {
+            putenv($__key . '=' . $__value);
+        }
+    }
+}
+unset($__envFile, $__line, $__key, $__value);
+
 // ── Error reporting (disable in production) ─────────────────────
 error_reporting(E_ALL);
 ini_set('display_errors', '1');

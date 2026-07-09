@@ -73,7 +73,7 @@ CREATE TABLE characters (
     is_active       BOOLEAN      NOT NULL DEFAULT TRUE, -- currently in simulation
     is_alive        BOOLEAN      NOT NULL DEFAULT TRUE,
     
-    ── Big Five Personality (0.0 – 1.0 scale) ─────────────────
+    -- ── Big Five Personality (0.0 – 1.0 scale) ─────────────────
     -- OCEAN model: Openness, Conscientiousness, Extraversion,
     -- Agreeableness, Neuroticism
     personality_openness        DECIMAL(4,3) NOT NULL DEFAULT 0.500,
@@ -82,40 +82,40 @@ CREATE TABLE characters (
     personality_agreeableness   DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     personality_neuroticism     DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     
-    ── Attachment Style ────────────────────────────────────────
+    -- ── Attachment Style ────────────────────────────────────────
     -- secure, anxious, avoidant, disorganized, fearful
     attachment_style            ENUM('secure','anxious','avoidant','disorganized','fearful')
                                 NOT NULL DEFAULT 'secure',
     attachment_anxiety          DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     attachment_avoidance        DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     
-    ── Core Drives (0.0 – 1.0) ─────────────────────────────────
+    -- ── Core Drives (0.0 – 1.0) ─────────────────────────────────
     drive_exploration           DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     drive_social                DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     drive_safety                DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     drive_dominance             DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     drive_achievement           DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     
-    ── Memory Parameters (for episodic memory simulation) ─────
+    -- ── Memory Parameters (for episodic memory simulation) ─────
     -- Decay rate: how fast memories fade (0.01 = slow, 0.20 = fast)
     -- Trauma retention: how strongly negative events are remembered
     memory_decay_rate           DECIMAL(4,3) NOT NULL DEFAULT 0.050,
     memory_trauma_retention     DECIMAL(4,3) NOT NULL DEFAULT 0.500,
     memory_capacity             SMALLINT UNSIGNED NOT NULL DEFAULT 100,
     
-    ── Initial Simulation State (set when released into world) ─
+    -- ── Initial Simulation State (set when released into world) ─
     spawn_region_x              INT NOT NULL DEFAULT 0,
     spawn_region_y              INT NOT NULL DEFAULT 0,
     initial_wealth              DECIMAL(8,2) NOT NULL DEFAULT 0.00,
     initial_knowledge           JSON DEFAULT NULL,      -- starting recipes/tools
     
-    ── Lifecycle ───────────────────────────────────────────────
+    -- ── Lifecycle ───────────────────────────────────────────────
     current_day                 INT UNSIGNED NOT NULL DEFAULT 0,  -- simulation day
     age_at_death                INT UNSIGNED DEFAULT NULL,
     death_cause                 VARCHAR(255) DEFAULT NULL,
     total_offspring             INT UNSIGNED NOT NULL DEFAULT 0,
     
-    ── Timestamps ──────────────────────────────────────────────
+    -- ── Timestamps ──────────────────────────────────────────────
     created_at                  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     released_at                 DATETIME DEFAULT NULL,   -- when injected into simulation
     died_at                     DATETIME DEFAULT NULL,
@@ -139,42 +139,42 @@ CREATE TABLE character_state_snapshots (
     character_id    INT UNSIGNED NOT NULL,
     simulation_day  INT UNSIGNED NOT NULL,              -- which day of simulation
     
-    ── Vital stats ────────────────────────────────────────────
+    -- ── Vital stats ────────────────────────────────────────────
     health          DECIMAL(5,2) NOT NULL,              -- 0.00 – 100.00
     hunger          DECIMAL(5,2) NOT NULL,              -- 0.00 – 100.00
     energy          DECIMAL(5,2) NOT NULL,              -- 0.00 – 100.00
     stress          DECIMAL(5,2) NOT NULL,              -- 0.00 – 100.00
     
-    ── Position ───────────────────────────────────────────────
+    -- ── Position ───────────────────────────────────────────────
     pos_x           INT NOT NULL,
     pos_y           INT NOT NULL,
     region_id       INT UNSIGNED DEFAULT NULL,          -- FK to regions (future)
     
-    ── Social state ──────────────────────────────────────────
+    -- ── Social state ──────────────────────────────────────────
     current_tribe_id    INT UNSIGNED DEFAULT NULL,      -- FK to tribes (future)
     social_standing     DECIMAL(4,3) DEFAULT NULL,      -- 0.0 – 1.0 within group
     num_bonds           SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     num_enemies         SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     
-    ── Economic state ────────────────────────────────────────
+    -- ── Economic state ────────────────────────────────────────
     wealth              DECIMAL(8,2) NOT NULL DEFAULT 0.00,
     inventory_json      JSON DEFAULT NULL,              -- current items
     known_recipes       JSON DEFAULT NULL,              -- learned recipes
     
-    ── Emotional state (for affective computing models) ──────
+    -- ── Emotional state (for affective computing models) ──────
     mood_happiness      DECIMAL(4,3) DEFAULT NULL,      -- 0.0 – 1.0
     mood_fear           DECIMAL(4,3) DEFAULT NULL,      -- 0.0 – 1.0
     mood_anger          DECIMAL(4,3) DEFAULT NULL,      -- 0.0 – 1.0
     mood_sadness        DECIMAL(4,3) DEFAULT NULL,      -- 0.0 – 1.0
     mood_curiosity      DECIMAL(4,3) DEFAULT NULL,      -- 0.0 – 1.0
     
-    ── Cognitive state ───────────────────────────────────────
+    -- ── Cognitive state ───────────────────────────────────────
     current_goal        VARCHAR(255) DEFAULT NULL,      -- what the GOAP planner chose
     goal_utility        DECIMAL(6,4) DEFAULT NULL,      -- utility score of chosen goal
     deliberation_depth  SMALLINT UNSIGNED DEFAULT NULL, -- how many steps the planner searched
     hesitations         SMALLINT UNSIGNED DEFAULT NULL, -- number of times decision was re-weighed
     
-    ── Timestamp ─────────────────────────────────────────────
+    -- ── Timestamp ─────────────────────────────────────────────
     recorded_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
@@ -197,23 +197,23 @@ CREATE TABLE character_actions (
     simulation_day  INT UNSIGNED NOT NULL,
     snapshot_id     BIGINT UNSIGNED DEFAULT NULL,       -- FK to state BEFORE action
     
-    ── Action details ────────────────────────────────────────
+    -- ── Action details ────────────────────────────────────────
     action_type     VARCHAR(60) NOT NULL,               -- e.g. 'forage', 'bond', 'attack', 'explore'
     action_target   VARCHAR(255) DEFAULT NULL,           -- target entity/object ID
     action_location_x INT DEFAULT NULL,
     action_location_y INT DEFAULT NULL,
     
-    ── Decision context ──────────────────────────────────────
+    -- ── Decision context ──────────────────────────────────────
     -- The utility scores that led to this action being chosen
     utility_score   DECIMAL(6,4) NOT NULL,              -- final utility of chosen action
     alternative_actions JSON DEFAULT NULL,              -- other actions considered with their scores
     
-    ── Outcome ───────────────────────────────────────────────
+    -- ── Outcome ───────────────────────────────────────────────
     success         BOOLEAN NOT NULL DEFAULT TRUE,
     outcome_detail  TEXT DEFAULT NULL,                   -- narrative description
     outcome_effects JSON DEFAULT NULL,                   -- structured effect deltas
     
-    ── Timestamp ─────────────────────────────────────────────
+    -- ── Timestamp ─────────────────────────────────────────────
     executed_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
@@ -238,30 +238,30 @@ CREATE TABLE user_feedback (
     character_id    INT UNSIGNED NOT NULL,
     simulation_day  INT UNSIGNED NOT NULL,              -- which day this feedback refers to
     
-    ── Alignment rating (how well the character matched user expectation) ──
+    -- ── Alignment rating (how well the character matched user expectation) ──
     alignment_score TINYINT UNSIGNED NOT NULL,          -- 1-5: 1=completely wrong, 5=perfect
     
-    ── Character state ratings (user's perception) ────────────
+    -- ── Character state ratings (user's perception) ────────────
     perceived_happiness     TINYINT UNSIGNED DEFAULT NULL,  -- 1-10
     perceived_health        TINYINT UNSIGNED DEFAULT NULL,  -- 1-10
     perceived_stress        TINYINT UNSIGNED DEFAULT NULL,  -- 1-10
     
-    ── Corrections (structured training signals) ────────────
+    -- ── Corrections (structured training signals) ────────────
     -- User says "my character wouldn't do that" — that's a correction signal
     would_change_action     TEXT DEFAULT NULL,           -- what would you have done differently?
     would_change_personality TEXT DEFAULT NULL,          -- would you adjust any personality scores?
     personality_corrections JSON DEFAULT NULL,          -- structured: {"neuroticism": -0.1}
     
-    ── Free response ──────────────────────────────────────────
+    -- ── Free response ──────────────────────────────────────────
     narrative_feedback      TEXT DEFAULT NULL,           -- free-form story feedback
     notable_events          TEXT DEFAULT NULL,           -- what stood out to the user
     
-    ── Engagement signal ──────────────────────────────────────
+    -- ── Engagement signal ──────────────────────────────────────
     time_spent_seconds      INT UNSIGNED DEFAULT NULL,  -- how long user spent reviewing
     actions_reviewed        SMALLINT UNSIGNED DEFAULT NULL, -- how many actions they looked at
     click_hesitation_count  SMALLINT UNSIGNED DEFAULT NULL, -- clicks before submitting
     
-    ── Timestamps ─────────────────────────────────────────────
+    -- ── Timestamps ─────────────────────────────────────────────
     created_at              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -290,16 +290,16 @@ CREATE TABLE social_interactions (
     interaction_type VARCHAR(60) NOT NULL,              -- 'share_food', 'bond', 'conflict', 'trade', 'teach'
     intensity       DECIMAL(4,3) NOT NULL,              -- 0.0 – 1.0 how strong the interaction was
     
-    ── Context ───────────────────────────────────────────────
+    -- ── Context ───────────────────────────────────────────────
     actor_mood_before   JSON DEFAULT NULL,              -- actor's mood state before
     target_mood_before  JSON DEFAULT NULL,              -- target's mood state before
     
-    ── Outcome ───────────────────────────────────────────────
+    -- ── Outcome ───────────────────────────────────────────────
     trust_delta     DECIMAL(4,3) DEFAULT NULL,          -- change in trust (actor→target)
     hostility_delta DECIMAL(4,3) DEFAULT NULL,          -- change in hostility
     knowledge_transferred JSON DEFAULT NULL,            -- what knowledge was shared
     
-    ── Timestamp ─────────────────────────────────────────────
+    -- ── Timestamp ─────────────────────────────────────────────
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (actor_char_id) REFERENCES characters(id) ON DELETE CASCADE,
@@ -322,23 +322,23 @@ CREATE TABLE relationships (
     character_a_id      INT UNSIGNED NOT NULL,
     character_b_id      INT UNSIGNED NOT NULL,
     
-    ── Relationship state ─────────────────────────────────────
+    -- ── Relationship state ─────────────────────────────────────
     trust_a_to_b        DECIMAL(4,3) NOT NULL DEFAULT 0.000,  -- what A feels about B
     trust_b_to_a        DECIMAL(4,3) NOT NULL DEFAULT 0.000,  -- what B feels about A
     hostility_a_to_b    DECIMAL(4,3) NOT NULL DEFAULT 0.000,
     hostility_b_to_a    DECIMAL(4,3) NOT NULL DEFAULT 0.000,
     
-    ── Bond type ──────────────────────────────────────────────
+    -- ── Bond type ──────────────────────────────────────────────
     bond_type           ENUM('none','acquaintance','friend','close_friend','pair_bond','rival','enemy')
                         NOT NULL DEFAULT 'none',
     bond_strength       DECIMAL(4,3) NOT NULL DEFAULT 0.000,
     
-    ── Interaction count ─────────────────────────────────────
+    -- ── Interaction count ─────────────────────────────────────
     total_interactions  INT UNSIGNED NOT NULL DEFAULT 0,
     last_interaction_day INT UNSIGNED DEFAULT NULL,
     last_interaction_type VARCHAR(60) DEFAULT NULL,
     
-    ── Timestamps ─────────────────────────────────────────────
+    -- ── Timestamps ─────────────────────────────────────────────
     created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -368,7 +368,7 @@ CREATE TABLE character_items (
     durability      DECIMAL(5,2) DEFAULT NULL,          -- 0.00 – 100.00
     is_equipped     BOOLEAN NOT NULL DEFAULT FALSE,
     
-    ── Provenance ─────────────────────────────────────────────
+    -- ── Provenance ─────────────────────────────────────────────
     was_invented    BOOLEAN NOT NULL DEFAULT FALSE,     -- true if character invented this
     crafted_from    JSON DEFAULT NULL,                  -- what items were combined
     
@@ -395,7 +395,7 @@ CREATE TABLE inventions (
     tags            JSON DEFAULT NULL,
     description     TEXT DEFAULT NULL,
     
-    ── Spread tracking ────────────────────────────────────────
+    -- ── Spread tracking ────────────────────────────────────────
     spread_count    INT UNSIGNED NOT NULL DEFAULT 1,    -- how many characters know it
     spread_mechanism ENUM('independent','taught','diffused','inherited')
                     NOT NULL DEFAULT 'independent',
@@ -444,16 +444,16 @@ CREATE TABLE tribes (
     formation_day   INT UNSIGNED NOT NULL,
     dissolution_day INT UNSIGNED DEFAULT NULL,
     
-    ── Territory ──────────────────────────────────────────────
+    -- ── Territory ──────────────────────────────────────────────
     territory_center_x  INT DEFAULT NULL,
     territory_center_y  INT DEFAULT NULL,
     territory_radius    INT DEFAULT NULL,
     
-    ── Belief system (emergent) ──────────────────────────────
+    -- ── Belief system (emergent) ──────────────────────────────
     belief_system       VARCHAR(255) DEFAULT NULL,
     cultural_values     JSON DEFAULT NULL,              -- emerged norms/taboos
     
-    ── Demographics ──────────────────────────────────────────
+    -- ── Demographics ──────────────────────────────────────────
     max_members         INT UNSIGNED DEFAULT NULL,
     total_members_ever  INT UNSIGNED NOT NULL DEFAULT 0,
     
@@ -499,13 +499,13 @@ CREATE TABLE world_events (
     severity        ENUM('minor','notable','critical','catastrophic') NOT NULL DEFAULT 'notable',
     description     TEXT NOT NULL,
     
-    ── Affected entities ──────────────────────────────────────
+    -- ── Affected entities ──────────────────────────────────────
     primary_tribe_id    INT UNSIGNED DEFAULT NULL,
     secondary_tribe_id  INT UNSIGNED DEFAULT NULL,
     primary_char_id     INT UNSIGNED DEFAULT NULL,
     secondary_char_id   INT UNSIGNED DEFAULT NULL,
     
-    ── Impact data (structured) ───────────────────────────────
+    -- ── Impact data (structured) ───────────────────────────────
     casualties      INT UNSIGNED DEFAULT NULL,
     inventions_spawned INT UNSIGNED DEFAULT NULL,
     territory_shift JSON DEFAULT NULL,
@@ -530,7 +530,7 @@ CREATE TABLE simulation_configs (
     name            VARCHAR(120) DEFAULT NULL,
     description     TEXT DEFAULT NULL,
     
-    ── Parameters ─────────────────────────────────────────────
+    -- ── Parameters ─────────────────────────────────────────────
     world_width     INT NOT NULL DEFAULT 512,
     world_height    INT NOT NULL DEFAULT 512,
     resource_density DECIMAL(4,3) NOT NULL DEFAULT 0.500,
@@ -538,7 +538,7 @@ CREATE TABLE simulation_configs (
     mutation_rate   DECIMAL(4,3) NOT NULL DEFAULT 0.050,
     max_characters  INT UNSIGNED NOT NULL DEFAULT 100,
     
-    ── Timestamps ─────────────────────────────────────────────
+    -- ── Timestamps ─────────────────────────────────────────────
     started_at      DATETIME DEFAULT NULL,
     ended_at        DATETIME DEFAULT NULL,
     tick_count      BIGINT UNSIGNED DEFAULT 0,
@@ -558,14 +558,14 @@ CREATE TABLE character_genomes (
     character_id    INT UNSIGNED NOT NULL UNIQUE,
     parent_genome_id BIGINT UNSIGNED DEFAULT NULL,      -- lineage tracking
     
-    ── Traits (0.0 – 2.0 normalized) ─────────────────────────
+    -- ── Traits (0.0 – 2.0 normalized) ─────────────────────────
     speed           DECIMAL(4,3) NOT NULL DEFAULT 1.000,
     sight_range     DECIMAL(4,3) NOT NULL DEFAULT 1.000,
     metabolism      DECIMAL(4,3) NOT NULL DEFAULT 1.000,
     fertility       DECIMAL(4,3) NOT NULL DEFAULT 1.000,
     resilience      DECIMAL(4,3) NOT NULL DEFAULT 1.000,
     
-    ── NEAT neural network (JSON-encoded topology) ───────────
+    -- ── NEAT neural network (JSON-encoded topology) ───────────
     neat_genome     JSON DEFAULT NULL,
     generation      INT UNSIGNED NOT NULL DEFAULT 0,    -- how many mutations from baseline
     
