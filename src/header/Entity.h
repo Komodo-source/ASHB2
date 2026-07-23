@@ -20,6 +20,8 @@
 #include "../ai/EpisodicMap.h"     // spatial event memory: food here, danger there
 #include "../items/ItemSystem.h"   // tag/property items, Inventory, ActionRule ids
 #include "../ai/neat/Neat.h"       // optional evolved neural brain (NEAT)
+#include "../ai/MindUpgrade.h"     // AI upgrade phases A-E: emotions, skills, facts,
+                                   // intentions, sleep, priors (plans/ai-upgrade-2026-07.md)
 
 class Entity;
 class Action;
@@ -371,6 +373,24 @@ public:
     bool             useNeatBrain = false;
     neat::Genome     neatGenome;        // empty unless useNeatBrain
 
+    // ── AI upgrade phases A-E (plans/ai-upgrade-2026-07.md) ──────────────────
+    // All default-initialized to neutral values so every existing spawn path
+    // keeps working; serialized append-only in saveTo/loadFrom.
+    EmotionState   emotions;            // B1: discrete OCC emotions
+    SkillSet       skills;              // C2: practice-curve skills
+    KnowledgeStore knowledge;           // C3: propositional facts / rumors
+    Intention      intention;           // B4: the season's persistent pursuit
+    float sleepPressure  = 30.0f;       // D2: climbs every tick, sleep clears it
+    float sleepQuality   = 70.0f;       // D2: how well the last sleep went
+    float injuryLevel    = 0.0f;        // D3: wounds from fights/hunts, heals slowly
+    float homeAttachment = 20.0f;       // D5: roots in current community
+    int   lastTribeIdSeen = -2;         // D5: change detector (-2 = never checked)
+    int   tribeSwitchDay  = -99999;     // D5: when the entity was last uprooted
+    // B2: expected outcome of the action just chosen (-1 = no expectation);
+    // consumed by mind::settleOutcome to produce regret/relief. Runtime only.
+    float lastExpectedOutcome = -1.0f;
+    float decisionCloseness   = 0.0f;   // B5: top-2 score ratio (1 = torn mind)
+
     bool knowsRecipe(int ruleId) const {
         for (int r : knownRecipeIds) if (r == ruleId) return true;
         return false;
@@ -470,7 +490,7 @@ public:
 
     // Save/Load
     void saveTo(std::ofstream& file) const;
-    void loadFrom(std::ifstream& file);
+    bool loadFrom(std::ifstream& file);  // false = truncated/corrupt block
     void resolvePointers(std::vector<Entity>& allEntities);
 
     // New: Initialize semantic memory from life memories
@@ -483,6 +503,8 @@ public:
     std::string lastActionName = "";
     std::string lastNarrative  = "";
 
+    std::string getCurrentActionName() const { return lastActionName; }
+
     // ── Phases 1-5: AI Enhancement ────────────────────────────────────────────
     PADState         pad;
     BodyLanguageCue  bodyLanguage = BodyLanguageCue::CONTENT;
@@ -491,6 +513,82 @@ public:
     ChainOfThought   lastCoT;
     HesitationState  hesitation;
     std::string      selfGrounding = "";
+
+    // ── Phase 6: Enhanced Cognitive Systems (ASHB2 Overhaul) ────────────────────
+
+    // Gossip and Information Systems
+    struct Rumor {
+        std::string topic;           // What the rumor is about (event, entity, etc.)
+        std::string content;         // The actual information/spin
+        float reliability;           // 0-1, how trustworthy this information is
+        int sourceEntityId;          // Who originally shared this (if known)
+        int transmissionCount;       // How many times this has been passed along
+        float beliefStrength;        // How strongly the entity believes this (0-1)
+        int firstHeardDay;           // When first encountered
+        int lastHeardDay;            // Most recent transmission
+
+        Rumor() : reliability(0.5f), sourceEntityId(-1), transmissionCount(0),
+                  beliefStrength(0.5f), firstHeardDay(0), lastHeardDay(0) {}
+    };
+
+    std::map<std::string, Rumor> knownRumors;   // Topic -> Rumor (what we've heard)
+    std::map<int, float> informationExpertise;  // Topic areas we're knowledgeable about
+
+    // Ideological Systems
+    struct IdeologicalPosition {
+        std::string issue;           // What this position is about (e.g., "tradition_vs_innovation")
+        float position;              // -100 to +100 (extreme disagreement to extreme agreement)
+        float conviction;            // 0-100, how strongly held this belief is
+        float opennessToChange;      // 0-100, willingness to update this belief
+
+        IdeologicalPosition() : position(0.0f), conviction(50.0f), opennessToChange(50.0f) {}
+    };
+
+    std::map<std::string, IdeologicalPosition> ideologicalStances;  // Issue -> Position
+
+    // Biological Homeostasis Systems
+    struct BiologicalState {
+        float caloricIntakeToday;    // Calories consumed today
+        float caloricExpenditureToday; // Calories burned today
+        float nutritionalStatus;     // 0-100, overall nourishment level
+        float hydrationLevel;        // 0-100, hydration status
+        float energyLevel;           // 0-100, current energy availability
+
+        BiologicalState() : caloricIntakeToday(0.0f), caloricExpenditureToday(0.0f),
+                           nutritionalStatus(50.0f), hydrationLevel(50.0f), energyLevel(50.0f) {}
+    };
+
+    BiologicalState biology;
+
+    // Disease and Immunity Systems
+    struct PathogenExposure {
+        int pathogenId;              // Type of pathogen
+        int exposureDay;             // When exposed
+        float viralLoad;             // Current pathogen load in body
+        bool isInfected;             // Whether actively infected
+        bool isContagious;             // Whether can transmit to others
+        int daysInfected;              // How long infected
+        int immunityLevel;             // 0-100, current immunity to this pathogen
+
+        PathogenExposure() : pathogenId(-1), exposureDay(0), viralLoad(0.0f),
+                           isInfected(false), isContagious(false), daysInfected(0), immunityLevel(0) {}
+    };
+
+    std::vector<PathogenExposure> pathogenExposures;
+    float baseImmunity = 50.0f;      // Base immune system strength (0-100)
+
+    // Epigenetic and Generational Trauma Systems
+    struct EpigeneticMarker {
+        std::string traumaSource;    // What caused this epigenetic change (war, famine, loss, etc.)
+        float methylationLevel;      // 0-100, degree of epigenetic modification
+        int generationOffset;        // How many generations ago this originated (0=self)
+        float expressionLevel;       // 0-100, how strongly this trait is expressed
+
+        EpigeneticMarker() : methylationLevel(0.0f), generationOffset(0), expressionLevel(0.0f) {}
+    };
+
+    std::vector<EpigeneticMarker> epigeneticMarkers;  // Trauma-induced epigenetic changes
+    float intergenerationalTraumaLoad;   // 0-100, accumulated trauma from ancestors
 
     // ── Geography / Civilization ─────────────────────────────────────────────
     int   originRegionId = -1;   // cradle/landmass this lineage started in (-1 = none)
@@ -509,6 +607,7 @@ public:
     std::string specialization = "farmer"; // "farmer"|"scholar"|"craftsman"|"trader"|"healer"|"warrior"|"priest"
     bool  isSpecialist = false;      // released from subsistence farming, fed from the tribe granary
     int   roleSinceDay = -1;         // civ-day the current role was assigned (-1 = never)
+    int   webCharId    = -1;         // web bridge: MySQL characters.id this entity embodies (-1 = pure AI)
     std::vector<int> knownTechIds;   // IDs of discovered/learned innovations
 
     // Temporary storage for IDs during loading (before pointer resolution)
@@ -535,6 +634,39 @@ public:
     // Phase 2: push a new significant event into working memory
     void addToWorkingMemory(const std::string& eventType,
                             const std::string& desc, float weight);
+
+    // ── Phase 6: Epigenetics & generational trauma ──────────────────────────
+    // Record a new trauma-induced methylation mark (war/famine/loss/abuse/...).
+    void addEpigeneticMarker(std::string traumaSource, float methylationLevel,
+                              int generationOffset = 0);
+    // Environmental support (0-100) modulates how strongly existing markers
+    // are expressed; call when living conditions change materially.
+    void updateEpigeneticExpression(float environmentalSupport);
+    // Apply currently-expressed markers to personality/mood/mental health and
+    // refresh intergenerationalTraumaLoad. Call periodically (not every tick).
+    void applyEpigeneticEffects();
+    // At birth: copy down decayed markers from both parents (either may be
+    // null for founders) and immediately resolve their initial expression.
+    void inheritEpigeneticMarkers(Entity* parent1, Entity* parent2);
+
+    // ── Phase 5: biological homeostasis ──────────────────────────────────────
+    // Once-per-day resolve: turns today's accumulated caloric intake/expenditure
+    // (bumped directly on biology.caloricIntakeToday/ExpenditureToday at the
+    // action-execution sites) into nutritionalStatus/energyLevel/hydrationLevel,
+    // applies starvation/overeating effects on mood and health, then resets the
+    // daily counters. Cheap (few float ops), so it can run for every living
+    // entity every in-world day.
+    void resolveBiologicalHomeostasis();
+
+    // ── Phase 5: disease vectors ──────────────────────────────────────────────
+    // Roll exposure to a pathogen from a contagious neighbour; survives the
+    // entity's baseImmunity + genome resilience. No-op if already exposed to
+    // the same pathogenId while it's still active.
+    void exposeToPathogen(int pathogenId, int today);
+    // Per-day progression: incubation -> symptomatic/contagious -> clears with
+    // immunityLevel raised (naive vaccination-equivalent) or the entity stays
+    // chronically contagious past a long timeout. Cheap, O(activePathogens).
+    void tickPathogens(int today);
 };
 
 // Removed duplicate extern globals for pointed relationships
@@ -551,4 +683,5 @@ int Entity::contains(const T& vec, Entity* ptr, int num_list) {
     return -1;
 }
 
-#endif // ENTITY_ENT
+#endif // ENTITY_H
+

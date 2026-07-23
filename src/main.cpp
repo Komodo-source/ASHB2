@@ -1,14 +1,9 @@
-#include <SDL.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include "./header/UI.h"
 #include "./header/Entity.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include <GLFW/glfw3.h>
 #include <vector>
 #include <algorithm>
 #include <time.h>
@@ -25,8 +20,6 @@
 #include "./util/clear.h"
 #include "./header/SaveLoad.h"
 #include "./header/Logging.h"
-#include "header/SDLEngine.h"
-#include "header/Image.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
 #include "./header/Kinship.h"
@@ -47,7 +40,8 @@
 #include "environment/EnvironmentModel.h"
 #include "world/ResourceSystem.h"
 #include "world/Ecosystem.h"
-#include "./header/LiveConfig.h"
+
+// Note: SaveLoad.h is already included above (line ~26).
 
 // M10: live config console state — all multipliers default to 1.0 (bit-exact
 // no-op); the GUI console mutates them at runtime.
@@ -968,6 +962,48 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
     for (auto& g : entityGroups) totalPop += g.size();
     const int staggerCohorts = totalPop > 6000 ? 4 : (totalPop > 2000 ? 2 : 1);
 
+    // AI upgrade: shared per-tick context for the mind upkeep pass.
+    const int  hourNow  = g_clock.hourOfDay();
+    const bool isNight  = (hourNow >= 22 || hourNow < 6);
+    const int  civDayNow = currentDay / SimClock::FRAMES_PER_TICK;
+
+    // ── Phase 5: pathogen vectors, once per in-world day ─────────────────────
+    // Two strictly separate passes, same idiom as the M11 movement pass below
+    // ("Pass 1 computes... nothing writes... Pass 2 applies" — every agent
+    // reacts to the same settled world state instead of whatever earlier
+    // agents in this same frame already changed). Exposure-check reads
+    // OTHER entities' isContagious flag; if it ran interleaved with
+    // tickPathogens (which can flip that flag) inside the single per-entity
+    // loop below, entity order within a group would silently change who
+    // catches what on a given day — chaos-amplified, that desynced the
+    // determinism pair at scale. Splitting into two full passes removes the
+    // ordering dependency: pass 1 only ever sees yesterday's settled
+    // contagion state, and pass 2's own mutations (fresh exposures start
+    // non-contagious) can't feed back into pass 1 since it already finished.
+    if (currentDay % SimClock::FRAMES_PER_TICK == 0) {
+#if 0
+        for (auto& group : entityGroups) {
+            for (Entity* entity : group) {
+                if (entity->entityHealth <= 0.0f) continue;
+                for (Entity* other : group) {
+                    if (other == entity || other->entityHealth <= 0.0f) continue;
+                    bool exposed = false;
+                    for (const auto& p : other->pathogenExposures) {
+                        if (p.isContagious) { entity->exposeToPathogen(p.pathogenId, civDayNow); exposed = true; break; }
+                    }
+                    if (exposed) break;
+                }
+            }
+        }
+        for (auto& group : entityGroups) {
+            for (Entity* entity : group) {
+                if (entity->entityHealth <= 0.0f) continue;
+                entity->tickPathogens(civDayNow);
+                entity->resolveBiologicalHomeostasis();
+            }
+        }
+#endif
+    }
 
     // Process each group of close entities
     for(auto& group : entityGroups){
@@ -984,6 +1020,15 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
 
             // Tick grief recovery
             entity->tickGrief(1.0f);
+
+            // ── AI upgrade upkeep (B1 emotions, D2 sleep, D5 homesickness):
+            // appraisal + decay runs for EVERYONE every tick, independent of
+            // the deliberation cohort stagger — feelings don't take turns.
+            mind::upkeep(entity, group, isNight, civDayNow);
+            // B4: adopt/abandon the season's pursuit — id-staggered weekly so
+            // the whole world doesn't re-plan on the same day.
+            if ((civDayNow + entity->entityId) % 7 == 0)
+                mind::updateIntention(entity, civDayNow);
 
             //lower pheromones
             if(!entity->pheromone.type.empty()){
@@ -1466,6 +1511,9 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                     target->pendingKillerId      = entity->entityId;
                     target->pendingKillerTribeId = entity->tribeId;
                     target->pendingKillMotive    = "aggression";
+                    // E3: the chronicle names the feeling behind the blow.
+                    { std::string emo = entity->emotions.dominant();
+                      if (!emo.empty()) target->pendingKillMotive += " (" + emo + ")"; }
                     // Grief propagation happens once, in the central removal
                     // pass (handleDeath) — no per-group duplicate here.
                     // M5: the group saw it happen — sanctions land immediately.
@@ -1702,6 +1750,15 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
                     ent.consolidateMemories(day);
                     if (ent.pruneLifeMemories(day))
                         ent.semanticMemory.rebuildFromLifeMemories(&ent);
+                    // Phase 6: re-resolve epigenetic expression against how
+                    // supportive the entity's current life is (happiness as
+                    // the cheap proxy) and re-apply its personality/mood pull.
+                    // Same 10-tick cadence as consolidation — this is a slow
+                    // drift, not a per-tick force.
+                    if (!ent.epigeneticMarkers.empty()) {
+                        ent.updateEpigeneticExpression(ent.entityHapiness);
+                        ent.applyEpigeneticEffects();
+                    }
                 }
             }
             auto pfD = pf_now();
@@ -1916,6 +1973,36 @@ static void printRealismReport(const std::vector<Entity>& entities,
                                   && viableReligions <= faithAllowance) << "]\n";
     std::cout << "5. No behavioral monoculture (top action < 25%): " << topAction << " "
               << (int)(topShare * 100) << "%  [" << verdict(topShare < 0.25f) << "]\n";
+
+    // ── E2: realism metrics v2 (AI upgrade). The three new lines assert only
+    // on runs long enough for the phenomena to develop; below that they are
+    // informational. `warn` is lowercase on purpose — CI greps "REALISM.*FAIL".
+    auto softVerdict = [&](bool ok, bool assertable) {
+        return assertable ? (ok ? "PASS" : "FAIL") : (ok ? "PASS" : "warn");
+    };
+    // 6. Emotional lives: fear, joy AND regret should all have occurred — a
+    // world with no felt emotion episodes is running on autopilot.
+    bool emoOk = g_mindStats.fearEpisodes > 0 && g_mindStats.joyEpisodes > 0 &&
+                 g_mindStats.regrets > 0;
+    std::cout << "6. Emotional lives (fear/joy/regret all occur): fear="
+              << g_mindStats.fearEpisodes << " joy=" << g_mindStats.joyEpisodes
+              << " regret=" << g_mindStats.regrets << " relief=" << g_mindStats.reliefs
+              << " guilt=" << g_mindStats.guiltEpisodes
+              << "  [" << softVerdict(emoOk, ticksRun >= 200) << "]\n";
+    // 7. Belief ecology: people should know things, mostly-but-not-perfectly
+    // true (1.0 = omniscient parrots, <0.5 = a world run on lies).
+    float acc = mind::populationBeliefAccuracy(entities);
+    bool beliefOk = acc < 0.0f || (acc >= 0.5f && acc <= 0.995f);
+    std::cout << "7. Belief ecology (0.5<=accuracy<=0.995): accuracy="
+              << (acc < 0.0f ? std::string("no facts yet") : std::to_string(acc))
+              << " shared=" << g_mindStats.factsShared << " lies=" << g_mindStats.liesTold
+              << "  [" << softVerdict(beliefOk, ticksRun >= 300) << "]\n";
+    // 8. Skill differentiation: practice curves should spread the population
+    // (Gini > 0.03) — everyone identical means learning-by-doing is dead.
+    float gini = mind::skillGini(entities);
+    std::cout << "8. Skills differentiate (best-skill Gini > 0.03): gini=" << gini
+              << " deepSleeps=" << g_mindStats.deepSleeps
+              << "  [" << softVerdict(gini > 0.03f, ticksRun >= 300) << "]\n";
     std::cout << "==========================================\n\n";
 }
 
@@ -1928,6 +2015,284 @@ int getRenderingChoice(){
     }else{
         return 2;
     }
+}
+
+// ── Web bridge: --inject <file> ──────────────────────────────────────────────
+// Applies a web-bridge injection file. Runs once, AFTER the world has been
+// created/loaded and BEFORE the tick loop — crucially before ent_quad takes
+// raw pointers into `entities`, so push_back (which may reallocate) is safe.
+//
+// File format: same line-based KEY:value idiom as the save files, one block
+// per web character, terminated by END. Unknown lines are ignored.
+//
+//   CHAR:42               MySQL characters.id
+//   NAME:Naelle
+//   OPENNESS:62           NUDGE:0 → absolute Big Five trait, 0-100
+//   CONSCIENTIOUSNESS:55  NUDGE:1 → signed delta, clamped to [-10,+10]
+//   EXTRAVERSION:71
+//   AGREEABLENESS:48
+//   NEUROTICISM:33
+//   NUDGE:0               0 = spawn a new entity; 1 = adjust the living
+//   END                       entity whose webCharId == CHAR
+//
+// A missing/empty file or a malformed block is skipped with a stderr note —
+// never fatal (the flag is optional and a no-op when absent).
+static void applyWebInjectFile(const std::string& path,
+                               std::vector<Entity>& entities,
+                               int width, int height) {
+    std::ifstream in(path);
+    if (!in.is_open()) {
+        std::cerr << "INJECT: cannot open '" << path << "' — skipping\n";
+        return;
+    }
+
+    const int civDay = FreeWillSystem::day / SimClock::FRAMES_PER_TICK;
+    auto vc = [](float v){ return std::max(0.0f, std::min(100.0f, v)); };
+
+    // Big Five block, index order O C E A N.
+    struct Block {
+        int         charId = -1;
+        std::string name;
+        bool        has[5] = { false, false, false, false, false };
+        float       v[5]   = { 0, 0, 0, 0, 0 };
+        int         nudge  = -1;
+    };
+
+    auto processBlock = [&](const Block& b) {
+        if (b.charId < 0 || (b.nudge != 0 && b.nudge != 1)) {
+            std::cerr << "INJECT: malformed block (CHAR/NUDGE missing or bad) — skipped\n";
+            return;
+        }
+
+        if (b.nudge == 1) {
+            // ── Feedback nudge: shift an existing web character's traits ─────
+            Entity* target = nullptr;
+            for (Entity& e : entities)
+                if (e.webCharId == b.charId && e.entityHealth > 0) { target = &e; break; }
+            if (!target) {
+                std::cerr << "INJECT: no living entity with webCharId " << b.charId << "\n";
+                if (globalCivEngine)
+                    globalCivEngine->logEvent(civDay, "A whisper from beyond finds no one",
+                        "tribe", "kind=web_nudge_missing charId=" + std::to_string(b.charId));
+                return;
+            }
+            float* traits[5] = { &target->personality.openness,
+                                 &target->personality.conscientiousness,
+                                 &target->personality.extraversion,
+                                 &target->personality.agreeableness,
+                                 &target->personality.neuroticism };
+            const char* tag[5] = { "dO", "dC", "dE", "dA", "dN" };
+            std::string deltas;
+            for (int i = 0; i < 5; ++i) {
+                if (!b.has[i]) continue;
+                float d = std::max(-10.0f, std::min(10.0f, b.v[i]));   // per-cycle cap
+                *traits[i] = vc(*traits[i] + d);
+                deltas += " " + std::string(tag[i]) + "=" + std::to_string((int)d);
+            }
+            if (globalCivEngine)
+                globalCivEngine->logEvent(civDay,
+                    target->name + " feels a subtle shift of temperament", "tribe",
+                    "kind=web_nudge charId=" + std::to_string(b.charId)
+                    + " entityId=" + std::to_string(target->entityId) + deltas);
+            return;
+        }
+
+        // ── NUDGE:0 — spawn a new web-controlled entity ──────────────────────
+        for (const Entity& e : entities) {
+            if (e.webCharId == b.charId) {
+                std::cerr << "INJECT: webCharId " << b.charId << " already in world — spawn skipped\n";
+                if (globalCivEngine)
+                    globalCivEngine->logEvent(civDay, "An echo of a soul already here fades",
+                        "tribe", "kind=web_spawn_duplicate charId=" + std::to_string(b.charId)
+                        + " entityId=" + std::to_string(e.entityId));
+                return;
+            }
+        }
+
+        int newId = 0;
+        for (const Entity& e : entities) newId = std::max(newId, e.entityId + 1);
+        const int   year     = globalCivEngine ? globalCivEngine->getCurrentYear() : -5000;
+        const float adultAge = 20.0f;   // web characters arrive as young adults
+        const int   birthYear = year - (int)adultAge;
+
+        // Same constructor + stat ranges as the founding population (main():
+        // founder spawn loop), so every subsystem starts initialised the same way.
+        Entity entity = Entity(
+            newId, adultAge, BetterRand::genNrInInterval(80.0f, 100.0f),
+            BetterRand::genNrInInterval(30.0f, 70.0f), BetterRand::genNrInInterval(0.0f, 50.0f),
+            BetterRand::genNrInInterval(80.0f, 100.0f), "", BetterRand::genNrInInterval(0.0f, 20.0f),
+            BetterRand::genNrInInterval(0.0f, 20.0f), BetterRand::genNrInInterval(0.0f, 40.0f),
+            BetterRand::genNrInInterval(60.0f, 100.0f), 'A', 0,
+            BetterRand::genNrInInterval(0.0f, 50.0f), -1, "happiness", birthYear);
+        entity.selected = false;
+        entity.salary   = 200;
+
+        // Position: centre of the mid-sized tribe closest to the median
+        // population, so newcomers land where society already is; membership is
+        // NOT forced — the tribe absorption logic recruits them naturally.
+        float px = width * 0.5f, py = height * 0.5f;
+        if (globalCivEngine && !globalCivEngine->tribes.empty()) {
+            std::vector<int> pops;
+            for (const Tribe& t : globalCivEngine->tribes)
+                if (t.population() > 0) pops.push_back(t.population());
+            if (!pops.empty()) {
+                std::sort(pops.begin(), pops.end());
+                int median = pops[pops.size() / 2];
+                const Tribe* home = nullptr;
+                for (const Tribe& t : globalCivEngine->tribes) {
+                    if (t.population() <= 0) continue;
+                    if (!home || std::abs(t.population() - median) < std::abs(home->population() - median))
+                        home = &t;
+                }
+                if (home) {
+                    px = home->centerX; py = home->centerY;
+                    entity.originRegionId = home->regionId;
+                }
+            }
+        }
+        // Small jitter so multiple injected souls don't stack, snapped to land.
+        float jx = std::max(10.0f, std::min((float)width  - 10.0f, px + BetterRand::genNrInInterval(-15.0f, 15.0f)));
+        float jy = std::max(10.0f, std::min((float)height - 10.0f, py + BetterRand::genNrInInterval(-15.0f, 15.0f)));
+        if (g_planet) {
+            const Tile* t = g_planet->tileAtWorld(jx, jy);
+            if (t && !t->isPassable()) { jx = px; jy = py; }
+        }
+        entity.posX = jx;
+        entity.posY = jy;
+
+        // Personality: questionnaire traits are ABSOLUTE 0-100 values; traits
+        // absent from the block fall back to a random draw. Unlike founders,
+        // the childhood shift below does NOT touch personality — the web user's
+        // measured traits must survive exactly.
+        entity.personality = generateRandomPersonality();
+        if (b.has[0]) entity.personality.openness          = vc(b.v[0]);
+        if (b.has[1]) entity.personality.conscientiousness = vc(b.v[1]);
+        if (b.has[2]) entity.personality.extraversion      = vc(b.v[2]);
+        if (b.has[3]) entity.personality.agreeableness     = vc(b.v[3]);
+        if (b.has[4]) entity.personality.neuroticism       = vc(b.v[4]);
+
+        // ValueSystem/integrity derived from personality — same formulas and
+        // seeding scheme as the founder loop.
+        std::mt19937 rng_spawn((unsigned)splitmix64(g_worldSeed.master ^ (0x51ED2C17ull * (newId + 1))));
+        std::normal_distribution<float> vd(50.0f, 18.0f);
+        entity.ValueSystem.familyOrientation = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.3f);
+        entity.ValueSystem.achievementDrive  = vc(vd(rng_spawn) + (entity.personality.conscientiousness - 50.0f) * 0.4f);
+        entity.ValueSystem.spiritualNeed     = vc(vd(rng_spawn) - (entity.personality.openness - 50.0f) * 0.2f);
+        entity.ValueSystem.hedonism          = vc(vd(rng_spawn) + (entity.personality.extraversion - 50.0f) * 0.3f - (entity.personality.conscientiousness - 50.0f) * 0.2f);
+        entity.ValueSystem.collectivism      = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.35f - (entity.personality.openness - 50.0f) * 0.1f);
+        entity.integrity = vc(0.4f * entity.personality.conscientiousness
+                            + 0.4f * entity.personality.agreeableness
+                            + static_cast<float>(BetterRand::genNrInInterval(-15.0f, 15.0f)));
+
+        // Developmental history (attachment/trauma), founder-style — minus the
+        // personality shift (see above).
+        float traumaRoll  = vc(static_cast<float>(BetterRand::genNrInInterval(0, 50)));
+        float nurtureRoll = vc(100.0f - traumaRoll + static_cast<float>(BetterRand::genNrInInterval(-20, 20)));
+        entity.dv.childhoodTraumaScore    = traumaRoll;
+        entity.dv.childhoodNurturingScore = nurtureRoll;
+        entity.dv.hadSecureAttachment     = (traumaRoll < 20.0f && nurtureRoll > 55.0f);
+        if (traumaRoll < 20.0f && nurtureRoll > 60.0f)      entity.dv.attachmentStyle = SECURE;
+        else if (traumaRoll > 55.0f)                        entity.dv.attachmentStyle = (nurtureRoll < 30.0f) ? DISORGANIZED : ANXIOUS;
+        else if (traumaRoll > 30.0f && nurtureRoll < 40.0f) entity.dv.attachmentStyle = AVOIDANT;
+        else                                                entity.dv.attachmentStyle = ANXIOUS;
+
+        // Personality is final — build drives + Jungian stack (as founders do).
+        entity.initPsychology();
+
+        // Starting emotional stats: founder formulas, driven by the web traits.
+        entity.entityStress       = vc(static_cast<float>(BetterRand::genNrInInterval(5, 30))
+                                    + (entity.personality.neuroticism - 50.0f) * 0.25f + traumaRoll * 0.15f);
+        entity.entityHygiene      = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
+                                    + (entity.personality.conscientiousness - 50.0f) * 0.20f);
+        entity.entityLoneliness   = vc(static_cast<float>(BetterRand::genNrInInterval(5, 45))
+                                    - (entity.personality.extraversion - 50.0f) * 0.25f + traumaRoll * 0.10f);
+        entity.entityBoredom      = vc(static_cast<float>(BetterRand::genNrInInterval(10, 50))
+                                    + (entity.personality.openness - 50.0f) * 0.15f);
+        entity.entityGeneralAnger = vc(static_cast<float>(BetterRand::genNrInInterval(0, 25))
+                                    + traumaRoll * 0.12f - (entity.personality.agreeableness - 50.0f) * 0.20f);
+        entity.entityHapiness     = vc(static_cast<float>(BetterRand::genNrInInterval(30, 72))
+                                    - traumaRoll * 0.15f + nurtureRoll * 0.10f
+                                    + (entity.personality.extraversion - 50.0f) * 0.10f);
+        entity.entityMentalHealth = vc(static_cast<float>(BetterRand::genNrInInterval(55, 95))
+                                    - traumaRoll * 0.20f + nurtureRoll * 0.08f);
+        entity.entityHealth       = vc(static_cast<float>(BetterRand::genNrInInterval(70, 100)));
+
+        // Life goals seeded from values (founder logic verbatim).
+        entity.m_goals.clear();
+        struct GoalSeed { std::string type; float weight; };
+        std::vector<GoalSeed> seeds = {
+            {"find_partner", entity.ValueSystem.familyOrientation},
+            {"build_career", entity.ValueSystem.achievementDrive},
+            {"make_friends", entity.ValueSystem.collectivism},
+            {"happiness",    entity.ValueSystem.hedonism},
+            {"self",         entity.ValueSystem.spiritualNeed}
+        };
+        auto best = std::max_element(seeds.begin(), seeds.end(),
+            [](const GoalSeed& a, const GoalSeed& g){ return a.weight < g.weight; });
+        LifeGoal primary; primary.type = best->type; primary.priority = 100.0f;
+        primary.progressToward = 0.0f; primary.frustrationLevel = 0.0f; primary.ticksSinceProgress = 0;
+        entity.m_goals.push_back(primary);
+        for (auto& s : seeds) {
+            if (s.type != best->type && s.weight > 35.0f && entity.m_goals.size() < 3) {
+                LifeGoal sec; sec.type = s.type; sec.priority = s.weight * 0.6f;
+                sec.progressToward = 0.0f; sec.frustrationLevel = 0.0f; sec.ticksSinceProgress = 0;
+                entity.m_goals.push_back(sec);
+            }
+        }
+
+        // Web identity + name (fallback name if the block omitted NAME).
+        entity.webCharId = b.charId;
+        entity.name = !b.name.empty() ? b.name : ("Newcomer" + std::to_string(b.charId));
+
+        if (globalKinship)
+            globalKinship->ensureFounderFamily(entity, year);
+
+        entities.push_back(entity);
+        std::cout << "INJECT: spawned '" << entity.name << "' entityId=" << newId
+                  << " webCharId=" << b.charId << " at (" << (int)entity.posX
+                  << "," << (int)entity.posY << ")\n";
+        if (globalCivEngine)
+            globalCivEngine->logEvent(civDay,
+                entity.name + " (a newcomer) wanders into the world", "tribe",
+                "kind=web_spawn charId=" + std::to_string(b.charId)
+                + " entityId=" + std::to_string(newId));
+    };
+
+    // ── Line parser: same forgiving KEY:value scanning as the save loader ────
+    Block b;
+    bool inBlock = false;
+    std::string line;
+    auto key = [&](const char* k){ return line.rfind(k, 0) == 0; };
+    while (std::getline(in, line)) {
+        while (!line.empty() && (line.back() == '\r' || line.back() == ' ' || line.back() == '\t'))
+            line.pop_back();
+        if (line.empty()) continue;
+        try {
+            if (key("CHAR:")) {
+                if (inBlock)
+                    std::cerr << "INJECT: block for charId " << b.charId << " missing END — dropped\n";
+                b = Block();
+                b.charId = std::stoi(line.substr(5));
+                inBlock = true;
+            }
+            else if (!inBlock) continue;   // stray line outside any block
+            else if (key("NAME:"))              { b.name = line.substr(5); }
+            else if (key("OPENNESS:"))          { b.v[0] = std::stof(line.substr(9));  b.has[0] = true; }
+            else if (key("CONSCIENTIOUSNESS:")) { b.v[1] = std::stof(line.substr(18)); b.has[1] = true; }
+            else if (key("EXTRAVERSION:"))      { b.v[2] = std::stof(line.substr(13)); b.has[2] = true; }
+            else if (key("AGREEABLENESS:"))     { b.v[3] = std::stof(line.substr(14)); b.has[3] = true; }
+            else if (key("NEUROTICISM:"))       { b.v[4] = std::stof(line.substr(12)); b.has[4] = true; }
+            else if (key("NUDGE:"))             { b.nudge = std::stoi(line.substr(6)); }
+            else if (line == "END")             { processBlock(b); b = Block(); inBlock = false; }
+            // anything else: ignored (forward compatibility)
+        } catch (const std::exception& ex) {
+            std::cerr << "INJECT: bad line '" << line << "' (" << ex.what() << ") — block dropped\n";
+            b = Block();
+            inBlock = false;
+        }
+    }
+    if (inBlock)
+        std::cerr << "INJECT: trailing block for charId " << b.charId << " missing END — dropped\n";
 }
 
 // ── Command-line options ─────────────────────────────────────────────────────
@@ -1944,8 +2309,11 @@ struct CliOptions {
     float       chaos     = -1.0f;
     // M8: persistence — resume a world, or checkpoint one mid-run.
     std::string loadFile;             // load this save instead of spawning founders
-    std::string saveFile = "src/data/saves/headless_save.txt"; // --save-at target
+    std::string saveFile = "headless_autosave.txt"; // --save-at target (goes to saves/ dir)
     int         saveAtTick = -1;      // >0 = write saveFile at this headless tick
+    // Web bridge: spawn/nudge web-controlled characters from a block file
+    // before the tick loop starts (see applyWebInjectFile).
+    std::string injectFile;
 };
 
 static CliOptions parseCli(int argc, char* argv[]) {
@@ -1961,6 +2329,7 @@ static CliOptions parseCli(int argc, char* argv[]) {
         else if (a == "--region")   { o.region = std::atoi(next(i)); }
         else if (a == "--chaos")    { o.chaos = (float)std::atof(next(i)); }
         else if (a == "--load")     { o.loadFile = next(i); }
+        else if (a == "--inject")   { o.injectFile = next(i); }
         else if (a == "--save-at")  { o.saveAtTick = std::atoi(next(i)); }
         else if (a == "--save-file"){ o.saveFile = next(i); }
         // M10: scenario presets — curated parameter bundles. Applied in
@@ -1986,10 +2355,10 @@ static CliOptions parseCli(int argc, char* argv[]) {
                          "  --seed <text|num>    world seed (same seed = same history)\n"
                          "  --entities <n>       founding population (default 40)\n"
                          "  --region <1-4>       disease-climate region (default 1)\n"
-                         "  --chaos <0.3-2.5>    divergence level (default 1.3)\n"
-                         "  --load <file>        resume from a save instead of spawning founders\n"
-                         "  --save-at <tick>     write a save at this headless tick\n"
-                         "  --save-file <file>   where --save-at writes (default src/data/saves/headless_save.txt)\n"
+                         "  --chaos <0.3-2.5>    divergence level (default 1.3)\n"                          "  --load <file>        resume from a save (looks in saves/ dir first, then raw path)\n"
+                          "  --inject <file>      web bridge: spawn/nudge web characters from a block file\n"
+                          "  --save-at <tick>     write a save at this headless tick\n"
+                          "  --save-file <file>   where --save-at writes (default saves/headless_autosave.txt)\n"
                          "  --scenario <name>    preset bundle: eden (gentle, 150 souls), crucible (harsh, 60),\n"
                          "                       babel (crowded, 400), dish (petri dish, 12). Later flags override.\n";
             std::exit(0);
@@ -2060,6 +2429,11 @@ int main(int argc, char* argv[]) {
     }
 
     int renderingType = headless ? 1 : getRenderingChoice();
+
+    // ── A2/E1: scoring priors — the human-in-the-loop tuning surface. Absent
+    // file = engine defaults (bit-identical classic scorer); a priors_vN file
+    // produced by the feedback loop retunes the mind without a recompile.
+    mind::loadPriors("bridge/priors_active.txt");
 
     // ── World seed (determines the whole planet & history; same seed = same run) ──
     {
@@ -2342,6 +2716,13 @@ int main(int argc, char* argv[]) {
                 std::cerr << "LOAD FAILED (" << cli.loadFile << "): continuing with fresh founders\n";
             }
         }
+
+        // ── Web bridge: inject web-controlled characters ─────────────────────
+        // Must run AFTER the world exists (fresh founders or a loaded save) and
+        // BEFORE ent_quad takes raw pointers into `entities` below — push_back
+        // may reallocate the vector.
+        if (!cli.injectFile.empty())
+            applyWebInjectFile(cli.injectFile, entities, width, height);
 
         bool showEntityWindow = false;
         int selectedEntityIndex = -1;

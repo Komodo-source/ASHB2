@@ -17,7 +17,7 @@
 struct SimClock {
     static constexpr int FRAMES_PER_TICK   = 60;
     static constexpr int TICKS_PER_DAY     = 1;
-    static constexpr int DAYS_PER_YEAR     = 8;
+    static constexpr int DAYS_PER_YEAR     = 16;
     static constexpr int TICKS_PER_CIV_TICK = 5;
 
     // Raw frame counter; the main loop assigns this every step.

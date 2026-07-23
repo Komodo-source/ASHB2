@@ -512,30 +512,6 @@ src/EnvironmentalInteraction.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/EnvironmentalInteraction.cpp.s
 .PHONY : src/EnvironmentalInteraction.cpp.s
 
-src/Image.obj: src/Image.cpp.obj
-.PHONY : src/Image.obj
-
-# target to build an object file
-src/Image.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.obj
-.PHONY : src/Image.cpp.obj
-
-src/Image.i: src/Image.cpp.i
-.PHONY : src/Image.i
-
-# target to preprocess a source file
-src/Image.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.i
-.PHONY : src/Image.cpp.i
-
-src/Image.s: src/Image.cpp.s
-.PHONY : src/Image.s
-
-# target to generate assembly for a file
-src/Image.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/Image.cpp.s
-.PHONY : src/Image.cpp.s
-
 src/JungianType.obj: src/JungianType.cpp.obj
 .PHONY : src/JungianType.obj
 
@@ -728,30 +704,6 @@ src/PlanningSystem.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/PlanningSystem.cpp.s
 .PHONY : src/PlanningSystem.cpp.s
 
-src/SDLEngine.obj: src/SDLEngine.cpp.obj
-.PHONY : src/SDLEngine.obj
-
-# target to build an object file
-src/SDLEngine.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SDLEngine.cpp.obj
-.PHONY : src/SDLEngine.cpp.obj
-
-src/SDLEngine.i: src/SDLEngine.cpp.i
-.PHONY : src/SDLEngine.i
-
-# target to preprocess a source file
-src/SDLEngine.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SDLEngine.cpp.i
-.PHONY : src/SDLEngine.cpp.i
-
-src/SDLEngine.s: src/SDLEngine.cpp.s
-.PHONY : src/SDLEngine.s
-
-# target to generate assembly for a file
-src/SDLEngine.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/SDLEngine.cpp.s
-.PHONY : src/SDLEngine.cpp.s
-
 src/SaveLoad.obj: src/SaveLoad.cpp.obj
 .PHONY : src/SaveLoad.obj
 
@@ -943,6 +895,30 @@ src/ai/GoapPlanner.s: src/ai/GoapPlanner.cpp.s
 src/ai/GoapPlanner.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/GoapPlanner.cpp.s
 .PHONY : src/ai/GoapPlanner.cpp.s
+
+src/ai/MindUpgrade.obj: src/ai/MindUpgrade.cpp.obj
+.PHONY : src/ai/MindUpgrade.obj
+
+# target to build an object file
+src/ai/MindUpgrade.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/MindUpgrade.cpp.obj
+.PHONY : src/ai/MindUpgrade.cpp.obj
+
+src/ai/MindUpgrade.i: src/ai/MindUpgrade.cpp.i
+.PHONY : src/ai/MindUpgrade.i
+
+# target to preprocess a source file
+src/ai/MindUpgrade.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/MindUpgrade.cpp.i
+.PHONY : src/ai/MindUpgrade.cpp.i
+
+src/ai/MindUpgrade.s: src/ai/MindUpgrade.cpp.s
+.PHONY : src/ai/MindUpgrade.s
+
+# target to generate assembly for a file
+src/ai/MindUpgrade.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\app.dir\build.make CMakeFiles/app.dir/src/ai/MindUpgrade.cpp.s
+.PHONY : src/ai/MindUpgrade.cpp.s
 
 src/ai/neat/Neat.obj: src/ai/neat/Neat.cpp.obj
 .PHONY : src/ai/neat/Neat.obj
@@ -1433,9 +1409,6 @@ help:
 	@echo ... src/EnvironmentalInteraction.obj
 	@echo ... src/EnvironmentalInteraction.i
 	@echo ... src/EnvironmentalInteraction.s
-	@echo ... src/Image.obj
-	@echo ... src/Image.i
-	@echo ... src/Image.s
 	@echo ... src/JungianType.obj
 	@echo ... src/JungianType.i
 	@echo ... src/JungianType.s
@@ -1460,9 +1433,6 @@ help:
 	@echo ... src/PlanningSystem.obj
 	@echo ... src/PlanningSystem.i
 	@echo ... src/PlanningSystem.s
-	@echo ... src/SDLEngine.obj
-	@echo ... src/SDLEngine.i
-	@echo ... src/SDLEngine.s
 	@echo ... src/SaveLoad.obj
 	@echo ... src/SaveLoad.i
 	@echo ... src/SaveLoad.s
@@ -1487,6 +1457,9 @@ help:
 	@echo ... src/ai/GoapPlanner.obj
 	@echo ... src/ai/GoapPlanner.i
 	@echo ... src/ai/GoapPlanner.s
+	@echo ... src/ai/MindUpgrade.obj
+	@echo ... src/ai/MindUpgrade.i
+	@echo ... src/ai/MindUpgrade.s
 	@echo ... src/ai/neat/Neat.obj
 	@echo ... src/ai/neat/Neat.i
 	@echo ... src/ai/neat/Neat.s

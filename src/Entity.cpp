@@ -42,7 +42,9 @@ Entity::Entity(int id)
       entityDiseaseType(-1),
       posX(0.0f),
       posY(0.0f),
-      selected(false)
+      selected(false),
+      epigeneticMarkers(),
+      intergenerationalTraumaLoad(0.0f)
 {
     // Rebuild semantic memory index from any existing life memories
     semanticMemory.rebuildFromLifeMemories(this);
@@ -62,11 +64,10 @@ Entity::Entity(int id,
                float hygiene,
                char sex,
                int bDay,
-               int antiBody = 15,
-               int diseaseType = -1,
-               std::string goalType = "happiness",
-               int birthYear
-                )
+               int antiBody,
+               int diseaseType,
+               std::string goalType,
+               int birthYear)
     : entityId(id),
       entityAge(age),
       entityHealth(health),
@@ -85,7 +86,9 @@ Entity::Entity(int id,
       entityDiseaseType(diseaseType),
       posX(0.0f),
       posY(0.0f),
-      selected(false)
+      selected(false),
+      epigeneticMarkers(),
+      intergenerationalTraumaLoad(0.0f)
 {
     if(entitySex == 'A'){
         if(BetterRand::genNrInInterval(0,1)){
@@ -325,6 +328,13 @@ void Entity::addGrief(int lostId, float intensity, bool isDeath) {
               << " (lost person " << lostId
               << (isDeath ? ", cause: death" : ", cause: breakup")
               << ", intensity: " << gs.intensity << ")\n";
+
+    // Phase 6: a severe bereavement leaves a methylation mark future children
+    // may inherit (grief that never fully resolves reshapes the next
+    // generation too) — gated on death + real intensity, not every breakup.
+    if (isDeath && gs.intensity > 0.5f) {
+        addEpigeneticMarker("loss", gs.intensity * 100.0f, 0);
+    }
 }
 
 void Entity::tickGrief(float deltaTime) {
@@ -430,6 +440,28 @@ void Entity::saveTo(std::ofstream& file) const {
     // Save PlanningSystem
     planner.saveTo(file);
 
+    // Save Epigenetic and Generational Trauma Systems
+    file << "EPIGENETIC_COUNT:" << epigeneticMarkers.size() << "\n";
+    for (const auto& marker : epigeneticMarkers) {
+        file << "EPIGENETIC:" << marker.traumaSource << ","
+             << marker.methylationLevel << ","
+             << marker.generationOffset << ","
+             << marker.expressionLevel << "\n";
+    }
+    file << "INTERGEN_TRAUMA_LOAD:" << intergenerationalTraumaLoad << "\n";
+
+    // Save Biological Homeostasis & Disease Vector Systems (Phase 5)
+    file << "BIOSTATE:" << biology.nutritionalStatus << ","
+         << biology.hydrationLevel << "," << biology.energyLevel << "\n";
+    file << "BASEIMMUNITY:" << baseImmunity << "\n";
+    file << "PATHOGEN_COUNT:" << pathogenExposures.size() << "\n";
+    for (const auto& p : pathogenExposures) {
+        file << "PATHOGEN:" << p.pathogenId << "," << p.exposureDay << ","
+             << p.viralLoad << "," << (p.isInfected ? 1 : 0) << ","
+             << (p.isContagious ? 1 : 0) << "," << p.daysInfected << ","
+             << p.immunityLevel << "\n";
+    }
+
     // Society layer: tribe/religion/family membership, role and standing.
     // Appended at the very end so older loaders simply never reach these lines.
     file << "TRIBEID:" << tribeId << "\n";
@@ -442,14 +474,49 @@ void Entity::saveTo(std::ofstream& file) const {
     file << "INTEGRITY:" << integrity << "\n";
     file << "DOMRANK:" << dominanceRank << "\n";
 
+    // ── AI upgrade phases A-E: emotions, skills, sleep, injury, intention,
+    // knowledge. Append-only: older loaders never reach unknown keys because
+    // the tail dispatcher below knows all of them; saves that predate them
+    // simply keep the defaults.
+    file << "EMOTIONS:" << emotions.fear << ',' << emotions.joy << ','
+         << emotions.sadness << ',' << emotions.shame << ',' << emotions.guilt << ','
+         << emotions.envy << ',' << emotions.gratitude << ',' << emotions.pride << ','
+         << emotions.hope << ',' << emotions.regret << "\n";
+    file << "SKILLS:";
+    for (int i = 0; i < SK_COUNT; ++i) file << (i ? "," : "") << skills.v[i];
+    file << "\n";
+    file << "SLEEPST:" << sleepPressure << ',' << sleepQuality << "\n";
+    file << "INJURY:" << injuryLevel << "\n";
+    file << "HOMEATT:" << homeAttachment << ',' << tribeSwitchDay << "\n";
+    file << "INTENT:" << (intention.active ? 1 : 0) << ',' << intention.sinceDay << ','
+         << intention.lastProgressDay << ',' << intention.progress << ','
+         << intention.type << "\n";
+    for (const KnownFact& k : knowledge.facts)
+        file << "FACT:" << k.subjectId << ',' << (int)k.predicate << ',' << k.value << ','
+             << k.confidence << ',' << k.sourceId << ',' << k.day << ','
+             << (k.isTrue ? 1 : 0) << "\n";
+
+    // Web bridge: MySQL characters.id this entity embodies (-1 = pure AI).
+    // MUST stay the LAST key — older loaders rewind on the unknown line and
+    // newer loaders presence-guard it, so saves stay append-only compatible.
+    file << "WEBCHARID:" << webCharId << "\n";
+
     file << "--- END ENTITY ---\n";
 }
 
-void Entity::loadFrom(std::ifstream& file) {
+bool Entity::loadFrom(std::ifstream& file) {
     std::string line;
 
     // Read entity header
     std::getline(file, line); // "--- ENTITY <id> ---"
+    if (line.rfind("--- ENTITY", 0) != 0) {
+        // Truncated or corrupt save (e.g. a pre-V2 binary planner blob whose
+        // 0x1A byte read as DOS EOF): report and let the caller stop cleanly
+        // instead of crashing on the field parses below.
+        std::cerr << "loadFrom: misaligned entity block (header='" << line
+                  << "' eof=" << file.eof() << ") — stopping entity load\n";
+        return false;
+    }
 
     std::getline(file, line); entityId = std::stoi(line.substr(3));
     std::getline(file, line); name = line.substr(5);
@@ -582,33 +649,154 @@ void Entity::loadFrom(std::ifstream& file) {
     // Load PlanningSystem
     planner.loadFrom(file);
 
-    // Society layer: tolerant of older saves that predate these lines — peek
-    // one line, and if it isn't a TRIBEID record, rewind so the end marker is
-    // read normally (same guard idiom as SALARY above).
-    std::streampos beforeSociety = file.tellg();
-    std::getline(file, line);
-    if (line.rfind("TRIBEID:", 0) == 0) {
-        tribeId = std::stoi(line.substr(8));
-        std::getline(file, line); religionId     = std::stoi(line.substr(11));
-        std::getline(file, line); familyId       = std::stoi(line.substr(9));
-        std::getline(file, line); specialization = line.substr(15);
-        std::getline(file, line); isSpecialist   = (std::stoi(line.substr(7)) != 0);
-        std::getline(file, line); roleSinceDay   = std::stoi(line.substr(10));
-        std::getline(file, line); auctoritas     = std::stof(line.substr(11));
-        std::getline(file, line); integrity      = std::stof(line.substr(10));
-        std::getline(file, line); dominanceRank  = std::stof(line.substr(8));
-        if (specialization.empty()) specialization = "farmer";
-    } else {
-        file.seekg(beforeSociety); // old save — no society block
-    }
+    // ── Append-only tail: society layer, web identity, end marker ────────────
+    // Read lines until the "--- END ENTITY ---" marker, dispatching every key
+    // we know; keys a save predates are simply absent and keep their defaults.
+    // This deliberately does NOT use the tellg/peek/seekg rewind idiom the old
+    // society guard used: on this toolchain (MinGW text-mode streams) tellg()
+    // mid-buffer is offset by the CRLFs still sitting in the internal buffer,
+    // so seekg() back landed PAST unread lines and corrupted the stream for
+    // any save missing an optional key (crashed loading pre-society saves).
+    // CSV splitter for the AI-upgrade keys (EMOTIONS/SKILLS/... below).
+    auto splitFloats = [](const std::string& s) {
+        std::vector<float> out;
+        std::stringstream ss(s); std::string tok;
+        while (std::getline(ss, tok, ','))
+            { try { out.push_back(std::stof(tok)); } catch (...) { out.push_back(0.0f); } }
+        return out;
+    };
 
-    // Read end marker
-    std::getline(file, line); // "--- END ENTITY ---"
+    while (std::getline(file, line)) {
+        if      (line.rfind("TRIBEID:", 0) == 0)        tribeId       = std::stoi(line.substr(8));
+        else if (line.rfind("RELIGIONID:", 0) == 0)     religionId    = std::stoi(line.substr(11));
+        else if (line.rfind("FAMILYID:", 0) == 0)       familyId      = std::stoi(line.substr(9));
+        else if (line.rfind("SPECIALIZATION:", 0) == 0) {
+            specialization = line.substr(15);
+            if (specialization.empty()) specialization = "farmer";
+        }
+        else if (line.rfind("ISSPEC:", 0) == 0)         isSpecialist  = (std::stoi(line.substr(7)) != 0);
+        else if (line.rfind("ROLESINCE:", 0) == 0)      roleSinceDay  = std::stoi(line.substr(10));
+        else if (line.rfind("AUCTORITAS:", 0) == 0)     auctoritas    = std::stof(line.substr(11));
+        else if (line.rfind("INTEGRITY:", 0) == 0)      integrity     = std::stof(line.substr(10));
+        else if (line.rfind("DOMRANK:", 0) == 0)        dominanceRank = std::stof(line.substr(8));
+        else if (line.rfind("EMOTIONS:", 0) == 0) {
+            auto f = splitFloats(line.substr(9));
+            if (f.size() >= 10) {
+                emotions.fear = f[0]; emotions.joy = f[1]; emotions.sadness = f[2];
+                emotions.shame = f[3]; emotions.guilt = f[4]; emotions.envy = f[5];
+                emotions.gratitude = f[6]; emotions.pride = f[7];
+                emotions.hope = f[8]; emotions.regret = f[9];
+            }
+        }
+        else if (line.rfind("SKILLS:", 0) == 0) {
+            auto f = splitFloats(line.substr(7));
+            for (int i = 0; i < SK_COUNT && i < (int)f.size(); ++i) skills.v[i] = f[i];
+        }
+        else if (line.rfind("SLEEPST:", 0) == 0) {
+            auto f = splitFloats(line.substr(8));
+            if (f.size() >= 2) { sleepPressure = f[0]; sleepQuality = f[1]; }
+        }
+        else if (line.rfind("INJURY:", 0) == 0)         injuryLevel   = std::stof(line.substr(7));
+        else if (line.rfind("HOMEATT:", 0) == 0) {
+            auto f = splitFloats(line.substr(8));
+            if (f.size() >= 2) { homeAttachment = f[0]; tribeSwitchDay = (int)f[1]; }
+        }
+        else if (line.rfind("INTENT:", 0) == 0) {
+            // INTENT:active,sinceDay,lastProgressDay,progress,type — type last
+            // because it is the only non-numeric field.
+            std::string body = line.substr(7);
+            size_t p = 0; int fieldNo = 0; std::string tok;
+            std::stringstream ss(body);
+            std::vector<std::string> parts;
+            while (std::getline(ss, tok, ',')) parts.push_back(tok);
+            (void)p; (void)fieldNo;
+            if (parts.size() >= 5) {
+                try {
+                    intention.active          = (std::stoi(parts[0]) != 0);
+                    intention.sinceDay        = std::stoi(parts[1]);
+                    intention.lastProgressDay = std::stoi(parts[2]);
+                    intention.progress        = std::stof(parts[3]);
+                    intention.type            = parts[4];
+                } catch (...) { intention = Intention{}; }
+            }
+        }
+        else if (line.rfind("FACT:", 0) == 0) {
+            auto f = splitFloats(line.substr(5));
+            if (f.size() >= 7) {
+                KnownFact k;
+                k.subjectId  = (int)f[0];
+                k.predicate  = (uint8_t)(int)f[1];
+                k.value      = f[2];
+                k.confidence = f[3];
+                k.sourceId   = (int)f[4];
+                k.day        = (int)f[5];
+                k.isTrue     = (f[6] != 0.0f);
+                knowledge.remember(k);
+            }
+        }
+        else if (line.rfind("EPIGENETIC_COUNT:", 0) == 0) {
+            int cnt = std::stoi(line.substr(18));
+            epigeneticMarkers.clear();
+            for (int i = 0; i < cnt && std::getline(file, line); ++i) {
+                if (line.rfind("EPIGENETIC:", 0) != 0) break;
+                std::stringstream ss(line.substr(11));
+                std::string tok; std::vector<std::string> parts;
+                while (std::getline(ss, tok, ',')) parts.push_back(tok);
+                if (parts.size() >= 4) {
+                    try {
+                        EpigeneticMarker m;
+                        m.traumaSource     = parts[0];
+                        m.methylationLevel = std::stof(parts[1]);
+                        m.generationOffset = std::stoi(parts[2]);
+                        m.expressionLevel  = std::stof(parts[3]);
+                        epigeneticMarkers.push_back(m);
+                    } catch (...) {}
+                }
+            }
+        }
+        else if (line.rfind("INTERGEN_TRAUMA_LOAD:", 0) == 0)
+            intergenerationalTraumaLoad = std::stof(line.substr(21));
+        else if (line.rfind("BIOSTATE:", 0) == 0) {
+            auto f = splitFloats(line.substr(9));
+            if (f.size() >= 3) {
+                biology.nutritionalStatus = f[0];
+                biology.hydrationLevel    = f[1];
+                biology.energyLevel       = f[2];
+            }
+        }
+        else if (line.rfind("BASEIMMUNITY:", 0) == 0)
+            baseImmunity = std::stof(line.substr(13));
+        else if (line.rfind("PATHOGEN_COUNT:", 0) == 0) {
+            int cnt = std::stoi(line.substr(15));
+            pathogenExposures.clear();
+            for (int i = 0; i < cnt && std::getline(file, line); ++i) {
+                if (line.rfind("PATHOGEN:", 0) != 0) break;
+                auto f = splitFloats(line.substr(9));
+                if (f.size() >= 7) {
+                    PathogenExposure p;
+                    p.pathogenId    = (int)f[0];
+                    p.exposureDay   = (int)f[1];
+                    p.viralLoad     = f[2];
+                    p.isInfected    = (f[3] != 0.0f);
+                    p.isContagious  = (f[4] != 0.0f);
+                    p.daysInfected  = (int)f[5];
+                    p.immunityLevel = (int)f[6];
+                    pathogenExposures.push_back(p);
+                }
+            }
+        }
+        else if (line.rfind("WEBCHARID:", 0) == 0)      webCharId     = std::stoi(line.substr(10));
+        else if (line.rfind("--- END ENTITY", 0) == 0)  break;
+        // Unknown key (a future format, or pre-V2 planner residue): skip it
+        // and resync on the END marker so one stray line can't desync every
+        // entity that follows.
+    }
 
     // Rebuild semantic memory index from loaded life memories
     semanticMemory.rebuildFromLifeMemories(this);
 
     selected = false;
+    return true;
 }
 
 void Entity::resolvePointers(std::vector<Entity>& allEntities) {
@@ -997,4 +1185,236 @@ void Entity::addToWorkingMemory(const std::string& eventType,
 
     if (workingMemory.size() > 5)
         workingMemory.resize(5);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 6: Epigenetic and Generational Trauma Systems
+// ─────────────────────────────────────────────────────────────────────────────
+void Entity::addEpigeneticMarker(std::string traumaSource, float methylationLevel, int generationOffset) {
+    // LiveConfig kill switch: ×0 = the whole system contributes nothing
+    // (bit-exact no-op), matching the M10 multiplier contract.
+    if (g_liveConfig.epigeneticsMul <= 0.0f) return;
+    EpigeneticMarker marker;
+    marker.traumaSource = traumaSource;
+    marker.methylationLevel = std::clamp(methylationLevel * g_liveConfig.epigeneticsMul, 0.0f, 100.0f);
+    marker.generationOffset = generationOffset;
+    marker.expressionLevel = marker.methylationLevel; // Initially expressed at same level as methylation
+    epigeneticMarkers.push_back(marker);
+
+    // Bounded like every other unbounded-in-principle per-entity list
+    // (lifeMemories, knowledge.facts): a lifetime of repeated famines/wars
+    // shouldn't grow this vector without limit. Evict the weakest-expressed
+    // mark first so the traits that actually still matter survive.
+    constexpr size_t MARKER_CAP = 24;
+    if (epigeneticMarkers.size() > MARKER_CAP) {
+        auto weakest = std::min_element(epigeneticMarkers.begin(), epigeneticMarkers.end(),
+            [](const EpigeneticMarker& a, const EpigeneticMarker& b) {
+                return a.expressionLevel < b.expressionLevel;
+            });
+        epigeneticMarkers.erase(weakest);
+    }
+}
+
+void Entity::updateEpigeneticExpression(float environmentalSupport) {
+    // environmentalSupport: 0-100, higher = more supportive environment
+    // In supportive environments, trauma-related methylation is expressed less
+    // In harsh environments, trauma-related methylation is expressed more
+
+    float supportFactor = environmentalSupport / 100.0f; // 0-1
+    for (auto& marker : epigeneticMarkers) {
+        // Inverse relationship: high support = low expression of trauma markers
+        // Low support = high expression of trauma markers
+        float expressionModifier = 1.0f - supportFactor;
+        marker.expressionLevel = marker.methylationLevel * (0.5f + 0.5f * expressionModifier);
+        // Clamp to 0-100 range
+        marker.expressionLevel = std::clamp(marker.expressionLevel, 0.0f, 100.0f);
+    }
+}
+
+void Entity::applyEpigeneticEffects() {
+    // Apply epigenetic effects to personality, drives, and mental health
+    float totalTraumaImpact = 0.0f;
+    int activeMarkers = 0;
+
+    for (const auto& marker : epigeneticMarkers) {
+        // Only consider markers with significant expression
+        if (marker.expressionLevel > 10.0f) {
+            float impact = marker.expressionLevel / 100.0f; // 0-1
+            totalTraumaImpact += impact;
+            activeMarkers++;
+
+            // Different trauma sources affect different aspects
+            if (marker.traumaSource == "war" || marker.traumaSource == "conflict") {
+                // War trauma increases aggression, anxiety, decreases trust
+                personality.neuroticism += impact * 5.0f;
+                personality.agreeableness -= impact * 3.0f;
+                entityGeneralAnger += impact * 4.0f;
+            } else if (marker.traumaSource == "famine" || marker.traumaSource == "starvation") {
+                // Famine trauma increases hoarding, decreases trust, increases neuroticism
+                personality.neuroticism += impact * 4.0f;
+                personality.agreeableness -= impact * 2.0f;
+                ValueSystem.hedonism -= impact * 3.0f; // Less pleasure-seeking, more survival-focused
+            } else if (marker.traumaSource == "loss" || marker.traumaSource == "grief") {
+                // Loss trauma increases neuroticism, decreases extraversion
+                personality.neuroticism += impact * 5.0f;
+                personality.extraversion -= impact * 3.0f;
+                entityMentalHealth -= impact * 3.0f;
+            } else if (marker.traumaSource == "abuse" || marker.traumaSource == "violence") {
+                // Abuse trauma increases anxiety, aggression, decreases trust
+                personality.neuroticism += impact * 6.0f;
+                personality.agreeableness -= impact * 4.0f;
+                entityGeneralAnger += impact * 5.0f;
+                entityMentalHealth -= impact * 4.0f;
+            }
+        }
+    }
+
+    // Update intergenerational trauma load (average of active markers)
+    if (activeMarkers > 0) {
+        intergenerationalTraumaLoad = (totalTraumaImpact / activeMarkers) * 100.0f;
+    } else {
+        intergenerationalTraumaLoad = 0.0f;
+    }
+
+    // Apply general mental health impact from accumulated trauma
+    if (intergenerationalTraumaLoad > 10.0f) {
+        entityMentalHealth -= (intergenerationalTraumaLoad - 10.0f) * 0.5f;
+        entityMentalHealth = std::max(0.0f, std::min(100.0f, entityMentalHealth));
+    }
+
+    // Ensure personality traits stay in valid range
+    personality.extraversion = std::clamp(personality.extraversion, 0.0f, 100.0f);
+    personality.agreeableness = std::clamp(personality.agreeableness, 0.0f, 100.0f);
+    personality.conscientiousness = std::clamp(personality.conscientiousness, 0.0f, 100.0f);
+    personality.neuroticism = std::clamp(personality.neuroticism, 0.0f, 100.0f);
+    personality.openness = std::clamp(personality.openness, 0.0f, 100.0f);
+}
+
+void Entity::inheritEpigeneticMarkers(Entity* parent1, Entity* parent2) {
+    // Inherit epigenetic markers from parents with some reduction
+    // Each generation, epigenetic marks fade somewhat unless reinforced
+    if (g_liveConfig.epigeneticsMul <= 0.0f) return; // kill switch: bit-exact no-op
+
+    auto inheritFromParent = [this](Entity* parent) {
+        if (!parent) return;
+
+        for (const auto& marker : parent->epigeneticMarkers) {
+            // Only inherit markers that have significant expression
+            if (marker.expressionLevel > 5.0f) {
+                EpigeneticMarker inheritedMarker;
+                inheritedMarker.traumaSource = marker.traumaSource;
+                // Methylation level decreases with each generation (epigenetic decay)
+                inheritedMarker.methylationLevel = marker.methylationLevel * 0.7f;
+                // Generation offset increases by 1
+                inheritedMarker.generationOffset = marker.generationOffset + 1;
+                // Expression level starts same as methylation but will be updated by environment
+                inheritedMarker.expressionLevel = inheritedMarker.methylationLevel;
+                epigeneticMarkers.push_back(inheritedMarker);
+            }
+        }
+    };
+
+    inheritFromParent(parent1);
+    inheritFromParent(parent2);
+
+    // Also update the individual's own intergenerational trauma load based on inherited markers
+    updateEpigeneticExpression(50.0f); // Assume neutral environment initially
+    applyEpigeneticEffects();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 5: Biological Homeostasis & Disease Vectors
+// ─────────────────────────────────────────────────────────────────────────────
+void Entity::resolveBiologicalHomeostasis() {
+    // Net energy balance for today, in the same arbitrary units the caloric
+    // bumps are recorded in at the action-execution sites (implem_free_will.cpp).
+    float net = biology.caloricIntakeToday - biology.caloricExpenditureToday;
+
+    // nutritionalStatus drifts toward a target set by today's balance, blended
+    // with the existing hunger/foodStore subsistence stat so this layer adds
+    // texture on top of survival rather than fighting it for authority.
+    float target = std::clamp(50.0f + net * 4.0f + (100.0f - entityHunger) * 0.3f,
+                               0.0f, 100.0f);
+    biology.nutritionalStatus += (target - biology.nutritionalStatus) * 0.3f;
+    biology.nutritionalStatus = std::clamp(biology.nutritionalStatus, 0.0f, 100.0f);
+
+    // Energy tracks nutrition, worn down by accumulated fatigue.
+    biology.energyLevel = std::clamp(biology.nutritionalStatus - fatigueLevel * 0.4f,
+                                      0.0f, 100.0f);
+
+    // Hydration: no dedicated drinking action exists, so this is a slow drift
+    // toward a comfortable setpoint that heavy same-day exertion knocks down.
+    float hydrationTarget = 70.0f - std::min(30.0f, biology.caloricExpenditureToday * 1.5f);
+    biology.hydrationLevel += (hydrationTarget - biology.hydrationLevel) * 0.25f;
+    biology.hydrationLevel = std::clamp(biology.hydrationLevel, 0.0f, 100.0f);
+
+    // Starvation: a chronic caloric deficit hits mood/cognition beyond what
+    // the hunger stat alone already inflicts. Overeating: a chronic, unneeded
+    // surplus buys nothing and costs a little sluggish discomfort —
+    // diminishing/negative returns past satiety. Gated behind the LiveConfig
+    // multiplier (×0 = bit-exact no-op) like every other new subsystem.
+    if (g_liveConfig.bioHomeostasisMul > 0.0f) {
+        if (biology.nutritionalStatus < 20.0f) {
+            float deficit = (20.0f - biology.nutritionalStatus) * 0.15f * g_liveConfig.bioHomeostasisMul;
+            entityStress      = std::min(100.0f, entityStress + deficit);
+            entityMentalHealth = std::max(0.0f, entityMentalHealth - deficit * 0.5f);
+        } else if (biology.nutritionalStatus > 90.0f &&
+                   biology.caloricIntakeToday > biology.caloricExpenditureToday * 1.8f) {
+            entityHapiness = std::max(0.0f, entityHapiness - 1.0f * g_liveConfig.bioHomeostasisMul);
+        }
+    }
+
+    biology.caloricIntakeToday      = 0.0f;
+    biology.caloricExpenditureToday = 0.0f;
+}
+
+void Entity::exposeToPathogen(int pathogenId, int today) {
+    // LiveConfig kill switch: ×0 = the whole system contributes nothing.
+    if (g_liveConfig.pathogenMul <= 0.0f) return;
+    for (const auto& p : pathogenExposures)
+        if (p.pathogenId == pathogenId) return; // already carrying/clearing this one
+
+    float immunity = std::clamp(baseImmunity * genome.resilience, 0.0f, 100.0f);
+    float roll = BetterRand::genNrInInterval(0.0f, 100.0f);
+    if (roll >= (100.0f - immunity) * 0.5f) return; // immune system fought it off on contact
+
+    PathogenExposure p;
+    p.pathogenId     = pathogenId;
+    p.exposureDay    = today;
+    p.viralLoad      = 10.0f;
+    p.isInfected     = false; // incubating
+    p.isContagious   = false;
+    p.daysInfected   = 0;
+    p.immunityLevel  = (int)immunity;
+    pathogenExposures.push_back(p);
+}
+
+void Entity::tickPathogens(int today) {
+    constexpr int INCUBATION_DAYS = 3;
+    constexpr int CHRONIC_TIMEOUT = 30;
+
+    for (auto it = pathogenExposures.begin(); it != pathogenExposures.end(); ) {
+        PathogenExposure& p = *it;
+        if (!p.isInfected && today - p.exposureDay >= INCUBATION_DAYS) {
+            p.isInfected   = true;
+            p.isContagious = true;
+        }
+        if (!p.isInfected) { ++it; continue; }
+
+        p.daysInfected++;
+        float immuneResponse = std::clamp(baseImmunity * genome.resilience, 10.0f, 150.0f);
+        p.viralLoad = std::clamp(p.viralLoad + 6.0f - immuneResponse * 0.08f, 0.0f, 100.0f);
+
+        entityHealth = std::max(0.0f, entityHealth - p.viralLoad * 0.01f);
+        entityStress = std::min(100.0f, entityStress + p.viralLoad * 0.02f);
+        p.isContagious = (p.viralLoad > 15.0f);
+
+        if (p.viralLoad <= 0.0f || p.daysInfected > CHRONIC_TIMEOUT) {
+            // Recovered: a lasting immunity bump (naive vaccination-equivalent).
+            baseImmunity = std::min(100.0f, baseImmunity + 4.0f);
+            it = pathogenExposures.erase(it);
+            continue;
+        }
+        ++it;
+    }
 }

@@ -225,6 +225,12 @@ private:
     // the RL "state". Kept small (a handful of buckets) to bound the Q-table.
     std::string rlStateSignature(Entity* entity, int numNearby) const;
 
+    // C1 eligibility-lite: the previous (state, action) pair shares a fraction
+    // of each new reward, so multi-step payoffs (hunt → eat) credit the chain.
+    // Runtime-only; not serialized.
+    std::string prevRlState;
+    std::string prevRlAction;
+
 
 
     // Last deliberation result (pipeline state) for reflection/logging
@@ -354,12 +360,54 @@ public:
     float calculateLifeMemoryBias(Entity* entity, const Action& action);
     SocialTier getSocialTier(Entity* from, Entity* to) const;
 
-    // New: Semantic memory-enhanced action scoring
+    // New: Utility AI and GOAP integration
+    struct UtilityFactors {
+        float driveSatisfaction;      // How much this action satisfies current drives (0-1)
+        float needReduction;          // How much this action reduces unmet needs (0-1)
+        float emotionalFit;           // How well this action fits current emotional state (0-1)
+        float memoryRelevance;        // How relevant this action is based on memory (0-1)
+        float socialAlignment;        // How well this action aligns with social context (0-1)
+        float goalProgress;           // How much this action advances current goals (0-1)
+        float habitStrength;          // Strength of habit for this action in current context (0-1)
+        float noveltyValue;           // Novelty/exploration value of this action (0-1)
+
+        UtilityFactors() :
+            driveSatisfaction(0.0f), needReduction(0.0f), emotionalFit(0.0f),
+            memoryRelevance(0.0f), socialAlignment(0.0f), goalProgress(0.0f),
+            habitStrength(0.0f), noveltyValue(0.0f) {}
+    };
+
+    // GOAP-style action representation for planning
+    struct GOAPAction {
+        std::string actionName;
+        std::map<std::string, bool> preconditions;  // Conditions that must be true to perform this action
+        std::map<std::string, bool> effects;        // Changes to world state after performing this action
+        float cost;                                 // Cost to perform this action (lower is better)
+
+        GOAPAction() : cost(1.0f) {}
+        GOAPAction(std::string name, float actionCost = 1.0f)
+            : actionName(name), cost(actionCost) {}
+    };
+
+    // Calculate utility score for an action based on multiple factors
+    UtilityFactors calculateUtilityFactors(Entity* entity, const Action& action,
+                                         const std::vector<Entity*>& neighbors,
+                                         const ActionContext& context);
+
+    // Combine utility factors into a single score using weighted sum
+    float calculateUtilityScore(const UtilityFactors& factors, Entity* entity);
+
+    // Semantic memory bias for actions
     float calculateSemanticMemoryBias(Entity* entity, const Action& action, const std::vector<Entity*>& neighbors);
 
-    // New: Plan-aware action selection
-    std::string getPlannedAction(Entity* entity, const std::vector<Entity*>& neighbors, float emergencyUrgency = 0.0f);
-    void reportActionResult(Entity* entity, const std::string& actionName, float successScore, bool wasEmergency = false);
+    // GOAP planning: find sequence of actions to achieve a goal state
+    std::vector<GOAPAction> planGOAP(Entity* entity,
+                                   const std::map<std::string, bool>& goalState,
+                                   const std::vector<GOAPAction>& availableActions,
+                                   int maxDepth = 5);
+
+    // Plan-aware action selection: returns the next planned action based on the entity's planner
+    std::string getPlannedAction(Entity* entity, const std::vector<Entity*>& neighbors, float emergencyUrgency);
 
     // ── Social realism: jealousy, rivalry, mate-guarding, crimes of passion ──
     // How prone an entity is to jealousy, derived from personality + attachment.
@@ -368,6 +416,9 @@ public:
     // partner-poaching) into emergent consequences: suspicion, resentment,
     // violence, and breakups. Called once per living entity each simulation tick.
     void  processSocialConsequences(Entity* e, const std::vector<Entity*>& group, int simDay);
+
+    // Report action results to the planner for learning
+    void reportActionResult(Entity* entity, const std::string& actionName, float successScore, bool wasEmergency);
 };
 
 #endif

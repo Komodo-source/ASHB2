@@ -55,6 +55,17 @@ void KinshipSystem::registerBirth(Entity& child, Entity* p1, Entity* p2, int yea
     if (p1) p1->childrenIds.push_back(child.entityId);
     if (p2) p2->childrenIds.push_back(child.entityId);
 
+    // Phase 6: epigenetic inheritance. Must happen HERE, at birth, while p1/p2
+    // are still fresh pointers into the live entities vector — NOT later at
+    // childhood-finalization time (FreeWillSystem::finalizeChildhood), which
+    // only has the legacy child.parent1/parent2 raw pointers. Those dangle
+    // once the entities vector reallocates for a later birth (this file's own
+    // comment above the class: "safe across entity-vector reallocation" is
+    // exactly why parent1Id/parent2Id exist instead), and a dangling read of
+    // a std::vector member (epigeneticMarkers) is far more dangerous than of
+    // a scalar float — it broke the determinism pair on a 300-tick run.
+    child.inheritEpigeneticMarkers(p1, p2);
+
     // Decide which family the child joins. Prefer parent1's line; if that parent
     // has no family yet, found one for them so lineage is never orphaned.
     Family* fam = nullptr;

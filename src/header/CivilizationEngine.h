@@ -126,6 +126,21 @@ struct Tribe {
     int            lastCoupDay     = -100000;  // cooldown so revolts don't chain
     int            totalCoups      = 0;        // how many times this tribe has revolted
 
+    // ── Elections & council ──────────────────────────────────────────────────
+    // Democracies choose their leader by real ballot every term; every regime
+    // seats a small council of notables whose mood steadies or shakes the ruler
+    // and who steer the tax rate toward what the government form will bear.
+    int   nextElectionDay    = -1;    // democracy: day of the next ballot (-1 = unscheduled)
+    int   termLengthDays     = 40;    // civ-days between ballots
+    std::vector<int> councilIds;      // 3 advisors, rebuilt each governance pass
+    float lastElectionMargin = 0.0f;  // winner's vote share 0-1 (electoral legitimacy)
+
+    // ── Corruption ───────────────────────────────────────────────────────────
+    // Accumulated graft: rises when a low-integrity leader skims the tax take
+    // or packs the specialist rolls with kin, decays under clean rule, and
+    // quietly erodes legitimacy until a scandal blows it open.
+    float corruption = 0.0f;          // 0-100
+
     // ── Vassalage ────────────────────────────────────────────────────────────
     // A defeated-but-not-destroyed tribe becomes a vassal: it keeps its identity
     // but siphons a share of its economy to the overlord, marches to the
@@ -179,6 +194,10 @@ struct Tribe {
     float spiritualism = 50.0f;
     float collectivism = 50.0f;
     float innovation   = 50.0f;
+    // ── A3/D4 (AI upgrade): festivity — how much this people celebrates.
+    // Drifts from member hedonism/extraversion; sets the festival cadence.
+    float festivity       = 50.0f;
+    int   lastFestivalDay = -99999;  // civ-day of the last feast held
 
     // Geographic center of mass
     float centerX = 700.0f;
@@ -344,6 +363,11 @@ public:
     int  totalCoups          = 0; // regime changes forced by popular revolt
     int  totalVassalizations = 0; // wars ended by subjugation rather than slaughter
     int  totalRebellions     = 0; // vassals that threw off their overlord
+    int  totalElections      = 0; // democratic ballots held (Society Plan 3)
+    int  totalSuccessions    = 0; // leaders replaced on a predecessor's death (Plan 4)
+    int  totalChallenges     = 0; // open challenges for the leadership (Plan 4)
+    int  totalScandals       = 0; // corruption scandals exposed (Plan 5)
+    int  totalDepositions    = 0; // leaders exiled in disgrace over graft (Plan 5)
 
     // True when tribes a and b are currently in an open war.
     bool areTribesAtWar(int tribeIdA, int tribeIdB) const;
@@ -422,6 +446,11 @@ private:
     // score, occasionally producing great works; dark ages erode it. Once/civ tick.
     void updateCulture(std::vector<Entity>& entities, int day);
 
+    // A3/D4 (AI upgrade): festivals — tribes with food and festive spirit hold
+    // periodic feasts (suppression discharge, joy, cohesion, chronicle entry);
+    // allied cultures slowly converge (horizontal transmission). Once/civ tick.
+    void updateFestivals(std::vector<Entity>& entities, int day);
+
     // Climate & natural disasters (Plan 12): droughts, floods, earthquakes and
     // rarer volcanoes/meteors strike regions, harming people and works. Once/civ tick.
     void updateClimate(std::vector<Entity>& entities, int day);
@@ -437,6 +466,16 @@ private:
     // Family dynasties (Plan 4.1): accrue prestige to the families of leaders,
     // the wealthy and the devout; announce the rise of "great families".
     void updateDynasties(std::vector<Entity>& entities, int day);
+
+    // Elections & councils (Society Plan 3): democracies ballot for their leader
+    // each term; every regime seats a council that judges the ruler and steers
+    // the tax rate, and the tax take is finally collected. Once per civ-day.
+    void updateElections(std::vector<Entity>& entities, int day);
+
+    // Corruption (Society Plan 5): graft quietly erodes legitimacy each day;
+    // oversight sometimes drags it into the light as a scandal that feeds the
+    // existing election/coup machinery — or exiles the worst offenders outright.
+    void updateCorruption(std::vector<Entity>& entities, int day);
 
     // Migration & colonization (Plan 13): send surplus population from a crowded
     // homeland to found a colony tribe in empty habitable land.
@@ -467,7 +506,11 @@ private:
 
     // ── Tribe operations ──────────────────────────────────────────────────────
     bool formTribe(std::vector<Entity*>& cluster, int day);
-    void electLeader(Tribe& tribe, std::vector<Entity>& entities);
+    // Succession only: installs a new leader when the seat is empty or its
+    // holder has died — hereditary where the regime allows, a snap ballot in
+    // democracies. Day-to-day turnover now goes through elections, challenges
+    // and coups instead of a per-tick dominance grab.
+    void electLeader(Tribe& tribe, std::vector<Entity>& entities, int day);
     void updateTribeCenter(Tribe& tribe, std::vector<Entity>& entities);
     void updateTribeValues(Tribe& tribe, std::vector<Entity>& entities);
     void updateTribeTech(Tribe& tribe, std::vector<Entity>& entities);

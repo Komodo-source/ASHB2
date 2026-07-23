@@ -59,6 +59,10 @@ public:
     // Clamped reputation nudge (deaths in battle, prestige, scandal, …).
     void adjustReputation(int familyId, float delta);
 
+    // Save/load support: after restoring families from a save, reset the
+    // internal ID counter so new families don't collide with loaded ones.
+    void resetNextFamilyId(int nextId) { nextFamilyId = nextId; }
+
 private:
     int     nextFamilyId = 0;
     Family* createFamily(Entity& founder, int year);

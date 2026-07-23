@@ -21,7 +21,7 @@ class Entity;
 struct MemoryVector {
     // The embedding vector (features encoding the memory's semantics)
     std::vector<float> embedding;
-    
+
     // Source memory metadata
     int memoryIndex;              // Index in the entity's lifeMemories vector
     std::string eventType;        // Type of event (e.g., "loss_death", "positive_bond", "trauma")
@@ -30,13 +30,23 @@ struct MemoryVector {
     int simulationDay;            // When the event happened
     bool isFormative;             // Whether this was a formative experience
     std::string internalNarrative; // Text description of the memory
-    
+
+    // Spatial memory components
+    float positionX;              // X coordinate where memory occurred
+    float positionY;              // Y coordinate where memory occurred
+    std::string locationTag;      // Semantic location tag (e.g., "home", "river", "forest")
+
+    // Memory graph connections
+    std::vector<int> associatedMemories; // Indices of associated memories in database
+    std::vector<float> associationStrengths; // Strength of each association (0-1)
+
     // Retrieval metadata
     float relevanceScore;         // Computed similarity to query
-    
-    MemoryVector() 
+
+    MemoryVector()
         : memoryIndex(-1), entityInvolvedId(-1), emotionalIntensity(0.0f),
-          simulationDay(0), isFormative(false), relevanceScore(0.0f) {}
+          simulationDay(0), isFormative(false), relevanceScore(0.0f),
+          positionX(0.0f), positionY(0.0f), locationTag("") {}
 };
 
 // ============================================================================
@@ -138,7 +148,10 @@ public:
                      bool isFormative,
                      int simulationDay,
                      const std::string& narrative,
-                     int memoryIndex);
+                     int memoryIndex,
+                     float positionX = 0.0f,
+                     float positionY = 0.0f,
+                     const std::string& locationTag = "");
     
     // Rebuild the entire memory database from an entity's life memories
     void rebuildFromLifeMemories(Entity* entity);

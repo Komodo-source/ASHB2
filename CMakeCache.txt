@@ -247,6 +247,9 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Build without GUI (no GLFW/OpenGL/ImGui)
+HEADLESS:BOOL=OFF
+
 //Value Computed by CMake
 ImGuiApp_BINARY_DIR:STATIC=C:/Users/LordN.NASHOU/Desktop/code/ASHB2
 

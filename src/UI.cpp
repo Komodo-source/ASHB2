@@ -27,6 +27,7 @@
 #include <cmath>
 #include "./header/BetterRand.h"
 #include "./header/LiveConfig.h"
+#include "./header/SaveLoad.h"
 
 // ShowEntityWindow implementation
 
@@ -97,18 +98,28 @@ int UI::showSaveLoadButtons(std::string& filename, int day, int num_entity, int 
     if (ImGui::Button("Load Game")) {
         result = 2;
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Auto Backup")) {
+        // Generate timestamped filename
+        std::string backupName = autobackupFilename();
+        strncpy(saveLoadFilename, backupName.c_str(), sizeof(saveLoadFilename) - 1);
+        saveLoadFilename[sizeof(saveLoadFilename) - 1] = '\0';
+        result = 1;  // trigger save
+    }
 
     ImGui::Separator();
-    ImGui::Text("Files in directory:");
+    ImGui::Text("Saves folder:");
     ImGui::BeginChild("FileBrowser", ImVec2(0, 150), true);
     try {
-        std::filesystem::path exeDir = std::filesystem::current_path();
-        for (const auto& entry : std::filesystem::directory_iterator(exeDir)) {
-            if (entry.is_regular_file()) {
-                std::string name = entry.path().filename().string();
-                if (ImGui::Selectable(name.c_str())) {
-                    strncpy(saveLoadFilename, name.c_str(), sizeof(saveLoadFilename) - 1);
-                    saveLoadFilename[sizeof(saveLoadFilename) - 1] = '\0';
+        if (ensureSavesDir()) {
+            std::string savesDir = std::string(SAVES_DIR);
+            for (const auto& entry : std::filesystem::directory_iterator(savesDir)) {
+                if (entry.is_regular_file()) {
+                    std::string name = entry.path().filename().string();
+                    if (ImGui::Selectable(name.c_str())) {
+                        strncpy(saveLoadFilename, name.c_str(), sizeof(saveLoadFilename) - 1);
+                        saveLoadFilename[sizeof(saveLoadFilename) - 1] = '\0';
+                    }
                 }
             }
         }
@@ -806,6 +817,47 @@ void UI::ShowCivilizationPanel(int simDay, std::vector<Entity*>& entities) {
                 }
                 ImGui::TextDisabled("    Roles: %d farm | %d craft | %d trade | %d schol | %d heal | %d war | %d priest",
                                     farmers, craftsmen, traders, scholars, healers, warriors, priests);
+            }
+
+            // Governance: who rules, how, with whose counsel — and how honestly.
+            {
+                auto byId = [&](int id) -> Entity* {
+                    if (id < 0) return nullptr;
+                    for (Entity* e : entities)
+                        if (e && e->entityId == id && e->entityHealth > 0.0f) return e;
+                    return nullptr;
+                };
+                Entity* leader = byId(tribe.leaderId);
+                ImGui::TextColored(ImVec4(0.95f, 0.85f, 0.55f, 1.0f),
+                    "    %s under %s (integrity %.0f)",
+                    governmentName(tribe.government),
+                    leader ? leader->name.c_str() : "no one",
+                    leader ? leader->integrity : 0.0f);
+                std::string council;
+                for (int cid : tribe.councilIds) {
+                    Entity* c = byId(cid);
+                    if (!c) continue;
+                    if (!council.empty()) council += ", ";
+                    council += c->name;
+                }
+                if (!council.empty())
+                    ImGui::TextDisabled("    Council: %s", council.c_str());
+                std::string ballot;
+                if (tribe.government == GOV_DEMOCRACY && tribe.nextElectionDay >= 0)
+                    ballot = " | election in "
+                           + std::to_string(std::max(0, tribe.nextElectionDay - simDay)) + "d";
+                ImGui::TextDisabled("    Treasury %.0f | tax %.0f%%%s",
+                    tribe.economy.token, tribe.taxeRate * 100.0f, ballot.c_str());
+                ImGui::Text("    Sat"); ImGui::SameLine(80);
+                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.3f,0.8f,0.4f,0.8f));
+                char idS[32]; snprintf(idS,32,"##sat%d",tribe.id);
+                ImGui::ProgressBar(tribe.govSatisfaction/100.0f, ImVec2(60,8), idS);
+                ImGui::PopStyleColor();
+                ImGui::SameLine(160); ImGui::Text("Corr"); ImGui::SameLine(190);
+                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.9f,0.2f,0.2f,0.8f));
+                char idC[32]; snprintf(idC,32,"##cor%d",tribe.id);
+                ImGui::ProgressBar(tribe.corruption/100.0f, ImVec2(60,8), idC);
+                ImGui::PopStyleColor();
             }
 
             // Known tech count (emergent innovations)
@@ -1519,6 +1571,7 @@ void UI::ShowConfigConsole() {
     ImGui::SliderFloat("Old-age mortality", &g_liveConfig.mortalityMul, 0.0f, 4.0f, "%.2fx");
     ImGui::SliderFloat("Food yield", &g_liveConfig.foodYieldMul, 0.1f, 3.0f, "%.2fx");
     ImGui::SliderFloat("Aggression", &g_liveConfig.aggressionMul, 0.0f, 4.0f, "%.2fx");
+    ImGui::SliderFloat("Corruption", &g_liveConfig.corruptionMul, 0.0f, 4.0f, "%.2fx");
     ImGui::Separator();
     ImGui::TextDisabled("Emergence (Steps 2-5)");
     ImGui::SliderFloat("Mutation rate",   &g_liveConfig.mutationRateMul,   0.0f, 4.0f, "%.2fx");

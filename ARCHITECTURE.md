@@ -44,11 +44,26 @@ decision core — a subsumption hierarchy where higher urgency preempts lower:
      persona, pheromones, values, grief, environment, norms). Aggregates that
      don't vary per action (social mood, pheromone fields) are hoisted to
      per-decision sums (M11).
-   - *Two-pass memory bias*: the top 14 candidates get episodic + semantic
-     memory multipliers, then the top 7 go to weighted-random selection —
+   - *Candidate scoring (AI upgrade)*: two further factors join the twelve —
+     discrete-emotion action tendencies (fear flees, guilt repairs, envy
+     climbs; `src/ai/MindUpgrade.cpp`) and the agent's persistent intention.
+     All factor weights are data (`ScoringPriors`), overridable at boot from
+     `bridge/priors_active.txt` — the human-in-the-loop tuning surface.
+   - *Active theory of mind*: before scoring, the agent predicts threat from
+     each attended neighbor through its OWN mental model of them (stale and
+     wrong beliefs included) plus visible body language — anticipated attacks
+     register as perceived events before they happen.
+   - *Metacognition*: stakes (peril, fear, predicted threat) set deliberation
+     width — calm routine thinks over 8→4 candidates, danger over 14→7.
+   - *Two-pass memory bias*: the top candidates get episodic + semantic
+     memory multipliers, then the finalists go to weighted-random selection —
      personality-temperature noise keeps minds non-greedy.
+   - *Prospection*: the chosen action's expected outcome (lived history + Q)
+     is stored; after execution the comparison yields regret (with a boosted
+     negative RL update — counterfactual learning) or relief.
    - *Chain-of-thought + hesitation*: the deliberation trace is stored on the
-     entity for the inspector UI.
+     entity for the inspector UI; near-tied top candidates lengthen hesitation,
+     and the dominant emotion is named in the trace.
 
 Above 2,000 living agents deliberation staggers into round-robin cohorts
 (2, then 4 above 6,000); upkeep still runs for everyone every tick.
@@ -68,6 +83,17 @@ Above 2,000 living agents deliberation staggers into round-robin cohorts
   gated by openness), plus habit reinforcement from outcomes.
 - **Persona** (`src/PersonaSystem.cpp`): PAD emotional state, body language,
   core beliefs, working memory, inner monologue.
+- **AI upgrade layer** (`src/ai/MindUpgrade.*`, plans/ai-upgrade-2026-07.md):
+  discrete OCC emotions with per-tick appraisal; skills with practice curves,
+  parent→child and teacher transmission, and yield effects on Hunt/Gather/Farm;
+  a propositional knowledge store (facts spread through gossip with
+  telephone-game distortion and outright lies from low-integrity grudges);
+  persistent multi-day intentions; sleep pressure/quality gating memory
+  consolidation; injuries from violence; place attachment and homesickness;
+  tribe festivity + festivals with allied-culture convergence. Everything is
+  serialized append-only and sits behind LiveConfig kill switches
+  (`emotionMul`, `cultureMul`). The realism report gained metrics 6-8
+  (emotion episodes, belief accuracy, skill Gini).
 
 ## Social and macro layers
 
@@ -114,6 +140,10 @@ live-config multipliers default to exactly 1.0, which is a bit-exact no-op.
 
 - **Save V2** (`src/SaveLoad.cpp`): versioned full-state save — clock, RNG
   stream, tribes, religions, era, entities — with legacy-format loading.
+  Every section is text `KEY:value` lines (the planner's old raw-binary blob
+  corrupted text-mode streams whenever a float byte hit 0x1A — now `PLAN_V2`
+  text); the entity loader skips unknown keys and resyncs on the END marker,
+  so a truncated block degrades to a partial load instead of a crash.
   Resume is a plausible continuation, not bit-exact vs an unbroken run
   (some subsystems self-seed).
 - **tick_history.jsonl**: sampled per-entity state for the HTML viewer and

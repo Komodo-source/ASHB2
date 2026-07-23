@@ -18,6 +18,15 @@ build/
 # Runtime output
 src/data/
 imgui.ini
+# Web bridge runtime files (world save, inject/report, scheduler log) — the
+# bridge/README.md itself IS committed.
+bridge/*.txt
+bridge/*.json
+bridge/*.log
+
+# Save files (simulation state backups)
+saves/
+
 *.log
 *.tmp
 *.temp

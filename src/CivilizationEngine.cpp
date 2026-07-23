@@ -8,6 +8,7 @@
 #include "EnvironmentModel.h"   // previously-unused seasonal model, now driving famine cycles
 #include "header/TechTree.h"    // structured, prerequisite-gated technology tree
 #include "header/Kinship.h"     // family/dynasty registry (Plan 4.1)
+#include "header/LiveConfig.h"  // corruptionMul: live graft-odds tunable (Society Plan 5)
 #include "header/Logging.h"     // persist civilization events to civilization_log.txt
 #include <algorithm>
 #include <cmath>
@@ -121,12 +122,15 @@ void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
     updateTechTree(entities, day);           // research accrues; tribes climb the tech tree
     updateEconomyResources(entities, day);   // Plan 6: materials/metals/luxury/knowledge + forts
     updateCulture(entities, day);            // Plan 7: artists produce culture; dark ages erode it
+    updateFestivals(entities, day);          // AI upgrade A3/D4: feasts, culture diffusion
     updateTechDiffusion(entities, day);      // Plan 1.4: techs spread tribe→tribe
     // Once-per-civ-day social passes (dynasties, classes, colonisation, sagas).
     if (day != lastDynastyDay) {
         lastDynastyDay = day;
         updateSocialClasses(entities, day);  // Plan 4.2: emergent wealth classes
         updateDynasties(entities, day);      // Plan 4.1: family prestige & great families
+        updateElections(entities, day);      // Society Plan 3: ballots, councils, taxes
+        updateCorruption(entities, day);     // Society Plan 5: graft, scandal, downfall
         updateColonization(entities, day);   // Plan 13: found colonies in empty land
         updateNarrativeChains(entities, day);// Plan 14: redemption / golden-age sagas
     }
@@ -188,7 +192,11 @@ void CivilizationEngine::tick(std::vector<Entity>& entities, int day) {
                << " techSpreads=" << totalTechSpreads
                << " classElite=" << eliteCount
                << " classMiddle=" << middleCount
-               << " classOutcast=" << outcastCount;
+               << " classOutcast=" << outcastCount
+               << " elections=" << totalElections
+               << " successions=" << totalSuccessions
+               << " scandals=" << totalScandals
+               << " depositions=" << totalDepositions;
             // Genetic/behavioural drift (Plan 23-lite): mean population personality,
             // so a post-mortem can chart how the gene pool shifts over the run.
             double oSum = 0, nSum = 0; int living = 0;
@@ -250,7 +258,7 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
         updateTribeValues(tribe, entities);
         updateTribeReligion(tribe, entities);
         updateTribeTech(tribe, entities);
-        electLeader(tribe, entities);
+        electLeader(tribe, entities, day);
 
         // Absorb tribeless entities with very compatible values — strict threshold so
         // dissimilar entities can form their own tribe instead
@@ -428,6 +436,13 @@ bool CivilizationEngine::formTribe(std::vector<Entity*>& cluster, int day) {
     tribe.collectivism = col / n;
     tribe.innovation   = inn / n;
 
+    // The founding temperament picks the founding order — the same mapping a
+    // revolution uses (stageCoup), so a peaceable band of founders actually
+    // starts as a democracy instead of every people being born an oligarchy.
+    if      (tribe.militarism   > 65.0f) tribe.government = GOV_AUTHORITARIAN;
+    else if (tribe.spiritualism > 65.0f) tribe.government = GOV_DIVINE_MONARCHY;
+    else                                 tribe.government = GOV_DEMOCRACY;
+
     tribes.push_back(tribe);
     logEvent(day, "The " + tribe.name + " was founded by " + bestLeader->name +
              " (" + std::to_string((int)cluster.size()) + " members)", "tribe",
@@ -443,32 +458,101 @@ bool CivilizationEngine::formTribe(std::vector<Entity*>& cluster, int day) {
 
 //collect taxes every week
 void CivilizationEngine::collectTaxes(Tribe& tribe, std::vector<Entity>& ent) {
+  float collected = 0.0f;
   for (int id_entity : tribe.memberIds) {
     Entity* tribe_member = entityById(ent, id_entity);
-    tribe.economy.earnMoney(tribe_member->salary.token * tribe.taxeRate);
-    tribe_member->salary.token -= tribe_member->salary.token * tribe.taxeRate;
+    if (!tribe_member || tribe_member->entityHealth <= 0.0f) continue;
+    float due = tribe_member->salary.token * tribe.taxeRate;
+    tribe.economy.earnMoney(due);
+    tribe_member->salary.token -= due;
+    collected += due;
+  }
+  if (collected <= 0.0f) return;
+
+  Entity* leader = entityById(ent, tribe.leaderId);
+  if (!leader || leader->entityHealth <= 0.0f) return;
+
+  // The perks of office: a legal stipend and slowly compounding authority —
+  // the prize that makes the seat worth seeking, holding, and abusing.
+  float stipend = collected * 0.05f;
+  tribe.economy.spendMoney(stipend);
+  leader->salary.earnMoney(stipend);
+  leader->auctoritas = std::min(100.0f, leader->auctoritas + 0.2f);
+
+  // ── Embezzlement (Society Plan 5) ──────────────────────────────────────────
+  // A low-integrity ruler skims the take. Transparent regimes make theft risky;
+  // opaque ones invite it. Graft accumulates on the tribe until a scandal
+  // (updateCorruption) drags it into the light.
+  float oversight;
+  switch (tribe.government) {
+      case GOV_DEMOCRACY:       oversight = 0.8f; break;
+      case GOV_OLIGARCHY:       oversight = 0.4f; break;
+      case GOV_DIVINE_MONARCHY: oversight = 0.3f; break;
+      default: /* AUTHORITARIAN */ oversight = 0.2f; break;
+  }
+  float greed = (100.0f - leader->integrity) / 100.0f
+              * (0.5f + leader->ValueSystem.achievementDrive / 200.0f);
+  std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+  if (roll(rng) < greed * (1.0f - oversight) * g_liveConfig.corruptionMul) {
+      float take = std::min(tribe.economy.token, collected * greed * 0.5f);
+      if (take > 0.0f) {
+          tribe.economy.spendMoney(take);
+          leader->salary.earnMoney(take);
+          tribe.corruption = std::min(100.0f, tribe.corruption + 1.0f + take * 0.05f);
+      }
   }
 }
 
-void CivilizationEngine::electLeader(Tribe& tribe, std::vector<Entity>& entities) {
+void CivilizationEngine::electLeader(Tribe& tribe, std::vector<Entity>& entities, int day) {
     if (tribe.memberIds.empty()) return;
-    int   bestId   = -1;
-    float bestRank = -1.0f;
-    for (int mid : tribe.memberIds) {
-        Entity* ent = entityById(entities, mid);
-        if (!ent || ent->entityHealth <= 0.0f) continue;
-        if (ent->dominanceRank > bestRank) { bestRank = ent->dominanceRank; bestId = mid; }
-    }
-    if (bestId >= 0 && bestId != tribe.leaderId) {
-        Entity* old = entityById(entities, tribe.leaderId);
-        Entity* neo = entityById(entities, bestId);
-        if (old && neo) {
-            std::string desc = neo->name + " seized leadership of " + tribe.name
-                             + " from " + old->name;
-            logEvent(0, desc, "tribe");
+
+    // A living leader who is still one of us keeps the seat: turnover now runs
+    // through ballots (updateElections), challenges and coups, not a daily
+    // dominance contest that made every voted-in ruler vanish a tick later.
+    Entity* sitting = entityById(entities, tribe.leaderId);
+    if (sitting && sitting->entityHealth > 0.0f && tribe.isMember(tribe.leaderId)) return;
+
+    // The seat is empty — a succession. The old ruler's body may still be in the
+    // world vector even though the member roll dropped them, so their family is
+    // recoverable for a hereditary claim.
+    int heir = -1;
+    if (sitting && globalKinship
+        && (tribe.government == GOV_DIVINE_MONARCHY || tribe.government == GOV_OLIGARCHY)
+        && sitting->familyId >= 0) {
+        float bestAuc = -1.0f;
+        for (int mid : tribe.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (!e || e->entityHealth <= 0.0f || e->entityAge < 16.0f) continue;
+            if (e->familyId != sitting->familyId) continue;
+            if (e->auctoritas > bestAuc) { bestAuc = e->auctoritas; heir = mid; }
         }
-        tribe.leaderId = bestId;
     }
+
+    bool hereditary = (heir >= 0);
+    if (heir < 0) heir = chooseLeaderFor(tribe, tribe.government, entities);
+    if (heir < 0) return;
+
+    tribe.leaderId = heir;
+    totalSuccessions++;
+    // A democracy doesn't inherit its dead ruler's mantle — it votes again.
+    if (tribe.government == GOV_DEMOCRACY) tribe.nextElectionDay = day;
+
+    Entity* neo = entityById(entities, heir);
+    if (!neo) return;
+    std::string famName = "-";
+    if (hereditary && globalKinship) {
+        Family* fam = globalKinship->findFamily(neo->familyId);
+        if (fam) {
+            fam->prestige = std::min(100.0f, fam->prestige + 2.0f);  // a ruling line
+            famName = fam->name;
+        }
+    }
+    logEvent(day, neo->name + (hereditary ? " inherits" : " assumes")
+                  + " the leadership of " + tribe.name, "tribe",
+             "kind=succession tribe=\"" + tribe.name + "\" tribeId=" + std::to_string(tribe.id)
+             + " heir=\"" + neo->name + "\" heirId=" + std::to_string(neo->entityId)
+             + " hereditary=" + (hereditary ? "1" : "0")
+             + " family=\"" + famName + "\"");
 }
 
 void CivilizationEngine::updateTribeCenter(Tribe& tribe, std::vector<Entity>& entities) {
@@ -494,7 +578,7 @@ void CivilizationEngine::updateTribeCenter(Tribe& tribe, std::vector<Entity>& en
 
 void CivilizationEngine::updateTribeValues(Tribe& tribe, std::vector<Entity>& entities) {
     if (tribe.memberIds.empty()) return;
-    float mil = 0, spi = 0, col = 0, inn = 0; float n = 0;
+    float mil = 0, spi = 0, col = 0, inn = 0, fes = 0; float n = 0;
     for (int mid : tribe.memberIds) {
         Entity* e = entityById(entities, mid);
         if (!e || e->entityHealth <= 0.0f) continue;
@@ -502,6 +586,7 @@ void CivilizationEngine::updateTribeValues(Tribe& tribe, std::vector<Entity>& en
         spi += e->ValueSystem.spiritualNeed;
         col += e->ValueSystem.collectivism;
         inn += e->personality.openness;
+        fes += (e->ValueSystem.hedonism + e->personality.extraversion) * 0.5f;
         n++;
     }
     if (n == 0) return;
@@ -511,6 +596,7 @@ void CivilizationEngine::updateTribeValues(Tribe& tribe, std::vector<Entity>& en
     drift(tribe.spiritualism, spi);
     drift(tribe.collectivism, col);
     drift(tribe.innovation,   inn);
+    drift(tribe.festivity,    fes);   // A3: how much this people celebrates
 
     // ── Biome shapes culture (the environment leaves its mark) ───────────────
     // Harsh land breeds militarism & scarcity; rich valleys breed innovation.
@@ -1698,14 +1784,27 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
 
         // 3. Promote toward target (highest dominance/talent first), or demote the
         //    surplus (lowest first — survival keeps the ablest provisioned).
+        //    Favoritism (Society Plan 5): a corrupt ruler bumps their own kin to
+        //    the front of the queue regardless of merit — nepotism the tribe
+        //    notices as graft, and the ruling house banks as standing.
+        Entity* dolLeader = entityById(entities, tribe.leaderId);
+        int favoredFamily = (dolLeader && dolLeader->entityHealth > 0.0f
+                             && dolLeader->integrity < 40.0f) ? dolLeader->familyId : -1;
         if (current < target) {
-            std::sort(members.begin(), members.end(), [](Entity* a, Entity* b) {
+            std::sort(members.begin(), members.end(), [&](Entity* a, Entity* b) {
+                bool ka = favoredFamily >= 0 && a->familyId == favoredFamily;
+                bool kb = favoredFamily >= 0 && b->familyId == favoredFamily;
+                if (ka != kb) return ka;
                 return a->dominanceRank > b->dominanceRank;
             });
             for (Entity* e : members) {
                 if (current >= target) break;
                 if (e->isSpecialist) continue;
                 if (e->roleSinceDay >= 0 && day - e->roleSinceDay < 3) continue;
+                if (favoredFamily >= 0 && e->familyId == favoredFamily && globalKinship) {
+                    tribe.corruption = std::min(100.0f, tribe.corruption + 0.5f);
+                    globalKinship->adjustReputation(favoredFamily, 1.0f);
+                }
                 e->isSpecialist = true;
                 // Careers are chosen at promotion, from the dominant trait.
                 if (e->specialization.empty() || e->specialization == "farmer") {
@@ -1987,6 +2086,79 @@ void CivilizationEngine::updateCulture(std::vector<Entity>& entities, int day) {
         for (Tribe& t : tribes) t.cultureScore *= 0.9f;
 }
 
+// ── A3/D4 (AI upgrade): festivals & horizontal culture transmission ──────────
+// A people with food in the granary and festive spirit periodically feasts:
+// suppressed anger discharges, joy and cohesion rise, roots deepen, and the
+// Chronicle gains rhythm. Between feasts, allied tribes' cultures slowly
+// converge (horizontal transmission) while wars keep enemies' apart — the
+// diplomacy pass already turns the resulting cultural distance into friction.
+void CivilizationEngine::updateFestivals(std::vector<Entity>& entities, int day) {
+    if (g_liveConfig.cultureMul <= 0.0f) return;   // director kill switch
+
+    auto clamp = [](float v, float lo, float hi) { return std::max(lo, std::min(hi, v)); };
+
+    for (Tribe& t : tribes) {
+        if (t.memberIds.size() < 3) continue;
+        // Festive peoples feast often (every ~60 days at festivity 100,
+        // ~130 at festivity 0); the live knob stretches or squeezes cadence.
+        int interval = (int)((130.0f - t.festivity * 0.7f) / std::max(0.25f, g_liveConfig.cultureMul));
+        if (day - t.lastFestivalDay < interval) continue;
+        // No feast during famine: the granary must carry a little surplus.
+        if (t.granary < (float)t.memberIds.size() * 0.2f) continue;
+        t.lastFestivalDay = day;
+        t.granary = std::max(0.0f, t.granary - (float)t.memberIds.size() * 0.15f);
+
+        int celebrants = 0;
+        for (int mid : t.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (!e || e->entityHealth <= 0.0f) continue;
+            ++celebrants;
+            // The feast is where a people breathes out.
+            e->emotionalState.suppressionDebt *= 0.5f;
+            if (e->emotions.joy < 20.0f) ++g_mindStats.joyEpisodes;
+            e->emotions.joy       = clamp(e->emotions.joy + 18.0f, 0.0f, 100.0f);
+            e->emotions.gratitude = clamp(e->emotions.gratitude + 6.0f, 0.0f, 100.0f);
+            e->entityStress       = clamp(e->entityStress - 8.0f, 0.0f, 100.0f);
+            e->entityHapiness     = clamp(e->entityHapiness + 5.0f, 0.0f, 100.0f);
+            e->entityLoneliness   = clamp(e->entityLoneliness - 10.0f, 0.0f, 100.0f);
+            e->homeAttachment     = clamp(e->homeAttachment + 3.0f, 0.0f, 100.0f);
+        }
+        if (celebrants == 0) continue;
+        t.govSatisfaction = clamp(t.govSatisfaction + 2.5f, 0.0f, 100.0f);
+        t.cultureScore    = clamp(t.cultureScore + 1.5f, 0.0f, 100.0f);
+        ++g_mindStats.festivalsHeld;
+        logEvent(day, "The " + t.name + " hold a great feast — old grudges soften, "
+                 "bonds renew and the fires burn late", "culture",
+                 "kind=festival tribe=\"" + t.name + "\""
+                 + " tribeId=" + std::to_string(t.id)
+                 + " celebrants=" + std::to_string(celebrants)
+                 + " festivity=" + std::to_string((int)t.festivity));
+    }
+
+    // Horizontal transmission: friendly neighbors trade songs, gods and habits.
+    // Convergence is slow (0.4%/day at full warmth) and only under contact —
+    // hostile or distant tribes keep their own ways and drift apart naturally.
+    for (size_t i = 0; i < tribes.size(); ++i) {
+        for (size_t j = i + 1; j < tribes.size(); ++j) {
+            Tribe& A = tribes[i];
+            Tribe& B = tribes[j];
+            auto ra = A.relations.find(B.id);
+            if (ra == A.relations.end() || ra->second < 40.0f) continue;
+            float w = 0.004f * (ra->second / 100.0f) * g_liveConfig.cultureMul;
+            auto converge = [&](float& a, float& b) {
+                float mid = (a + b) * 0.5f;
+                a += (mid - a) * w;
+                b += (mid - b) * w;
+            };
+            converge(A.militarism,   B.militarism);
+            converge(A.spiritualism, B.spiritualism);
+            converge(A.collectivism, B.collectivism);
+            converge(A.innovation,   B.innovation);
+            converge(A.festivity,    B.festivity);
+        }
+    }
+}
+
 // ── Climate & natural disasters (Improvement Plan 12) ─────────────────────────
 // Beyond the seasonal famine cycle, the land itself occasionally turns violent:
 // droughts and floods are common, earthquakes rarer, volcanoes and meteors rare
@@ -2189,6 +2361,236 @@ void CivilizationEngine::updateDynasties(std::vector<Entity>& entities, int day)
                      + " familyId=" + std::to_string(fam.id)
                      + " prestige=" + std::to_string((int)fam.prestige));
         }
+    }
+}
+
+// ── Elections & councils (Society Plan 3) ──────────────────────────────────────
+// Every regime seats a council of three notables — the crowd each government
+// form actually listens to — whose mood steadies or shakes the ruler and who
+// steer the tax rate toward what the people will bear. Democracies go further:
+// on a fixed term every member casts a real ballot, scored by personal opinion,
+// standing, blood and the incumbent's record, and unpopular rulers actually lose.
+void CivilizationEngine::updateElections(std::vector<Entity>& entities, int day) {
+    auto clampf = [](float v, float lo, float hi) { return std::max(lo, std::min(hi, v)); };
+    // A member's net opinion of another, from their private reputation ledger.
+    auto opinionOf = [](Entity* voter, int aboutId) -> float {
+        auto it = voter->reputationMap.find(aboutId);
+        if (it == voter->reputationMap.end()) return 0.0f;
+        return it->second.positiveScore - it->second.negativeScore;
+    };
+
+    for (Tribe& t : tribes) {
+        if (t.population() < 3) { t.councilIds.clear(); continue; }
+
+        std::vector<Entity*> members;
+        members.reserve(t.memberIds.size());
+        for (int mid : t.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (e && e->entityHealth > 0.0f && e->entityAge >= 16.0f) members.push_back(e);
+        }
+        if (members.size() < 3) { t.councilIds.clear(); continue; }
+
+        // 1. Seat the council: each regime elevates its own kind of notable.
+        auto councilVirtue = [&](Entity* e) -> float {
+            switch (t.government) {
+                case GOV_OLIGARCHY:       return e->salary.token;
+                case GOV_DIVINE_MONARCHY: return e->ValueSystem.spiritualNeed;
+                case GOV_AUTHORITARIAN:   return e->dominanceRank;
+                default: /* DEMOCRACY */  return e->auctoritas;
+            }
+        };
+        std::vector<Entity*> notables;
+        for (Entity* e : members) if (e->entityId != t.leaderId) notables.push_back(e);
+        std::sort(notables.begin(), notables.end(), [&](Entity* a, Entity* b) {
+            return councilVirtue(a) > councilVirtue(b);
+        });
+        t.councilIds.clear();
+        for (size_t i = 0; i < notables.size() && i < 3; ++i)
+            t.councilIds.push_back(notables[i]->entityId);
+
+        // 2. The council's mood steadies or shakes the ruler.
+        if (!t.councilIds.empty() && t.leaderId >= 0) {
+            float mood = 0.0f;
+            for (int cid : t.councilIds) {
+                Entity* c = entityById(entities, cid);
+                if (c) mood += opinionOf(c, t.leaderId);
+            }
+            mood /= (float)t.councilIds.size();
+            t.govSatisfaction = clampf(t.govSatisfaction + clampf(mood / 25.0f, -2.0f, 2.0f),
+                                       0.0f, 100.0f);
+        }
+
+        // 3. The council steers taxation toward what the regime can extract.
+        float taxTarget;
+        switch (t.government) {
+            case GOV_AUTHORITARIAN:   taxTarget = 0.20f; break;
+            case GOV_OLIGARCHY:       taxTarget = 0.15f; break;
+            case GOV_DIVINE_MONARCHY: taxTarget = 0.10f; break;
+            default: /* DEMOCRACY */  taxTarget = 0.05f; break;
+        }
+        if      (t.taxeRate < taxTarget) t.taxeRate = std::min(taxTarget, t.taxeRate + 0.01f);
+        else if (t.taxeRate > taxTarget) t.taxeRate = std::max(taxTarget, t.taxeRate - 0.01f);
+        t.taxeRate = clampf(t.taxeRate, 0.0f, 0.30f);
+
+        // 4. With a rate finally set, the tax take is actually collected — the
+        //    treasury the leader draws a stipend from, and may steal from.
+        collectTaxes(t, entities);
+
+        // 5. Democracies ballot on a fixed term (or a snap election after a
+        //    death or scandal); other regimes never ask the people at all.
+        if (t.government != GOV_DEMOCRACY) { t.nextElectionDay = -1; continue; }
+        if (t.nextElectionDay < 0) { t.nextElectionDay = day + t.termLengthDays; continue; }
+        if (day < t.nextElectionDay) continue;
+
+        // Candidates: the incumbent defends the seat against the most respected.
+        std::vector<Entity*> candidates;
+        Entity* incumbent = entityById(entities, t.leaderId);
+        if (incumbent && incumbent->entityHealth > 0.0f) candidates.push_back(incumbent);
+        std::sort(members.begin(), members.end(), [](Entity* a, Entity* b) {
+            return a->auctoritas > b->auctoritas;
+        });
+        for (Entity* e : members) {
+            if (candidates.size() >= 5) break;
+            if (e != incumbent) candidates.push_back(e);
+        }
+        if (candidates.size() < 2) { t.nextElectionDay = day + t.termLengthDays; continue; }
+
+        // Every member votes: private opinion, public standing, blood, dynastic
+        // glamour — and the incumbent answers for the state of the nation.
+        std::map<int, int> votes;
+        std::uniform_real_distribution<float> jitter(0.0f, 5.0f);
+        for (Entity* voter : members) {
+            Entity* pick = nullptr; float bestScore = -1e9f;
+            for (Entity* cand : candidates) {
+                float score = opinionOf(voter, cand->entityId)
+                            + cand->auctoritas * 0.3f
+                            + (voter->familyId >= 0 && voter->familyId == cand->familyId ? 15.0f : 0.0f)
+                            + jitter(rng);
+                if (globalKinship && cand->familyId >= 0) {
+                    Family* fam = globalKinship->findFamily(cand->familyId);
+                    if (fam) score += fam->prestige * 0.1f;
+                }
+                if (cand == incumbent) score += (t.govSatisfaction - 60.0f) * 0.5f;
+                if (score > bestScore) { bestScore = score; pick = cand; }
+            }
+            if (pick) votes[pick->entityId]++;
+        }
+
+        int winnerId = -1, winnerVotes = -1, turnout = 0;
+        for (const auto& kv : votes) {
+            turnout += kv.second;
+            if (kv.second > winnerVotes) { winnerVotes = kv.second; winnerId = kv.first; }
+        }
+        if (winnerId < 0 || turnout <= 0) { t.nextElectionDay = day + t.termLengthDays; continue; }
+
+        Entity* winner = entityById(entities, winnerId);
+        bool upset = (winnerId != t.leaderId);
+        t.leaderId           = winnerId;
+        t.lastElectionMargin = (float)winnerVotes / (float)turnout;
+        t.govSatisfaction    = clampf(t.govSatisfaction + 10.0f * t.lastElectionMargin, 0.0f, 100.0f);
+        t.nextElectionDay    = day + t.termLengthDays;
+        totalElections++;
+        if (winner) {
+            winner->auctoritas = std::min(100.0f, winner->auctoritas + 3.0f);
+            logEvent(day, t.name + ": " + winner->name
+                          + (upset ? " unseats the leadership, winning " : " is re-elected with ")
+                          + std::to_string((int)(t.lastElectionMargin * 100.0f)) + "% of "
+                          + std::to_string(turnout) + " votes", "tribe",
+                     "kind=election tribe=\"" + t.name + "\" tribeId=" + std::to_string(t.id)
+                     + " winner=\"" + winner->name + "\" winnerId=" + std::to_string(winnerId)
+                     + " margin=" + std::to_string(t.lastElectionMargin)
+                     + " turnout=" + std::to_string(turnout)
+                     + " upset=" + (upset ? "1" : "0"));
+        }
+    }
+}
+
+// ── Corruption: pressure, detection, scandal (Society Plan 5) ──────────────────
+// Graft banked by collectTaxes and nepotism doesn't stay free: the people feel
+// the missing granary money every day, and sooner or later — soonest where rule
+// is transparent and scholars keep records — the books are opened. A scandal
+// craters the ruler's name, feeds the election/coup machinery, and the worst
+// offenders are driven out of the tribe altogether.
+void CivilizationEngine::updateCorruption(std::vector<Entity>& entities, int day) {
+    auto clampf = [](float v, float lo, float hi) { return std::max(lo, std::min(hi, v)); };
+    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+
+    for (Tribe& t : tribes) {
+        if (t.population() == 0) { t.corruption *= 0.9f; continue; }
+        t.corruption = std::max(0.0f, t.corruption - 0.3f);   // clean rule is forgotten
+        if (t.corruption <= 0.5f) continue;
+
+        // The people feel the theft long before they can prove it.
+        t.govSatisfaction = clampf(t.govSatisfaction - t.corruption / 50.0f, 0.0f, 100.0f);
+
+        // Petty graft stays beneath notice; only real plunder risks the books.
+        if (t.corruption < 10.0f) continue;
+
+        Entity* leader = entityById(entities, t.leaderId);
+        if (!leader || leader->entityHealth <= 0.0f) continue;
+
+        float oversight;
+        switch (t.government) {
+            case GOV_DEMOCRACY:       oversight = 0.8f; break;
+            case GOV_OLIGARCHY:       oversight = 0.4f; break;
+            case GOV_DIVINE_MONARCHY: oversight = 0.3f; break;
+            default: /* AUTHORITARIAN */ oversight = 0.2f; break;
+        }
+        int scholars = 0;
+        for (int mid : t.memberIds) {
+            Entity* e = entityById(entities, mid);
+            if (e && e->entityHealth > 0.0f && e->specialization == "scholar") scholars++;
+        }
+        float exposure = (t.corruption / 100.0f) * oversight
+                       * (1.0f + 0.1f * scholars) * 0.25f * g_liveConfig.corruptionMul;
+        if (roll(rng) >= exposure) continue;
+
+        // ── Scandal: the books are opened ────────────────────────────────────
+        bool severe = t.corruption > 70.0f;
+        totalScandals++;
+        logEvent(day, "SCANDAL in the " + t.name + ": " + leader->name
+                      + " is exposed for plundering the common stores", "tribe",
+                 "kind=scandal tribe=\"" + t.name + "\" tribeId=" + std::to_string(t.id)
+                 + " leader=\"" + leader->name + "\" leaderId=" + std::to_string(leader->entityId)
+                 + " graft=" + std::to_string((int)t.corruption)
+                 + " severe=" + (severe ? "1" : "0"));
+
+        // The ruler's name collapses in every household ledger.
+        int shamed = 0;
+        for (int mid : t.memberIds) {
+            if (shamed >= 20) break;
+            Entity* w = entityById(entities, mid);
+            if (!w || w->entityHealth <= 0.0f || w->entityId == leader->entityId) continue;
+            auto& rep = w->reputationMap[leader->entityId];
+            rep.negativeScore   = clampf(rep.negativeScore + 30.0f, 0.0f, 100.0f);
+            rep.trustworthiness = clampf(rep.trustworthiness - 30.0f, 0.0f, 100.0f);
+            shamed++;
+        }
+        if (globalKinship && leader->familyId >= 0)
+            globalKinship->adjustReputation(leader->familyId, -10.0f);
+
+        t.govSatisfaction = clampf(t.govSatisfaction - (15.0f + t.corruption / 5.0f), 0.0f, 100.0f);
+        t.corruption *= 0.5f;
+
+        if (severe) {
+            // Driven out of the tribe entirely — the exile pattern.
+            totalDepositions++;
+            t.memberIds.erase(std::remove(t.memberIds.begin(), t.memberIds.end(),
+                                          leader->entityId), t.memberIds.end());
+            leader->tribeId     = -1;
+            leader->entityStress = clampf(leader->entityStress + 25.0f, 0.0f, 100.0f);
+            leader->Esteem       = clampf(leader->Esteem - 30.0f, 0.0f, 100.0f);
+            t.leaderId = -1;
+            logEvent(day, leader->name + " is cast out of the " + t.name
+                          + " in disgrace", "tribe",
+                     "kind=exile reason=\"corruption\" entity=\"" + leader->name + "\""
+                     + " entityId=" + std::to_string(leader->entityId)
+                     + " tribe=\"" + t.name + "\" tribeId=" + std::to_string(t.id));
+            electLeader(t, entities, day);   // the succession machinery fills the seat
+        } else if (t.government == GOV_DEMOCRACY) {
+            t.nextElectionDay = day;         // a snap election — let the people answer
+        }
+        // Otherwise the cratered satisfaction feeds the existing coup machinery.
     }
 }
 
@@ -2697,7 +3099,15 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
                     e->entityHealth -= 0.5f + roll(rng) * attrDmg;
                     e->entityStress = std::min(100.0f, e->entityStress + 1.5f);
                     e->entityHapiness = std::max(0.0f, e->entityHapiness - (ethnic ? 2.0f : 0.5f));
-                    if (before > 0.0f && e->entityHealth <= 0.0f) totalWarDeaths++;
+                    if (before > 0.0f && e->entityHealth <= 0.0f) {
+                        totalWarDeaths++;
+                    }
+#if 0
+                    else if (before > 0.0f) {
+                        if (roll(rng) < 0.05f)
+                            e->addEpigeneticMarker("war", (ethnic ? 55.0f : 35.0f), 0);
+                    }
+#endif
                 }
             };
             attrit(A, aLossRate);
@@ -3071,6 +3481,13 @@ void CivilizationEngine::updateCarryingCapacity(std::vector<Entity>& entities, i
                 e.entityStress = std::min(100.0f, e.entityStress + severity * 6.0f);
                 e.entityHealth = std::max(0.0f, e.entityHealth - severity * 2.5f);
                 e.entityHapiness = std::max(0.0f, e.entityHapiness - severity * 3.0f);
+#if 0
+                if (severity > 0.35f) {
+                    std::uniform_real_distribution<float> markRoll(0.0f, 1.0f);
+                    if (markRoll(rng) < 0.08f)
+                        e.addEpigeneticMarker("famine", severity * 80.0f, 0);
+                }
+#endif
             }
             // Pressure release: migration toward open land.
             migrateOverflow(rid, pop, K, entities, day);
@@ -3090,6 +3507,18 @@ void CivilizationEngine::updateCarryingCapacity(std::vector<Entity>& entities, i
                              + " capacity=" + std::to_string((int)K)
                              + " overshootRatio=" + std::to_string(ratio));
                     loseTechnology(day, rn, resist);
+#if 0
+                    int seeded = 0;
+                    for (Entity& e : entities) {
+                        if (seeded >= 5) break;
+                        if (e.entityHealth <= 0.0f) continue;
+                        const Tile* t = g_planet->tileAtWorld(e.posX, e.posY);
+                        int erid = (t && t->regionId >= 0) ? t->regionId : e.originRegionId;
+                        if (erid != rid) continue;
+                        e.exposeToPathogen(1, day / 60);
+                        seeded++;
+                    }
+#endif
                 }
             }
         }
@@ -3378,6 +3807,27 @@ std::string CivilizationEngine::getBigSummary() const {
     ss << "Treaties signed (all time): " << totalTreatiesSigned
        << "   now in force: " << activeTreatyCount() << "\n";
     ss << diplomacySummary() << "\n";
+    ss << "\n--- Governance & society ---\n";
+    ss << "Elections held: " << totalElections
+       << "   successions: " << totalSuccessions << "\n";
+    ss << "Leadership challenges: " << totalChallenges
+       << "   coups: " << totalCoups << "   rebellions: " << totalRebellions << "\n";
+    ss << "Corruption scandals: " << totalScandals
+       << "   leaders exiled in disgrace: " << totalDepositions << "\n";
+    // Mean live graft under each form of rule — transparency should show here.
+    {
+        float sum[4] = {0,0,0,0}; int cnt[4] = {0,0,0,0};
+        for (const auto& t : tribes) {
+            if (t.population() == 0) continue;
+            sum[(int)t.government] += t.corruption; cnt[(int)t.government]++;
+        }
+        ss << "Avg corruption : ";
+        for (int g = 0; g < 4; ++g)
+            if (cnt[g] > 0)
+                ss << governmentName((GovernmentType)g) << " "
+                   << (int)(sum[g] / cnt[g]) << "  ";
+        ss << "\n";
+    }
     return ss.str();
 }
 

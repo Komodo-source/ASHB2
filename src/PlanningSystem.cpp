@@ -1,4 +1,4 @@
-#include "./header/PlanningSystem.h"
+﻿#include "./header/PlanningSystem.h"
 #include "./header/Entity.h"
 #include "./ai/GoapPlanner.h"     // Step 3: A* over ActionRules
 #include "./items/ItemSystem.h"
@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <queue>
+#include <sstream>
 
 // ============================================================================
 // PlanningSystem Implementation
@@ -735,86 +736,74 @@ void PlanningSystem::tick(Entity* entity, const std::vector<Entity*>& neighbors,
 // ============================================================================
 
 void PlanningSystem::saveTo(std::ofstream& file) const {
-    // Save current plan
-    size_t stepsSize = currentPlan.steps.size();
-    file.write(reinterpret_cast<const char*>(&stepsSize), sizeof(stepsSize));
+    // Text format. The old raw-binary blob went through a TEXT-mode stream:
+    // any float byte equal to 0x1A read back as DOS end-of-file and silently
+    // truncated the whole save from that point (probabilistic load crashes).
+    // Strings go on their own lines so commas in rationales can't split fields.
+    file << "PLAN_V2:" << currentPlan.steps.size() << ','
+         << currentPlan.currentStepIndex << ','
+         << currentPlan.planGenerationDay << ','
+         << (currentPlan.isActive ? 1 : 0) << ','
+         << cumulativeFrustration << ','
+         << ticksSinceLastPlan << "\n";
     for (const auto& step : currentPlan.steps) {
-        size_t nameLen = step.actionName.length();
-        file.write(reinterpret_cast<const char*>(&nameLen), sizeof(nameLen));
-        file.write(step.actionName.data(), nameLen);
-        
-        size_t targetLen = step.targetType.length();
-        file.write(reinterpret_cast<const char*>(&targetLen), sizeof(targetLen));
-        file.write(step.targetType.data(), targetLen);
-        
-        file.write(reinterpret_cast<const char*>(&step.targetEntityId), sizeof(step.targetEntityId));
-        file.write(reinterpret_cast<const char*>(&step.priority), sizeof(step.priority));
-        file.write(reinterpret_cast<const char*>(&step.expectedDuration), sizeof(step.expectedDuration));
-        
-        size_t rationaleLen = step.rationale.length();
-        file.write(reinterpret_cast<const char*>(&rationaleLen), sizeof(rationaleLen));
-        file.write(step.rationale.data(), rationaleLen);
-        
-        file.write(reinterpret_cast<const char*>(&step.completed), sizeof(step.completed));
-        file.write(reinterpret_cast<const char*>(&step.failed), sizeof(step.failed));
-        file.write(reinterpret_cast<const char*>(&step.ticksExecuted), sizeof(step.ticksExecuted));
-        file.write(reinterpret_cast<const char*>(&step.outcomeScore), sizeof(step.outcomeScore));
+        file << "PSTEP:" << step.targetEntityId << ',' << step.priority << ','
+             << step.expectedDuration << ',' << (step.completed ? 1 : 0) << ','
+             << (step.failed ? 1 : 0) << ',' << step.ticksExecuted << ','
+             << step.outcomeScore << "\n";
+        file << "PSTR:" << step.actionName << "\n";
+        file << "PSTR:" << step.targetType << "\n";
+        file << "PSTR:" << step.rationale << "\n";
     }
-    
-    file.write(reinterpret_cast<const char*>(&currentPlan.currentStepIndex), sizeof(currentPlan.currentStepIndex));
-    
-    size_t goalLen = currentPlan.primaryGoal.length();
-    file.write(reinterpret_cast<const char*>(&goalLen), sizeof(goalLen));
-    file.write(currentPlan.primaryGoal.data(), goalLen);
-    
-    file.write(reinterpret_cast<const char*>(&currentPlan.planGenerationDay), sizeof(currentPlan.planGenerationDay));
-    file.write(reinterpret_cast<const char*>(&currentPlan.isActive), sizeof(currentPlan.isActive));
-    
-    file.write(reinterpret_cast<const char*>(&cumulativeFrustration), sizeof(cumulativeFrustration));
-    file.write(reinterpret_cast<const char*>(&ticksSinceLastPlan), sizeof(ticksSinceLastPlan));
+    file << "PGOAL:" << currentPlan.primaryGoal << "\n";
 }
 
 void PlanningSystem::loadFrom(std::ifstream& file) {
-    // Load current plan
-    size_t stepsSize;
-    file.read(reinterpret_cast<char*>(&stepsSize), sizeof(stepsSize));
+    auto splitCsv = [](const std::string& s) {
+        std::vector<std::string> out;
+        std::stringstream ss(s); std::string tok;
+        while (std::getline(ss, tok, ',')) out.push_back(tok);
+        return out;
+    };
+    std::string line;
+    if (!std::getline(file, line) || line.rfind("PLAN_V2:", 0) != 0) {
+        // Pre-V2 save: the binary blob is unrecoverable through a text-mode
+        // stream â€” keep a fresh planner. Entity::loadFrom's tail loop skips
+        // the residue and resyncs on the END ENTITY marker.
+        return;
+    }
+    currentPlan = DailyPlan();
+    auto h = splitCsv(line.substr(8));
+    size_t stepsSize = 0;
+    if (h.size() >= 6) {
+        try {
+            stepsSize                     = (size_t)std::stoul(h[0]);
+            currentPlan.currentStepIndex  = std::stoi(h[1]);
+            currentPlan.planGenerationDay = std::stoi(h[2]);
+            currentPlan.isActive          = (std::stoi(h[3]) != 0);
+            cumulativeFrustration         = std::stof(h[4]);
+            ticksSinceLastPlan            = std::stoi(h[5]);
+        } catch (...) { currentPlan = DailyPlan(); return; }
+    }
     currentPlan.steps.resize(stepsSize);
     for (auto& step : currentPlan.steps) {
-        size_t nameLen;
-        file.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
-        step.actionName.resize(nameLen);
-        file.read(&step.actionName[0], nameLen);
-        
-        size_t targetLen;
-        file.read(reinterpret_cast<char*>(&targetLen), sizeof(targetLen));
-        step.targetType.resize(targetLen);
-        file.read(&step.targetType[0], targetLen);
-        
-        file.read(reinterpret_cast<char*>(&step.targetEntityId), sizeof(step.targetEntityId));
-        file.read(reinterpret_cast<char*>(&step.priority), sizeof(step.priority));
-        file.read(reinterpret_cast<char*>(&step.expectedDuration), sizeof(step.expectedDuration));
-        
-        size_t rationaleLen;
-        file.read(reinterpret_cast<char*>(&rationaleLen), sizeof(rationaleLen));
-        step.rationale.resize(rationaleLen);
-        file.read(&step.rationale[0], rationaleLen);
-        
-        file.read(reinterpret_cast<char*>(&step.completed), sizeof(step.completed));
-        file.read(reinterpret_cast<char*>(&step.failed), sizeof(step.failed));
-        file.read(reinterpret_cast<char*>(&step.ticksExecuted), sizeof(step.ticksExecuted));
-        file.read(reinterpret_cast<char*>(&step.outcomeScore), sizeof(step.outcomeScore));
+        if (!std::getline(file, line) || line.rfind("PSTEP:", 0) != 0) break;
+        auto f = splitCsv(line.substr(6));
+        if (f.size() >= 7) {
+            try {
+                step.targetEntityId   = std::stoi(f[0]);
+                step.priority         = std::stof(f[1]);
+                step.expectedDuration = std::stoi(f[2]);
+                step.completed        = (std::stoi(f[3]) != 0);
+                step.failed           = (std::stoi(f[4]) != 0);
+                step.ticksExecuted    = std::stoi(f[5]);
+                step.outcomeScore     = std::stof(f[6]);
+            } catch (...) {}
+        }
+        if (std::getline(file, line) && line.rfind("PSTR:", 0) == 0) step.actionName = line.substr(5);
+        if (std::getline(file, line) && line.rfind("PSTR:", 0) == 0) step.targetType = line.substr(5);
+        if (std::getline(file, line) && line.rfind("PSTR:", 0) == 0) step.rationale  = line.substr(5);
     }
-    
-    file.read(reinterpret_cast<char*>(&currentPlan.currentStepIndex), sizeof(currentPlan.currentStepIndex));
-    
-    size_t goalLen;
-    file.read(reinterpret_cast<char*>(&goalLen), sizeof(goalLen));
-    currentPlan.primaryGoal.resize(goalLen);
-    file.read(&currentPlan.primaryGoal[0], goalLen);
-    
-    file.read(reinterpret_cast<char*>(&currentPlan.planGenerationDay), sizeof(currentPlan.planGenerationDay));
-    file.read(reinterpret_cast<char*>(&currentPlan.isActive), sizeof(currentPlan.isActive));
-    
-    file.read(reinterpret_cast<char*>(&cumulativeFrustration), sizeof(cumulativeFrustration));
-    file.read(reinterpret_cast<char*>(&ticksSinceLastPlan), sizeof(ticksSinceLastPlan));
+    if (std::getline(file, line) && line.rfind("PGOAL:", 0) == 0)
+        currentPlan.primaryGoal = line.substr(6);
 }

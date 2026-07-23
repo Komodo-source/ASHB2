@@ -452,6 +452,38 @@ void FreeWillSystem::finalizeChildhood(Entity* child) {
         child->dv.attachmentStyle = ANXIOUS;
     }
 
+    // ── A3: vertical cultural transmission — a child's values are seeded
+    // between its parents' LIVED values (which their own lives already bent),
+    // so family lines and tribes accumulate distinct value cultures instead of
+    // every generation rolling fresh dice. C2: parents also pass down craft.
+    if (child->parent1 && child->parent2) {
+        auto blend = [](float own, float p1, float p2) {
+            float mid = (p1 + p2) * 0.5f;
+            return std::max(0.0f, std::min(100.0f, own * 0.55f + mid * 0.45f));
+        };
+        auto& v  = child->ValueSystem;
+        auto& a  = child->parent1->ValueSystem;
+        auto& b  = child->parent2->ValueSystem;
+        v.familyOrientation = blend(v.familyOrientation, a.familyOrientation, b.familyOrientation);
+        v.achievementDrive  = blend(v.achievementDrive,  a.achievementDrive,  b.achievementDrive);
+        v.spiritualNeed     = blend(v.spiritualNeed,     a.spiritualNeed,     b.spiritualNeed);
+        v.hedonism          = blend(v.hedonism,          a.hedonism,          b.hedonism);
+        v.collectivism      = blend(v.collectivism,      a.collectivism,      b.collectivism);
+        for (int s = 0; s < SK_COUNT; ++s) {
+            child->skills.learnFrom(child->parent1->skills, (SkillId)s);
+            child->skills.learnFrom(child->parent2->skills, (SkillId)s);
+        }
+    }
+
+    // Phase 6: a harsh-enough childhood of its own also leaves a fresh
+    // epigenetic mark (inheritance from parents already happened at birth,
+    // in KinshipSystem::registerBirth — NOT here, where parent1/parent2 are
+    // the legacy raw pointers that can dangle after 80 ticks of vector growth).
+    if (trauma > 40.0f) {
+        child->addEpigeneticMarker("abuse", trauma * 0.6f, 0);
+        child->applyEpigeneticEffects();
+    }
+
     child->lifeStage = ADULT;
 
     ASHB_TRACE_STREAM << "=== CHILDHOOD COMPLETE: " << child->getName() << " ===\n";
@@ -1592,11 +1624,15 @@ std::string FreeWillSystem::rlStateSignature(Entity* entity, int numNearby) cons
         return v < 33.0f ? "L" : (v < 66.0f ? "M" : "H");
     };
     std::string s;
-    s.reserve(4);
+    s.reserve(6);
     s += b3(entity->entityLoneliness);
     s += (entity->entityGeneralAnger > 50.0f ? "a" : "_");
     s += (entity->entityHunger      > 50.0f ? "h" : "_");
     s += (numNearby > 0              ? "p" : "s");
+    // C1: two more predictive features — felt fear and the season — so what
+    // pays off in a safe summer is learned apart from a fearful winter.
+    s += (entity->emotions.fear > 50.0f ? 'f' : '_');
+    s += season.empty() ? '_' : season[0];
     return s;
 }
 
@@ -2405,6 +2441,52 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                       << " -> (" << pointed->getId() << ")" << pointed->getName() << " +" << increment << std::endl;
         }
     }
+    else if (action->name == "ChallengeLeader") {
+        // Society Plan 4: the challenge is real. Outside a democracy, calling
+        // the leader out to their face can actually take the seat — a popular
+        // ruler is hard to topple, a despised one falls easily. In a democracy,
+        // or aimed at anyone who isn't the leader, it is campaigning: a bid for
+        // standing that pays off at the ballot instead.
+        if (engineCivilization && pointer->tribeId >= 0) {
+            Tribe* tribe = engineCivilization->findTribe(pointer->tribeId);
+            if (tribe && tribe->leaderId != pointer->entityId) {
+                bool againstLeader = (pointed->entityId == tribe->leaderId
+                                      && pointed->tribeId == tribe->id);
+                if (!againstLeader || tribe->government == GOV_DEMOCRACY) {
+                    pointer->auctoritas = std::min(100.0f, pointer->auctoritas + 2.0f);
+                } else {
+                    float mine = pointer->dominanceRank + pointer->auctoritas;
+                    float his  = pointed->dominanceRank + pointed->auctoritas;
+                    float odds = mine / std::max(1.0f, mine + his)
+                               * (1.0f - tribe->govSatisfaction / 150.0f);
+                    std::uniform_real_distribution<float> roll(0.0f, 1.0f);
+                    bool won = roll(rng) < odds;
+                    engineCivilization->totalChallenges++;
+                    if (won) {
+                        tribe->leaderId = pointer->entityId;
+                        tribe->govSatisfaction = std::max(0.0f, tribe->govSatisfaction - 10.0f);
+                        pointer->auctoritas   = std::min(100.0f, pointer->auctoritas + 5.0f);
+                        pointed->entityStress = std::min(100.0f, pointed->entityStress + 15.0f);
+                    } else {
+                        pointer->auctoritas   = std::max(0.0f, pointer->auctoritas - 5.0f);
+                        pointer->entityGeneralAnger = std::min(100.0f, pointer->entityGeneralAnger + 10.0f);
+                    }
+                    int idx = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
+                    if (idx == -1) pointed->addAnger({ 1, pointer, 25.0f });
+                    else pointed->list_entityPointedAnger[idx].anger =
+                             std::min(100.0f, pointed->list_entityPointedAnger[idx].anger + 25.0f);
+                    engineCivilization->logEvent(day,
+                        pointer->getName() + (won ? " deposes " : " fails to depose ")
+                        + pointed->getName() + " as leader of " + tribe->name, "tribe",
+                        "kind=leader_challenge result=" + std::string(won ? "success" : "failure")
+                        + " challenger=\"" + pointer->getName() + "\""
+                        + " challengerId=" + std::to_string(pointer->entityId)
+                        + " leader=\"" + pointed->getName() + "\""
+                        + " tribe=\"" + tribe->name + "\" tribeId=" + std::to_string(tribe->id));
+                }
+            }
+        }
+    }
     else if (action->name == "Gossip") {
         if (BetterRand::genNrInInterval(1, 100) <= 30) {
             int index = pointed->contains(pointed->list_entityPointedAnger, pointer, 2);
@@ -2790,36 +2872,57 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
             // Game is less seasonal than crops — blend toward 1.0. The local
             // food chain scales the kill: a teeming region rewards the hunter,
             // an overhunted one yields little. Hunting then depletes the herd.
+            // C2: a practiced hunter takes more from the same land (0.8-1.5×).
             float huntMod = 0.5f + 0.5f * envMod;
             float game = g_ecosystem.gameAbundance(rid);
-            float gross = BetterRand::genNrInInterval(3, 7) * huntMod * (0.7f + 0.3f * localAb) * game;
+            float gross = BetterRand::genNrInInterval(3, 7) * huntMod * (0.7f + 0.3f * localAb) * game
+                        * mind::skillYieldMul(entity, SK_HUNT);
             float got = landYield(gross);
             entity->foodStore = std::min(20.0f, entity->foodStore + got);
             entity->entityHunger = std::max(0.0f, entity->entityHunger - 14.0f); // eat fresh kill
             g_ecosystem.huntPressure(rid, got);
         } else if (an == "Gather") {
             float forage = g_ecosystem.forageAbundance(rid);
-            float gross = BetterRand::genNrInInterval(2, 4) * envMod * localAb * forage;
+            float gross = BetterRand::genNrInInterval(2, 4) * envMod * localAb * forage
+                        * mind::skillYieldMul(entity, SK_GATHER);
             float got = landYield(gross);
             entity->foodStore = std::min(20.0f, entity->foodStore + got);
             entity->entityHunger = std::max(0.0f, entity->entityHunger - 9.0f);
             g_ecosystem.foragePressure(rid, got);
+            // C3: a rich haul is worth telling people about — the fact enters
+            // the knowledge economy and can travel (and distort) via gossip.
+            if (got > 3.0f && g_resources.valid(rid)) {
+                KnownFact f;
+                f.subjectId = rid; f.predicate = FACT_FOOD_AT;
+                f.value = localAb; f.confidence = 0.85f;
+                f.sourceId = -1; f.day = day / 60; f.isTrue = (localAb >= 1.0f);
+                entity->knowledge.remember(f);
+            }
         } else if (an == "Farm") {
-            float gross = BetterRand::genNrInInterval(4, 8) * envMod * localAb; // best sustained yield, most seasonal
+            float gross = BetterRand::genNrInInterval(4, 8) * envMod * localAb  // best sustained yield, most seasonal
+                        * mind::skillYieldMul(entity, SK_FARM);
             entity->foodStore = std::min(20.0f, entity->foodStore + landYield(gross));
         } else if (an == "EatMeal") {
             float eaten = std::min(entity->foodStore, 1.5f);
             entity->foodStore   -= eaten;
             entity->entityHunger = std::max(0.0f, entity->entityHunger - (eaten * 25.0f + 3.0f));
+            // Phase 5: caloric intake for today's homeostasis resolve.
+            entity->biology.caloricIntakeToday += eaten * 10.0f;
         }
 
         // ── Fatigue: physical labour tires you out; rest restores you ────────
         if (an == "Sleep")                    entity->fatigueLevel = std::max(0.0f, entity->fatigueLevel - 45.0f);
         else if (an == "Rest")                entity->fatigueLevel = std::max(0.0f, entity->fatigueLevel - 25.0f);
         else if (an == "Hunt" || an == "Farm" || an == "Build" || an == "Raid" ||
-                 an == "Duel" || an == "Work on Project" || an == "Basic Manual Work")
-            entity->fatigueLevel = std::min(100.0f, entity->fatigueLevel + BetterRand::genNrInInterval(8, 16));
-        else if (an == "Gather")              entity->fatigueLevel = std::min(100.0f, entity->fatigueLevel + 6.0f);
+                 an == "Duel" || an == "Work on Project" || an == "Basic Manual Work") {
+            float exertion = BetterRand::genNrInInterval(8, 16);
+            entity->fatigueLevel = std::min(100.0f, entity->fatigueLevel + exertion);
+            // Phase 5: exertion burns calories the daily resolve must cover.
+            entity->biology.caloricExpenditureToday += exertion * 0.6f;
+        } else if (an == "Gather") {
+            entity->fatigueLevel = std::min(100.0f, entity->fatigueLevel + 6.0f);
+            entity->biology.caloricExpenditureToday += 4.0f;
+        }
     }
 
 
@@ -2827,13 +2930,28 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     action->outcomeSuccess = outcomeSuccess;
     ASHB_TRACE_STREAM << "Outcome Success: " << outcomeSuccess << "\n";
 
+    // ── B2/C2/D3/B4: settle the act — regret/relief from expected-vs-actual,
+    // skill practice, injuries from violence, intention progress.
+    // (mind:: functions take civ-days; `day` counts frames, 60 per tick.)
+    float surprise = mind::settleOutcome(entity, action->name, outcomeSuccess, day / 60);
+
     // RL: reinforce this (state, action) pair from the realised outcome. The
     // reward is the outcome success scaled to the Q-value range (0..100); the
     // post-action situation becomes the next state for bootstrapping.
+    // B2: counterfactual learning — a painful surprise teaches harder than a
+    // routine failure (the regret bonus deepens the negative update).
     {
-        float reward = outcomeSuccess * 100.0f;
+        float reward = outcomeSuccess * 100.0f
+                     + (surprise < -0.25f ? surprise * 25.0f : 0.0f);
         const std::string rlNextState = rlStateSignature(entity, context.numPeopleNearby);
         rlSystem.processExperience(entity, rlPreState, action->name, reward, rlNextState);
+        // C1 eligibility-lite: yesterday's choice shares credit/blame for
+        // today's result, so multi-step payoffs (hunt → eat) credit the chain.
+        if (!prevRlState.empty())
+            rlSystem.processExperience(entity, prevRlState, prevRlAction,
+                                       reward * 0.3f, rlPreState);
+        prevRlState  = rlPreState;
+        prevRlAction = action->name;
     }
 
     // Phase 3: sentiment-modulated emotional impact on pointed target
@@ -2845,13 +2963,24 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
             pointed->entityStress   = std::max(0.0f,   pointed->entityStress   - intensity * 2.5f);
             pointed->addToWorkingMemory("positive_interaction",
                 entity->name + " showed genuine kindness", intensity);
+            // B1: kindness received becomes gratitude — reciprocation follows.
+            pointed->emotions.gratitude = std::min(100.0f,
+                pointed->emotions.gratitude + intensity * 5.0f);
+            if (pointed->emotions.gratitude >= 20.0f) ++g_mindStats.gratitudeEpisodes;
+            // C3: friendly contact is when facts travel (rumors, food tips).
+            mind::shareKnowledge(entity, pointed, day / 60);
         } else if (sentiment < 0) {
             pointed->entityStress       = std::min(100.0f, pointed->entityStress       + intensity * 5.0f);
             pointed->entityGeneralAnger = std::min(100.0f, pointed->entityGeneralAnger + intensity * 4.0f);
             pointed->entityHapiness     = std::max(0.0f,   pointed->entityHapiness     - intensity * 3.0f);
             pointed->addToWorkingMemory("negative_interaction",
                 entity->name + " was hostile", intensity);
+            // B1: hostility received instills fear of the aggressor.
+            pointed->emotions.fear = std::min(100.0f,
+                pointed->emotions.fear + intensity * 4.0f);
         }
+        // C3: gossip is the knowledge economy's main artery, whatever its tone.
+        if (action->name == "Gossip") mind::shareKnowledge(entity, pointed, day / 60);
         pointed->updatePAD();
     }
 
@@ -3400,7 +3529,10 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
     }
     std::stable_sort(ranked.begin(), ranked.end(),
         [](const Salient& a, const Salient& b) { return a.salience > b.salience; });
-    const int perceptBudget = 3 + (int)(perception.attentionalFocus * 9.0f); // 3..12
+    int perceptBudget = 3 + (int)(perception.attentionalFocus * 9.0f); // 3..12
+    // D1-lite senses: darkness halves how many souls the eye can track. What
+    // the agent doesn't perceive at night, it genuinely doesn't act on.
+    if (context.isNightTime) perceptBudget = std::max(2, perceptBudget / 2);
     if ((int)ranked.size() > perceptBudget) ranked.resize(perceptBudget);
 
     std::vector<Entity*> attended;
@@ -3424,6 +3556,37 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
             ev.intensity = (s.nb->entityHapiness - 60.0f) / 40.0f;
             ev.source = s.nb;
             perception.events.push_back(ev);
+        }
+    }
+
+    // ── B3: active theory of mind — read the room through my (possibly stale,
+    // possibly wrong) model of each attended mind + their visible body language.
+    // An anticipated attack registers as a perceived event BEFORE it happens,
+    // so fear, flight and pre-emptive boundary-setting become possible.
+    float predictedThreat = 0.0f;
+    Entity* predictedSource = nullptr;
+    for (Entity* nb : attended) {
+        float t = mind::threatPrediction(entity, nb, day);
+        if (t > predictedThreat) { predictedThreat = t; predictedSource = nb; }
+    }
+    if (predictedThreat > 0.5f && predictedSource) {
+        entity->emotions.fear = std::min(100.0f, entity->emotions.fear + predictedThreat * 10.0f);
+        PerceivedEvent ev;
+        ev.eventType = "AnticipatedThreat";
+        ev.intensity = predictedThreat;
+        ev.source = predictedSource;
+        perception.events.push_back(ev);
+    }
+    // D1-lite hearing: open rage nearby is a commotion everyone registers,
+    // even without knowing exactly what happened.
+    for (Entity* nb : attended) {
+        if (nb->emotionalState.expressedAnger > 70.0f) {
+            PerceivedEvent ev;
+            ev.eventType = "Commotion";
+            ev.intensity = nb->emotionalState.expressedAnger / 100.0f;
+            ev.source = nb;
+            perception.events.push_back(ev);
+            break;
         }
     }
 
@@ -3519,6 +3682,32 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
     // RL: snapshot the situation once; each candidate is scored against it below.
     const std::string rlState = rlStateSignature(entity, (int)attended.size());
 
+    // ── B5: metacognition — decide how hard this decision is worth thinking
+    // about. Stakes = bodily peril, felt fear, or an anticipated attack. Calm
+    // routine days deliberate over a narrow slate (cheaper AND more habitual —
+    // System 1); dangerous days get the full candidate width (System 2).
+    const float stakes = std::max(
+        std::max(entity->entityHunger / 100.0f, (100.0f - entity->entityHealth) / 100.0f),
+        std::max(entity->emotions.fear / 100.0f, predictedThreat));
+    const int memPassCut = stakes > 0.5f ? 14 : 8;
+    const int finalCut   = stakes > 0.5f ? 7  : 4;
+
+    // ── C4: NEAT hybrid arbitration — an evolved brain biases forage/eat
+    // scoring instead of overriding deliberation, so instinct and reasoning
+    // blend. Evaluated once per decision (not per action).
+    float neatForage = 1.0f, neatEat = 1.0f;
+    if (entity->useNeatBrain && !entity->neatGenome.empty()) {
+        float nin[neat::N_INPUTS] = {
+            entity->entityHunger / 100.0f, entity->entityHealth / 100.0f,
+            entity->fatigueLevel / 100.0f, 0.0f, 0.0f, 0.0f,
+            entity->foodStore > 0.5f ? 1.0f : 0.0f,
+            entity->entityLoneliness / 100.0f, 1.0f };
+        float nout[neat::N_OUTPUTS];
+        entity->neatGenome.evaluate(nin, nout);
+        neatForage = 0.75f + 0.5f * nout[2];
+        neatEat    = 0.75f + 0.5f * nout[3];
+    }
+
     // Generate 3-7 candidates using existing scoring utilities
     std::vector<ActionCandidate> candidates;
 
@@ -3551,6 +3740,7 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
     for (const Action& act : availableActions) {
         const Action* aPtr = &act;
+        const std::string& an0 = act.name;
         bool isSocialCat = (act.needCategory == "social" ||
                             act.name == "Murder" || act.name == "Betray");
         if (isSocialCat && attended.empty()) {
@@ -3578,16 +3768,29 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
             std::cout << "\n";
         }
 
-        float score = requirementFitness * 0.20f + needSatisfaction * 0.25f + memoryBias * 0.10f +
-                      varietyBonus * 0.10f + socialInfluence * 0.19f;
-        score *= contextualWeight;
-        score *= personalityModifier;
-        score *= valueSatisfaction;
-        score *= griefModifier;
-        score *= pheromoneInfluence;
-        score *= envModifier;
-        score *= normModifier;
+        // A2: additive blend + multiplicative factors, weights from g_priors —
+        // defaults are the historical constants, so an absent priors file is
+        // the engine's classic behavior; a loaded priors_vN retunes the mind
+        // without a recompile (the human-in-the-loop tuning surface).
+        float score = requirementFitness * g_priors.wRequire + needSatisfaction * g_priors.wNeed +
+                      memoryBias * g_priors.wMemBias + varietyBonus * g_priors.wVariety +
+                      socialInfluence * g_priors.wSocial;
+        score *= mind::adjustFactor(contextualWeight,    g_priors.mContext);
+        score *= mind::adjustFactor(personalityModifier, g_priors.mPersona);
+        score *= mind::adjustFactor(valueSatisfaction,   g_priors.mValue);
+        score *= mind::adjustFactor(griefModifier,       g_priors.mGrief);
+        score *= mind::adjustFactor(pheromoneInfluence,  g_priors.mPherom);
+        score *= mind::adjustFactor(envModifier,         g_priors.mEnv);
+        score *= mind::adjustFactor(normModifier,        g_priors.mNorm);
+        // B1: discrete emotions act as tendencies (fear flees, guilt repairs,
+        // envy climbs); B4: the season's intention pulls its aligned actions.
+        score *= mind::emotionActionModifier(entity, an0);
+        score *= mind::intentionModifier(entity, an0);
+        // C4: evolved instinct nudges subsistence choices.
+        if      (an0 == "Gather" || an0 == "Hunt") score *= neatForage;
+        else if (an0 == "EatMeal")                 score *= neatEat;
 
+        
         // Planned action bias: boost if this matches the planned action
         if (!plannedActionName.empty() && act.name == plannedActionName) {
             score *= 1.5f;
@@ -3683,18 +3886,22 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
     // expensive calls ~3×.
     std::sort(candidates.begin(), candidates.end(),
         [](const ActionCandidate& a, const ActionCandidate& b) { return a.score > b.score; });
-    if (candidates.size() > 14) candidates.resize(14);
+    // B5: the metacognitive width chosen above — 14/7 under high stakes, 8/4
+    // for calm routine (same outcome distribution shape, ~40% cheaper).
+    if ((int)candidates.size() > memPassCut) candidates.resize(memPassCut);
     for (ActionCandidate& c : candidates) {
         // Autobiographical + semantic memory shape preference: trauma avoids
         // social, loss pulls toward coping, learned facts about people/actions
         // bias encounters. Both are multipliers centered on 1.0.
         c.score *= calculateLifeMemoryBias(entity, *c.action);
-        c.score *= calculateSemanticMemoryBias(entity, *c.action, attended);
+        MemoryQuery query;
+        query.actionType = c.action->name;
+        c.score *= entity->semanticMemory.calculateMemoryActionBias(c.action->name, query);
     }
 
     std::sort(candidates.begin(), candidates.end(),
         [](const ActionCandidate& a, const ActionCandidate& b) { return a.score > b.score; });
-    if (candidates.size() > 7) candidates.resize(7);
+    if ((int)candidates.size() > finalCut) candidates.resize(finalCut);
     seg(s_msMemPass);
 
     Deliberation delib;
@@ -3737,6 +3944,33 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         }
     }
 
+    // ── B2: prospection — before acting, remember what outcome the mind
+    // expects (Q-value blended with the last few lived outcomes of this same
+    // action). mind::settleOutcome compares it with reality: a bad surprise
+    // becomes regret and a stronger lesson, a good one becomes relief.
+    if (delib.chosenAction != nullptr) {
+        // Expectations come from LIVED history of this same action — an act
+        // never tried carries no expectation (and so can't disappoint). This
+        // keeps regret/relief centered on the agent's own experience instead
+        // of a fixed optimism prior that would make regret chronic.
+        float memExp = 0.0f; int seen = 0;
+        for (const ActionMemory& am : actionHistory) {
+            if (am.actionName == delib.chosenAction->name) {
+                memExp += am.outcomeSuccess;
+                if (++seen >= 3) break;
+            }
+        }
+        if (seen > 0) {
+            float q = rlSystem.getActionValue(entity->getId(), rlState,
+                                              delib.chosenAction->name) / 100.0f;
+            entity->lastExpectedOutcome = 0.65f * (memExp / seen) + 0.35f * q;
+        } else {
+            entity->lastExpectedOutcome = -1.0f;   // first time: no expectation
+        }
+        entity->decisionCloseness = (candidates.size() >= 2 && candidates[0].score > 0.0f)
+                                    ? candidates[1].score / candidates[0].score : 0.0f;
+    }
+
     // Introspection artifacts: the UI renders lastCoT, and hesitation feeds
     // the narrative layer. Built from the FINAL choice so the displayed
     // reasoning matches the executed action.
@@ -3750,6 +3984,9 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         std::string situationHint = attended.empty()
             ? "alone"
             : std::to_string(attended.size()) + " people noticed nearby";
+        // E3: name the feeling — the chronicle and inspector read motive here.
+        std::string domEmo = entity->emotions.dominant();
+        if (!domEmo.empty()) situationHint += ", feeling " + domEmo;
         entity->lastCoT = buildChainOfThought(
             entity->entityLoneliness, entity->entityStress, entity->entityGeneralAnger,
             entity->entityHapiness, entity->entityMentalHealth, entity->entityBoredom,
@@ -3770,6 +4007,10 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         } else {
             entity->hesitation = HesitationState{};
         }
+        // B2: a genuinely torn mind (top-2 candidates nearly tied) dwells
+        // longer — hesitation finally has a driver beyond moral weight.
+        if (entity->decisionCloseness > 0.9f && entity->hesitation.ticksRemaining > 0.0f)
+            entity->hesitation.ticksRemaining += 2.0f;
     }
 
     // Record what was actually decided (previously captured before selection,
@@ -3787,6 +4028,286 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
     if (delib.chosenAction != nullptr) return const_cast<Action*>(delib.chosenAction);
     return nullptr;
+}
+
+// Calculate utility factors for an action based on multiple dimensions
+FreeWillSystem::UtilityFactors FreeWillSystem::calculateUtilityFactors(Entity* entity, const Action& action,
+                                                                     const std::vector<Entity*>& neighbors,
+                                                                     const ActionContext& context) {
+    UtilityFactors factors;
+
+    if (!entity) return factors;
+
+    // Drive satisfaction: how much the action satisfies current drives
+    float driveScore = 0.0f;
+    int driveCount = 0;
+
+    // Hunger drive
+    if (entity->entityHunger > 30.0f) {  // Hungry
+        driveScore += (action.name == "EatMeal" || action.name == "Hunt" ||
+                      action.name == "Gather" || action.name == "Farm") ? 1.0f : 0.0f;
+        driveCount++;
+    }
+
+    // Fatigue drive
+    if (entity->fatigueLevel > 45.0f) {  // Tired
+        driveScore += (action.name == "Sleep" || action.name == "Rest") ? 1.0f : 0.0f;
+        driveCount++;
+    }
+
+    // Stress drive
+    if (entity->entityStress > 50.0f) {  // Stressed
+        driveScore += (action.name == "Prayer" || action.name == "SeekTherapy" ||
+                      action.name == "Socialize" || action.name == "CreativeActivity") ? 1.0f : 0.0f;
+        driveCount++;
+    }
+
+    // Social drive (loneliness)
+    if (entity->entityLoneliness > 30.0f) {  // Lonely
+        driveScore += (action.needCategory == "social" && !neighbors.empty()) ? 1.0f : 0.0f;
+        driveCount++;
+    }
+
+    factors.driveSatisfaction = driveCount > 0 ? (driveScore / driveCount) : 0.5f;
+
+    // Need reduction: how much the action reduces unmet needs
+    factors.needReduction = calculateNeedSatisfaction(action, entity) * 0.01f;  // Convert to 0-1 range
+
+    // Emotional fit: how well the action fits current emotional state
+    float emotionFit = 0.5f;  // Neutral baseline
+    if (entity->entityHapiness > 70.0f) {  // Happy
+        emotionFit += (action.name == "Celebrate" || action.name == "Socialize" ||
+                      action.name == "CreativeActivity") ? 0.3f : 0.0f;
+    } else if (entity->entityHapiness < 30.0f) {  // Unhappy
+        emotionFit += (action.name == "SeekTherapy" || action.name == "Prayer" ||
+                      action.name == "Socialize") ? 0.3f : 0.0f;
+    }
+
+    if (entity->entityStress > 70.0f) {  // Stressed
+        emotionFit += (action.name == "Rest" || action.name == "Sleep" ||
+                      action.name == "Prayer" || action.name == "CreativeActivity") ? 0.3f : 0.0f;
+    } else if (entity->entityStress < 30.0f) {  // Relaxed
+        emotionFit += (action.name == "Exercise" || action.name == "Hunt" ||
+                      action.name == "Explore") ? 0.3f : 0.0f;
+    }
+
+    factors.emotionalFit = std::min(1.0f, std::max(0.0f, emotionFit));
+
+    // Memory relevance: how relevant the action is based on memory
+    MemoryQuery query;
+    query.actionType = action.name;
+    factors.memoryRelevance = entity->semanticMemory.calculateMemoryActionBias(action.name, query) * 2.0f - 1.0f;  // Convert to -1 to 1 range
+    factors.memoryRelevance = (factors.memoryRelevance + 1.0f) * 0.5f;  // Convert to 0 to 1 range
+
+    // Social alignment: how well the action aligns with social context
+    factors.socialAlignment = 0.5f;  // Neutral baseline
+    if (!neighbors.empty()) {
+        float socialMatch = 0.0f;
+        int socialCount = 0;
+
+        // Check if action matches what others are doing
+        for (Entity* nb : neighbors) {
+            if (nb->lastActionName == action.name) {
+                socialMatch += 1.0f;
+            }
+            socialCount++;
+        }
+
+        if (socialCount > 0) {
+            factors.socialAlignment = 0.5f + (socialMatch / socialCount) * 0.5f;
+        }
+
+        // Adjust for social needs
+        if (action.needCategory == "social") {
+            factors.socialAlignment += (entity->entityLoneliness / 100.0f) * 0.3f;
+        }
+    }
+
+    // Goal progress: how much the action advances current goals
+    // Simplified: based on personality and current needs
+    factors.goalProgress = 0.5f;  // Baseline
+    if (entity->ValueSystem.achievementDrive > 50.0f) {
+        factors.goalProgress += (action.needCategory == "achievement") ? 0.3f : 0.0f;
+    }
+    if (entity->ValueSystem.familyOrientation > 50.0f) {
+        factors.goalProgress += (action.name == "Marry" || action.name == "couple" ||
+                                action.name == "HelpSupport") ? 0.3f : 0.0f;
+    }
+
+    // Habit strength: strength of habit for this action in current context
+    factors.habitStrength = 0.0f;
+    for (const Habit& h : habits) {
+        if (h.actionId == action.actionId &&
+            h.triggerContext.isNightTime == context.isNightTime &&
+            h.triggerContext.isWeekend == context.isWeekend) {
+            factors.habitStrength = h.strength;
+            break;
+        }
+    }
+
+    // Novelty value: novelty/exploration value of this action
+    factors.noveltyValue = calculateVarietyBonus(action.actionId, action);
+    // Invert so higher = more novel (variety bonus is higher for less recent actions)
+    factors.noveltyValue = 1.0f - factors.noveltyValue;
+
+    return factors;
+}
+
+// Combine utility factors into a single score using weighted sum
+float FreeWillSystem::calculateUtilityScore(const UtilityFactors& factors, Entity* entity) {
+    if (!entity) return 0.0f;
+
+    // Weights for different factors - can be tuned based on personality/situation
+    float driveWeight = 0.20f;
+    float needWeight = 0.20f;
+    float emotionWeight = 0.15f;
+    float memoryWeight = 0.15f;
+    float socialWeight = 0.10f;
+    float goalWeight = 0.10f;
+    float habitWeight = 0.05f;
+    float noveltyWeight = 0.05f;
+
+    // Adjust weights based on personality
+    if (entity->personality.neuroticism > 60.0f) {
+        emotionWeight += 0.05f;
+        driveWeight -= 0.05f;
+    }
+    if (entity->personality.extraversion > 60.0f) {
+        socialWeight += 0.05f;
+        needWeight -= 0.05f;
+    }
+    if (entity->personality.openness > 60.0f) {
+        noveltyWeight += 0.05f;
+        habitWeight -= 0.05f;
+    }
+
+    float score =
+        factors.driveSatisfaction * driveWeight +
+        factors.needReduction * needWeight +
+        factors.emotionalFit * emotionWeight +
+        factors.memoryRelevance * memoryWeight +
+        factors.socialAlignment * socialWeight +
+        factors.goalProgress * goalWeight +
+        factors.habitStrength * habitWeight +
+        factors.noveltyValue * noveltyWeight;
+
+    return std::min(1.0f, std::max(0.0f, score));  // Clamp to 0-1
+}
+
+// GOAP planning: find sequence of actions to achieve a goal state
+std::vector<FreeWillSystem::GOAPAction> FreeWillSystem::planGOAP(Entity* entity,
+                                                               const std::map<std::string, bool>& goalState,
+                                                               const std::vector<FreeWillSystem::GOAPAction>& availableActions,
+                                                               int maxDepth) {
+    if (!entity || availableActions.empty()) return {};
+
+    // Simple A* implementation for GOAP
+    struct Node {
+        GOAPAction action;
+        std::vector<GOAPAction> path;
+        float cost;
+        std::map<std::string, bool> state;
+
+        bool operator>(const Node& other) const {
+            return cost > other.cost;
+        }
+    };
+
+    // Start with current world state
+    auto getWorldState = [entity]() -> std::map<std::string, bool> {
+        std::map<std::string, bool> state;
+        // Basic needs
+        state["hungry"] = entity->entityHunger > 50.0f;
+        state["tired"] = entity->fatigueLevel > 50.0f;
+        state["stressed"] = entity->entityStress > 50.0f;
+        state["lonely"] = entity->entityLoneliness > 50.0f;
+        state["unhappy"] = entity->entityHapiness < 50.0f;
+        state["healthy"] = entity->entityHealth > 50.0f;
+        // Add more as needed
+        return state;
+    };
+
+    auto startState = getWorldState();
+    auto goalMet = [&](const std::map<std::string, bool>& state) -> bool {
+        for (const auto& goal : goalState) {
+            auto it = state.find(goal.first);
+            if (it == state.end() || it->second != goal.second) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // Priority queue for open set (min-heap based on cost)
+    std::vector<Node> openList;
+    std::vector<std::map<std::string, bool>> closedList;
+
+    // Initialize with empty action (no-op start state)
+    Node startNode;
+    startNode.action = GOAPAction("None", 0.0f);
+    startNode.cost = 0.0f;
+    startNode.state = startState;
+    openList.push_back(startNode);
+
+    while (!openList.empty() && openList[0].path.size() < static_cast<size_t>(maxDepth)) {
+        // Sort by cost (simple approach - in real implementation use proper heap)
+        std::sort(openList.begin(), openList.end(), [](const Node& a, const Node& b) {
+            return a.cost < b.cost;
+        });
+
+        Node current = openList[0];
+        openList.erase(openList.begin());
+
+        // Check if goal is reached
+        if (goalMet(current.state)) {
+            return current.path;
+        }
+
+        // Add to closed list
+        bool alreadyClosed = false;
+        for (const auto& closedState : closedList) {
+            if (closedState == current.state) {
+                alreadyClosed = true;
+                break;
+            }
+        }
+        if (alreadyClosed) continue;
+        closedList.push_back(current.state);
+
+        // Expand neighbors (try each action)
+        for (const GOAPAction& action : availableActions) {
+            // Check if action's preconditions are met
+            bool prereqsMet = true;
+            for (const auto& precondition : action.preconditions) {
+                auto it = current.state.find(precondition.first);
+                if (it == current.state.end() || it->second != precondition.second) {
+                    prereqsMet = false;
+                    break;
+                }
+            }
+
+            if (!prereqsMet) continue;
+
+            // Create new state after applying action effects
+            std::map<std::string, bool> newState = current.state;
+            for (const auto& effect : action.effects) {
+                newState[effect.first] = effect.second;
+            }
+
+            // Create new node
+            Node neighbor;
+            neighbor.action = action;
+            neighbor.path = current.path;
+            neighbor.path.push_back(action);
+            neighbor.cost = current.cost + action.cost;
+            neighbor.state = newState;
+
+            openList.push_back(neighbor);
+        }
+    }
+
+    // Return empty plan if no solution found within maxDepth
+    return {};
 }
 
 // ============================================================================
@@ -3808,6 +4329,10 @@ void FreeWillSystem::applySocialSanction(Entity* offender, Entity* victim,
 
     for (Entity* w : witnesses) {
         if (!w || w == offender || w == victim || w->entityHealth <= 0.0f) continue;
+        // C3/B1: the crime becomes a propositional fact the witness can retell
+        // (and distort, and be lied about) — plus a genuine fear spike.
+        // (`simDay` here counts frames; mind:: takes civ-days.)
+        mind::observeCrime(w, offender, lethal, simDay / 60);
 
         // How much this witness cared about the victim.
         float bondV     = std::max(0.0f, w->searchConnSocial(victim));
@@ -4188,6 +4713,9 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
                     victim->pendingKillerId      = e->entityId;
                     victim->pendingKillerTribeId = e->tribeId;
                     victim->pendingKillMotive    = "jealousy";
+                    // E3: the chronicle names the feeling behind the blade.
+                    { std::string emo = e->emotions.dominant();
+                      if (!emo.empty()) victim->pendingKillMotive += " (" + emo + ")"; }
                 }
                 // M5: the community answers — vendetta, reputation, possible exile.
                 applySocialSanction(e, victim, group, lethal, simDay);

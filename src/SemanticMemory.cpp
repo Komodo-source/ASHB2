@@ -122,29 +122,29 @@ std::vector<float> SemanticMemorySystem::generateEmbedding(
 {
     std::vector<float> embedding;
     embedding.reserve(config.embeddingDimension);
-    
+
     auto eventFeatures = encodeEventType(eventType);
     embedding.insert(embedding.end(), eventFeatures.begin(), eventFeatures.end());
-    
+
     embedding.push_back(emotionalIntensity);
     embedding.push_back(isFormative ? 1.0f : 0.0f);
     embedding.push_back(std::tanh(emotionalIntensity * 0.5f));
     embedding.push_back(emotionalIntensity * (isFormative ? 1.5f : 1.0f));
-    
+
     float recency = std::exp(-dayAge / 300.0f);
     embedding.push_back(recency);
     embedding.push_back(1.0f - recency);
-    
+
     if (config.useKeywordEncoding) {
         auto keywordFeatures = extractKeywordFeatures(narrative);
         embedding.insert(embedding.end(), keywordFeatures.begin(), keywordFeatures.end());
     }
-    
+
     size_t currentSize = embedding.size();
     if (currentSize < (size_t)config.embeddingDimension) {
         std::hash<std::string> hasher;
         size_t seed = hasher(eventType) ^ (hasher(narrative) << 1);
-        
+
         for (int i = (int)currentSize; i < config.embeddingDimension; ++i) {
             size_t h = seed ^ (i * 0x9e3779b9);
             h = (h ^ (h >> 16)) * 0x85ebca6b;
@@ -155,14 +155,14 @@ std::vector<float> SemanticMemorySystem::generateEmbedding(
     } else if (currentSize > (size_t)config.embeddingDimension) {
         embedding.resize(config.embeddingDimension);
     }
-    
+
     float magnitude = 0.0f;
     for (float v : embedding) magnitude += v * v;
     magnitude = std::sqrt(magnitude);
     if (magnitude > 0.0001f) {
         for (auto& v : embedding) v /= magnitude;
     }
-    
+
     return embedding;
 }
 
@@ -272,7 +272,10 @@ void SemanticMemorySystem::indexMemory(const std::string& eventType,
                                         bool isFormative,
                                         int simulationDay,
                                         const std::string& narrative,
-                                        int memoryIndex)
+                                        int memoryIndex,
+                                        float positionX,
+                                        float positionY,
+                                        const std::string& locationTag)
 {
     MemoryVector mv;
     mv.memoryIndex = memoryIndex;
@@ -282,12 +285,15 @@ void SemanticMemorySystem::indexMemory(const std::string& eventType,
     mv.simulationDay = simulationDay;
     mv.isFormative = isFormative;
     mv.internalNarrative = narrative;
-    
-    mv.embedding = generateEmbedding(eventType, emotionalIntensity, 
+    mv.positionX = positionX;
+    mv.positionY = positionY;
+    mv.locationTag = locationTag;
+
+    mv.embedding = generateEmbedding(eventType, emotionalIntensity,
                                       isFormative, simulationDay, narrative);
-    
+
     memoryDatabase.push_back(mv);
-    
+
     if (entityInvolvedId >= 0) {
         entityMemoryIndex[entityInvolvedId].push_back((int)memoryDatabase.size() - 1);
     }
@@ -340,6 +346,18 @@ MemorySearchResult SemanticMemorySystem::searchRelevantMemories(const MemoryQuer
         float emotionalBonus = 1.0f + memoryDatabase[i].emotionalIntensity * 0.3f;
         
         float finalScore = decayedScore * entityBoost * formativeBoost * emotionalBonus;
+
+        // NEW: Spatial memory considerations
+        // Boost memories that have spatial context when we're doing spatial reasoning
+        float spatialRelevance = 1.0f;
+        if (query.contextType == "location" || query.contextType == "encounter_entity") {
+            // If we're asking about location or encountering entities, spatially tagged memories are more relevant
+            if (!memoryDatabase[i].locationTag.empty()) {
+                spatialRelevance = 1.3f;
+            }
+        }
+
+        finalScore = finalScore * spatialRelevance;
         scoredMemories.push_back({finalScore, (int)i});
     }
     
@@ -509,7 +527,7 @@ std::string SemanticMemorySystem::generateMemoryRationale(const MemorySearchResu
 // ============================================================================
 
 void SemanticMemorySystem::saveTo(std::ofstream& file) const {
-    file << "SEMANTIC_MEMORY_V2:\n";
+    file << "SEMANTIC_MEMORY_V3:\n";
     file << "DB_SIZE:" << memoryDatabase.size() << "\n";
     for (const auto& mv : memoryDatabase) {
         file << "MV:" << mv.memoryIndex << ","
@@ -518,7 +536,10 @@ void SemanticMemorySystem::saveTo(std::ofstream& file) const {
              << mv.emotionalIntensity << ","
              << mv.simulationDay << ","
              << mv.isFormative << ","
-             << mv.internalNarrative << "\n";
+             << mv.internalNarrative << ","
+             << mv.positionX << ","
+             << mv.positionY << ","
+             << mv.locationTag << "\n";
     }
     file << "IDX_SIZE:" << entityMemoryIndex.size() << "\n";
     for (const auto& [key, val] : entityMemoryIndex) {
@@ -534,21 +555,21 @@ void SemanticMemorySystem::saveTo(std::ofstream& file) const {
 void SemanticMemorySystem::loadFrom(std::ifstream& file) {
     clear();
     std::string line;
-    
+
     // Read header
-    std::getline(file, line); // SEMANTIC_MEMORY_V2:
-    
+    std::getline(file, line); // SEMANTIC_MEMORY_V3:
+
     // Read database size
     std::getline(file, line);
     if (line.substr(0, 8) != "DB_SIZE:") return;
     size_t dbSize = std::stoul(line.substr(8));
     memoryDatabase.resize(dbSize);
-    
+
     for (size_t i = 0; i < dbSize; ++i) {
         std::getline(file, line); // MV:...
         if (line.substr(0, 3) != "MV:") continue;
         std::string data = line.substr(3);
-        
+
         auto& mv = memoryDatabase[i];
         size_t c1 = data.find(',');
         size_t c2 = data.find(',', c1 + 1);
@@ -556,41 +577,47 @@ void SemanticMemorySystem::loadFrom(std::ifstream& file) {
         size_t c4 = data.find(',', c3 + 1);
         size_t c5 = data.find(',', c4 + 1);
         size_t c6 = data.find(',', c5 + 1);
-        
+        size_t c7 = data.find(',', c6 + 1);
+        size_t c8 = data.find(',', c7 + 1);
+        size_t c9 = data.find(',', c8 + 1);
+
         if (c1 != std::string::npos) mv.memoryIndex = std::stoi(data.substr(0, c1));
         if (c2 != std::string::npos) mv.eventType = data.substr(c1 + 1, c2 - c1 - 1);
         if (c3 != std::string::npos) mv.entityInvolvedId = std::stoi(data.substr(c2 + 1, c3 - c2 - 1));
         if (c4 != std::string::npos) mv.emotionalIntensity = std::stof(data.substr(c3 + 1, c4 - c3 - 1));
         if (c5 != std::string::npos) mv.simulationDay = std::stoi(data.substr(c4 + 1, c5 - c4 - 1));
         if (c6 != std::string::npos) mv.isFormative = (data.substr(c5 + 1, c6 - c5 - 1) == "1");
-        if (c6 != std::string::npos) mv.internalNarrative = data.substr(c6 + 1);
-        
+        if (c7 != std::string::npos) mv.internalNarrative = data.substr(c6 + 1, c7 - c6 - 1);
+        if (c8 != std::string::npos) mv.positionX = std::stof(data.substr(c7 + 1, c8 - c7 - 1));
+        if (c9 != std::string::npos) mv.positionY = std::stof(data.substr(c8 + 1, c9 - c8 - 1));
+        if (c9 != std::string::npos) mv.locationTag = data.substr(c9 + 1);
+
         mv.embedding = std::vector<float>(config.embeddingDimension, 0.0f);
     }
-    
+
     // Read entity index
     std::getline(file, line);
     if (line.substr(0, 9) != "IDX_SIZE:") return;
     size_t idxSize = std::stoul(line.substr(9));
-    
+
     for (size_t i = 0; i < idxSize; ++i) {
         std::getline(file, line); // IDX:...
         if (line.substr(0, 4) != "IDX:") continue;
         std::string idxData = line.substr(4);
         size_t comma = idxData.find(',');
         if (comma == std::string::npos) continue;
-        
+
         int key = std::stoi(idxData.substr(0, comma));
         std::string vals = idxData.substr(comma + 1);
         std::vector<int> vec;
-        
+
         size_t start = 0, end = 0;
         while ((end = vals.find(';', start)) != std::string::npos) {
             vec.push_back(std::stoi(vals.substr(start, end - start)));
             start = end + 1;
         }
         if (start < vals.length()) vec.push_back(std::stoi(vals.substr(start)));
-        
+
         entityMemoryIndex[key] = vec;
     }
 }
