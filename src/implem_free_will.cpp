@@ -1883,6 +1883,13 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         };
         observe(pointer, pointed);
         observe(pointed, pointer);
+
+        // B3: a positive interaction is also the deceiver's opportunity to
+        // fake warmth toward someone they're grudge-holding against — see
+        // mind::attemptDeception for the gate (low integrity + grudge).
+        if (sentiment > 0) {
+            mind::attemptDeception(pointer, pointed, action->name, today);
+        }
     }
 
     if (action->name == "Desire") {
@@ -2620,6 +2627,10 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         }
     }
     else if (action->name == "Manipulate") {
+        // B3: this is the moment a faked-friendly mask no longer explains the
+        // behavior — check whether pointed's trust in pointer was inflated by
+        // deception (or just high) and let the prediction error snap it.
+        mind::detectDeception(pointed, pointer, action->name, day);
         int social_index = pointer->contains(pointer->list_entityPointedSocial, pointed, 4);
         if (social_index == -1) {
             float social = static_cast<float>(BetterRand::genNrInInterval(1, 5));
@@ -2650,6 +2661,8 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         }
     }
     else if (action->name == "Betray") {
+        // B3: same reveal moment as Manipulate, but for the payoff of a long con.
+        mind::detectDeception(pointed, pointer, action->name, day);
         pointer->onMajorEventAddOrBoostGoal("betrayal");
         LifeMemory mem;
         mem.eventType = "betrayal";

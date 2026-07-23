@@ -129,6 +129,7 @@ struct MindRunStats {
     long factsShared = 0, liesTold = 0;
     long festivalsHeld = 0;
     long deepSleeps = 0, sleeplessNights = 0;
+    long deceptionsAttempted = 0, deceptionsDetected = 0;
 };
 extern MindRunStats g_mindStats;
 
@@ -158,6 +159,23 @@ float intentionModifier(const Entity* e, const std::string& actionName);
 // B3: how threatening does `other` look, judged ONLY through the observer's
 // (possibly stale, possibly wrong) mental model + visible body language. 0..1.
 float threatPrediction(Entity* self, Entity* other, int simDay);
+
+// B3: active deception. Gated to low-integrity agents who hold a grudge
+// against `target` (the "high stakes" cue) — during a positive social
+// interaction they fake warmth, inflating the target's trust in them beyond
+// what the genuine interaction earned, at the cost of the target's true read
+// on them (predictability). Call after the normal sentiment-driven trust
+// update on a positive-sentiment action. No-op (returns false) off-gate.
+bool attemptDeception(Entity* deceiver, Entity* target, const std::string& actionName, int simDay);
+
+// B3: detection. Call at the moment `offender` commits an act (Betray,
+// Manipulate) against `victim` that a faked-friendly mask would no longer
+// explain. If the victim's trust in the offender was inflated by deception
+// (or simply high), the prediction error "snaps": trust and predictability
+// collapse harder than a graded update, and — only when the victim was truly
+// fooled — a distinct shock (fear/shame + a named memory) registers instead
+// of the ordinary anger the action already applies elsewhere.
+void detectDeception(Entity* victim, Entity* offender, const std::string& actionName, int simDay);
 
 // B2 + C2 + D3: post-action settlement — regret/relief from expected-vs-actual,
 // skill practice, injuries from violent actions, intention progress.

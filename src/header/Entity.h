@@ -219,6 +219,15 @@ struct MentalModelOfOther {
     int   lastObservedDay = 0;
     float confidence      = 0.1f;   // 0..1
 
+    // B3: active deception. `fakedByThem` marks that the subject's trust was
+    // inflated by the OTHER faking warmth (mind::attemptDeception), not earned
+    // — `fakeTrustGain` is how much, so a later reveal (mind::detectDeception)
+    // knows how far the prediction error snap should crater trust. Neither
+    // field is persisted (list_MentalModelOfOther isn't saved at all — theory
+    // of mind is runtime-only), so no save/load work is needed here.
+    bool  fakedByThem   = false;
+    float fakeTrustGain = 0.0f;
+
     void  updateFromObservation(Entity* observed, float observerAccuracy, int simDay);
     float effectiveConfidence(int today) const;
 

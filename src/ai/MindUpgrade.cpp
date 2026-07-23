@@ -407,6 +407,73 @@ float mind::threatPrediction(Entity* self, Entity* other, int simDay) {
     return clamp01f(visible + believed + heard);
 }
 
+bool mind::attemptDeception(Entity* deceiver, Entity* target, const std::string& an, int simDay) {
+    if (!deceiver || !target) return false;
+    // Gate: a low-integrity agent only bothers staging warmth when there is
+    // something to eventually collect on — reuse the grudge cue that already
+    // gates C3 lies, so "high stakes" means the same thing in both places.
+    if (deceiver->integrity >= 35.0f) return false;
+    bool grudge = false;
+    for (const auto& a : deceiver->list_entityPointedAnger)
+        if (a.pointedEntity == target && a.anger > 30.0f) { grudge = true; break; }
+    if (!grudge) return false;
+    if (BetterRand::genNrInInterval(0, 100) >= 30) return false; // not staged every time
+
+    MentalModelOfOther* m = target->getModelOf(deceiver);
+    if (!m) return false;
+    // Fake warmth lands on top of the genuine sentiment bump already applied
+    // by the caller — trust climbs further than the interaction earned, while
+    // predictability (the target's TRUE read on them) erodes: the surface
+    // signal and the underlying person are diverging, even if trust can't
+    // see that yet.
+    float boost = 3.0f + deceiver->personality.extraversion / 40.0f;
+    m->trustLevel      = std::min(100.0f, m->trustLevel + boost);
+    m->predictability  = std::max(0.0f, m->predictability - 0.02f);
+    m->fakeTrustGain  += boost;
+    m->fakedByThem     = true;
+    ++g_mindStats.deceptionsAttempted;
+    return true;
+}
+
+void mind::detectDeception(Entity* victim, Entity* offender, const std::string& an, int simDay) {
+    if (!victim || !offender) return;
+    MentalModelOfOther* m = victim->getModelOf(offender);
+    if (!m) return;
+    bool wasFooled = m->fakedByThem && m->fakeTrustGain > 5.0f;
+    if (!wasFooled && m->trustLevel < 55.0f) return;  // nothing to snap
+
+    // Prediction-error snap: the more trust had built up (genuinely or
+    // manufactured), the harder detection craters it — this is what makes a
+    // betrayal register as a shock rather than the graded per-anger update
+    // the caller already applies alongside this.
+    float priorTrust  = m->trustLevel;
+    m->trustLevel     = std::min(m->trustLevel, wasFooled ? 5.0f : 15.0f);
+    m->predictability = wasFooled ? 0.05f : std::min(m->predictability, 0.2f);
+    m->confidence      = std::min(1.0f, m->confidence + 0.5f);   // now certain — painfully so
+    m->perceivedIntentionality = std::min(1.0f, m->perceivedIntentionality + 0.4f);
+    m->lastObservedDay = simDay;
+    m->lastInteractionOutcome = "deception_revealed";
+    m->fakedByThem   = false;
+    m->fakeTrustGain = 0.0f;
+
+    if (wasFooled) {
+        ++g_mindStats.deceptionsDetected;
+        float shock = std::min(1.0f, priorTrust / 60.0f);
+        victim->emotions.shame = clamp100(victim->emotions.shame + 8.0f * shock); // fooled — stings
+        float before = victim->emotions.fear;
+        victim->emotions.fear = clamp100(victim->emotions.fear + 15.0f * shock);
+        if (before < 20.0f && victim->emotions.fear >= 20.0f) ++g_mindStats.fearEpisodes;
+
+        LifeMemory mem;
+        mem.eventType = "deception_revealed";
+        mem.entityInvolvedId = offender->entityId;
+        mem.emotionalIntensity = 0.75f;
+        mem.simulationDay = simDay;
+        mem.internalNarrative = offender->getName() + " had fooled me completely — I never saw it coming.";
+        victim->lifeMemories.push_back(mem);
+    }
+}
+
 // ─── B2/C2/D3: post-action settlement ─────────────────────────────────────────
 
 float mind::settleOutcome(Entity* e, const std::string& an, float outcome, int simDay) {

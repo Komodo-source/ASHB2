@@ -351,7 +351,7 @@ of crashing.
 | A4 orphan triage | ⏸ deferred | dormant modules left in place (deletion is a separate, destructive pass) |
 | B1 discrete emotions | ✅ | 10 emotions, appraisal in `mind::upkeep`, 13th scoring factor, body feedback |
 | B2 prospection/regret | ✅ | history-centered expectations, asymmetric thresholds (outcome quantization), counterfactual RL bonus, hesitation driver |
-| B3 active ToM | ✅ (anticipation + reputational channel) | `threatPrediction` via mental model + body language + heard facts; full deception deferred (lies exist in C3) |
+| B3 active ToM | ✅ (anticipation + reputational + deception) | `threatPrediction` via mental model + body language + heard facts; deception now live — `attemptDeception`/`detectDeception` (2026-07-23): low-integrity+grudge agents fake warmth to inflate a target's trust beyond what the interaction earned, and a later Betray/Manipulate against them snaps trust/predictability harder as a "prediction error" than the graded update, with a distinct shock memory when the target was truly fooled |
 | B4 intentions | ✅ (bias form) | weekly adoption from top LifeGoal, progress/abandonment, scoring pull; GOAP social-fact compilation deferred |
 | B5 metacognition | ✅ | stakes-driven candidate widths 8/4 vs 14/7, night-narrowed percept budget |
 | C1 RL generalization | ✅ (lite) | +fear/season state features, eligibility-lite previous-pair credit; function approximation deferred |

@@ -2003,6 +2003,13 @@ static void printRealismReport(const std::vector<Entity>& entities,
     std::cout << "8. Skills differentiate (best-skill Gini > 0.03): gini=" << gini
               << " deepSleeps=" << g_mindStats.deepSleeps
               << "  [" << softVerdict(gini > 0.03f, ticksRun >= 300) << "]\n";
+    // 9. Deception (B3): rare and optional by design (low-integrity + grudge
+    // gated) — never a CI failure, purely informational on how often faked
+    // warmth gets staged and later detected.
+    std::cout << "9. Deception (informational): attempted="
+              << g_mindStats.deceptionsAttempted << " detected="
+              << g_mindStats.deceptionsDetected
+              << "  [" << (g_mindStats.deceptionsAttempted > 0 ? "PASS" : "warn") << "]\n";
     std::cout << "==========================================\n\n";
 }
 
