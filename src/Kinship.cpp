@@ -1,6 +1,9 @@
 #include "./header/Kinship.h"
 #include "./header/Entity.h"
 #include "../src/world/Lexicon.h"
+#include "./header/LiveConfig.h"   // III-P4 classMul / IV-P1 traitMul kill switches
+#include "./header/BetterRand.h"    // IV-P1 vertical transmission rolls
+#include "./header/CivilizationEngine.h"  // IV-P1 trait catalogue (rival ways)
 
 #include <algorithm>
 
@@ -78,10 +81,58 @@ void KinshipSystem::registerBirth(Entity& child, Entity* p1, Entity* p2, int yea
         fam = createFamily(child, year);
     }
 
+    // I-P3: place the child in the line. Depth counts from the founder of the
+    // house, so a family's `generation` becomes the real answer to "how many
+    // generations has this bloodline run" — the through-line the Chronicle
+    // follows across a whole world's history.
+    int parentDepth = 0;
+    if (p1) parentDepth = std::max(parentDepth, p1->lineageDepth);
+    if (p2) parentDepth = std::max(parentDepth, p2->lineageDepth);
+    child.lineageDepth = parentDepth + 1;
+
+    // III-P4: cultural capital is inherited before it is earned (Bourdieu). A
+    // child raised in a literate, well-regarded house starts life holding most
+    // of what that house holds; one raised without it starts from nothing and
+    // must accumulate. This single line is why advantage compounds across
+    // generations instead of being redealt at every birth.
+    if ((p1 || p2) && g_liveConfig.classMul != 0.0f) {
+        float inherited = p1 && p2 ? (p1->culturalCapital + p2->culturalCapital) * 0.5f
+                                   : (p1 ? p1->culturalCapital : p2->culturalCapital);
+        child.culturalCapital = std::max(0.0f, std::min(100.0f, inherited * 0.75f));
+    }
+
+    // IV-P1: vertical transmission — the strongest channel culture has. A child
+    // takes up nearly everything both its parents do, and about half of what
+    // only one of them does; the share that fails to pass is where a lineage's
+    // ways quietly change. This is why a people stays itself across generations
+    // without anything enforcing it, and why an isolated valley diverges.
+    if ((p1 || p2) && g_liveConfig.traitMul != 0.0f) {
+        const unsigned long long a = p1 ? p1->cultureTraits : 0ull;
+        const unsigned long long b = p2 ? p2->cultureTraits : 0ull;
+        unsigned long long got = 0ull, pool = a | b;
+        while (pool) {
+            const unsigned long long bit = pool & (~pool + 1ull);
+            const bool both = (a & bit) && (b & bit);
+            if (BetterRand::genNrInInterval(0.0f, 1.0f) < (both ? 0.92f : 0.55f)) {
+                // Parents who married across a difference (she buries, he burns)
+                // do not hand the child both ways — it grows up doing one.
+                if (globalCivEngine) {
+                    int id = 0;
+                    while ((bit >> id) != 1ull) ++id;
+                    got &= ~globalCivEngine->culture.rivals(id);
+                }
+                got |= bit;
+            }
+            pool &= pool - 1ull;
+        }
+        child.cultureTraits = got;
+    }
+
     if (fam) {
         child.familyId = fam->id;
         fam->memberIds.push_back(child.entityId);
         fam->births++;
+        fam->generation = std::max(fam->generation, child.lineageDepth);
         // A healthy growing line gains a little standing.
         fam->reputation = std::min(100.0f, fam->reputation + 0.5f);
     }

@@ -130,6 +130,10 @@ struct MindRunStats {
     long festivalsHeld = 0;
     long deepSleeps = 0, sleeplessNights = 0;
     long deceptionsAttempted = 0, deceptionsDetected = 0;
+    // IV-P4: the peaceful status route — gifts given, and the collective
+    // discharge festivals and rites actually deliver.
+    long giftsGiven = 0;
+    double festivalStressDischarged = 0.0;
 };
 extern MindRunStats g_mindStats;
 
@@ -150,6 +154,33 @@ void upkeep(Entity* e, const std::vector<Entity*>& group, bool isNight, int simD
 // B1: emotion → action-tendency multiplier (the 13th scoring factor).
 // Neutral 1.0 when all emotions are quiet; clamped to [0.4, 2.2].
 float emotionActionModifier(const Entity* e, const std::string& actionName);
+
+// ── I-P1 (Track I): the self that acts ───────────────────────────────────────
+// Recompute the agent's narrative identity (self-story + dominant value +
+// defining memory) from what it actually values and remembers, and log life
+// milestones. Cheap; called on a staggered cadence. Deterministic (no RNG).
+void updateNarrativeIdentity(Entity* e, int simDay);
+// Ease senseOfPurpose toward a target built from goal progress, social
+// integration, role and faith; high purpose buffers stress/mental health, low
+// purpose feeds anomie/despair. Effect magnitude scales with
+// g_liveConfig.identityMul (0 = bit-exact neutral). Runs every tick (cheap).
+void updatePurpose(Entity* e, const std::vector<Entity*>& group, int simDay);
+// Identity-congruence scorer (14th factor): nudge toward acting in character,
+// scaled by how settled the identity is. Neutral 1.0 when identityMul==0 or the
+// action is identity-orthogonal.
+float identityCongruenceModifier(const Entity* e, const std::string& actionName);
+// Append an autobiography entry (deduped by title within a recency window; capped).
+void recordLifeChapter(Entity* e, const std::string& title, int otherId,
+                       const std::string& note, int simDay);
+
+// ── IV-P2 (Track IV): doctrine with teeth ────────────────────────────────────
+// The 15th scoring factor: what a believer's faith actually forbids, demands
+// and encourages. Reads the creed cached on the Entity (refreshed once per
+// civ-day by the religion pass), so no registry lookup happens in the hot loop.
+// Neutral 1.0 when the agent holds no faith, when doctrineMul == 0, or when the
+// action is doctrinally indifferent. Scaled by personal devotion — a lukewarm
+// member is barely constrained, a zealot heavily so.
+float doctrineModifier(const Entity* e, const std::string& actionName);
 
 // B4: weekly intention selection / frustration-driven abandonment.
 void updateIntention(Entity* e, int simDay);

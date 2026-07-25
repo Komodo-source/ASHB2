@@ -857,6 +857,15 @@ bool loadGame(const std::string& filepath, std::vector<Entity>& entities,
         }
     }
 
+    // A save from an older build can disagree with this one about any field it
+    // has since gained or reshaped, and every parse below is a std::sto* that
+    // throws rather than returns on a value it cannot read. Unhandled, that
+    // aborted the whole program on a bad file — the user asked to open a world
+    // and got "terminate called after throwing an instance of
+    // 'std::out_of_range'" and no simulation. Failing to load is an ordinary
+    // outcome and belongs to the caller, which already knows how to start a
+    // fresh world instead.
+    try {
     std::string line;
     std::getline(file, line);
     const bool v3 = (line == SAVE_FORMAT_V3);
@@ -944,7 +953,13 @@ bool loadGame(const std::string& filepath, std::vector<Entity>& entities,
     std::getline(file, line);                        // ENTITY_COUNT:
     int entityCount = std::stoi(line.substr(13));
 
-    entities.clear();
+    // Read into a temporary first and only then take over the world. Clearing
+    // `entities` up front meant a save that failed halfway — an older format,
+    // a truncated file — destroyed the perfectly good founding population the
+    // caller had already spawned, leaving nothing to fall back to and a run
+    // with zero people in it.
+    std::vector<Entity> loaded;
+    loaded.reserve((size_t)std::max(0, entityCount));
     for (int i = 0; i < entityCount; i++) {
         Entity entity(0);
         if (!entity.loadFrom(file)) {
@@ -952,8 +967,9 @@ bool loadGame(const std::string& filepath, std::vector<Entity>& entities,
                       << entityCount << " — continuing with what was readable\n";
             break;
         }
-        entities.push_back(entity);
+        loaded.push_back(entity);
     }
+    entities.swap(loaded);
 
     // Resolve pointers after all entities are loaded
     for (Entity& entity : entities) {
@@ -979,6 +995,14 @@ bool loadGame(const std::string& filepath, std::vector<Entity>& entities,
               << (v3 ? " (V3)" : v2 ? " (V2)" : " (legacy)")
               << ": " << entities.size() << " entities" << std::endl;
     return true;
+    } catch (const std::exception& ex) {
+        // Whatever the caller already had is left alone — if the save died
+        // before the population section, that is the freshly spawned founders,
+        // and the run can go on with them.
+        std::cerr << "Could not read save '" << fullPath << "': " << ex.what()
+                  << ".\n       It is most likely from an older build than this one.\n";
+        return false;
+    }
 }
 
 

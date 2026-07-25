@@ -1,6 +1,8 @@
 #ifndef LIVE_CONFIG_H
 #define LIVE_CONFIG_H
 
+#include <string>
+
 // M10: live config console — a small set of world tunables the GUI can turn
 // while the simulation runs. Every field is a multiplier with default 1.0, and
 // each is applied at exactly one read site, so leaving the console untouched
@@ -23,6 +25,25 @@ struct LiveConfig {
     //    0.0 = feature contributes nothing (bit-exact neutral factor). ────────
     float emotionMul  = 1.0f;  // B1 discrete-emotion action tendencies (MindUpgrade.cpp)
     float cultureMul  = 1.0f;  // A3/D4 tribal culture drift + festival cadence (CivilizationEngine.cpp)
+    float identityMul = 1.0f;  // I-P1 identity-congruence scorer + purpose buffering (MindUpgrade.cpp); 0 = bit-exact off
+    float relationshipMul = 1.0f; // I-P2 couple stickiness + jealousy tempering + forgiveness (implem_free_will.cpp); 0 = bit-exact off
+    float moodMul = 1.0f;      // I-P4 hedonic adaptation + coping discharge + post-traumatic drift (MindUpgrade.cpp); 0 = bit-exact off
+    float knowledgeMul = 1.0f; // II-P1 collective-brain innovation rate + writing-as-archive (CivilizationEngine.cpp); 0 = bit-exact off
+    float feudMul = 1.0f;      // II-P4 persistent grievance ledger — feuds across generations (CivilizationEngine.cpp); 0 = bit-exact off
+    float cityMul = 1.0f;      // III-P1 settlement tiers: agglomeration benefits + crowding costs (CivilizationEngine.cpp); 0 = bit-exact off
+    float institutionMul = 1.0f; // II-P2 schools/guilds/bureaucracies: archives, teaching, admin capacity (CivilizationEngine.cpp); 0 = bit-exact off
+    float legacyMul = 1.0f;    // I-P3 causal legacy: attribution, memorials, inherited reputation (CivilizationEngine.cpp); 0 = bit-exact off
+    float tradeMul = 1.0f;     // III-P2 regional prices, trade routes, caravans (CivilizationEngine.cpp); 0 = bit-exact off
+    float warMul = 1.0f;       // II-P4 consequential war: unbiased casualties + empires (CivilizationEngine.cpp); 0 = bit-exact off
+    float giftMul = 1.0f;      // IV-P4 gift/potlatch, festival effervescence, great works (implem_free_will.cpp/CivilizationEngine.cpp); 0 = bit-exact off
+    float languageMul = 1.0f;  // IV-P3 language: intelligibility gates diffusion, trade, diplomacy, assimilation (CivilizationEngine.cpp); 0 = bit-exact off
+    float doctrineMul = 1.0f;  // IV-P2 religion with teeth: doctrine scorer, rites, schisms (MindUpgrade.cpp/CivilizationEngine.cpp); 0 = bit-exact off
+    float classMul = 1.0f;     // III-P4 heritable class: cultural capital, estates, sticky mobility (SocialOrder.cpp/CivilizationEngine.cpp); 0 = bit-exact off
+    float cycleMul = 1.0f;     // II-P3 secular cycles: elite overproduction, immiseration, strife (CivilizationEngine.cpp); 0 = bit-exact off
+    float traitMul = 1.0f;     // IV-P1 cultural traits: transmission, 25% tipping point, cultural distance (CivilizationEngine.cpp/Kinship.cpp); 0 = bit-exact off
+    float laborMul = 1.0f;     // III-P3 labour market (skills, demand, weak ties, guilds) + demographic transition (CivilizationEngine.cpp/implem_free_will.cpp); 0 = bit-exact off
+    float demographyMul = 1.0f;// §8 infant & child mortality — the hump at the bottom of the lifespan curve (Entity.cpp); 0 = bit-exact off
+    float networkMul = 1.0f;   // §8 personal Dunbar layers — role- and temperament-scaled social capacity (main.cpp); 0 = bit-exact off (flat 5-9 cap)
 
     // ── ASHB2 overhaul knobs (epigenetics, disease vectors). Same contract:
     //    ×1.0 = baseline, ×0.0 = feature contributes nothing. ─────────────────
@@ -37,5 +58,13 @@ struct LiveConfig {
 };
 
 extern LiveConfig g_liveConfig;
+
+// Set one knob by name, e.g. setLiveConfigKnob("cityMul", 0.0f). Returns false
+// for an unknown name. This is what makes the kill switches testable without a
+// GUI: `--set cityMul=0` in a headless run must reproduce the pre-feature world
+// bit-for-bit, which is the acceptance condition every phase of
+// plans/parallel-earth-upgrade.md is held to (§2 rule 2, §10 point 7), and what
+// scripts/butterfly.py needs to measure a feature's divergence.
+bool setLiveConfigKnob(const std::string& name, float value);
 
 #endif // LIVE_CONFIG_H

@@ -13,8 +13,7 @@
 >   tribe-value drift, which achieves the same "similar-but-not-identical" goal with
 >   far less glue and risk.
 > - The world map + History/Divergence panels render in the **GLFW** ("statistics")
->   mode only; the SDL mode is pure-SDL with no ImGui surface. The world still drives
->   the simulation identically in both modes.
+>   mode; headless runs drive the same world without any ImGui surface.
 > - **Runtime** long-run verification (collapse/dark-age, cross-run divergence of the
 >   history signature) requires running the GUI on a real desktop — it can't run in a
 >   headless CI shell.
@@ -38,8 +37,7 @@ properties; radically different histories. Replayable from a master seed.
 **Build context (verified):** CMake + MinGW, C++17, OpenMP optional. Add new `.cpp`
 to the `add_executable(app …)` list in `CMakeLists.txt:79-115`; new source dirs need an
 entry in `include_directories(...)` (`CMakeLists.txt:36-49`). **No new external deps** —
-noise is hand-rolled. ImGui (GLFW path, `renderingType==1`) and SDL are the two render
-backends.
+noise is hand-rolled. ImGui on the GLFW/OpenGL path is the only render backend.
 
 **Key facts the plan relies on:**
 - `EnvironmentModel.cpp` is *compiled* (`ENVIRONMENT_SOURCES`, `CMakeLists.txt:71,111`)
@@ -270,7 +268,7 @@ ages — the non-linear shape of real history. It's **already written**, just ne
 2. **Divergence:** 5 seeds → 5 distinct signatures; eyeball maps + dominant religions differ.
 3. **No dead wiring:** `grep -rn "WorldEnvironment\|CulturalTransmission\|ResourceManager\|g_planet\|environment::" src/main.cpp` now returns matches (was 0).
 4. **Seeding hygiene:** `grep -rn "random_device\|time(0)\|time(NULL)" src/` — none in sim logic.
-5. **Build:** clean CMake reconfigure + build on MinGW; run both render paths (ImGui & SDL)
+5. **Build:** clean CMake reconfigure + build on MinGW; run the GUI and headless paths
    without crash; load/save round-trips with new fields (`Entity::saveTo/loadFrom`,
    `SaveLoad.cpp`).
 6. **Performance:** 256×160 planet + N regions ticks at acceptable FPS (quadtree already

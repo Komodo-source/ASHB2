@@ -851,6 +851,20 @@ void FreeWillSystem::initializeActions() {
     helpSupport.baseSatisfaction = 20.0f;
     availableActions.push_back(helpSupport);
 
+    // ── IV-P4: the gift (Mauss) ──────────────────────────────────────────────
+    // Giving is not charity here, it is a MOVE. Mauss's three obligations — to
+    // give, to receive, and to repay — make a gift a claim on the other person,
+    // and the giver's standing rises precisely because they could afford to
+    // part with something. That gives this world a second route to status,
+    // running against the only one it had: violence. A man who cannot fight
+    // can still be somebody by feeding people.
+    // Requires something to give (wealth), so the poor cannot buy standing.
+    Action giveGift("GiveGift", 43, "social");   // 24 was already WatchEntertainment's id
+    giveGift.requirements = { {"happiness", 50.0f, 0.7f}, {"loneliness", 30.0f, 0.5f} };
+    giveGift.statChanges = { {"happiness", 6.0f}, {"loneliness", -6.0f}, {"stress", -3.0f} };
+    giveGift.baseSatisfaction = 16.0f;
+    availableActions.push_back(giveGift);
+
     // Ignore/Avoid (social)
     Action ignoreAvoid("IgnoreAvoid", 21, "social");
     ignoreAvoid.requirements = { {"stress", 60.0f, 0.7f}, {"anger", 40.0f, 0.6f} };
@@ -2260,6 +2274,10 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                 boomBoost = globalCivEngine->postWarBirthBoost(boomTribe, FreeWillSystem::day / 60);
             }
             float desireGate = 35.0f / boomBoost;   // 1.0 normally; <35 during a post-war boom
+            // III-P3: the same transition, applied where the gate is: a
+            // modernising household needs a stronger spark before it conceives.
+            if (globalCivEngine)
+                desireGate /= globalCivEngine->fertilityModifier(*pointer, *pointed);
             if (dHere >= desireGate && dThere >= desireGate &&
                 pointer->entityAge >= 18 && pointed->entityAge >= 18 &&
                 pointer->entityAge <= 55 && pointed->entityAge <= 55) {
@@ -2287,6 +2305,7 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                     globalCivEngine->logEvent(-1, baby.getName() + " was born to "
                         + pointer->name + " and " + pointed->name, "birth");
                     globalCivEngine->totalBirths++;
+                    globalCivEngine->recordBirthDemography(*pointer, *pointed);   // III-P3
                 }
                 if (globalLogger) globalLogger->logBirth(baby.entityId, baby.getName(),
                     pointer->getId(), pointed->getId(), pointer->getName(), pointed->getName());
@@ -2854,6 +2873,48 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     //for (auto& [k, v] : statsAfter) ASHB_TRACE_STREAM << "  " << k << ": " << v << "\n";
     //
 
+    // ── IV-P4: the gift actually changes hands ───────────────────────────────
+    // A gift is only a gift if it costs the giver something and lands with the
+    // receiver. What it buys is standing (auctoritas/esteem) and an obligation:
+    // the receiver owes, and that debt is a bond. Prestige earned this way is
+    // the peaceful competitor to the violence pipeline — Mauss's point exactly.
+    if (action->name == "GiveGift" && pointed && g_liveConfig.giftMul != 0.0f) {
+        const float gm = g_liveConfig.giftMul;
+        // You can only give what you have; the more you give away relative to
+        // your means, the more it says about you.
+        float gift = std::min(entity->salary.token * 0.18f, 400.0f);
+        if (gift > 1.0f) {
+            entity->salary.spendMoney(gift);
+            pointed->salary.earnMoney(gift);
+            // Standing: conspicuous generosity is read as power.
+            float renown = std::min(6.0f, gift / 60.0f) * gm;
+            entity->auctoritas = std::min(100.0f, entity->auctoritas + renown);
+            entity->Esteem     = std::min(100.0f, entity->Esteem + renown * 0.6f);
+            // The obligation to repay: a durable social edge on both sides,
+            // stronger on the receiver's, who now owes.
+            auto bond = [](Entity* from, Entity* to, float delta) {
+                int idx = from->contains(from->list_entityPointedSocial, to, 4);
+                if (idx == -1) {
+                    entityPointedSocial link;
+                    link.Id = to->entityId; link.pointedEntity = to; link.social = std::max(0.0f, delta);
+                    from->list_entityPointedSocial.push_back(link);
+                } else {
+                    from->list_entityPointedSocial[idx].social =
+                        std::min(100.0f, from->list_entityPointedSocial[idx].social + delta);
+                }
+            };
+            bond(entity, pointed, 4.0f * gm);
+            bond(pointed, entity, 7.0f * gm);
+            pointed->emotions.gratitude = std::min(100.0f, pointed->emotions.gratitude + 14.0f * gm);
+            // Being given to is a reason to think well of someone.
+            PerceivedReputation& rep = pointed->reputationMap[entity->entityId];
+            rep.entityId = entity->entityId;
+            rep.positiveScore = std::min(100.0f, rep.positiveScore + 5.0f * gm);
+            rep.trustworthiness = std::min(100.0f, rep.trustworthiness + 3.0f * gm);
+            ++g_mindStats.giftsGiven;
+        }
+    }
+
     //check work action -> implements economics
     if(action->name == "Basic Manual Work"){
       entity->salary.earnMoney(BetterRand::genNrInInterval(100, 200));
@@ -3274,6 +3335,7 @@ Action* FreeWillSystem::checkHabitTrigger(const ActionContext& context) {
             std::uniform_real_distribution<float> dist(0.0f, 1.0f);
             if (dist(rng) < triggerChance) {
                 for (auto& action : availableActions) {
+                    if (action.name == "GiveGift" && g_liveConfig.giftMul == 0.0f) continue;
                     if (action.actionId == habit.actionId) {
                         return &action;
                     }
@@ -3496,7 +3558,8 @@ bool FreeWillSystem::isActionSocial(const Action* act){
     return (an == "Socialize" || an == "GoodConnection" || an == "Desire" || an == "AngerConnection" ||
                                    an == "Gossip" || an == "HelpSupport" || an == "Flirt" || an == "Date" || an == "Reconcile" ||
                                    an == "couple" || an == "breeding" || an == "Apologize" || an == "Insult" || an == "Manipulate" ||
-                                   an == "Jealousy" || an == "Betray" || an == "Discrimination" || an == "IgnoreAvoid" || an == "SetBoundaries");
+                                   an == "Jealousy" || an == "Betray" || an == "Discrimination" || an == "IgnoreAvoid" || an == "SetBoundaries" ||
+                               an == "GiveGift");
 }
 
 
@@ -3727,6 +3790,7 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
     if (entity->entityLoneliness > 50.0f || entity->socialDeficit > 40.0f) {
         for (auto& action : availableActions) {
+            if (action.name == "GiveGift" && g_liveConfig.giftMul == 0.0f) continue;
             if (action.needCategory == "social" && !attended.empty()) {
                 ActionCandidate c(&action);
                 c.score = 5.0f * (entity->entityLoneliness / 100.0f);
@@ -3754,6 +3818,11 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
     for (const Action& act : availableActions) {
         const Action* aPtr = &act;
         const std::string& an0 = act.name;
+        // IV-P4 kill switch: with giftMul at 0 the gift must not even be a
+        // candidate — merely scoring it would shift the softmax and consume
+        // different RNG, so the off-state would no longer reproduce the
+        // pre-feature world bit-for-bit.
+        if (act.name == "GiveGift" && g_liveConfig.giftMul == 0.0f) continue;
         bool isSocialCat = (act.needCategory == "social" ||
                             act.name == "Murder" || act.name == "Betray");
         if (isSocialCat && attended.empty()) {
@@ -3799,6 +3868,26 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         // envy climbs); B4: the season's intention pulls its aligned actions.
         score *= mind::emotionActionModifier(entity, an0);
         score *= mind::intentionModifier(entity, an0);
+        // I-P1: identity-congruence — people act to stay who they believe they
+        // are (self-story + coherence). Neutral 1.0 when identityMul==0.
+        score *= mind::identityCongruenceModifier(entity, an0);
+        // IV-P2: what the agent's faith forbids, demands and blesses. Neutral
+        // 1.0 for the unbelieving and when doctrineMul == 0.
+        score *= mind::doctrineModifier(entity, an0);
+        // IV-P4: who gives? Mauss's answer is: whoever has a surplus and wants
+        // standing. Generosity is not a mood here, it is a strategy — so the
+        // gift is weighted by what the agent can spare times how much they care
+        // about rank. Without this the action sat in the catalogue and was
+        // never once chosen (prosocial giving has no need that presses for it,
+        // unlike hunger or loneliness), which made the whole peaceful status
+        // route dead on arrival.
+        if (an0 == "GiveGift" && g_liveConfig.giftMul != 0.0f) {
+            float surplus = std::min(2.5f, entity->salary.token / 250.0f);
+            float wantsRank = (entity->ValueSystem.achievementDrive * 0.45f
+                             + entity->personality.extraversion    * 0.25f
+                             + entity->personality.agreeableness   * 0.30f) / 100.0f;
+            score *= (0.2f + 3.0f * surplus * wantsRank) * g_liveConfig.giftMul;
+        }
         // C4: evolved instinct nudges subsistence choices.
         if      (an0 == "Gather" || an0 == "Hunt") score *= neatForage;
         else if (an0 == "EatMeal")                 score *= neatEat;
@@ -3815,7 +3904,8 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         bool isSocialAction = (an == "Socialize" || an == "GoodConnection" || an == "Desire" || an == "AngerConnection" ||
                                an == "Gossip" || an == "HelpSupport" || an == "Flirt" || an == "Date" || an == "Reconcile" ||
                                an == "couple" || an == "breeding" || an == "Apologize" || an == "Insult" || an == "Manipulate" ||
-                               an == "Jealousy" || an == "Betray" || an == "Discrimination" || an == "IgnoreAvoid" || an == "SetBoundaries");
+                               an == "Jealousy" || an == "Betray" || an == "Discrimination" || an == "IgnoreAvoid" || an == "SetBoundaries" ||
+                               an == "GiveGift");
 
         if (isSocialAction) {
             if (attended.empty()) {
@@ -3881,6 +3971,7 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
     if (candidates.size() < 3) {
         for (const Action& act : availableActions) {
+            if (act.name == "GiveGift" && g_liveConfig.giftMul == 0.0f) continue;
             ActionCandidate c(&act);
             c.score = calculateNeedSatisfaction(act, entity) + calculateContextualWeight(act, context);
             candidates.push_back(c);
@@ -4612,8 +4703,16 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
         }
 
         // -- 2. Suspicion / trust / satisfaction dynamics ------------------
+        // I-P2: how secure the bond is (built commitment + earned trust) — a
+        // trusting, long-committed partner does not spiral over every glance.
+        const float rMul = g_liveConfig.relationshipMul;
+        float security = ((cp.commitment * 0.5f + cp.trust * 0.5f) / 100.0f);
+        security = security < 0.0f ? 0.0f : (security > 1.0f ? 1.0f : security);
         if (rivalThreat > 0.0f) {
-            float build = rivalThreat * (0.15f + 0.35f * jeal);
+            // Tit-for-tat starts NICE, not paranoid: security tempers the jealous
+            // read, so mate-guarding stress no longer dominates social life (F4).
+            float temper = 1.0f - 0.55f * security * rMul;
+            float build = rivalThreat * (0.15f + 0.35f * jeal) * temper;
             cp.suspicion    = std::min(100.0f, cp.suspicion + build * 0.05f);
             cp.trust        = std::max(0.0f,   cp.trust        - build * 0.020f);
             cp.satisfaction = std::max(0.0f,   cp.satisfaction - build * 0.015f);
@@ -4621,10 +4720,14 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
             e->entityHapiness = std::max(0.0f,   e->entityHapiness - build * 0.020f);
         } else {
             // No threat in sight: wounds heal, the bond quietly strengthens.
-            cp.suspicion    = std::max(0.0f,   cp.suspicion - 0.30f);
-            cp.trust        = std::min(100.0f, cp.trust        + 0.10f);
-            cp.satisfaction = std::min(100.0f, cp.satisfaction + 0.05f);
-            cp.commitment   = std::min(100.0f, cp.commitment   + 0.05f);
+            // Companionate love matures with time; forgiveness (trust recovery)
+            // runs faster in agreeable partners — nice, retaliatory, FORGIVING.
+            float mature = (cp.daysTogether > 60 ? 0.04f : 0.0f) * rMul;
+            float forgive = e->personality.agreeableness * 0.0010f * rMul;
+            cp.suspicion    = std::max(0.0f,   cp.suspicion - 0.30f - 0.20f * rMul);
+            cp.trust        = std::min(100.0f, cp.trust        + 0.10f + forgive);
+            cp.satisfaction = std::min(100.0f, cp.satisfaction + 0.05f + mature * 0.5f);
+            cp.commitment   = std::min(100.0f, cp.commitment   + 0.05f + mature);
         }
 
         // -- 3. Jealous reaction: resent the rival, and the disloyal partner
@@ -4768,6 +4871,12 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
             // enough for lineages to outpace mortality — without spawning a child
             // every cycle.
             float fertility = 38.0f + cp.commitment * 0.28f + pos(e->searchConnDesire(P)) * 0.28f;
+            // III-P3: the demographic transition. A prosperous, urban, literate
+            // household with children who live has markedly fewer of them than a
+            // poor rural one that expects to bury some — the single most robust
+            // regularity in modern demography, and the reason late-run societies
+            // stop looking like early ones. Exactly ×1.0 when laborMul is 0.
+            if (globalCivEngine) fertility *= globalCivEngine->fertilityModifier(*e, *P);
             // Young couples in their prime are markedly more fertile, so the
             // population pyramid refills from the bottom instead of greying out.
             float youngerAge = std::min(e->entityAge, P->entityAge);
@@ -4804,6 +4913,7 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
                     globalCivEngine->logEvent(-1, baby.getName() + " was born to the couple "
                         + e->name + " & " + P->name, "birth");
                     globalCivEngine->totalBirths++;
+                    globalCivEngine->recordBirthDemography(*e, *P);   // III-P3
                 }
                 if (globalLogger) {
                     globalLogger->logEvent("breeding",
@@ -4816,9 +4926,19 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
         }
 
         // -- 5. Breakup when trust or satisfaction collapses ---------------
+        // I-P2: love is sticky. A long, committed bond (children raise commitment
+        // at conception, so it is already encoded there) tolerates lower trust and
+        // is far less likely to end on a bad day — real dissolution is ~15-30%,
+        // not the 52% of the flagship run. Shallow/poisoned bonds still break.
+        float resilience = (cp.commitment / 100.0f) * 0.6f +
+                           std::min(1.0f, cp.daysTogether / 200.0f) * 0.4f;
+        resilience = resilience < 0.0f ? 0.0f : (resilience > 1.0f ? 1.0f : resilience);
+        float floorT      = 12.0f * (1.0f - 0.5f  * resilience * rMul);
+        int   breakChance = (int)(12.0f * (1.0f - 0.75f * resilience * rMul) + 0.5f);
+        if (breakChance < 2) breakChance = 2;
         if (P->entityHealth > 0.0f &&
-            (cp.trust < 12.0f || cp.satisfaction < 12.0f) &&
-            BetterRand::genNrInInterval(0, 100) < 12) {
+            (cp.trust < floorT || cp.satisfaction < floorT) &&
+            BetterRand::genNrInInterval(0, 100) < breakChance) {
             Entity* ex = P;
             if (globalLogger) globalLogger->logRelationship(
                 e->entityId, e->name, ex->entityId, ex->name,

@@ -47,6 +47,51 @@
 // no-op); the GUI console mutates them at runtime.
 LiveConfig g_liveConfig;
 
+// Name → knob, so a headless run can turn any multiplier from the command line
+// (`--set cityMul=0`). The A/B and kill-switch contract in
+// plans/parallel-earth-upgrade.md §2 is only meaningful if it can be exercised
+// without the GUI console.
+bool setLiveConfigKnob(const std::string& n, float v) {
+    static const std::pair<const char*, float LiveConfig::*> kKnobs[] = {
+        { "moveForceMul",     &LiveConfig::moveForceMul },
+        { "mortalityMul",     &LiveConfig::mortalityMul },
+        { "foodYieldMul",     &LiveConfig::foodYieldMul },
+        { "aggressionMul",    &LiveConfig::aggressionMul },
+        { "corruptionMul",    &LiveConfig::corruptionMul },
+        { "mutationRateMul",  &LiveConfig::mutationRateMul },
+        { "pheromoneDecayMul",&LiveConfig::pheromoneDecayMul },
+        { "inventionRateMul", &LiveConfig::inventionRateMul },
+        { "neatBrainShare",   &LiveConfig::neatBrainShare },
+        { "emotionMul",       &LiveConfig::emotionMul },
+        { "cultureMul",       &LiveConfig::cultureMul },
+        { "identityMul",      &LiveConfig::identityMul },
+        { "relationshipMul",  &LiveConfig::relationshipMul },
+        { "moodMul",          &LiveConfig::moodMul },
+        { "knowledgeMul",     &LiveConfig::knowledgeMul },
+        { "feudMul",          &LiveConfig::feudMul },
+        { "cityMul",          &LiveConfig::cityMul },
+        { "institutionMul",   &LiveConfig::institutionMul },
+        { "legacyMul",        &LiveConfig::legacyMul },
+        { "tradeMul",         &LiveConfig::tradeMul },
+        { "warMul",           &LiveConfig::warMul },
+        { "cycleMul",         &LiveConfig::cycleMul },
+        { "classMul",         &LiveConfig::classMul },
+        { "doctrineMul",      &LiveConfig::doctrineMul },
+        { "languageMul",      &LiveConfig::languageMul },
+        { "giftMul",          &LiveConfig::giftMul },
+        { "traitMul",         &LiveConfig::traitMul },
+        { "laborMul",         &LiveConfig::laborMul },
+        { "demographyMul",    &LiveConfig::demographyMul },
+        { "networkMul",       &LiveConfig::networkMul },
+        { "epigeneticsMul",   &LiveConfig::epigeneticsMul },
+        { "pathogenMul",      &LiveConfig::pathogenMul },
+        { "bioHomeostasisMul",&LiveConfig::bioHomeostasisMul },
+    };
+    for (const auto& k : kKnobs)
+        if (n == k.first) { g_liveConfig.*(k.second) = v; return true; }
+    return false;
+}
+
 using GroupEntity = std::vector<std::vector<Entity*>>;
 
 // ── Global climate / season state ────────────────────────────────────────────
@@ -313,6 +358,19 @@ static std::string determineDeathCause(const Entity& e) {
 // printRealismReport() when a headless run finishes.
 static std::map<std::string, int> g_deathLedger;
 static std::map<std::string, int> g_actionTally;
+// IV-P2: the same tally, split by the faith of whoever acted. This is what
+// makes "believers of different faiths behave differently" a measurement rather
+// than an assertion — if doctrine has teeth, two congregations' action mixes
+// must diverge. Keyed religionId -> action -> count (-1 = the unbelieving).
+static std::map<int, std::map<std::string, long>> g_faithActionTally;
+// §8: demography and affect, recorded at the one moment both are final — the
+// death pass. A world's realism shows in the SHAPE of these, not in their
+// averages: human lifespans are right-skewed with a hump of infant deaths at
+// the very bottom, and the stress people die carrying should be spread across
+// the range rather than piled at 100 (the flagship run's chronic-stress
+// artifact). Plain vectors: nothing reads them but the report.
+static std::vector<float> g_deathAges;
+static std::vector<float> g_deathStress;
 
 // M11: true when running --headless. Presentation-only work (inner monologue,
 // narrative sentences) is skipped — nobody is watching, and at 1k+ agents the
@@ -708,8 +766,32 @@ void tickRelationshipDecay(Entity* ent, float deltaTime) {
     // Without a cap, passive proximity + alliance bonding lets an entity rack up
     // dozens of weak social links while it only ever has a handful of desire/anger
     // bonds. Extraverts tolerate a few more connections than introverts.
+    // §8: the ceiling is real, but it is not the same ceiling for everybody —
+    // and a world where it is produces the flat degree distribution the report
+    // caught (everyone holding six ties, nobody holding twenty). Dunbar's
+    // layers scale with temperament AND with what a person's life puts in front
+    // of them: a trader on the roads, a priest before the congregation and a
+    // leader holding a people together meet a multiple of the people a farmer
+    // does. That is what turns the graph right-skewed — most people modest, a
+    // few hubs — without lifting the cognitive ceiling itself (150).
+    // Kill switch: networkMul == 0 restores the old flat 5–9 cap exactly.
     const int baseCap = 5;
     int socialCap = baseCap + (int)(ent->personality.extraversion / 100.0f * 4.0f); // 5–9
+    if (g_liveConfig.networkMul != 0.0f) {
+        float cap = 5.0f + ent->personality.extraversion / 100.0f * 10.0f;   // 5–15
+        if (ent->isSpecialist) {
+            if (ent->specialization == "trader")      cap += 10.0f;
+            else if (ent->specialization == "priest") cap += 8.0f;
+            else if (ent->specialization == "healer") cap += 6.0f;
+            else                                      cap += 3.0f;
+        }
+        if (globalCivEngine) {
+            const Tribe* home = ent->tribeId >= 0 ? globalCivEngine->findTribe(ent->tribeId) : nullptr;
+            if (home && home->leaderId == ent->entityId) cap += 12.0f;
+        }
+        cap *= g_liveConfig.networkMul;
+        socialCap = (int)std::min(150.0f, std::max(3.0f, cap));   // Dunbar's ceiling stands
+    }
     if ((int)ent->list_entityPointedSocial.size() > socialCap) {
         // Prune the weakest bonds first, preserving the strongest relationships.
         std::sort(ent->list_entityPointedSocial.begin(), ent->list_entityPointedSocial.end(),
@@ -1401,6 +1483,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                                    chosenAction->name == "Gossip" ||
                                    chosenAction->name == "Apologize" ||
                                    chosenAction->name == "HelpSupport" ||
+                                   chosenAction->name == "GiveGift" ||
                                    chosenAction->name == "IgnoreAvoid" ||
                                    chosenAction->name == "Insult" ||
                                    chosenAction->name == "Manipulate" ||
@@ -1441,6 +1524,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 //saving data
                 entity->saveEntityStats(chosenAction);
                 g_actionTally[chosenAction->name]++;
+                g_faithActionTally[entity->religionId][chosenAction->name]++;
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, target->name, "targeted action");
 
                 // ── Romantic side-drive ───────────────────────────────────────
@@ -1524,6 +1608,7 @@ void applyFreeWill(std::vector<std::vector<Entity*>>& entityGroups, int currentD
                 sys.executeAction(entity, chosenAction, context);
                 entity->saveEntityStats(chosenAction);
                 g_actionTally[chosenAction->name]++;
+                g_faithActionTally[entity->religionId][chosenAction->name]++;
                 globalLogger->logAction(entity->entityId, entity->name, chosenAction->name, "", "self-directed action");
 
                 // ── Narrative + inner monologue (GUI-only presentation) ──────
@@ -1604,6 +1689,9 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
                         cause.rfind("murder", 0) == 0)
                         bucket = "homicide";
                     g_deathLedger[bucket]++;
+                    // §8: the two distributions the report checks the shape of.
+                    g_deathAges.push_back(e.entityAge);
+                    g_deathStress.push_back(e.entityStress);
                 }
                 if (globalLogger) {
                     globalLogger->logDeath(e.entityId, e.name, (int)e.entityAge,
@@ -1612,6 +1700,12 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
                 // Record every death in the civilisation's running history & tally.
                 if (globalCivEngine) {
                     globalCivEngine->totalDeaths++;
+                    // I-P3: close the book on this life — gather what it changed,
+                    // pass its standing to its children, mark the ground. Runs
+                    // HERE, inside the death pass, while every pointer into
+                    // `entities` is still valid (the same reason handleDeath is
+                    // called from this block and not after the erase).
+                    globalCivEngine->recordLegacy(entities, e, day / 60);
                     globalCivEngine->logEvent(day / 60, e.name + " died of " + cause
                         + " at age " + std::to_string((int)e.entityAge), "death");
                 }
@@ -1877,42 +1971,12 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             // 5th tick: per-tick export of the whole population produced
             // ~27 MB per 500 ticks and dominated I/O.
             if (g_clock.isCivTick())
-                exportTickHistory("./src/data/tick_history.jsonl", entities, day);
+                exportTickHistory("./src/data/tick_history.json", entities, day);
         }
         day++;
     }
 }
 
-/*
-void initialiseSDL(std::vector<Entity>& entities, std::vector<Entity*>& ent_quad, std::vector<std::vector<Entity*>>& close_entity_together, int& day, int& frameCounter, const int UPDATE_FREQUENCY, int width, int height, int& selectedEntityIndex, bool& showEntityWindow){
-    SDLEngine SDLEngine("ASHB2 DEBUG");
-    Image obj(SDLEngine, "assets/background.jpg");
-
-    bool running = true;
-    SDL_Event event;
-    while (running)
-    {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-            }
-        }
-
-        // Apply free will and simulation updates
-        updateSimulationStep(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, false, width, height, selectedEntityIndex, showEntityWindow);
-
-        SDLEngine.initialiserRendu();
-        obj.dessiner(0,0);
-
-        // SDL mode: no spatial positions — entity count indicator only
-        SDL_SetRenderDrawColor(SDLEngine.getRenderer(), 255, 255, 255, 255);
-
-        SDLEngine.finaliserRendu();
-    }
-    } */
-
-
-// ── M9: red/green realism report ──────────────────────────────────────────────
 // Five falsifiable assertions about whether the run looks like a human world.
 // Printed after every headless run so a regression in social dynamics is
 // caught by eye (or by grepping "REALISM.*FAIL" in CI) instead of going
@@ -2010,18 +2074,708 @@ static void printRealismReport(const std::vector<Entity>& entities,
               << g_mindStats.deceptionsAttempted << " detected="
               << g_mindStats.deceptionsDetected
               << "  [" << (g_mindStats.deceptionsAttempted > 0 ? "PASS" : "warn") << "]\n";
-    std::cout << "==========================================\n\n";
-}
+    // 10. II-P2: institutions should exist and hold knowledge nobody's skull
+    // does. `archived` counts techniques written down; `saves` counts times an
+    // archive carried one through a collapse that would otherwise have erased
+    // it — the ratchet doing its job. Informational below 400 ticks: a people
+    // needs writing and a scholar before it can found a school at all.
+    if (civ) {
+        size_t archived = 0;
+        for (const auto& inst : civ->institutions.all()) archived += inst->archive.size();
+        std::cout << "10. Institutions store knowledge (informational): live="
+                  << civ->institutions.getInstitutionCount()
+                  << " founded=" << civ->totalInstitutions
+                  << " archived=" << archived
+                  << " saves=" << civ->totalArchiveSaves
+                  << "  [" << softVerdict(civ->totalInstitutions > 0, ticksRun >= 400) << "]\n";
+        // 11. I-P3: do lives leave marks that outlast them? `notable` counts
+        // lives the world still carries a mark of; `persisting` is the plan's
+        // acceptance bar — marks still standing at least two generations after
+        // the person died (a founder whose house is still running, a maker
+        // whose work is still named). `deepest` is the longest bloodline.
+        int deepest = 0, persisting = 0;
+        if (globalKinship) {
+            for (const auto& fam : globalKinship->families) {
+                deepest = std::max(deepest, fam.generation);
+                if (fam.founderId < 0 || fam.generation < 3) continue;
+                for (const auto& l : civ->legacies)
+                    if (l.entityId == fam.founderId && !l.marks.empty()) { ++persisting; break; }
+            }
+        }
+        // 12. III-P2's acceptance test, measured rather than asserted: if trade
+        // does what trade does, two peoples joined by a road should disagree
+        // LESS about what food is worth than two who are not. `linked` and
+        // `unlinked` are mean absolute price-index gaps; linked < unlinked is
+        // arbitrage working. Needs at least one route and one unlinked pair to
+        // mean anything.
+        {
+            float linkSum = 0.0f, freeSum = 0.0f;
+            int   linkN = 0, freeN = 0;
+            const auto& tr = civ->tribes;
+            for (size_t i = 0; i < tr.size(); ++i)
+                for (size_t j = i + 1; j < tr.size(); ++j) {
+                    bool linked = false;
+                    for (const auto& r : civ->tradeRoutes)
+                        if (r.active && r.a == std::min(tr[i].id, tr[j].id)
+                                     && r.b == std::max(tr[i].id, tr[j].id)) { linked = true; break; }
+                    float gap = std::abs(tr[i].priceFood - tr[j].priceFood);
+                    if (linked) { linkSum += gap; ++linkN; } else { freeSum += gap; ++freeN; }
+                }
+            float linkAvg = linkN ? linkSum / linkN : -1.0f;
+            float freeAvg = freeN ? freeSum / freeN : -1.0f;
+            // `<=` with a hair of tolerance, because the success case saturates:
+            // a world criss-crossed by 2,500 caravan trips has arbitraged every
+            // gap it can reach down to zero, and zero is not less than zero.
+            bool ok = (linkN > 0 && freeN > 0 && linkAvg <= freeAvg + 1e-6f);
+            std::cout << "11. Lives leave marks (informational): notable="
+                      << civ->totalNotableLives
+                      << " works=" << civ->greatWorks.size()
+                      << " memorials=" << civ->totalMemorials
+                      << " deepestLine=" << deepest
+                      << " persisting>=2gen=" << persisting
+                      << "  [" << softVerdict(civ->totalNotableLives > 0, ticksRun >= 400) << "]\n";
+            std::cout << "12. Trade narrows price gaps (linked < unlinked): linked="
+                      << (linkN ? std::to_string(linkAvg) : std::string("n/a"))
+                      << " unlinked=" << (freeN ? std::to_string(freeAvg) : std::string("n/a"))
+                      << " routes=" << civ->totalRoutesOpened
+                      << " cut=" << civ->totalRoutesCut
+                      << " caravans=" << civ->totalCaravans
+                      // Both halves of the comparison have to exist. A world
+                      // whose surviving peoples are ALL joined by roads has no
+                      // unlinked pair left to compare against — that is trade
+                      // having won, not arbitrage having failed.
+                      << "  [" << softVerdict(ok, ticksRun >= 400 && linkN > 0 && freeN > 0) << "]\n";
+        }
+        // 13. II-P4: is war consequential and plural? Four things at once —
+        // war actually kills (deaths as a share of all deaths, in a rough
+        // historical band rather than the bloodless ritual of the flagship
+        // run), maps change hands (conquests), polities assemble and come
+        // apart (empires), and the deepest standing feud shows blood debt
+        // outliving the people who first drew it.
+        {
+            float warShare = totalDeaths > 0
+                           ? (float)civ->totalWarDeaths / (float)totalDeaths : 0.0f;
+            float deepestFeud = 0.0f;
+            for (const auto& t : civ->tribes)
+                for (const auto& g : t.grievance)
+                    deepestFeud = std::max(deepestFeud, g.second);
+            // Largest polity actually held: how many peoples the biggest
+            // overlord rules right now. This is what "empire" is measured on.
+            int maxVassals = 0;
+            for (const auto& o : civ->tribes) {
+                int held = 0;
+                for (const auto& v : civ->tribes) if (v.overlordTribeId == o.id) ++held;
+                maxVassals = std::max(maxVassals, held);
+            }
+            // The band has a ceiling as well as a floor. §8 asks for a
+            // HISTORICAL share, and the first cut of II-P4 only checked that
+            // war killed anybody at all — under which a world where war
+            // accounts for half of all deaths and grinds the population from
+            // 217 down to 19 reads as a pass. Even the most warlike societies
+            // ethnographers have measured lose well under a third of their dead
+            // to violence; above that the sim is not modelling history, it is
+            // modelling an extinction event.
+            bool ok = civ->totalWarDeaths > 0 && civ->totalConquests > 0
+                      && (totalDeaths < 40 || warShare <= 0.30f);
+            std::cout << "13. War is consequential (deaths>0, conquests>0, share<=30%): warDead="
+                      << civ->totalWarDeaths
+                      << " share=" << (int)(warShare * 100) << "%"
+                      << " conquests=" << civ->totalConquests
+                      << " empires=" << civ->totalEmpires
+                      << "/" << civ->totalEmpiresFallen << " fell"
+                      << " maxVassals=" << maxVassals
+                      << " deepestFeud=" << (int)deepestFeud
+                      << "  [" << softVerdict(ok, ticksRun >= 400) << "]\n";
+        }
+        // 14. II-P3's claim, measured: political stress and how well ordinary
+        // people are living should move in ANTI-PHASE across a long run — when
+        // life at the bottom degrades and elites pile up, stress rises; strife
+        // discharges it and the cycle turns. A negative correlation is the
+        // signature; a flat or positive one means the cycle is not running.
+        {
+            // Measured on the DETRENDED series, which is what "oscillate in
+            // anti-phase" means and what the raw correlation cannot see. Over a
+            // long run both quantities carry a trend — a world that grows
+            // richer AND more crowded raises average wellbeing and average
+            // political stress together — and that shared drift swamps the
+            // cycle riding on top of it, reporting a positive correlation for a
+            // world whose cycles are textbook. Subtract a moving average from
+            // each and correlate what is left: the swings, which are the claim.
+            const auto& h = civ->cycleHistory;
+            float corr = 0.0f;
+            if (h.size() >= 20) {
+                const int W = 15;                       // half-window, in samples
+                std::vector<double> rw, ri;
+                for (size_t i = 0; i < h.size(); ++i) {
+                    const size_t lo = (i > (size_t)W) ? i - W : 0;
+                    const size_t hi = std::min(h.size() - 1, i + W);
+                    double sw = 0, si = 0;
+                    for (size_t k = lo; k <= hi; ++k) { sw += h[k].wellbeing; si += h[k].instability; }
+                    const double n = (double)(hi - lo + 1);
+                    rw.push_back(h[i].wellbeing   - sw / n);
+                    ri.push_back(h[i].instability - si / n);
+                }
+                double mw = 0, mi = 0;
+                for (size_t i = 0; i < rw.size(); ++i) { mw += rw[i]; mi += ri[i]; }
+                mw /= rw.size(); mi /= ri.size();
+                double cov = 0, vw = 0, vi = 0;
+                for (size_t i = 0; i < rw.size(); ++i) {
+                    double dw = rw[i] - mw, di = ri[i] - mi;
+                    cov += dw * di; vw += dw * dw; vi += di * di;
+                }
+                if (vw > 1e-9 && vi > 1e-9) corr = (float)(cov / std::sqrt(vw * vi));
+            }
+            bool ok = (h.size() >= 20 && corr < 0.0f && civ->totalStrifes > 0);
+            float mWell = 0, mInst = 0, mElite = 0, peakInst = 0, mOver = 0;
+            for (const auto& s : h) {
+                mWell += s.wellbeing; mInst += s.instability; mElite += s.elites; mOver += s.overshoot;
+                peakInst = std::max(peakInst, s.instability);
+            }
+            if (!h.empty()) { mWell /= h.size(); mInst /= h.size(); mElite /= h.size(); mOver /= h.size(); }
+            std::cout << "14. Secular cycle runs (wellbeing vs instability anti-phase): corr="
+                      << (h.size() >= 20 ? std::to_string(corr) : std::string("n/a"))
+                      << " strifes=" << civ->totalStrifes
+                      << " meanWellbeing=" << (int)mWell
+                      << " meanInstability=" << (int)mInst
+                      << " peakInstability=" << (int)peakInst
+                      << " eliteRatio=" << mElite
+                      << " overshoot=" << mOver
+                      << " samples=" << h.size()
+                      << "  [" << softVerdict(ok, ticksRun >= 800) << "]\n";
+        }
+        // 15. III-P4's acceptance test. Three things at once:
+        //  • top10Share — what fraction of all wealth the richest tenth hold.
+        //    A Pareto-shaped world sits near 40-70%; an even split is ~10%.
+        //  • eliteLineages — how concentrated the elite is by family: the share
+        //    of patricians drawn from the most over-represented houses. If
+        //    advantage is heritable, elite families recur.
+        //  • mobility — the share of living adults whose class differs from the
+        //    parent they inherited from. The plan's bar is that this is
+        //    NONZERO (rank is not caste) but well BELOW random mixing.
+        {
+            std::vector<float> w;
+            for (const auto& e : entities)
+                if (e.entityHealth > 0.0f) w.push_back(std::max(0.0f, e.salary.token));
+            std::sort(w.begin(), w.end());
+            float total = 0.0f, top = 0.0f;
+            for (size_t i = 0; i < w.size(); ++i) {
+                total += w[i];
+                if (i >= w.size() - w.size() / 10) top += w[i];
+            }
+            float topShare = (total > 0.0f) ? top / total : 0.0f;
 
-int getRenderingChoice(){
-    std::cout << "Choose your rendering method(1 or 2)\n  1-Simple Dots representing entities (=more statistics, less beautiful) \n  2-Graphic rendering with character moving(=less statistics, more beautiful)\n>";
-    std::string input;
-    std::cin >> input;
-    if(input == "1"){
-        return 1;
-    }else{
-        return 2;
+            std::map<int, int> eliteByFamily;
+            int elites = 0, moved = 0, comparable = 0;
+            for (const auto& e : entities) {
+                if (e.entityHealth <= 0.0f) continue;
+                if (e.socialClass == CLASS_PATRICIAN) { ++elites; ++eliteByFamily[e.familyId]; }
+                if (e.entityAge < 18.0f) continue;
+                // Compare against the parent we can still find.
+                for (int pid : { e.parent1Id, e.parent2Id }) {
+                    if (pid < 0) continue;
+                    for (const auto& p : entities)
+                        if (p.entityId == pid) {
+                            ++comparable;
+                            if (p.socialClass != e.socialClass) ++moved;
+                            break;
+                        }
+                    break;
+                }
+            }
+            int biggest = 0;
+            for (const auto& kv : eliteByFamily) biggest = std::max(biggest, kv.second);
+            float eliteConc = elites > 0 ? (float)biggest / (float)elites : 0.0f;
+            float mobility  = comparable > 0 ? (float)moved / (float)comparable : -1.0f;
+            bool ok = (topShare > 0.25f) && (mobility >= 0.0f && mobility < 0.5f);
+            std::cout << "15. Class is heritable & sticky (top10>25%, 0<=mobility<50%): top10Share="
+                      << (int)(topShare * 100) << "%"
+                      << " elites=" << elites
+                      << " largestEliteHouse=" << (int)(eliteConc * 100) << "%"
+                      << " mobility=" << (mobility < 0 ? std::string("n/a")
+                                                       : std::to_string((int)(mobility * 100)) + "%")
+                      << " (" << comparable << " child/parent pairs)"
+                      // A mobility RATE needs a denominator worth dividing by.
+                      // It is measured over adults with a parent still living,
+                      // which in a world of a couple of hundred souls can be a
+                      // dozen pairs — and one patrician with four grown
+                      // children then reads as "class is not heritable". Below
+                      // thirty pairs the number is reported, not asserted on.
+                      << "  [" << softVerdict(ok, ticksRun >= 600 && comparable >= 30) << "]\n";
+        }
+        // 16. IV-P1's acceptance test: is culture content that diverges and
+        // tips? Two measurements, neither of which a scalar `cultureScore` can
+        // produce at all:
+        //  • meanDistance — how unlike each other the world's peoples actually
+        //    are, averaged over every pair (0 = one global monoculture, 1 = no
+        //    two peoples share a single practice). This is the plan's "distinct
+        //    trait sets" bar: transmission that ran everywhere at once would
+        //    drive this to 0, and traits that never travelled would pin it at 1.
+        //    `distanceCorr` (map distance vs cultural distance) and `far`/`near`
+        //    (across landmasses vs within one) report the geographic texture,
+        //    but are informational: tribes migrate, split and colonise, so on a
+        //    single crowded cradle they are dominated by descent rather than by
+        //    who lives where.
+        //  • cascades — how often a trait crossed Centola's 25% critical mass.
+        //    Cascades alongside fizzles is the punctuated dynamic: novelties
+        //    mostly die quietly, and the survivors take a whole people quickly.
+        {
+            double farSum = 0.0, nearSum = 0.0;
+            int    farN = 0, nearN = 0;
+            std::vector<std::pair<double, double>> pairs;   // (map distance, cultural distance)
+            unsigned long long worldTraits = 0ull;
+            const auto& tr = civ->tribes;
+            for (size_t i = 0; i < tr.size(); ++i) {
+                worldTraits |= tr[i].knownTraits;
+                for (size_t j = i + 1; j < tr.size(); ++j) {
+                    if (tr[i].cultureTraits == 0ull || tr[j].cultureTraits == 0ull) continue;
+                    double d = environment::CulturalTransmissionSystem::distance(
+                                   tr[i].cultureTraits, tr[j].cultureTraits);
+                    if (tr[i].regionId == tr[j].regionId) { nearSum += d; ++nearN; }
+                    else                                  { farSum  += d; ++farN;  }
+                    double dx = tr[i].centerX - tr[j].centerX, dy = tr[i].centerY - tr[j].centerY;
+                    pairs.push_back({ std::sqrt(dx * dx + dy * dy), d });
+                }
+            }
+            double corr = 0.0;
+            if (pairs.size() >= 10) {
+                double mg = 0, mc = 0;
+                for (const auto& p : pairs) { mg += p.first; mc += p.second; }
+                mg /= pairs.size(); mc /= pairs.size();
+                double cov = 0, vg = 0, vc = 0;
+                for (const auto& p : pairs) {
+                    double dg = p.first - mg, dc = p.second - mc;
+                    cov += dg * dc; vg += dg * dg; vc += dc * dc;
+                }
+                if (vg > 1e-9 && vc > 1e-9) corr = cov / std::sqrt(vg * vc);
+            }
+            float farAvg  = farN  ? (float)(farSum  / farN)  : -1.0f;
+            float nearAvg = nearN ? (float)(nearSum / nearN) : -1.0f;
+            double meanDist = 0.0;
+            for (const auto& p : pairs) meanDist += p.second;
+            if (!pairs.empty()) meanDist /= pairs.size();
+            // One people cannot be culturally unlike anybody; there the line
+            // reports and warns rather than failing on a world too small to
+            // have a cultural geography at all.
+            const bool measurable = pairs.size() >= 3;
+            // Traits dying out is the other half of the punctuated dynamic, but
+            // a short run legitimately hasn't buried one yet — only demand it
+            // once the world has had time to forget something.
+            bool ok = meanDist > 0.15 && civ->totalCascades > 0
+                      && (ticksRun < 600 || civ->totalFizzles > 0);
+            std::cout << "16. Culture diverges & tips (peoples differ, traits rise & die): meanDistance="
+                      << (measurable ? std::to_string(meanDist) : std::string("n/a"))
+                      << " distanceCorr="
+                      << (pairs.size() >= 10 ? std::to_string(corr) : std::string("n/a"))
+                      << " pairs=" << pairs.size()
+                      << " far=" << (farN  ? std::to_string(farAvg)  : std::string("n/a"))
+                      << " near=" << (nearN ? std::to_string(nearAvg) : std::string("n/a"))
+                      << " traitsAlive="
+                      << environment::CulturalTransmissionSystem::count(worldTraits)
+                      << " invented=" << civ->totalTraitsInvented
+                      << " cascades=" << civ->totalCascades
+                      << " fizzles="  << civ->totalFizzles
+                      << " diffused=" << civ->totalTraitsDiffused
+                      << "  [" << softVerdict(ok, ticksRun >= 400 && measurable) << "]\n";
+        }
+            // 17. IV-P2's acceptance test: do congregations actually behave
+            // differently? A first cut compared the share of *aggressive* acts
+            // between the two largest faiths, which measured almost nothing —
+            // violence is 0.04% of all action in this world, so the comparison
+            // was pure noise. The honest measurement is the whole action mix:
+            // total-variation distance between the two congregations' action
+            // distributions (0 = they do exactly the same things in the same
+            // proportions, 1 = no overlap at all), plus the devotional share,
+            // which is what the afterlife/asceticism axes bear on directly and
+            // is common enough to read.
+            {
+                std::vector<std::pair<int, long>> byFaith;
+                for (const auto& kv : g_faithActionTally) {
+                    if (kv.first < 0) continue;              // skip the unbelieving
+                    long n = 0;
+                    for (const auto& a : kv.second) n += a.second;
+                    if (n >= 200) byFaith.push_back({ kv.first, n });   // enough to compare
+                }
+                std::sort(byFaith.begin(), byFaith.end(),
+                          [](const auto& a, const auto& b){ return a.second > b.second; });
+                auto devotionalShare = [&](int rid) -> float {
+                    const auto& t = g_faithActionTally[rid];
+                    long tot = 0, dev = 0;
+                    for (const auto& a : t) {
+                        tot += a.second;
+                        if (a.first == "Prayer" || a.first == "Preach" || a.first == "Meditate")
+                            dev += a.second;
+                    }
+                    return tot > 0 ? (float)dev / (float)tot : 0.0f;
+                };
+                float tv = -1.0f, dA = 0.0f, dB = 0.0f;
+                if (byFaith.size() > 1) {
+                    const auto& A = g_faithActionTally[byFaith[0].first];
+                    const auto& B = g_faithActionTally[byFaith[1].first];
+                    long nA = byFaith[0].second, nB = byFaith[1].second;
+                    std::set<std::string> names;
+                    for (const auto& a : A) names.insert(a.first);
+                    for (const auto& b : B) names.insert(b.first);
+                    double sum = 0.0;
+                    for (const auto& n : names) {
+                        double pa = A.count(n) ? (double)A.at(n) / nA : 0.0;
+                        double pb = B.count(n) ? (double)B.at(n) / nB : 0.0;
+                        sum += std::abs(pa - pb);
+                    }
+                    tv = (float)(sum * 0.5);
+                    dA = devotionalShare(byFaith[0].first);
+                    dB = devotionalShare(byFaith[1].first);
+                }
+                bool ok = (tv > 0.05f) && civ->totalRites > 0;
+                std::cout << "17. Faiths differ in conduct (action-mix distance > 0.05): congregations="
+                          << byFaith.size()
+                          << " actionMixDistance=" << (tv < 0 ? std::string("n/a") : std::to_string(tv))
+                          << " devotionalA=" << (dA * 100) << "%"
+                          << " devotionalB=" << (dB * 100) << "%"
+                          << " rites=" << civ->totalRites
+                          << " schisms=" << civ->totalSchisms
+                          << "  [" << softVerdict(ok, ticksRun >= 600) << "]\n";
+            }
+            // 18. IV-P3's acceptance test: does a language boundary actually
+            // slow things down? Diffusion RATE (transfers per contact
+            // opportunity) inside a shared tongue against the rate across an
+            // opaque one. Comparing rates and not raw counts matters — most
+            // pairs share a tongue, so counts alone would say nothing. Also
+            // reports the mean intelligibility across the world's peoples and
+            // how many pairs have creolised into mutual understanding.
+            {
+                double rSame  = civ->diffusionOpportunitySame > 0
+                    ? (double)civ->diffusionSameTongue / civ->diffusionOpportunitySame : -1.0;
+                double rCross = civ->diffusionOpportunityCross > 0
+                    ? (double)civ->diffusionCrossTongue / civ->diffusionOpportunityCross : -1.0;
+                float meanIntel = -1.0f;
+                {
+                    double sum = 0.0; int n = 0;
+                    const auto& tr = civ->tribes;
+                    for (size_t i = 0; i < tr.size(); ++i)
+                        for (size_t j = i + 1; j < tr.size(); ++j) {
+                            sum += civ->mutualIntelligibility(tr[i], tr[j]); ++n;
+                        }
+                    if (n) meanIntel = (float)(sum / n);
+                }
+                bool ok = (rSame >= 0.0 && rCross >= 0.0 && rSame > rCross);
+                std::cout << "18. Language gates diffusion (same-tongue rate > cross-tongue): same="
+                          << (rSame  < 0 ? std::string("n/a") : std::to_string(rSame))
+                          << " cross=" << (rCross < 0 ? std::string("n/a") : std::to_string(rCross))
+                          << " meanIntelligibility="
+                          << (meanIntel < 0 ? std::string("n/a") : std::to_string(meanIntel))
+                          << " creolisations=" << civ->totalCreolisations
+                          << "  [" << softVerdict(ok, ticksRun >= 600) << "]\n";
+            }
+
+        // ── §8: Realism Report v3 — the cross-cutting assertions ─────────────
+        // Everything above measures one phase's own claim. These five measure
+        // the SHAPES the plan says a world resembling Earth has to have,
+        // regardless of which phase produced them: how people die, how many
+        // people they know, how their settlements are sized, what they fight
+        // over, and whether what they know goes backwards.
+        // See plans/parallel-earth-upgrade.md §8.
+
+        // 19. Demography: a human lifespan distribution is not a bell curve. It
+        // has a hump of deaths at the very start of life and a long right tail
+        // of people who got through it — infant mortality plus survivorship. A
+        // world where nobody dies young, or where nobody reaches old age, has
+        // the wrong shape whatever its mean says.
+        {
+            std::vector<float> ages = g_deathAges;
+            std::sort(ages.begin(), ages.end());
+            float infantShare = 0.0f, elderShare = 0.0f, median = -1.0f, mean = 0.0f;
+            if (!ages.empty()) {
+                int young = 0, old = 0;
+                for (float a : ages) { if (a < 5.0f) ++young; if (a >= 60.0f) ++old; mean += a; }
+                infantShare = (float)young / ages.size();
+                elderShare  = (float)old   / ages.size();
+                mean       /= ages.size();
+                median      = ages[ages.size() / 2];
+            }
+            // Deaths in childhood happen but do not dominate, and a meaningful
+            // share of people live long enough to grow old.
+            bool ok = ages.size() >= 20 && infantShare > 0.01f && infantShare < 0.45f
+                      && elderShare > 0.05f;
+            std::cout << "19. Lifespans have a human shape (infant hump 1-45%, elders >5%): infant<5="
+                      << (int)(infantShare * 100) << "%"
+                      << " elders60+=" << (int)(elderShare * 100) << "%"
+                      << " median=" << (median < 0 ? std::string("n/a") : std::to_string((int)median))
+                      << " mean=" << (int)mean
+                      << " deaths=" << ages.size()
+                      << "  [" << softVerdict(ok, ticksRun >= 600 && ages.size() >= 20) << "]\n";
+        }
+
+        // 20. Networks: Dunbar's ceiling is a fact about human cognition, and a
+        // social graph that ignores it is a graph of address books, not
+        // friendships. Degrees should also be *unequal* — most people hold a
+        // modest circle, a few are hubs — which is what a log-normal-ish spread
+        // looks like from the outside.
+        {
+            std::vector<int> degree;
+            for (const auto& e : entities) {
+                if (e.entityHealth <= 0.0f) continue;
+                int d = 0;
+                for (const auto& s : e.list_entityPointedSocial)
+                    if (s.social > 5.0f) ++d;
+                degree.push_back(d);
+            }
+            std::sort(degree.begin(), degree.end());
+            int   maxDeg = degree.empty() ? 0 : degree.back();
+            float medDeg = degree.empty() ? 0.0f : (float)degree[degree.size() / 2];
+            float meanDeg = 0.0f;
+            for (int d : degree) meanDeg += d;
+            if (!degree.empty()) meanDeg /= degree.size();
+            double var = 0.0;
+            for (int d : degree) var += (d - meanDeg) * (d - meanDeg);
+            float sd = degree.empty() ? 0.0f : (float)std::sqrt(var / degree.size());
+            bool ok = !degree.empty() && maxDeg <= 150 && sd > 1.0f;
+            std::cout << "20. Social circles are Dunbar-capped & uneven (max<=150, spread>1): max="
+                      << maxDeg << " median=" << (int)medDeg << " mean=" << meanDeg
+                      << " sd=" << sd << " people=" << degree.size()
+                      << "  [" << softVerdict(ok, ticksRun >= 300) << "]\n";
+        }
+
+        // 21. Zipf: settlement sizes in every studied human society fall on a
+        // rank-size line — the second city about half the first, the third a
+        // third of it. Fitting log(size) against log(rank) and reading off the
+        // slope and how tightly the points sit on it is the standard test, and
+        // it is emergent here: nothing assigns sizes, migration and surplus do.
+        {
+            std::vector<int> sizes;
+            for (const auto& t : civ->tribes)
+                if (t.population() > 0) sizes.push_back(t.population());
+            std::sort(sizes.begin(), sizes.end(), std::greater<int>());
+            double slope = 0.0, r2 = -1.0;
+            if (sizes.size() >= 5) {
+                double mx = 0, my = 0;
+                const int n = (int)sizes.size();
+                std::vector<double> X(n), Y(n);
+                for (int i = 0; i < n; ++i) {
+                    X[i] = std::log((double)(i + 1));
+                    Y[i] = std::log((double)sizes[i]);
+                    mx += X[i]; my += Y[i];
+                }
+                mx /= n; my /= n;
+                double sxy = 0, sxx = 0, syy = 0;
+                for (int i = 0; i < n; ++i) {
+                    sxy += (X[i] - mx) * (Y[i] - my);
+                    sxx += (X[i] - mx) * (X[i] - mx);
+                    syy += (Y[i] - my) * (Y[i] - my);
+                }
+                if (sxx > 1e-9 && syy > 1e-9) {
+                    slope = sxy / sxx;
+                    r2    = (sxy * sxy) / (sxx * syy);
+                }
+            }
+            bool ok = r2 >= 0.75 && slope < -0.2 && slope > -2.5;
+            std::cout << "21. Settlement sizes fit a rank-size law (R^2>=0.75, slope -0.2..-2.5): slope="
+                      << (r2 < 0 ? std::string("n/a") : std::to_string(slope))
+                      << " R^2=" << (r2 < 0 ? std::string("n/a") : std::to_string(r2))
+                      << " settlements=" << sizes.size()
+                      << " largest=" << (sizes.empty() ? 0 : sizes[0])
+                      << "  [" << softVerdict(ok, ticksRun >= 600 && sizes.size() >= 5) << "]\n";
+        }
+
+        // 22. Conflict is plural: real wars are fought over faith, land, food,
+        // tribute and borders, and a world that only ever fights one of those
+        // has a single mechanism wearing five names.
+        {
+            int kinds = 0, total = 0;
+            for (int i = 0; i < 5; ++i) {
+                total += civ->warsByReason[i];
+                if (civ->warsByReason[i] > 0) ++kinds;
+            }
+            bool ok = kinds >= 4;
+            std::cout << "22. Wars have plural causes (>=4 kinds): kinds=" << kinds
+                      << " ethnic="   << civ->warsByReason[WAR_ETHNIC]
+                      << " conquest=" << civ->warsByReason[WAR_CONQUEST]
+                      << " resource=" << civ->warsByReason[WAR_RESOURCE]
+                      << " tribute="  << civ->warsByReason[WAR_TRIBUTE]
+                      << " border="   << civ->warsByReason[WAR_BORDER]
+                      << " declared=" << total
+                      << "  [" << softVerdict(ok, ticksRun >= 800 && total >= 8) << "]\n";
+        }
+
+        // 23. The knowledge ratchet (II-P1's central claim, measured over the
+        // whole run rather than at the end): before writing, a collapse can take
+        // techniques back out of the world; after it, the archive holds and what
+        // is known must never fall. `dropsAfterWriting` is the number of times
+        // it did anyway — the one number that has to be zero. Affect rides along
+        // here too: the stress people die carrying should be spread, not piled
+        // at the ceiling.
+        {
+            // Two kinds of loss, and only one of them is a broken ratchet. A
+            // fall that lands in the same window as a COLLAPSE is the dark age
+            // eating the library — exactly what writing and its archives are
+            // supposed to prevent, so after literacy it must never happen. A
+            // fall with no collapse behind it is a people dying out and taking
+            // a craft nobody else practised with it: a real way to lose
+            // knowledge, and not a failure of the ratchet.
+            int dropsBefore = 0, dropsAfter = 0, attrition = 0, peak = 0;
+            bool seenLiterate = false;
+            const auto& h = civ->knowledgeHistory;
+            for (size_t i = 1; i < h.size(); ++i) {
+                if (h[i - 1].literate) seenLiterate = true;
+                if (h[i].techCount < h[i - 1].techCount) {
+                    const bool collapsed = h[i].darkAges > h[i - 1].darkAges;
+                    if (!collapsed)        ++attrition;
+                    else if (seenLiterate) ++dropsAfter;
+                    else                   ++dropsBefore;
+                }
+                peak = std::max(peak, h[i].techCount);
+            }
+            float pinned = 0.0f, sdStress = 0.0f;
+            if (!g_deathStress.empty()) {
+                int atCeiling = 0; double m = 0;
+                for (float s : g_deathStress) { if (s >= 95.0f) ++atCeiling; m += s; }
+                m /= g_deathStress.size();
+                double v = 0;
+                for (float s : g_deathStress) v += (s - m) * (s - m);
+                sdStress = (float)std::sqrt(v / g_deathStress.size());
+                pinned   = (float)atCeiling / g_deathStress.size();
+            }
+            bool ok = dropsAfter == 0 && pinned < 0.5f
+                      && (g_deathStress.size() < 20 || sdStress > 5.0f);
+            std::cout << "23. Knowledge ratchets & nobody dies pinned (collapse-drops-after-writing=0, pinned<50%): drops="
+                      << dropsAfter << " (before writing " << dropsBefore
+                      << ", lost with their last keepers " << attrition << ")"
+                      << " peakTech=" << peak
+                      << " darkAges=" << civ->darkAgeCount
+                      << " diedAtStress100=" << (int)(pinned * 100) << "%"
+                      << " stressSd=" << sdStress
+                      << "  [" << softVerdict(ok, ticksRun >= 600) << "]\n";
+        }
+
+        // 24. III-P3's acceptance test, both halves of it:
+        //  • The demographic transition — birth RATES (births per thousand
+        //    population-days of fertile adults, so a city is not "more fertile"
+        //    merely for being bigger) must fall with wealth and with
+        //    urbanisation. This is the check that separates a modernising
+        //    society from an early one, and it is the reason late-run
+        //    demography stops looking like the opening centuries.
+        //  • The labour market — the specialist share must rise with settlement
+        //    size (a camp cannot feed a scholar; a city cannot function without
+        //    one), and posts should be filled through weak ties and taught
+        //    through guilds rather than handed out by rank.
+        {
+            auto rate = [](long births, double popDays) {
+                return popDays > 0.0 ? (double)births * 1000.0 / popDays : -1.0;
+            };
+            double richRate = rate(civ->birthsRich, civ->popDaysRich);
+            double poorRate = rate(civ->birthsPoor, civ->popDaysPoor);
+            long   urbanB = 0, ruralB = 0;
+            double urbanD = 0.0, ruralD = 0.0;
+            for (int t = 0; t < 5; ++t) {
+                if (t >= 2) { urbanB += civ->birthsByTier[t]; urbanD += civ->popDaysByTier[t]; }
+                else        { ruralB += civ->birthsByTier[t]; ruralD += civ->popDaysByTier[t]; }
+            }
+            double urbanRate = rate(urbanB, urbanD), ruralRate = rate(ruralB, ruralD);
+            auto share = [&](int t) {
+                return civ->specialistSamplesByTier[t] > 0
+                     ? civ->specialistShareByTier[t] / (double)civ->specialistSamplesByTier[t]
+                     : -1.0;
+            };
+            double campShare = share(0), townShare = -1.0;
+            {   // the biggest settlement class this world actually built
+                double sum = 0.0; long n = 0;
+                for (int t = 2; t < 5; ++t)
+                    if (civ->specialistSamplesByTier[t] > 0) {
+                        sum += civ->specialistShareByTier[t];
+                        n   += civ->specialistSamplesByTier[t];
+                    }
+                if (n > 0) townShare = sum / (double)n;
+            }
+            // What is asserted and what is merely reported, and why. The
+            // wealth gradient is measured WITHIN each people (every parent
+            // against their own tribe's mean), so prosperity, food, safety and
+            // partner availability are held constant and what remains is the
+            // transition itself — that one is the test. The urban/rural
+            // comparison is across peoples, where a town is a town precisely
+            // BECAUSE it is thriving, so its higher birth rate is that
+            // prosperity showing through rather than the transition failing;
+            // it is printed for the reader and not asserted on. And the
+            // gradient is a late-run claim by construction: a world too poor to
+            // have produced a wealth spread has nothing to show yet.
+            const bool wealthOk = (richRate >= 0.0 && poorRate > 0.0 && richRate < poorRate);
+            const bool mixOk    = (townShare < 0.0 || campShare < 0.0 || townShare > campShare);
+            const bool measurable = (civ->popDaysRich > 500.0 && civ->popDaysPoor > 500.0);
+            bool ok = wealthOk && mixOk;
+            std::cout << "24. Fertility falls with wealth (within a people), specialists track size: rich="
+                      << (richRate < 0 ? std::string("n/a") : std::to_string(richRate))
+                      << " poor=" << (poorRate < 0 ? std::string("n/a") : std::to_string(poorRate))
+                      << " urban=" << (urbanRate < 0 ? std::string("n/a") : std::to_string(urbanRate))
+                      << " rural=" << (ruralRate < 0 ? std::string("n/a") : std::to_string(ruralRate))
+                      << " specialistShare camp=" << (campShare < 0 ? std::string("n/a")
+                                                      : std::to_string(campShare))
+                      << " town+=" << (townShare < 0 ? std::string("n/a") : std::to_string(townShare))
+                      << " hires=" << civ->hiresTotal
+                      << " viaWeakTie=" << civ->hiresViaWeakTie
+                      << " apprenticed=" << civ->apprenticeships
+                      << "  [" << softVerdict(ok, ticksRun >= 800 && measurable) << "]\n";
+        }
+            // 25. IV-P4's acceptance test, three claims in one line:
+            //  • festivals and rites measurably discharge stress (the F5 relief
+            //    valve) — total stress points removed by collective gathering;
+            //  • the gift is a REAL status route: gifts given, potlatches held,
+            //    and the resulting non-violent prestige;
+            //  • art outlives its makers: great works standing as memorials.
+            // The comparison that matters is gifts against killings — if the
+            // peaceful route to standing is used more than the violent one,
+            // the structural brake Mauss describes is actually working.
+            {
+                long killings = 0;
+                for (const auto& kv : g_actionTally)
+                    if (kv.first == "Murder" || kv.first == "Duel" || kv.first == "Raid")
+                        killings += kv.second;
+                bool ok = g_mindStats.festivalStressDischarged > 0.0
+                          && g_mindStats.giftsGiven > 0;
+                std::cout << "25. Ritual & gift work (discharge>0, gifts>0): stressDischarged="
+                          << (long)g_mindStats.festivalStressDischarged
+                          << " festivals=" << g_mindStats.festivalsHeld
+                          << " rites=" << civ->totalRites
+                          << " gifts=" << g_mindStats.giftsGiven
+                          << " potlatches=" << civ->totalPotlatches
+                          << " vsKillings=" << killings
+                          << " greatWorks=" << civ->greatWorks.size()
+                          << "  [" << softVerdict(ok, ticksRun >= 400) << "]\n";
+            }
+
+            // 26. §10.1 — the plan's headline claim, and the one the flagship
+            // run report said was impossible: a civilisation crosses into
+            // modernity AND STAYS. Both halves are asserted, because the old
+            // world could touch an era and lose it again the same century —
+            // 181 dark ages of Medieval↔Modern yo-yo. "Stays" is read off the
+            // last fifth of the run: having got there, the world is still there
+            // at the end, and it did not spend that stretch flickering.
+            {
+                const auto& h = civ->knowledgeHistory;
+                int  peakEra = 0, endEra = 0, heldSamples = 0, tailSamples = 0;
+                const size_t tailFrom = h.size() - h.size() / 5;
+                for (size_t i = 0; i < h.size(); ++i) {
+                    peakEra = std::max(peakEra, h[i].era);
+                    if (i >= tailFrom) {
+                        ++tailSamples;
+                        if (h[i].era >= (int)ERA_RENNAISSANCE) ++heldSamples;
+                    }
+                }
+                if (!h.empty()) endEra = h.back().era;
+                const float held = tailSamples > 0 ? (float)heldSamples / tailSamples : 0.0f;
+                // Crossing over is reaching the early modern rung; holding is
+                // spending the closing stretch at renaissance or above (a
+                // one-rung slip is survivable history, a fall to the bronze age
+                // is the failure this plan exists to fix).
+                bool ok = peakEra >= (int)ERA_EARLY_MODERN
+                          && endEra >= (int)ERA_RENNAISSANCE
+                          && held >= 0.8f;
+                std::cout << "26. A civilisation crosses into modernity and stays (peak>=EarlyModern, held>=80%): peakEra="
+                          << peakEra << " endEra=" << endEra
+                          << " heldTail=" << (int)(held * 100) << "%"
+                          << " techs=" << (h.empty() ? 0 : h.back().techCount)
+                          << " darkAges=" << civ->darkAgeCount
+                          << "  [" << softVerdict(ok, ticksRun >= 2000) << "]\n";
+            }
     }
+    std::cout << "==========================================\n\n";
 }
 
 // ── Web bridge: --inject <file> ──────────────────────────────────────────────
@@ -2318,6 +3072,13 @@ struct CliOptions {
     std::string loadFile;             // load this save instead of spawning founders
     std::string saveFile = "headless_autosave.txt"; // --save-at target (goes to saves/ dir)
     int         saveAtTick = -1;      // >0 = write saveFile at this headless tick
+    int         saveEvery  = -1;      // >0 = rolling autosave every N ticks
+    bool        saveOnExit = false;   // write the world once the run finishes
+    // True when the terminal run was CHOSEN at the prompt rather than passed on
+    // the command line. A scripted headless run must never block on stdin; a
+    // person who just picked "no window" is sitting right there and should
+    // still be asked the same world questions the windowed path asks.
+    bool        interactiveTerminal = false;
     // Web bridge: spawn/nudge web-controlled characters from a block file
     // before the tick loop starts (see applyWebInjectFile).
     std::string injectFile;
@@ -2339,6 +3100,20 @@ static CliOptions parseCli(int argc, char* argv[]) {
         else if (a == "--inject")   { o.injectFile = next(i); }
         else if (a == "--save-at")  { o.saveAtTick = std::atoi(next(i)); }
         else if (a == "--save-file"){ o.saveFile = next(i); }
+        else if (a == "--save-every"){ o.saveEvery = std::atoi(next(i)); }
+        else if (a == "--save-on-exit") { o.saveOnExit = true; }
+        // Turn any live-config knob from the command line: `--set cityMul=0`.
+        // Repeatable. This is how a kill switch gets verified headlessly — run
+        // the pair with and without the knob and diff the logs.
+        else if (a == "--set") {
+            std::string kv = next(i);
+            size_t eq = kv.find('=');
+            if (eq == std::string::npos || eq == 0) {
+                std::cerr << "--set expects KNOB=VALUE (got '" << kv << "') — ignored\n";
+            } else if (!setLiveConfigKnob(kv.substr(0, eq), (float)std::atof(kv.c_str() + eq + 1))) {
+                std::cerr << "--set: unknown knob '" << kv.substr(0, eq) << "' — ignored\n";
+            }
+        }
         // M10: scenario presets — curated parameter bundles. Applied in
         // parse order, so any explicit flag AFTER --scenario overrides it.
         else if (a == "--scenario") {
@@ -2365,7 +3140,10 @@ static CliOptions parseCli(int argc, char* argv[]) {
                          "  --chaos <0.3-2.5>    divergence level (default 1.3)\n"                          "  --load <file>        resume from a save (looks in saves/ dir first, then raw path)\n"
                           "  --inject <file>      web bridge: spawn/nudge web characters from a block file\n"
                           "  --save-at <tick>     write a save at this headless tick\n"
-                          "  --save-file <file>   where --save-at writes (default saves/headless_autosave.txt)\n"
+                          "  --save-file <file>   where saves are written (default saves/headless_autosave.txt)\n"
+                          "  --save-every <n>     rolling autosave every N ticks (overwrites --save-file)\n"
+                          "  --save-on-exit       write the world once the run finishes\n"
+                          "  --set <knob>=<val>   set a live-config multiplier (repeatable), e.g. --set cityMul=0\n"
                          "  --scenario <name>    preset bundle: eden (gentle, 150 souls), crucible (harsh, 60),\n"
                          "                       babel (crowded, 400), dish (petri dish, 12). Later flags override.\n";
             std::exit(0);
@@ -2383,6 +3161,50 @@ int main(int argc, char* argv[]) {
             if (cli.headlessTicks <= 0) cli.headlessTicks = 500;
         }
     }
+    // ── How do you want to watch this world? ─────────────────────────────────
+    // Running without a window used to mean remembering `--headless <ticks>`
+    // before the program started, which is fine for scripts and useless at a
+    // prompt. Asked here instead, so the terminal run is a first-class way to
+    // start the simulation rather than a flag you had to know about. Skipped
+    // entirely when the command line already decided (--headless, ASHB_HEADLESS
+    // or --load), because a scripted run must never block on stdin.
+    if (cli.headlessTicks <= 0 && !std::getenv("ASHB_HEADLESS")) {
+        std::cout << "\nHow do you want to run this world?\n"
+                     "  1  With a window   — watch it live (graphs, inspector, save/load buttons)\n"
+                     "  2  In the terminal — no window: run N ticks, print the realism report\n"
+                     ">";
+        std::string modeInput;
+        std::getline(std::cin, modeInput);
+        // Tolerate a stray newline left in the buffer by an earlier read.
+        if (modeInput.empty()) std::getline(std::cin, modeInput);
+        if (!modeInput.empty() && modeInput[0] == '2') {
+            cli.interactiveTerminal = true;
+            std::cout << "how many ticks (blank = 1000): ";
+            std::string t; std::getline(std::cin, t);
+            cli.headlessTicks = t.empty() ? 1000 : std::atoi(t.c_str());
+            if (cli.headlessTicks <= 0) cli.headlessTicks = 1000;
+
+            // Saving, from the terminal. The windowed build has had save/load
+            // buttons all along; a terminal run could only checkpoint at one
+            // hard-coded tick given on the command line. Both questions are
+            // asked here so a long unattended run can be resumed rather than
+            // repeated — the same saves/ directory and the same format the
+            // window writes, so a world saved here opens there.
+            std::cout << "save the world when it finishes? (filename, blank = no): ";
+            std::string sf; std::getline(std::cin, sf);
+            if (!sf.empty()) { cli.saveFile = sf; cli.saveOnExit = true; }
+            std::cout << "autosave every how many ticks? (blank/0 = never): ";
+            std::string se; std::getline(std::cin, se);
+            const int every = se.empty() ? 0 : std::atoi(se.c_str());
+            if (every > 0) {
+                cli.saveEvery = every;
+                if (!cli.saveOnExit && sf.empty()) {
+                    std::cout << "  autosaving to '" << cli.saveFile << "'\n";
+                }
+            }
+        }
+    }
+
     const bool headless = (cli.headlessTicks > 0);
     g_headlessMode = headless;
     std::cout << "Client version 2.64.0\n";
@@ -2417,9 +3239,13 @@ int main(int argc, char* argv[]) {
     std::cout << "@author: Komodo \n";
 
     // Region (disease climate)
+    // A terminal run chosen at the prompt still gets asked the world questions;
+    // only a scripted one (--headless / ASHB_HEADLESS) takes the defaults.
+    const bool askWorldQuestions = (!headless || cli.interactiveTerminal);
+
     if (cli.region >= 1 && cli.region <= 4) {
         Disease::region = cli.region * 10;
-    } else if (headless) {
+    } else if (!askWorldQuestions) {
         Disease::region = 10;                 // default: Paris/Oceanic
     } else {
         implementRegion();
@@ -2429,13 +3255,11 @@ int main(int argc, char* argv[]) {
     int entity_num = 40;
     if (cli.entities > 0) {
         entity_num = cli.entities;
-    } else if (!headless) {
+    } else if (askWorldQuestions) {
         std::cout << "enter entity number (default: 40): ";
         std::cin >> entity_num;
         if (!entity_num) entity_num = 40;
     }
-
-    int renderingType = headless ? 1 : getRenderingChoice();
 
     // ── A2/E1: scoring priors — the human-in-the-loop tuning surface. Absent
     // file = engine defaults (bit-identical classic scorer); a priors_vN file
@@ -2445,7 +3269,7 @@ int main(int argc, char* argv[]) {
     // ── World seed (determines the whole planet & history; same seed = same run) ──
     {
         std::string seedInput = cli.seedText;
-        if (!cli.seedGiven && !headless) {
+        if (!cli.seedGiven && askWorldQuestions) {
             std::cout << "enter world seed (text or number, blank = random): ";
             std::cin.ignore();
             std::getline(std::cin, seedInput);
@@ -2463,7 +3287,7 @@ int main(int argc, char* argv[]) {
         float chaos = 1.3f;
         if (cli.chaos > 0.0f) {
             chaos = cli.chaos;
-        } else if (!headless) {
+        } else if (askWorldQuestions) {
             std::cout << "chaos level 0.5 (tame) .. 2.0 (wild) [default 1.3]: ";
             std::string chaosInput;
             std::getline(std::cin, chaosInput);
@@ -2788,7 +3612,19 @@ int main(int argc, char* argv[]) {
                 // the save→load path gets exercised by automated tests.
                 if (cli.saveAtTick > 0 && ticksDone == cli.saveAtTick)
                     saveGame(cli.saveFile, entities, day, frameCounter, globalCivEngine);
+                // Rolling autosave: overwrite the same file, so a run that dies
+                // at hour three is resumable from minutes ago rather than lost.
+                if (cli.saveEvery > 0 && ticksDone % cli.saveEvery == 0) {
+                    saveGame(cli.saveFile, entities, day, frameCounter, globalCivEngine);
+                    std::cout << "AUTOSAVE: tick " << ticksDone
+                              << " -> saves/" << cli.saveFile << "\n";
+                }
             }
+        }
+        if (cli.saveOnExit) {
+            saveGame(cli.saveFile, entities, day, frameCounter, globalCivEngine);
+            std::cout << "SAVED: saves/" << cli.saveFile
+                      << "  (resume with --load " << cli.saveFile << ")\n";
         }
         if (profile && ticksDone > 0)
             std::cout << "PROFILE: sim=" << (msSim / ticksDone) << " ms/tick, movement="
@@ -2800,7 +3636,8 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    if(renderingType == 1){
+    // Interactive mode: GLFW + OpenGL + Dear ImGui is the only render path.
+    {
         if (!glfwInit()) return -1;
 
         GLFWwindow* window = glfwCreateWindow(width, height, "ASHB", NULL, NULL);
@@ -2908,8 +3745,6 @@ int main(int argc, char* argv[]) {
         ImPlot::DestroyContext();
         ImGui::DestroyContext();
         glfwTerminate();
-    }else{// sdl rendering
-        //initialiseSDL(entities, ent_quad, close_entity_together, day, frameCounter, UPDATE_FREQUENCY, width, height, selectedEntityIndex, showEntityWindow);
     }
     return 0;
 }

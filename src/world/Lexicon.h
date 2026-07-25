@@ -27,6 +27,27 @@ public:
     // Blend src's language into dst (conquest/merger -> creolisation).
     void blend(int dstRegion, int srcRegion, float strength);
 
+    // ── IV-P3 (Track IV): can these two peoples understand each other? ───────
+    // Mutual intelligibility as the share of sound-stuff two languages hold in
+    // common (Jaccard over onsets, nuclei and codas). 1 = the same tongue,
+    // 0 = nothing shared. Languages that started as one and have only drifted
+    // stay high; ones seeded separately start near zero and only converge if
+    // their speakers actually meet. This is the number the rest of the
+    // simulation asks before letting anything cross a language boundary:
+    // words, techniques, treaties, trust. See plans/parallel-earth-upgrade.md
+    // §7 IV-P3.
+    float intelligibility(int regionA, int regionB) const;
+
+    // ── IV-P3: ethnogenesis ──────────────────────────────────────────────────
+    // Fork a new tongue from an existing one and immediately drift it. This is
+    // what a language SPLIT is: a people that breaks away takes its parents'
+    // speech with it and then stops sharing the changes. Languages were keyed
+    // to regions, and in a single-cradle world that meant every people spoke
+    // the same tongue and no barrier could ever exist; forking per breakaway
+    // people is what lets a language family actually branch.
+    // Returns the new language id (an index into the same table).
+    int cloneLanguage(int srcLangId, uint64_t salt);
+
     int regionCount() const { return (int)langs.size(); }
 
 private:

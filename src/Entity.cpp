@@ -174,6 +174,33 @@ void Entity::IncrementBDay(){
         this->entityLifeStage = LifeStage::ELDER;
     }
 
+    // ── §8: infant and child mortality ──────────────────────────────────────
+    // The hump at the bottom of every human lifespan distribution, and the
+    // reason pre-modern life expectancy reads as ~40 while the adults who got
+    // through childhood mostly died in their sixties and seventies (the note
+    // on the Gompertz block below already assumed this hump existed; it did
+    // not). Without it a world's demography has the wrong shape: no family
+    // ever loses a child, so nothing about fertility, grief or heirs is
+    // pressured the way it was for every human society before medicine.
+    //
+    // The odds are worst in the first year and fall away fast, and what moves
+    // them is what actually moved them: the health the child is carrying,
+    // whether it is going hungry, and whether it has any immunity built up.
+    // Kill switch: demographyMul == 0 returns before the roll is drawn.
+    if (entityAge >= 1.0f && entityAge < 6.0f && entityHealth > 0.0f
+        && g_liveConfig.demographyMul != 0.0f) {
+        float base    = (entityAge < 2.0f) ? 0.085f : 0.030f / (entityAge - 1.0f);
+        float frailty = 1.0f + std::max(0.0f, 60.0f - entityHealth) / 60.0f;
+        float hunger  = (entityHunger > 60.0f) ? 1.5f : 1.0f;
+        float immune  = (entityAntiBody > 50) ? 0.7f : 1.0f;
+        float hazard  = std::min(0.35f, base * frailty * hunger * immune)
+                        * g_liveConfig.demographyMul;
+        if (BetterRand::genNrInInterval<BetterRand::BERNOULI>(hazard)) {
+            entityHealth = 0.0f;
+            pendingDeathCause = "died in infancy";
+        }
+    }
+
     // Era-aware aging: elders lose health faster based on their era's life expectancy
     if (this->entityLifeStage == LifeStage::ELDER) {
         int currentYear = globalCivEngine ? globalCivEngine->getCurrentYear() : 0;
@@ -496,6 +523,22 @@ void Entity::saveTo(std::ofstream& file) const {
              << k.confidence << ',' << k.sourceId << ',' << k.day << ','
              << (k.isTrue ? 1 : 0) << "\n";
 
+    // ── I-P1: narrative identity, sense of purpose, life-story chapters ──
+    file << "NARRID:" << narrativeIdentity.selfStory << ',' << narrativeIdentity.dominantValue << ','
+         << narrativeIdentity.definingMemoryIdx << ',' << narrativeIdentity.coherence << "\n";
+    file << "PURPOSE:" << senseOfPurpose << "\n";
+    file << "STRESSBL:" << stressBaseline << "\n";
+    file << "LINEAGE:" << lineageDepth << "\n";
+    // III-P4 cultural capital and IV-P1 the trait set that signals it: both are
+    // slow, inherited quantities, so a reloaded world that lost them would
+    // restart every lineage's cultural standing from scratch.
+    file << "CULTCAP:" << culturalCapital << "\n";
+    file << "CULTTRAITS:" << cultureTraits << "\n";
+    file << "CULTHELD:" << committedTraits << "\n";
+    file << "CHAPTERS:" << lifeChapters.size() << "\n";
+    for (const LifeChapter& c : lifeChapters)
+        file << "CHAPTER:" << c.day << ',' << c.otherId << ',' << c.title << ',' << c.note << "\n";
+
     // Web bridge: MySQL characters.id this entity embodies (-1 = pure AI).
     // MUST stay the LAST key — older loaders rewind on the unknown line and
     // newer loaders presence-guard it, so saves stay append-only compatible.
@@ -666,7 +709,19 @@ bool Entity::loadFrom(std::ifstream& file) {
         return out;
     };
 
+    // One unreadable key must not take the whole world down with it. Every
+    // conversion below is a std::sto* that THROWS on an empty or malformed
+    // value, and the throw was unhandled: loading any save whose tail carried
+    // one such line aborted the process with nothing but "terminate called
+    // after throwing an instance of 'std::invalid_argument'" — no key, no line,
+    // no world. A save you cannot open is not a save, and the whole point of
+    // this tail is that a file may legitimately be from an older or newer
+    // build. So a line that cannot be parsed is skipped, its field keeps its
+    // default, and the first few are named on stderr so the mismatch is
+    // findable instead of fatal.
+    int loadComplaints = 0;
     while (std::getline(file, line)) {
+      try {
         if      (line.rfind("TRIBEID:", 0) == 0)        tribeId       = std::stoi(line.substr(8));
         else if (line.rfind("RELIGIONID:", 0) == 0)     religionId    = std::stoi(line.substr(11));
         else if (line.rfind("FAMILYID:", 0) == 0)       familyId      = std::stoi(line.substr(9));
@@ -735,7 +790,12 @@ bool Entity::loadFrom(std::ifstream& file) {
             }
         }
         else if (line.rfind("EPIGENETIC_COUNT:", 0) == 0) {
-            int cnt = std::stoi(line.substr(18));
+            // "EPIGENETIC_COUNT:" is seventeen characters; reading from
+            // eighteen skipped the digit and handed std::stoi an empty string,
+            // which threw and — before the guard above existed — aborted the
+            // program. This one off-by-one is why no save in saves/ could be
+            // opened at all.
+            int cnt = std::stoi(line.substr(17));
             epigeneticMarkers.clear();
             for (int i = 0; i < cnt && std::getline(file, line); ++i) {
                 if (line.rfind("EPIGENETIC:", 0) != 0) break;
@@ -785,11 +845,52 @@ bool Entity::loadFrom(std::ifstream& file) {
                 }
             }
         }
+        else if (line.rfind("NARRID:", 0) == 0) {
+            std::stringstream ss(line.substr(7)); std::string tok; std::vector<std::string> p;
+            while (std::getline(ss, tok, ',')) p.push_back(tok);
+            if (p.size() >= 4) {
+                narrativeIdentity.selfStory     = p[0];
+                narrativeIdentity.dominantValue = p[1];
+                try { narrativeIdentity.definingMemoryIdx = std::stoi(p[2]);
+                      narrativeIdentity.coherence         = std::stof(p[3]); } catch (...) {}
+                narrativeIdentity.lastStory = narrativeIdentity.selfStory;
+            }
+        }
+        else if (line.rfind("PURPOSE:", 0) == 0)         senseOfPurpose = std::stof(line.substr(8));
+        else if (line.rfind("STRESSBL:", 0) == 0)        stressBaseline = std::stof(line.substr(9));
+        else if (line.rfind("LINEAGE:", 0) == 0)         lineageDepth  = std::stoi(line.substr(8));
+        else if (line.rfind("CULTCAP:", 0) == 0)         culturalCapital = std::stof(line.substr(8));
+        else if (line.rfind("CULTTRAITS:", 0) == 0)      cultureTraits = std::stoull(line.substr(11));
+        else if (line.rfind("CULTHELD:", 0) == 0)        committedTraits = std::stoull(line.substr(9));
+        else if (line.rfind("CHAPTERS:", 0) == 0) {
+            int cnt = 0; try { cnt = std::stoi(line.substr(9)); } catch (...) { cnt = 0; }
+            lifeChapters.clear();
+            for (int i = 0; i < cnt && std::getline(file, line); ++i) {
+                if (line.rfind("CHAPTER:", 0) != 0) break;
+                // day,otherId,title,note — note may contain commas, so take the rest.
+                std::string body = line.substr(8);
+                size_t c1 = body.find(','), c2 = body.find(',', c1 + 1),
+                       c3 = (c2 == std::string::npos) ? std::string::npos : body.find(',', c2 + 1);
+                if (c1 == std::string::npos || c2 == std::string::npos || c3 == std::string::npos) continue;
+                LifeChapter ch;
+                try { ch.day     = std::stoi(body.substr(0, c1));
+                      ch.otherId = std::stoi(body.substr(c1 + 1, c2 - c1 - 1)); } catch (...) { continue; }
+                ch.title = body.substr(c2 + 1, c3 - c2 - 1);
+                ch.note  = body.substr(c3 + 1);
+                lifeChapters.push_back(ch);
+            }
+        }
         else if (line.rfind("WEBCHARID:", 0) == 0)      webCharId     = std::stoi(line.substr(10));
         else if (line.rfind("--- END ENTITY", 0) == 0)  break;
         // Unknown key (a future format, or pre-V2 planner residue): skip it
         // and resync on the END marker so one stray line can't desync every
         // entity that follows.
+      } catch (const std::exception& ex) {
+        if (loadComplaints++ < 5)
+            std::cerr << "LOAD: skipped unreadable line \""
+                      << line.substr(0, std::min<size_t>(line.size(), 48))
+                      << "\" (" << ex.what() << ") — field left at its default\n";
+      }
     }
 
     // Rebuild semantic memory index from loaded life memories

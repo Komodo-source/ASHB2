@@ -238,6 +238,280 @@ void mind::upkeep(Entity* e, const std::vector<Entity*>& group,
         }
         e->homeAttachment = clamp100(e->homeAttachment + 0.05f + familiar * 0.05f);
     }
+
+    // ── I-P1: the self that acts — recompute the narrative identity on a
+    //    staggered cadence (1/16 of the population per day), then ease the
+    //    protective sense of purpose every tick (cheap float work).
+    if (e->lastIdentityDay < 0 || (simDay & 15) == (e->entityId & 15))
+        updateNarrativeIdentity(e, simDay);
+    updatePurpose(e, group, simDay);
+
+    // ── I-P4: hedonic adaptation + post-traumatic change ─────────────────────
+    const float moodMul = g_liveConfig.moodMul;
+    if (moodMul != 0.0f) {
+        // The mind habituates: a personal stress setpoint (higher for neurotic
+        // agents, lowered by a sense of purpose) that the running baseline drifts
+        // toward, and current stress relaxes toward once acute stressors pass —
+        // so nobody spends a whole life pinned at 100 (the F5 artifact).
+        float setpoint = clamp100(25.0f + e->personality.neuroticism * 0.30f
+                                        - e->senseOfPurpose * 0.12f);
+        // Baseline tracks lived stress slowly (chronic-load memory) but is capped
+        // well below the extreme so habituation can't rationalise a life at 100.
+        e->stressBaseline = clamp100(std::min(75.0f, e->stressBaseline +
+                                     (e->entityStress - e->stressBaseline) * 0.01f));
+        // Recovery target is setpoint-dominant so it stays bounded long-run; acute
+        // stress then decays over days (strong pull) instead of pinning at ~90.
+        float relaxTarget = 0.75f * setpoint + 0.25f * e->stressBaseline;
+        if (e->entityStress > relaxTarget)
+            e->entityStress = clamp100(e->entityStress +
+                                       (relaxTarget - e->entityStress) * 0.08f * moodMul);
+
+        // Post-traumatic change cuts both ways (staggered, bounded): sustained
+        // grief scars an unsupported mind (neuroticism up) but tempers a
+        // supported one into resilience (growth) — identical genomes, divergent
+        // people. Ties into I-P1 purpose as the support signal.
+        if (e->getGriefIntensity() > 0.6f && (simDay & 31) == (e->entityId & 31)) {
+            bool supported = e->senseOfPurpose > 45.0f && e->personality.agreeableness > 55.0f;
+            if (supported)
+                e->personality.neuroticism = std::max(0.0f,  e->personality.neuroticism - 0.3f * moodMul);
+            else
+                e->personality.neuroticism = std::min(100.0f, e->personality.neuroticism + 0.3f * moodMul);
+        }
+    }
+}
+
+// ─── I-P1: narrative identity, purpose, life-story spine (Track I) ─────────────
+
+void mind::recordLifeChapter(Entity* e, const std::string& title, int otherId,
+                             const std::string& note, int simDay) {
+    if (!e) return;
+    const bool onceEver = (title == "born" || title == "first_love" ||
+                           title == "elevated" || title == "first_kill" ||
+                           title == "became_parent" || title == "great_lineage" ||
+                           title == "rose_to_prominence" || title == "mastery");
+    for (auto it = e->lifeChapters.rbegin(); it != e->lifeChapters.rend(); ++it) {
+        if (it->title == title) {
+            if (onceEver) return;
+            if (simDay - it->day < 40) return;   // don't spam recurring milestones
+            break;
+        }
+    }
+    LifeChapter c; c.title = title; c.otherId = otherId; c.note = note; c.day = simDay;
+    e->lifeChapters.push_back(c);
+    if (e->lifeChapters.size() > 40) e->lifeChapters.erase(e->lifeChapters.begin());
+}
+
+void mind::updateNarrativeIdentity(Entity* e, int simDay) {
+    if (!e) return;
+    e->lastIdentityDay = simDay;
+    NarrativeIdentity& ni = e->narrativeIdentity;
+
+    // 1) dominant value axis — the spine of the self.
+    const struct { const char* n; float s; } ax[5] = {
+        {"family",     e->ValueSystem.familyOrientation},
+        {"achievement",e->ValueSystem.achievementDrive},
+        {"spirit",     e->ValueSystem.spiritualNeed},
+        {"pleasure",   e->ValueSystem.hedonism},
+        {"collective", e->ValueSystem.collectivism} };
+    int bi = 0; for (int i = 1; i < 5; ++i) if (ax[i].s > ax[bi].s) bi = i;
+    ni.dominantValue = ax[bi].n;
+
+    // 2) defining formative memory (the most emotionally intense anchor).
+    int anchor = -1; float best = -1.0f;
+    int trauma = 0, violence = 0;
+    for (int i = 0; i < (int)e->lifeMemories.size(); ++i) {
+        const LifeMemory& m = e->lifeMemories[i];
+        float w = m.emotionalIntensity + (m.isFormative ? 0.5f : 0.0f);
+        if (w > best) { best = w; anchor = i; }
+        if (m.isFormative && m.emotionalIntensity > 0.6f &&
+            (m.eventType.find("death")  != std::string::npos ||
+             m.eventType.find("loss")   != std::string::npos ||
+             m.eventType.find("betray") != std::string::npos ||
+             m.eventType.find("attack") != std::string::npos)) ++trauma;
+        if (m.eventType.find("kill")  != std::string::npos ||
+            m.eventType.find("fight") != std::string::npos)   ++violence;
+    }
+    ni.definingMemoryIdx = anchor;
+
+    // 3) choose the self-story from values + lived experience.
+    const bool isLeader = e->auctoritas > 55.0f || e->dominanceRank > 60.0f;
+    const float fightSkill = e->skills.get(SK_FIGHT);
+    std::string story;
+    if (violence >= 3 || fightSkill > 60.0f)      story = "fighter";
+    else if (trauma >= 2)                          story = "survivor";
+    else if (isLeader && bi == 1)                  story = "leader";
+    else if (bi == 0)                              story = (e->ValueSystem.familyOrientation > 65.0f ? "carer" : "provider");
+    else if (bi == 1)                              story = "maker";
+    else if (bi == 2)                              story = "believer";
+    else if (bi == 4)                              story = "carer";
+    else                                           story = "seeker";
+
+    // 4) coherence: a story that holds settles the self; a flip unsettles it.
+    if (!ni.lastStory.empty() && ni.lastStory == story)
+        ni.coherence = clamp100(ni.coherence + 6.0f);
+    else if (!ni.lastStory.empty())
+        ni.coherence = clamp100(ni.coherence * 0.6f + 15.0f);
+    ni.lastStory = story;
+    ni.selfStory = story;
+    e->SelfConcept.primaryIdentity = story;   // legacy label kept in sync for existing UI
+
+    // 5) life-story milestones (state-based, so a staggered check still catches
+    //    them; recording is deduped/capped in recordLifeChapter).
+    if (e->lifeChapters.empty() && e->entityAge < 3.0f)
+        recordLifeChapter(e, "born", -1, "came into the world", simDay);
+    if (!e->list_entityPointedCouple.empty())
+        recordLifeChapter(e, "first_love", e->list_entityPointedCouple[0].id, "found a partner", simDay);
+    if (e->isSpecialist)
+        recordLifeChapter(e, "elevated", -1, "took up the calling of " + e->specialization, simDay);
+    if (e->tribeSwitchDay >= 0 && simDay - e->tribeSwitchDay >= 0 && simDay - e->tribeSwitchDay < 16 && simDay > 0)
+        recordLifeChapter(e, "migrated", e->tribeId, "left for a new people", simDay);
+    if (e->getGriefIntensity() > 0.5f)
+        recordLifeChapter(e, "bereaved", -1, "lost someone dear", simDay);
+
+    // ── I-P3: achievement / legacy milestones — the marks a life leaves, so a
+    //    reader can trace who this person BECAME and what they left behind.
+    if ((int)e->childrenIds.size() >= 1)
+        recordLifeChapter(e, "became_parent", e->childrenIds[0], "brought a child into the world", simDay);
+    if ((int)e->childrenIds.size() >= 5)
+        recordLifeChapter(e, "great_lineage", -1, "founded a great line of " +
+                          std::to_string(e->childrenIds.size()) + " children", simDay);
+    if (e->auctoritas > 70.0f || e->dominanceRank > 70.0f)
+        recordLifeChapter(e, "rose_to_prominence", -1, "rose to command the respect of many", simDay);
+    if (violence >= 1)
+        recordLifeChapter(e, "first_kill", -1, "took a life for the first time", simDay);
+    // Mastery: renowned in a craft — "the best healer in the valley".
+    { int bs = 0; for (int i = 1; i < SK_COUNT; ++i) if (e->skills.v[i] > e->skills.v[bs]) bs = i;
+      if (e->skills.v[bs] > 80.0f)
+          recordLifeChapter(e, "mastery", -1, std::string("became a master of ") + kSkillNames[bs], simDay); }
+}
+
+void mind::updatePurpose(Entity* e, const std::vector<Entity*>& group, int simDay) {
+    if (!e) return;
+    const float mul = g_liveConfig.identityMul;
+
+    // components, each 0..1
+    float goalProg = 0.0f; int gc = 0;
+    for (const LifeGoal& g : e->m_goals) { goalProg += g.progressToward; ++gc; }
+    goalProg = gc ? clamp01f(goalProg / (gc * 100.0f)) : 0.3f;
+
+    int familiar = 0, scanned = 0;
+    for (Entity* nb : group) {
+        if (nb == e || !nb) continue;
+        if (++scanned > 8) break;
+        if (e->searchConnSocial(nb) > 30.0f) ++familiar;
+    }
+    const float integration = clamp01f(familiar / 5.0f);
+    const float role  = clamp01f((e->isSpecialist ? 0.7f : 0.3f) + e->auctoritas / 250.0f);
+    const float faith = (e->religionId >= 0) ? clamp01f(e->ValueSystem.spiritualNeed / 100.0f) : 0.0f;
+
+    // Recentre upward: even a modestly-engaged life carries adequate meaning
+    // (a 28-point floor), so the buffer is the common case and despair the
+    // exception (as in real populations) — the opposite of a world where
+    // everyone is chronically anomic.
+    const float target = 28.0f + 72.0f * (0.35f*goalProg + 0.30f*integration + 0.20f*role + 0.15f*faith);
+    e->senseOfPurpose = clamp100(e->senseOfPurpose + (target - e->senseOfPurpose) * 0.05f);
+
+    // Wellbeing effect — gated so identityMul==0 is bit-exact old behaviour.
+    // High purpose buffers (fixes the "everyone dies at stress 100" artifact);
+    // only genuine aimlessness+isolation (rare) tips into anomie/despair.
+    if (mul != 0.0f) {
+        if (e->senseOfPurpose > 60.0f) {
+            e->entityStress       = clamp100(e->entityStress       - 0.5f  * mul);
+            e->entityMentalHealth = clamp100(e->entityMentalHealth + 0.05f * mul);
+        } else if (e->senseOfPurpose < 18.0f) {
+            e->entityMentalHealth = clamp100(e->entityMentalHealth - 0.05f * mul);
+            e->emotions.sadness   = clamp100(e->emotions.sadness   + 0.4f  * mul);
+        }
+    }
+}
+
+// ── IV-P2: doctrine with teeth ───────────────────────────────────────────────
+// Faiths in this world were behaviourally identical: the doctrinal axes existed
+// on the Religion and nothing ever read them, so a pacifist creed and a warrior
+// creed produced exactly the same conduct and the only visible difference was a
+// name. This is where a religion starts costing its members something — which
+// is also what makes it worth having, and worth splitting over.
+//
+// Each axis forbids or demands what that kind of creed really does:
+//   militarism      a crusading faith blesses the sword; a pacifist one stays it
+//   asceticism      a spiritual creed curbs appetite and idle pleasure
+//   authority       a hierarchical one buys obedience and punishes insubordination
+//   afterlifeFocus  a next-worldly one pulls the living toward rite and prayer
+//   tolerance       an exclusive one licenses contempt for outsiders
+// Everything is scaled by personal devotion, so a nominal member is barely
+// bound and a zealot is heavily so.
+float mind::doctrineModifier(const Entity* e, const std::string& an) {
+    if (!e) return 1.0f;
+    const float mul = g_liveConfig.doctrineMul;
+    if (mul == 0.0f) return 1.0f;              // bit-exact neutral kill switch
+    const Creed& c = e->creed;
+    if (!c.held) return 1.0f;                  // the unbelieving are unconstrained
+
+    // Devotion decides how much of the doctrine actually bites.
+    const float zeal = std::max(0.0f, std::min(1.0f, c.devotion / 100.0f)) * mul;
+    if (zeal <= 0.0f) return 1.0f;
+    float m = 1.0f;
+
+    // Axes are expressed as a signed pull away from the neutral 50.
+    const float war   = (c.militarism     - 50.0f) / 50.0f;
+    const float asc   = (c.asceticism     - 50.0f) / 50.0f;
+    const float auth  = (c.authority      - 50.0f) / 50.0f;
+    const float after = (c.afterlifeFocus - 50.0f) / 50.0f;
+    const float tol   = (c.tolerance      - 50.0f) / 50.0f;
+
+    if (an == "Murder" || an == "Duel" || an == "Raid" || an == "AngerConnection") {
+        m *= 1.0f + war * 0.55f * zeal;        // blessed by a crusade, forbidden by a peace
+    } else if (an == "Insult" || an == "Discrimination") {
+        m *= 1.0f + war * 0.25f * zeal;
+        m *= 1.0f - tol * 0.45f * zeal;        // a syncretic faith shames contempt
+    } else if (an == "Prayer" || an == "Meditate" || an == "Preach") {
+        m *= 1.0f + after * 0.60f * zeal + asc * 0.30f * zeal;
+    } else if (an == "WatchEntertainment" || an == "Party" || an == "Drink" ||
+               an == "Gamble" || an == "CreativeActivity") {
+        m *= 1.0f - asc * 0.45f * zeal;        // the ascetic forgo their pleasures
+    } else if (an == "Trade" || an == "Work" || an == "Craft") {
+        m *= 1.0f - asc * 0.20f * zeal;        // this-worldly getting-on is suspect
+    } else if (an == "ChallengeLeader" || an == "Betray" || an == "Manipulate") {
+        m *= 1.0f - auth * 0.50f * zeal;       // a hierarchical creed buys obedience
+    } else if (an == "HelpSupport" || an == "Apologize" || an == "Reconcile") {
+        m *= 1.0f + tol * 0.30f * zeal - war * 0.15f * zeal;
+    }
+    return std::max(0.25f, std::min(2.2f, m));
+}
+
+float mind::identityCongruenceModifier(const Entity* e, const std::string& an) {
+    if (!e) return 1.0f;
+    const float mul = g_liveConfig.identityMul;
+    if (mul == 0.0f) return 1.0f;                     // bit-exact neutral kill switch
+    const std::string& s = e->narrativeIdentity.selfStory;
+    float m = 1.0f;
+    // Identity favors the CHARACTERISTIC, expressive choices that make a person
+    // recognisable — not the need-driven subsistence actions (Farm/Hunt/EatMeal),
+    // which the need/reflex layers already govern. Piling identity onto those
+    // would just flatten behavioural diversity, so they are deliberately absent.
+    if (s == "provider" || s == "carer") {
+        if (an=="HelpSupport"||an=="GoodConnection"||an=="couple"||an=="breeding") m = 1.15f;
+        else if (an=="Betray"||an=="Murder"||an=="Discrimination")                 m = 0.85f;
+    } else if (s == "maker") {
+        if (an=="Work on Project"||an=="LearnSkill"||an=="CreativeActivity"||an=="Read") m = 1.18f;
+    } else if (s == "leader") {
+        if (an=="LeadGroup"||an=="DefendTribe"||an=="ChallengeLeader") m = 1.18f;
+        else if (an=="Socialize")                                     m = 1.08f;
+    } else if (s == "believer") {
+        if (an=="Prayer"||an=="SeekTherapy") m = 1.2f;
+        else if (an=="DrinkAlcohol"||an=="Smoke"||an=="Jealousy") m = 0.85f;
+    } else if (s == "fighter") {
+        if (an=="Duel"||an=="DefendTribe"||an=="AngerConnection") m = 1.18f;
+        else if (an=="Flee")                                      m = 0.9f;
+    } else if (s == "survivor") {
+        if (an=="Rest"||an=="Flee"||an=="SeekTherapy") m = 1.12f;   // coping/self-preservation, not subsistence
+    } else { // seeker
+        if (an=="CreativeActivity"||an=="WatchEntertainment"||an=="Gaming"||an=="Scrolling") m = 1.12f;
+    }
+    // A settled self pulls harder toward acting in character.
+    const float pull = 0.4f + 0.6f * clamp01f(e->narrativeIdentity.coherence / 100.0f);
+    m = 1.0f + (m - 1.0f) * pull;
+    return adjustFactor(m, mul);
 }
 
 // ─── B1: emotion → action tendencies (the 13th scoring factor) ────────────────
@@ -595,6 +869,18 @@ float mind::settleOutcome(Entity* e, const std::string& an, float outcome, int s
             e->lifeMemories.push_back(mem);
             e->intention.active = false;
         }
+    }
+
+    // ── I-P4: coping discharges accumulated tension ──────────────────────────
+    // A restful, reflective, devotional or social act bleeds off suppression
+    // debt and stress — the personal complement to collective festival relief.
+    const float moodMul = g_liveConfig.moodMul;
+    if (moodMul != 0.0f &&
+        (an == "Rest" || an == "Sleep" || an == "Prayer" || an == "SeekTherapy" ||
+         an == "CreativeActivity" || an == "Socialize" || an == "WatchEntertainment")) {
+        e->emotionalState.suppressionDebt =
+            std::max(0.0f, e->emotionalState.suppressionDebt - 3.0f * moodMul);
+        e->entityStress = clamp100(e->entityStress - 1.5f * moodMul);
     }
     return surprise;
 }

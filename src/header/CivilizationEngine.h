@@ -9,6 +9,7 @@
 #include <random>
 #include "Economics.h"
 #include "WorldSeed.h"
+#include "../environment/EnvironmentModel.h"   // II-P2: InstitutionalSystem
 
 class Entity;
 
@@ -59,6 +60,13 @@ struct Religion {
     // level gives followers a larger happiness/mental bonus — real stakes that a
     // conquest or extinction then destroys.
     int   institutionLevel = 0;
+
+    // ── IV-P2: what this faith DOES, and how it has fractured ────────────────
+    // A religion survives because its rites are worth attending, and it splits
+    // when a body of its members has drifted from what it teaches.
+    int   lastRiteDay   = -99999;
+    int   ritesHeld     = 0;
+    int   lastSchismDay = -99999;
 
     std::vector<int> followerIds;
     int parentReligionId = -1; // -1 = original; >=0 = schism from parent
@@ -189,6 +197,64 @@ struct Tribe {
     float cultureScore          = 0.0f;   // 0-100 cultural vitality
     int   culturalAchievements  = 0;      // great works produced over the run
 
+    // ── III-P2: this place's prices (Track III) ──────────────────────────────
+    // The global `g_market` sets what a good is worth in the world at large;
+    // these are the multipliers that make it worth something DIFFERENT here.
+    // A people sitting on full granaries prices food cheaply; a hungry one
+    // bids it up. That gap between neighbours is what a caravan exists to
+    // close, and closing it is how a merchant earns. 1.0 = the world price.
+    // ── II-P3: the secular cycle (Track II) ──────────────────────────────────
+    // Turchin's structural-demographic reading of why societies come apart on a
+    // rhythm rather than at random. Three quantities do the work: how well the
+    // common people are actually living, how many aspirants there are for the
+    // few positions that confer power, and the political stress that builds when
+    // the first falls while the second rises. Stress does not accumulate for
+    // ever — it discharges as strife, which culls the surplus elite and resets
+    // the cycle. That discharge is what makes history oscillate instead of
+    // flat-lining. See plans/parallel-earth-upgrade.md §5 II-P3.
+    float popularWellbeing     = 50.0f;  // "real wages": what life is like at the bottom
+    float eliteOverproduction  = 1.0f;   // aspirants per available office (>1 = too many)
+    float instability          = 0.0f;   // 0-100 political stress indicator
+    int   strifeCount          = 0;      // times this people has torn itself apart
+    int   lastStrifeDay        = -99999;
+
+    // II-P4: was this people an empire (>=3 vassals) as of the last check? The
+    // latch that makes "an empire rose" and "an empire fell" single events
+    // rather than a status reprinted every civ-day.
+    bool  wasEmpire   = false;
+
+    float priceFood   = 1.0f;   // 0.5 (glut) .. 2.0 (dearth)
+    float priceGoods  = 1.0f;   // materials, metal and luxuries
+    float tradeWealth = 0.0f;   // cumulative earnings from commerce
+
+    // ── I-P3: attribution (Track I) ──────────────────────────────────────────
+    // Who made this. A people that cannot name its founder has no history, only
+    // a present; the Chronicle reads these back so a reader can follow a person
+    // from their birth to the nation that still carries their mark.
+    int         founderId = -1;
+    std::string founderName;
+
+    // ── III-P1: settlement tier (Track III) ──────────────────────────────────
+    // The tribe's home hardens into a physical place that grows with population:
+    // camp→village→town→city→great city. Bigger tiers agglomerate (faster
+    // research/culture — the collective brain) but pay a crowding cost (disease,
+    // sanitation, unrest). Emergent sizes skew into a Zipf-like hierarchy.
+    int   settlementTier = 0;   // 0 camp,1 village,2 town,3 city,4 great city
+    int   peakTier       = 0;   // highest tier ever reached (for the chronicle)
+
+    // ── IV-P1: this people's culture, as content (Track IV) ──────────────────
+    // Not a score — a set. `cultureTraits` is what a majority of the members
+    // actually hold (the ways an outsider would recognise this people by);
+    // `knownTraits` is everything anyone here carries, majority or not, which is
+    // the pool a novelty can still cascade out of. Both are recomputed from the
+    // members each civ-day, so they need no serialisation: the truth lives in
+    // the people, exactly as it should.
+    unsigned long long cultureTraits   = 0ull; // held by >= half the members
+    unsigned long long knownTraits     = 0ull; // held by at least one member
+    // Latch: traits that have already crossed the critical mass here, so a
+    // cascade is announced once when it happens rather than every day it holds.
+    unsigned long long cascadedTraits  = 0ull;
+
     // Collective cultural values (0-100), evolve from member averages + drift
     float militarism   = 50.0f;
     float spiritualism = 50.0f;
@@ -203,6 +269,14 @@ struct Tribe {
     float centerX = 700.0f;
     float centerY = 525.0f;
     int   regionId = -1;   // landmass/cradle the tribe currently sits in
+    // ── IV-P3: the tongue this people speaks ─────────────────────────────────
+    // Seeded from the homeland's language, but a people that breaks away forks
+    // its own and drifts. Keyed per TRIBE rather than per region because a
+    // single-cradle world has one region — and with language keyed to regions
+    // every people spoke the same tongue, so no barrier could ever exist and
+    // the whole mechanism was inert. This is the ethnolinguistic identity the
+    // plan asks for: distinct from the tribe, inherited by its daughters.
+    int   languageId = -1;
     int   homeBiome = -1;  // Biome at the tribe centre (drives cultural drift)
 
     // ── Division of labour ───────────────────────────────────────────────────
@@ -212,6 +286,17 @@ struct Tribe {
     // base determines superstructure.
     float granary        = 0.0f;
     int   specialistCount = 0;  // current non-farming specialists (UI / decisions)
+
+    // ── III-P3: what a labour market and a fertility decision need to know ───
+    // Both are recomputed from the members each civ-day in updateDivisionOfLabour,
+    // so neither is serialized: they are summaries of the people, not state of
+    // their own. `meanWealth` is what "rich" means HERE (a wealthy household in
+    // a poor valley is not a wealthy household in a trading city), and
+    // `childSurvival` is the share of this people's children who are living
+    // through it — the quantity that, once it rises, stops parents replacing
+    // children they no longer expect to lose.
+    float meanWealth    = 0.0f;   // mean tokens held by living members
+    float childSurvival = 0.5f;   // 0-1, smoothed share of under-12s in good health
 
     // Known technologies (by innovation id) — emergent innovation diffusion.
     std::set<int> knownTechIds;
@@ -233,6 +318,15 @@ struct Tribe {
     std::map<int, TribeStance> stances;
     std::map<int, float>       relations; // -100..+100
     std::set<int>              ethnicWarWith; // tribe ids this is in an ethnic/hate war with
+
+    // ── II-P4: persistent grievance ledger (Track II) ────────────────────────
+    // Unlike `relations` (which warms back toward 0 once fighting stops, so
+    // atrocities are forgotten in a generation), grievance is a DURABLE memory
+    // of concrete harms — battle dead, seized land, subjugation — that decays
+    // only very slowly. It drags relations down for generations and gives war a
+    // revenge cause that outlives the people who first drew blood (Axelrod:
+    // unforgiving tit-for-tat). Runtime-only, like the rest of Tribe.
+    std::map<int, float> grievance;   // tribeId -> accumulated unavenged harm 0..100
 
     int  population()  const { return (int)memberIds.size(); }
     bool isMember(int id) const {
@@ -346,6 +440,167 @@ public:
     int                 lastDynastyDay  = -1;  // dynasty/class passes run once per civ-day
     // Live social-class census (Plan 4.2), refreshed each civ-day for the report.
     int eliteCount=0, upperCount=0, middleCount=0, lowerCount=0, outcastCount=0;
+
+    // ── II-P2: institutions that store and transmit (Track II) ───────────────
+    // The formerly-dead `InstitutionalSystem` (0 call sites) now ticks from the
+    // civ loop. Schools/archives hold techniques independently of any living
+    // member, guilds preserve a craft, and a bureaucracy is the administrative
+    // capacity that lets a people grow past the size a camp can govern. Runtime
+    // state (not serialized): founding conditions are re-evaluated every
+    // civ-day, so a loaded world re-founds its institutions and re-archives the
+    // techs its tribes still know within a few ticks.
+    environment::InstitutionalSystem institutions;
+    int totalInstitutions   = 0;   // ever founded (report)
+    int totalArchiveSaves   = 0;   // techs a collapse would have erased, but didn't
+
+    // ── I-P3: visible causal legacy (Track I) ────────────────────────────────
+    // The plan's demand is that every life leave marks a reader can *see*. Three
+    // structures carry it: great works are attributed to the hand that made
+    // them; memorials fix a death to a place ("the ford where Kael drowned") so
+    // the map itself remembers; and a Legacy is the closing entry on a life —
+    // what that person founded, invented, led and left behind, kept after they
+    // are gone so descendants can be measured against them. All runtime state.
+    struct GreatWork {
+        std::string name;
+        std::string founderName;
+        int   founderId = -1;
+        int   tribeId   = -1;
+        int   day       = 0;
+    };
+    struct Memorial {
+        float x = 0.0f, y = 0.0f;
+        std::string placeName;   // "the ford where Kael drowned"
+        std::string personName;
+        int   entityId = -1;
+        int   day      = 0;
+        float weight   = 1.0f;   // how large the memory looms
+    };
+    struct Legacy {
+        int         entityId  = -1;
+        std::string name;
+        std::string familyName;
+        int         familyId       = -1;
+        int         deathDay       = 0;
+        int         lineageDepth   = 1;
+        int         descendants    = 0;   // living children at death
+        float       weight         = 0.0f;// how much this life actually changed
+        std::vector<std::string> marks;   // "founded the Tarn", "invented Writing"
+    };
+    std::vector<GreatWork> greatWorks;
+    std::vector<Memorial>  memorials;
+    std::vector<Legacy>    legacies;      // notable lives only, capped
+    int totalNotableLives  = 0;
+    int totalMemorials     = 0;
+
+    // ── III-P2: trade routes (Track III) ─────────────────────────────────────
+    // A standing commercial link between two peoples: a path that goods, and
+    // with them techniques and habits, actually travel along. A route exists
+    // only while the ground is passable, the peoples are not at war, and there
+    // is someone to walk it — which is precisely why cutting one (a war, a
+    // closed pass) is a thing worth doing, and why the price gap it was holding
+    // shut springs back open when it goes.
+    struct TradeRoute {
+        int   a = -1, b = -1;      // tribe ids (a < b)
+        int   establishedDay = 0;
+        int   lastRunDay     = -999;
+        float distance       = 0.0f;
+        float volume         = 0.0f;   // cumulative goods carried
+        bool  bySea          = false;  // needed Sailing to open
+        bool  active         = true;
+    };
+    std::vector<TradeRoute> tradeRoutes;
+    int   totalCaravans     = 0;
+    int   totalRoutesOpened = 0;
+    int   totalRoutesCut    = 0;
+
+    // II-P4: empires assembled by conquest and lost to overstretch.
+    int   totalEmpires       = 0;
+    int   totalEmpiresFallen = 0;
+
+    // ── II-P3: the cycle, sampled so it can be *seen* ────────────────────────
+    // A claim that well-being and instability move in anti-phase is only worth
+    // making if it is measured. These are world-level averages taken on a fixed
+    // cadence; the end-of-run report correlates them, and the series is what a
+    // plot of the secular cycle would be drawn from.
+    struct CycleSample {
+        int   day        = 0;
+        float wellbeing  = 0.0f;
+        float instability= 0.0f;
+        float gini       = 0.0f;
+        float elites     = 0.0f;   // mean elite overproduction
+        float overshoot  = 0.0f;   // mean Malthusian pressure (pop/capacity - 1)
+    };
+    std::vector<CycleSample> cycleHistory;
+    int totalStrifes = 0;
+
+    // IV-P2 counters for the report.
+    int totalRites   = 0;
+    int totalSchisms = 0;
+    // IV-P4: feasts where surplus was burned for standing instead of blood.
+    int totalPotlatches = 0;
+
+    // ── IV-P3: does a language boundary actually slow things down? ───────────
+    // Diffusion events tallied by whether donor and recipient shared a tongue,
+    // with the opportunities that produced them, so the report can compare
+    // RATES rather than raw counts (there are far more same-tongue pairs).
+    long diffusionSameTongue = 0,  diffusionOpportunitySame  = 0;
+    long diffusionCrossTongue = 0, diffusionOpportunityCross = 0;
+    int  totalCreolisations = 0;
+    // IV-P3: how well two peoples understand one another (0-1). Returns 1 when
+    // the feature is off, so every gate it guards stays wide open (bit-exact).
+    // Public: the end-of-run report measures the world's mean intelligibility.
+    float mutualIntelligibility(const Tribe& a, const Tribe& b) const;
+
+    // ── IV-P1: the culture layer, and how to tell it is alive (Track IV) ─────
+    // The catalogue and the transmission maths live in the environment layer;
+    // the engine drives them from its own seeded stream so a run replays.
+    environment::CulturalTransmissionSystem culture;
+    // ── §8: instrumentation for "parallel Earth" ─────────────────────────────
+    // You cannot claim realism you do not measure. These series and tallies
+    // exist purely so the end-of-run report can put a number on claims the plan
+    // makes — they are never read by the simulation, so they cannot change it.
+    // See plans/parallel-earth-upgrade.md §8.
+    int warsByReason[5] = { 0, 0, 0, 0, 0 };   // indexed by WarReason
+
+    // ── III-P3: the labour market and the demographic transition, measured ───
+    // Births alone prove nothing about fertility: a tier-3 city holds more
+    // people than a camp, so it has more births whatever its birth RATE. What
+    // the plan claims is that the RATE falls with wealth and urbanisation, so
+    // both the births and the population-days that produced them are counted,
+    // split the same two ways. `specialistShare*` does the matching job for the
+    // labour half: whether the specialist mix really does track settlement size.
+    long birthsByTier[5]   = { 0, 0, 0, 0, 0 };
+    double popDaysByTier[5] = { 0, 0, 0, 0, 0 };
+    long   birthsRich = 0, birthsPoor = 0;
+    double popDaysRich = 0.0, popDaysPoor = 0.0;
+    double specialistShareByTier[5] = { 0, 0, 0, 0, 0 };
+    long   specialistSamplesByTier[5] = { 0, 0, 0, 0, 0 };
+    long   hiresTotal = 0, hiresViaWeakTie = 0, apprenticeships = 0;
+    // Called once per birth from the conception sites, while both parents are
+    // still in hand, so the birth is filed under the tier and wealth bracket it
+    // actually happened in.
+    void recordBirthDemography(const Entity& a, const Entity& b);
+    // The demographic transition itself: what this couple's circumstances do to
+    // their odds of conceiving. Returns exactly 1.0f when the feature is off.
+    float fertilityModifier(const Entity& a, const Entity& b) const;
+    struct KnowledgeSample {
+        int day       = 0;
+        int techCount = 0;    // innovations known to the world + tree nodes unlocked
+        bool literate = false;// has anybody written anything down yet?
+        int  darkAges = 0;    // cumulative collapses, so a fall can be attributed
+        int  era      = 0;    // §10.1: the rung the world stood on that day
+    };
+    std::vector<KnowledgeSample> knowledgeHistory;
+
+    int totalTraitsInvented = 0;   // novelties struck by somebody, ever
+    int totalCascades       = 0;   // times a trait crossed the 25% critical mass
+    int totalFizzles        = 0;   // times a trait died out of a people entirely
+    int totalTraitsDiffused = 0;   // traits carried into a people from outside
+
+    // I-P3: close the book on a life — gather what it changed, pass its standing
+    // to its children, and mark the ground where it ended. Called once per death
+    // from the death pass, while every pointer is still valid.
+    void recordLegacy(std::vector<Entity>& entities, const Entity& dead, int day);
 
     // ── Running tallies for the report / big summary ─────────────────────────
     // Incremented from across the simulation so the History panel can show a
@@ -462,6 +717,31 @@ private:
     // Social classes (Plan 4.2): derive an emergent elite/upper/middle/lower/outcast
     // class from each living person's wealth percentile and apply class effects.
     void updateSocialClasses(std::vector<Entity>& entities, int day);
+    // III-P1: settlement tiers — cities emerge/grow, agglomerate, and crowd.
+    void updateSettlements(std::vector<Entity>& entities, int day);
+    // II-P2: found/tick/dissolve institutions — schools archive and teach,
+    // guilds keep a craft alive, bureaucracies govern beyond a camp's reach.
+    void updateInstitutions(std::vector<Entity>& entities, int day);
+    // III-P2: regional prices, trade routes and the caravans that run them.
+    void updateTrade(std::vector<Entity>& entities, int day);
+    // II-P3: elite overproduction, popular immiseration, and the strife that
+    // discharges the political stress they build — the secular cycle.
+    void updateSecularCycle(std::vector<Entity>& entities, int day);
+    // III-P4: cultivate cultural capital — the third axis of class, inherited
+    // at birth and at the grave so advantage compounds down a bloodline.
+    void updateClassReproduction(std::vector<Entity>& entities, int day);
+    // IV-P2: hand believers their creed, hold the rites, and split faiths along
+    // the doctrinal fault lines their congregations actually have.
+    void updateDoctrine(std::vector<Entity>& entities, int day);
+    // IV-P3: languages drift apart in isolation and creolise on contact.
+    void updateLanguages(std::vector<Entity>& entities, int day);
+    // IV-P1: culture as content — traits invented, caught, taught, dropped and
+    // carried down trade roads, with Centola's 25% tipping point deciding
+    // whether a novelty stays a quirk or cascades into a people's way of life.
+    void updateCulturalTraits(std::vector<Entity>& entities, int day);
+    // II-P2 helper: how much administrative capacity a people's bureaucracy
+    // gives it (0 = none). Read by splitLargeTribes and the government pass.
+    float adminCapacity(int tribeId) const;
 
     // Family dynasties (Plan 4.1): accrue prestige to the families of leaders,
     // the wealthy and the devout; announce the rise of "great families".
@@ -567,6 +847,10 @@ private:
     int  trySyncretism(std::vector<Entity>& entities, int day);
 
     // ── Innovation operations ─────────────────────────────────────────────────
+    // II-P1: how often a member of this people has an idea worth chasing, as a
+    // multiple of the bare per-capita rate — scholars, literacy, schools, the
+    // press and the method each raise it. 1.0 when knowledgeMul is off.
+    float researchClimate(const Entity& ent, const Tribe* tribe) const;
     bool discoverInnovation(Entity* inventor, Tribe* tribe, int day);
     void spreadInnovations(std::vector<Entity>& entities, int day);
     bool entityKnowsPrereqs(const Entity* ent, const Innovation& inn) const;

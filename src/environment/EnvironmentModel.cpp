@@ -262,9 +262,144 @@ float CulturalGroup::calculateTraitAdoption(const CulturalTrait& trait) {
 
 // ============= CulturalTransmissionSystem Implementation =============
 
+// ── IV-P1: the world's catalogue of cultural traits ─────────────────────────
+// Fixed, ordered and bounded at 64 so a person's whole culture is one machine
+// word. The mix is deliberate: taboos and beliefs travel slowly but hold on
+// once they are in (a people does not casually stop burying its dead); fashions
+// and tastes catch fast and are dropped just as fast, which is what makes them
+// the things that visibly cascade. `prestigious` marks what a household shows
+// off with — the traits III-P4 converts into cultural capital.
+namespace {
+struct TraitSeed { const char* name; const char* category; float trans; float mut; bool prestige; int family; };
+static const TraitSeed kTraitCatalogue[] = {
+    // ── practices: how a people does the ordinary work of living ────────────
+    { "Ancestor Veneration",   "practice", 0.16f, 0.010f, false , -1 },
+    { "Communal Feasting",     "practice", 0.26f, 0.012f, false , -1 },
+    { "Bride-Price",           "practice", 0.14f, 0.008f, false ,  1 },
+    { "Dowry",                 "practice", 0.14f, 0.008f, true  ,  1 },
+    { "Cremation of the Dead", "practice", 0.12f, 0.006f, false ,  0 },
+    { "Sky Burial",            "practice", 0.10f, 0.006f, false ,  0 },
+    { "Grave Goods",           "practice", 0.13f, 0.007f, true  ,  0 },
+    { "Age-Set Initiation",    "practice", 0.15f, 0.008f, false , 12 },
+    { "Guest-Right",           "practice", 0.22f, 0.010f, false , -1 },
+    { "Blood Oath",            "practice", 0.18f, 0.010f, false , 11 },
+    { "Ritual Bathing",        "practice", 0.20f, 0.011f, false , -1 },
+    { "Seasonal Pilgrimage",   "practice", 0.17f, 0.009f, true  , -1 },
+    { "Storytelling Nights",   "practice", 0.28f, 0.013f, false , -1 },
+    { "Gift Exchange",         "practice", 0.24f, 0.011f, true  , -1 },
+    { "Duelling",              "practice", 0.16f, 0.012f, false , 11 },
+    { "Council of Elders",     "practice", 0.15f, 0.008f, true  , 12 },
+    // ── beliefs: what a people takes to be true about the world ─────────────
+    { "Sun Worship",           "belief",   0.14f, 0.007f, false ,  5 },
+    { "River Spirits",         "belief",   0.14f, 0.007f, false ,  5 },
+    { "The Wheel of Rebirth",  "belief",   0.11f, 0.006f, true  ,  5 },
+    { "Fate-Written Lives",    "belief",   0.13f, 0.007f, false ,  6 },
+    { "Dream Omens",           "belief",   0.19f, 0.010f, false ,  6 },
+    { "The Evil Eye",          "belief",   0.21f, 0.011f, false , -1 },
+    { "Sacred Mountains",      "belief",   0.12f, 0.006f, false ,  5 },
+    { "Ancestral Judgement",   "belief",   0.13f, 0.007f, false , -1 },
+    { "Star-Reading",          "belief",   0.15f, 0.009f, true  ,  6 },
+    { "The Unmade Name",       "belief",   0.10f, 0.006f, false , -1 },
+    // ── taboos: what a people will not do, and punishes ─────────────────────
+    { "Meat Taboo",            "taboo",    0.09f, 0.005f, false ,  7 },
+    { "Blood Taboo",           "taboo",    0.09f, 0.005f, false , -1 },
+    { "Silence at Dawn",       "taboo",    0.11f, 0.006f, false , -1 },
+    { "Forbidden Naming",      "taboo",    0.08f, 0.005f, false , -1 },
+    { "Exogamy Rule",          "taboo",    0.10f, 0.005f, false , -1 },
+    { "Left-Hand Prohibition", "taboo",    0.12f, 0.007f, false , -1 },
+    { "Sacred Grove Ban",      "taboo",    0.10f, 0.005f, false , -1 },
+    { "Fasting Season",        "taboo",    0.13f, 0.007f, true  ,  7 },
+    // ── tastes: what a people finds fine, and cultivates ────────────────────
+    { "Polyphonic Singing",    "taste",    0.27f, 0.014f, true  ,  8 },
+    { "Geometric Ornament",    "taste",    0.25f, 0.013f, true  ,  9 },
+    { "Spiced Cooking",        "taste",    0.30f, 0.015f, false , 10 },
+    { "Fermented Drink",       "taste",    0.31f, 0.015f, false , 10 },
+    { "Verse Recital",         "taste",    0.24f, 0.013f, true  ,  8 },
+    { "Carved Beadwork",       "taste",    0.26f, 0.014f, true  ,  9 },
+    { "Drum Circles",          "taste",    0.29f, 0.014f, false ,  8 },
+    { "Letters and Numbers",   "taste",    0.18f, 0.009f, true  , -1 },
+    // ── fashions: what a people wears, and stops wearing ────────────────────
+    { "Face Tattoos",          "fashion",  0.34f, 0.018f, false ,  3 },
+    { "Braided Hair",          "fashion",  0.36f, 0.019f, false ,  2 },
+    { "Dyed Cloth",            "fashion",  0.35f, 0.018f, true  ,  4 },
+    { "Bone Piercings",        "fashion",  0.33f, 0.018f, false ,  3 },
+    { "Long Beards",           "fashion",  0.32f, 0.017f, false ,  2 },
+    { "Shaven Heads",          "fashion",  0.32f, 0.017f, false ,  2 },
+    { "Copper Bangles",        "fashion",  0.34f, 0.018f, true  ,  4 },
+    { "Feather Headdress",     "fashion",  0.33f, 0.018f, true  ,  4 },
+};
+} // namespace
+
 CulturalTransmissionSystem::CulturalTransmissionSystem()
     : verticalTransmissionRate(0.8f), horizontalTransmissionRate(0.3f),
-      obliqueTransmissionRate(0.5f) {}
+      obliqueTransmissionRate(0.5f) {
+    const int n = (int)(sizeof(kTraitCatalogue) / sizeof(kTraitCatalogue[0]));
+    traitLibrary.reserve(n);
+    for (int i = 0; i < n && i < MAX_TRAITS; ++i) {
+        CulturalTrait t;
+        t.id               = i;
+        t.name             = kTraitCatalogue[i].name;
+        t.category         = kTraitCatalogue[i].category;
+        t.prevalence       = 0.0f;
+        t.transmissionRate = kTraitCatalogue[i].trans;
+        t.mutationRate     = kTraitCatalogue[i].mut;
+        t.prestigious      = kTraitCatalogue[i].prestige;
+        t.family           = kTraitCatalogue[i].family;
+        traitLibrary.push_back(t);
+    }
+}
+
+unsigned long long CulturalTransmissionSystem::rivals(int id) const {
+    if (id < 0 || id >= (int)traitLibrary.size()) return 0ull;
+    const int fam = traitLibrary[id].family;
+    if (fam < 0) return 0ull;
+    unsigned long long set = 0ull;
+    for (const CulturalTrait& t : traitLibrary)
+        if (t.family == fam && t.id != id) set |= bit(t.id);
+    return set;
+}
+
+int CulturalTransmissionSystem::count(unsigned long long set) {
+    int n = 0;
+    while (set) { set &= set - 1ull; ++n; }
+    return n;
+}
+
+float CulturalTransmissionSystem::distance(unsigned long long a, unsigned long long b) {
+    const unsigned long long both = a | b;
+    if (both == 0ull) return 0.0f;          // two peoples with no culture yet are not strangers
+    return 1.0f - (float)count(a & b) / (float)count(both);
+}
+
+// The tipping point, in one function. Below the critical mass the chance of
+// picking a novelty up is a fraction of its natural catchiness — enough that a
+// lucky trait can climb, not enough that most do. At or above it the same trait
+// spreads several times faster, so the last three quarters of a population
+// convert in a fraction of the time the first quarter took: a cascade.
+float CulturalTransmissionSystem::adoptionChance(int traitId, float prevalence,
+                                                 float receptiveness) const {
+    if (traitId < 0 || traitId >= (int)traitLibrary.size()) return 0.0f;
+    const float base = traitLibrary[traitId].transmissionRate * 0.05f;
+    const float crit = (float)CRITICAL_MASS_PCT / 100.0f;
+    const float r    = receptiveness < 0.2f ? 0.2f : (receptiveness > 1.8f ? 1.8f : receptiveness);
+    if (prevalence < crit)
+        return base * r * (prevalence / crit) * 0.25f;   // a minority quirk, mostly ignored
+    return base * r * (1.0f + 2.5f * prevalence);        // everyone is doing it
+}
+
+// Its mirror: what almost nobody does any more is dropped, which is how a
+// fizzled novelty actually leaves the world instead of lingering at 2%.
+float CulturalTransmissionSystem::abandonChance(int traitId, float prevalence) const {
+    if (traitId < 0 || traitId >= (int)traitLibrary.size()) return 0.0f;
+    const float crit = (float)CRITICAL_MASS_PCT / 100.0f;
+    if (prevalence >= crit) return 0.0f;                 // established: nobody feels foolish
+    // Fashions are shed easily, taboos hardly ever — the same rate that makes
+    // them catch fast makes them fall away fast. Below the critical mass this
+    // deliberately outweighs adoption: a novelty that does not find its first
+    // handful of converts quickly is a novelty that dies, which is why most of
+    // them do and why the ones that survive look like a sudden change.
+    return traitLibrary[traitId].transmissionRate * 0.090f * (1.0f - prevalence / crit);
+}
 
 void CulturalTransmissionSystem::addGroup(const CulturalGroup& group) {
     groups.push_back(group);
@@ -392,12 +527,18 @@ float CulturalTransmissionSystem::calculateCulturalDistance(int entityId1,
 // ============= Institution Implementation =============
 
 void Institution::updateLegitimacy() {
-    // Legitimacy based on resource distribution fairness and rule compliance
-    float avgSupport = 0.0f;
-    for (int memberId : memberIds) {
-        // Would calculate individual support
+    // An institution with nobody in it has no standing to lose or keep — and
+    // dividing by an empty membership used to produce NaN legitimacy, which
+    // then poisoned every comparison downstream.
+    if (memberIds.empty()) {
+        legitimacy = std::max(0.0f, legitimacy - 0.01f);   // an empty hall fades
+        return;
     }
-    legitimacy = avgSupport / memberIds.size();
+    // Legitimacy drifts toward how well the institution is actually working:
+    // people go on believing in a school that teaches and a court that judges.
+    // The civ layer supplies `efficiency` from real outcomes each civ-day.
+    legitimacy += (efficiency - legitimacy) * 0.02f;
+    legitimacy = std::max(0.0f, std::min(1.0f, legitimacy));
 }
 
 float Institution::enforceRule(const std::string& ruleName, int entityId) {
@@ -423,8 +564,9 @@ void Institution::distributeResources() {
 
 InstitutionalSystem::InstitutionalSystem() {}
 
-void InstitutionalSystem::createInstitution(InstitutionType type, 
-                                             const std::string& name) {
+int InstitutionalSystem::createInstitution(InstitutionType type,
+                                           const std::string& name,
+                                           int tribeId, int foundingDay) {
     static int nextId = 1;
     auto inst = std::make_shared<Institution>();
     inst->id = nextId++;
@@ -432,9 +574,11 @@ void InstitutionalSystem::createInstitution(InstitutionType type,
     inst->name = name;
     inst->legitimacy = 0.5f;
     inst->efficiency = 0.5f;
-    inst->foundingDay = 0;
-    
+    inst->foundingDay = foundingDay;
+    inst->tribeId = tribeId;
+
     institutions.push_back(inst);
+    return inst->id;
 }
 
 void InstitutionalSystem::addMember(int institutionId, int entityId) {
@@ -521,6 +665,50 @@ void InstitutionalSystem::update(float deltaTime) {
         inst->updateLegitimacy();
         inst->distributeResources();
     }
+}
+
+// ── II-P2: the queries the civilisation layer runs every civ-day ─────────────
+
+Institution* InstitutionalSystem::find(int tribeId, InstitutionType type) {
+    for (auto& inst : institutions)
+        if (inst->tribeId == tribeId && inst->type == type) return inst.get();
+    return nullptr;
+}
+
+const Institution* InstitutionalSystem::find(int tribeId, InstitutionType type) const {
+    for (const auto& inst : institutions)
+        if (inst->tribeId == tribeId && inst->type == type) return inst.get();
+    return nullptr;
+}
+
+bool InstitutionalSystem::archiveHolds(const std::string& techName) const {
+    // A near-dead institution has lost the thread: the scrolls rot, the last
+    // master takes the trick to the grave. Only a going concern still holds it.
+    for (const auto& inst : institutions)
+        if (inst->legitimacy > 0.15f && inst->archive.count(techName)) return true;
+    return false;
+}
+
+void InstitutionalSystem::dissolve(int institutionId) {
+    for (auto it = institutions.begin(); it != institutions.end(); ++it) {
+        if ((*it)->id != institutionId) continue;
+        for (int mid : (*it)->memberIds) {
+            auto m = entityMemberships.find(mid);
+            if (m == entityMemberships.end()) continue;
+            m->second.erase(std::remove(m->second.begin(), m->second.end(), institutionId),
+                            m->second.end());
+            if (m->second.empty()) entityMemberships.erase(m);
+        }
+        institutions.erase(it);
+        return;
+    }
+}
+
+void InstitutionalSystem::dissolveTribe(int tribeId) {
+    std::vector<int> doomed;
+    for (const auto& inst : institutions)
+        if (inst->tribeId == tribeId) doomed.push_back(inst->id);
+    for (int id : doomed) dissolve(id);
 }
 
 size_t InstitutionalSystem::getInstitutionCount() const {

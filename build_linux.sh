@@ -12,8 +12,8 @@ g++ -std=c++17 -O2 \
   src/world/PlanetView.cpp src/world/Lexicon.cpp src/world/ResourceSystem.cpp \
   src/world/Ecosystem.cpp src/UI.cpp src/Entity.cpp src/Drive.cpp \
   src/JungianType.cpp src/Disease.cpp src/Logging.cpp src/implem_free_will.cpp \
-  src/SaveLoad.cpp src/Kinship.cpp src/SocialOrder.cpp src/SDLEngine.cpp \
-  src/Image.cpp src/SemanticMemory.cpp src/PlanningSystem.cpp \
+  src/SaveLoad.cpp src/Kinship.cpp src/SocialOrder.cpp \
+  src/SemanticMemory.cpp src/PlanningSystem.cpp \
   src/PersonaSystem.cpp src/NarrativeEngine.cpp src/CivilizationEngine.cpp \
   src/TechTree.cpp src/Diplomacy.cpp src/Economics.cpp \
   src/items/ItemSystem.cpp src/ai/GoapPlanner.cpp src/ai/neat/Neat.cpp \

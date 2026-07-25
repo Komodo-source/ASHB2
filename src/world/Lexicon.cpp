@@ -133,6 +133,68 @@ void Lexicon::drift(int regionId, uint64_t tick) {
     L.rngState = s;
 }
 
+// ── IV-P3: mutual intelligibility ────────────────────────────────────────────
+// Two tongues understand each other in proportion to the sound-stuff they
+// share. Jaccard over the three inventories: |A ∩ B| / |A ∪ B|, averaged across
+// onsets, nuclei and codas. It is deliberately a *lexical* measure — this world
+// models languages as syllable inventories, so overlap of those inventories is
+// the honest thing to compute, and it moves exactly as speakers' contact moves
+// it (blend raises it, drift lowers it).
+float Lexicon::intelligibility(int regionA, int regionB) const {
+    if (regionA == regionB) return 1.0f;
+    if (regionA < 0 || regionB < 0) return 0.5f;          // unknown tongue: assume a lingua franca
+    if (regionA >= (int)langs.size() || regionB >= (int)langs.size()) return 0.5f;
+    const Language& A = langs[regionA];
+    const Language& B = langs[regionB];
+
+    auto jaccard = [](const std::vector<std::string>& x,
+                      const std::vector<std::string>& y) -> float {
+        if (x.empty() && y.empty()) return 1.0f;
+        int shared = 0;
+        for (const auto& a : x)
+            if (std::find(y.begin(), y.end(), a) != y.end()) ++shared;
+        int uni = (int)x.size() + (int)y.size() - shared;
+        return uni > 0 ? (float)shared / (float)uni : 0.0f;
+    };
+    // Vowels carry less distinguishing weight than consonant clusters: two
+    // languages sharing only their vowels are still mutually opaque.
+    return 0.40f * jaccard(A.onsets, B.onsets)
+         + 0.20f * jaccard(A.nuclei, B.nuclei)
+         + 0.40f * jaccard(A.codas,  B.codas);
+}
+
+int Lexicon::cloneLanguage(int srcLangId, uint64_t salt) {
+    Language child = langFor(srcLangId);          // copy the parents' speech
+    uint64_t s = splitmix64(child.rngState ^ salt ^ 0x9E3779B97F4A7C15ull);
+
+    // Sound change after a split is both loss and innovation: some of the
+    // parents' distinctions are levelled away and new ones appear. `drift()`
+    // alone only ever ADDS onsets, so a fork built from it would stay almost
+    // perfectly intelligible with its parent for ever — a language family that
+    // never actually branches. Dropping roughly a third of the inherited
+    // inventory and minting replacements is what makes the daughter tongue
+    // audibly its own within a generation, while still recognisably related.
+    auto diverge = [&](std::vector<std::string>& inv,
+                       const std::vector<std::string>& pool, size_t keepMin) {
+        for (size_t i = inv.size(); i-- > keepMin; ) {
+            s = splitmix64(s);
+            if (s % 100 < 35) inv.erase(inv.begin() + i);
+        }
+        int add = 2 + (int)(splitmix64(s++) % 3);
+        for (int k = 0; k < add; ++k) {
+            const std::string& item = pickFrom(pool, s);
+            if (std::find(inv.begin(), inv.end(), item) == inv.end()) inv.push_back(item);
+        }
+    };
+    diverge(child.onsets, ALL_ONSETS, 4);
+    diverge(child.codas,  ALL_CODAS,  3);
+    diverge(child.nuclei, ALL_NUCLEI, 3);
+
+    child.rngState = s;
+    langs.push_back(child);
+    return (int)langs.size() - 1;
+}
+
 void Lexicon::blend(int dstRegion, int srcRegion, float strength) {
     if (dstRegion == srcRegion) return;
     Language& D = langFor(dstRegion);

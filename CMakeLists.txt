@@ -16,6 +16,26 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 
+# ── Determinism: define every automatic variable ──────────────────────────────
+# Design rule #1 (plans/parallel-earth-upgrade.md §2) is that two runs of the
+# same seed are bit-identical. That contract was silently broken: an automatic
+# variable somewhere was being read before it was written, so each run inherited
+# whatever the stack happened to hold and the two runs of scripts/validate.sh
+# diverged within the first civ tick. (Two concrete offenders are fixed at
+# source — LifeGoal and PheromoneRelease::releasing_level in Entity.h — and this
+# class of bug has bitten the project before.)
+#
+# Zero-initialising untouched locals closes the whole class structurally rather
+# than one field at a time: undefined reads become a defined 0 instead of a
+# per-run lottery. It costs a fraction of a percent of tick throughput and does
+# NOT excuse leaving fields uninitialised — new POD members still get default
+# member initialisers (see the note above `struct LifeGoal`). Verified: with
+# this flag `scripts/validate.sh` passes the determinism pair; without it, it
+# fails on the very first run pair.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-ftrivial-auto-var-init=zero)
+endif()
+
 # Enable OpenMP for parallelization if available
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
@@ -25,7 +45,7 @@ endif()
 # ── Compile definition for headless mode ──────────────────────────────────────
 if(HEADLESS)
     add_definitions(-DHEADLESS)
-    message(STATUS "HEADLESS mode: building without GLFW/OpenGL/SDL/ImGui GUI")
+    message(STATUS "HEADLESS mode: building without GLFW/OpenGL/ImGui GUI")
 endif()
 
 # ── GUI libraries (only needed for interactive mode) ──────────────────────────

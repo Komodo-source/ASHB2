@@ -98,6 +98,48 @@ struct SelfConcept {
 };
 
 
+// ── I-P1 (Track I): narrative identity + purpose + life-story spine ──────────
+// The raw material for a "meaningful person": an identity distilled from what
+// the agent actually values and remembers (so it drives choice, not just UI),
+// a sense of purpose that buffers despair (Durkheim: integration/meaning
+// protect), and an ordered autobiography the Chronicle/Interview can read back.
+// See plans/parallel-earth-upgrade.md §4 I-P1.
+struct NarrativeIdentity {
+    std::string selfStory     = "seeker"; // survivor|provider|carer|maker|leader|believer|fighter|seeker
+    std::string dominantValue = "";       // which ValueSystem axis rules the self
+    int   definingMemoryIdx   = -1;       // anchor formative memory (index into lifeMemories)
+    float coherence           = 30.0f;    // 0-100 how settled/consistent the identity is
+    std::string lastStory     = "";       // did the story hold since last recompute? (coherence)
+};
+
+struct LifeChapter {
+    std::string title;     // born|first_love|bereaved|first_kill|triumph|betrayed|migrated|elevated|ruined
+    int         day     = 0;
+    int         otherId = -1;
+    std::string note;      // one human-readable line
+};
+
+// ── IV-P2 (Track IV): the creed a believer actually carries ──────────────────
+// A faith's doctrinal axes live on the Religion, but the scoring loop runs
+// thousands of times a tick and has no business looking up a religion registry.
+// So the axes of whatever a person believes are cached here and refreshed once
+// per civ-day. This is the wire that finally gives doctrine *teeth*: a pacifist
+// creed suppresses the violence pipeline for its believers, an ascetic one
+// curbs their appetites, an authoritarian one buys obedience — so two faiths
+// become behaviourally distinguishable instead of the near-identical creeds the
+// flagship report complained of. Runtime-only (rebuilt from the faith each
+// civ-day, so a loaded world restores it within a day).
+// See plans/parallel-earth-upgrade.md §7 IV-P2.
+struct Creed {
+    bool  held           = false;  // does this person actually follow a faith?
+    float militarism     = 50.0f;  // 0 pacifist      ←→ 100 crusader
+    float tolerance      = 50.0f;  // 0 exclusive     ←→ 100 syncretic
+    float asceticism     = 50.0f;  // 0 material      ←→ 100 spiritual
+    float authority      = 50.0f;  // 0 egalitarian   ←→ 100 hierarchical
+    float afterlifeFocus = 50.0f;  // 0 this-world    ←→ 100 next-world
+    float devotion       = 50.0f;  // how strongly THIS person holds it (0-100)
+};
+
 struct GriefState {
     int lostPersonId;      // ID of the lost person
     int stagesRemaining;   // Kübler-Ross: 5 stages remaining
@@ -120,20 +162,26 @@ struct EmotionalState {
     float suppressionDebt = 0.0f; // accumulation du coût de la suppression
 };
 
+// NOTE (determinism): every field carries a default initializer. These structs
+// are built as stack locals before being copied onto an Entity, so a member the
+// constructor happens not to touch would otherwise be read as whatever the
+// stack held — which is how two identical-seed runs diverged. Design rule #1
+// (plans/parallel-earth-upgrade.md §2) depends on this staying true: never add
+// a POD field here without a default.
 struct LifeGoal {
     std::string type;
         // "find_partner", "build_career", "make_friends", "happiness", "self", "build_family"
-    float priority;          // dynamic, shifts with context
-    float progressToward;
-    float frustrationLevel;  // increases when blocked
-    int ticksSinceProgress;
+    float priority         = 0.0f;   // dynamic, shifts with context
+    float progressToward   = 0.0f;
+    float frustrationLevel = 0.0f;   // increases when blocked
+    int ticksSinceProgress = 0;
 };
 
 
 struct PheromoneRelease {
     std::string type = "";
         //social, breeding, procreation_simulation
-    float releasing_level; //0-100
+    float releasing_level = 0.0f; //0-100
 };
 
 // Big Five personality traits
@@ -400,6 +448,52 @@ public:
     float lastExpectedOutcome = -1.0f;
     float decisionCloseness   = 0.0f;   // B5: top-2 score ratio (1 = torn mind)
 
+    // ── I-P1 (Track I): a meaningful person — an identity that drives choice, a
+    // protective sense of purpose, and a readable life story. NARRID/PURPOSE/
+    // CHAPTERS serialized append-only. lastIdentityDay is runtime-only.
+    NarrativeIdentity        narrativeIdentity;
+    float                    senseOfPurpose  = 40.0f; // meaning/integration; buffers stress, resists despair
+    std::vector<LifeChapter> lifeChapters;
+    int                      lastIdentityDay = -1;    // last narrative recompute (staggered cadence)
+
+    // ── III-P4 (Track III): cultural capital (Bourdieu) ──────────────────────
+    // The third axis of class, alongside money and legal standing: literacy,
+    // taste, manners, the bearing that comes of being raised in a house that
+    // already had them. It is what lets a family stay elite through a bad
+    // generation of finances, and what a newly rich commoner conspicuously
+    // lacks — status is *signalled* by it and *reproduced* through it, because
+    // children absorb their parents' share of it before they ever earn any.
+    // Serialized (CULTCAP).
+    float                    culturalCapital = 30.0f;   // 0-100
+
+    // ── IV-P1 (Track IV): the culture this person actually carries ───────────
+    // One bit per trait in the world catalogue
+    // (environment::CulturalTransmissionSystem): the practices they keep, the
+    // things they believe, what they will not do, what they find fine, and how
+    // they wear their hair. Culture is therefore a property of PEOPLE that
+    // moves between heads — inherited from parents at birth, caught from peers,
+    // taught by elders, carried down trade roads — and a tribe's culture is
+    // just what enough of its members happen to hold. Serialized (CULTTRAITS).
+    unsigned long long       cultureTraits   = 0ull;
+    // The subset of those this person will NOT give up: what they invented
+    // themselves, and what they carried home from somewhere else. Centola's
+    // committed minority, in one word — the reason a novelty gets any chance at
+    // all to reach the critical mass instead of being dropped the first season
+    // it makes its holder look odd. Serialized (CULTHELD).
+    unsigned long long       committedTraits = 0ull;
+
+    // ── I-P3 (Track I): how deep in its family line this person stands. The
+    // founder of a house is 1, their children 2, and so on — the spine the
+    // Chronicle walks to render a multi-generation saga, and what makes
+    // "this line has run five generations" a fact rather than a guess.
+    // Serialized (LINEAGE).
+    int                      lineageDepth    = 1;
+
+    // ── I-P4 (Track I): hedonic adaptation — a slowly-drifting personal stress
+    // baseline the mind habituates to, so acute stress recovers instead of
+    // staying pinned at 100 for a whole life. Serialized (STRESSBL).
+    float                    stressBaseline  = 40.0f;
+
     bool knowsRecipe(int ruleId) const {
         for (int r : knownRecipeIds) if (r == ruleId) return true;
         return false;
@@ -603,6 +697,8 @@ public:
     int   originRegionId = -1;   // cradle/landmass this lineage started in (-1 = none)
     int   tribeId       = -1;    // which tribe this entity belongs to (-1 = none)
     int   religionId    = -1;    // which religion they follow (-1 = none)
+    // IV-P2: the doctrine of that faith, cached for the scoring loop (runtime).
+    Creed creed;
     float dominanceRank = 0.0f;  // emergent social hierarchy position (0-100)
 
     // ── Social stratification (Clientela & Class) ────────────────────────────

@@ -24,6 +24,10 @@ struct Family {
     float            prestige       = 0.0f;  // Plan 4.1: dynastic standing (leaders/wealth/faith)
     bool             prominent      = false; // has risen to "great family" status (announced once)
     int              generation     = 1;     // dynastic depth
+    // I-P3: deepest generation already announced in the Chronicle, so a saga
+    // milestone ("this line has run five generations") is reported once, not
+    // every civ-day for the rest of the run.
+    int              announcedGeneration = 0;
 };
 
 // ── KinshipSystem ──────────────────────────────────────────────────────────────

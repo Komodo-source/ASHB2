@@ -1409,6 +1409,7 @@ void UI::ShowInterviewWindow(Entity* selected, std::vector<Entity*>& entities, i
         "What do you remember?",
         "What do you want from life?",
         "What do you think of the others?",
+        "Who are you, and what have you lived through?",
     };
     for (int i = 0; i < (int)(sizeof(questions) / sizeof(questions[0])); ++i) {
         if (ImGui::RadioButton(questions[i], question == i)) question = i;
@@ -1553,6 +1554,57 @@ void UI::ShowInterviewWindow(Entity* selected, std::vector<Entity*>& entities, i
         }
         if (listed == 0)
             ans = "\"Truthfully, I do not know anyone well enough to judge.\"";
+        break;
+    }
+    case 6: {
+        // §8: the life read back as a life. Everything here is a real field —
+        // the identity I-P1 distilled from what this person values and
+        // remembers, the purpose that buffers their despair, the chapters of
+        // their story in the order they happened, how deep in their line they
+        // stand (I-P3), and the ways they keep (IV-P1). This is the acceptance
+        // bar "you can open any agent and read a coherent life", made openable.
+        const auto& id = selected->narrativeIdentity;
+        ans = "\"I am a " + id.selfStory + "";
+        if (!id.dominantValue.empty()) ans += ", and what I hold to is " + id.dominantValue;
+        ans += ".\" ";
+        ans += std::string(id.coherence > 66.0f ? "(They say it without hesitating.) "
+                           : id.coherence > 33.0f ? "(They say it as though still deciding.) "
+                                                  : "(They do not sound sure of it.) ");
+        ans += "\n\n\"";
+        ans += selected->senseOfPurpose > 66.0f
+                   ? "My days mean something. I know what they are for."
+               : selected->senseOfPurpose > 33.0f
+                   ? "Some days feel like they are for something. Others, less."
+                   : "I do not know what any of it is for.";
+        ans += "\"\n";
+        if (selected->lineageDepth > 1)
+            ans += "\n(The " + std::to_string(selected->lineageDepth)
+                 + std::string(selected->lineageDepth == 2 ? "nd" :
+                               selected->lineageDepth == 3 ? "rd" : "th")
+                 + " generation of their house.)\n";
+        if (!selected->lifeChapters.empty()) {
+            ans += "\nTheir story so far:\n";
+            for (const LifeChapter& c : selected->lifeChapters)
+                ans += "  · day " + std::to_string(c.day) + " — "
+                     + (c.note.empty() ? c.title : c.note)
+                     + (c.otherId >= 0 ? " (" + nameOf(c.otherId) + ")" : "") + "\n";
+        }
+        if (globalCivEngine && selected->cultureTraits != 0ull) {
+            std::string ways;
+            unsigned long long set = selected->cultureTraits;
+            int shown = 0;
+            while (set && shown < 8) {
+                unsigned long long low = set & (~set + 1ull);
+                int tid = 0;
+                while ((low >> tid) != 1ull) ++tid;
+                ways += (ways.empty() ? "" : ", ")
+                      + globalCivEngine->culture.trait(tid).name;
+                set &= set - 1ull;
+                ++shown;
+            }
+            if (set) ways += ", …";
+            ans += "\nThe ways they keep: " + ways + "\n";
+        }
         break;
     }
     }

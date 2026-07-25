@@ -1,10 +1,10 @@
 # ASHB2 — an agent-based civilization & life simulator
 
-ASHB2 is a "society in a box" written in C++17, rendered with GLFW + Dear ImGui (and SDL2/ImPlot). Psychologically rich individual agents live, form relationships, reproduce, and die — and their moment-to-moment decisions emergently produce tribes, religions, economies, wars, and history.
+ASHB2 is a "society in a box" written in C++17, rendered with GLFW + Dear ImGui + ImPlot. Psychologically rich individual agents live, form relationships, reproduce, and die — and their moment-to-moment decisions emergently produce tribes, religions, economies, wars, and history.
 
 ## Building
 
-Requires CMake ≥ 3.10 and MinGW-w64 (g++ with C++17). Bundled third-party libs live in `libs/` (GLFW, ImGui, SDL2).
+Requires CMake ≥ 3.10 and MinGW-w64 (g++ with C++17). Bundled third-party libs live in `libs/` (GLFW, ImGui).
 
 ```bash
 cmake -G "MinGW Makefiles" .

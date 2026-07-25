@@ -13,7 +13,7 @@ A two-tier **human civilization simulator** ("Truman Show in a box"):
 - **Micro tier**: individual humans ("entities") with Big Five personality, attachment styles, bipolar homeostatic drives, Jungian cognitive stacks, PAD emotion, grief, life goals, semantic memory, a Tree-of-Thoughts planner, Q-learning, habits, jealousy/crimes-of-passion, reproduction, disease, hunger/metabolism.
 - **Macro tier**: `CivilizationEngine` aggregates entities into tribes, religions, tech trees, diplomacy, wars, economies, social classes (patrician/plebeian/slave), kinship clans; the world is a procedural planet with biomes, regional resources, an ecosystem, seasons and harvest luck.
 
-C++17, GLFW + Dear ImGui + ImPlot rendering, SDL2 linked (image loading; SDL render path is dead). ~17,600 lines of .cpp + ~7,400 lines of headers (excluding vendored ImPlot).
+C++17, GLFW + Dear ImGui + ImPlot rendering. ~17,600 lines of .cpp + ~7,400 lines of headers (excluding vendored ImPlot).
 
 ## 0.2 File tree with purpose annotations
 
@@ -49,7 +49,7 @@ ASHB2/
 │   ├── SaveLoad.cpp       (160)  # saves ONLY entities+day (civ/kinship/economy/RNG lost)
 │   ├── WorldMap.cpp/WorldSeed.cpp# deterministic seed streams (splitmix64)
 │   ├── TechTree.cpp, Kinship.cpp, Disease.cpp, movement.cpp*, SpatialMesh.cpp*,
-│   │   Graph.cpp*, Heritage.cpp*, Logging.cpp, Action.cpp, SDLEngine.cpp*, Image.cpp,
+│   │   Graph.cpp*, Heritage.cpp*, Logging.cpp, Action.cpp,
 │   │   CommunicationBasis.cpp*  (* = dead / not compiled / stub — see audit)
 │   ├── header/                   # 35 headers incl. vendored implot (78KB+67KB+390KB cpp)
 │   ├── world/    Noise, Planet, PlanetView, Lexicon, ResourceSystem, Ecosystem  (LIVE)
@@ -122,7 +122,7 @@ pipeline that actually runs (cognitive) never sets `entity->lastCoT`.
 |---|---|
 | ✅ Works | Needs/stat drift, action selection, relationships (social/desire/anger/couple), grief, reproduction+kinship, disease, tribes, religions (over-fecund: 328/run), innovations+tech tree, seasons/harvest, resources/ecosystem, market, social classes, movement forces, ImGui UI (graph, mind board, civ panel), deterministic world gen, per-run logs, post-mortem generator (python) |
 | ⚠️ Partial | Wars/diplomacy (system exists; **0 wars in 1,368-day flagship run** — thresholds unreachable), RL (Q bias wired but reward = raw outcome), planner (ToT plans but only biases scores ×1.5), PAD/body language (computed, barely consumed), norms (SocialNormSystem exists; the emergent-norm block in applyFreeWill writes into a commented-out map), save/load (entities only — civ/kinship/economy/planner/RNG all lost), Chain-of-Thought (only in dead path) |
-| ❌ Dead | validation/ scalability/ observability/ modules/ (3,000+ lines compiled, never referenced), SpatialMesh.cpp + movement.cpp (not in CMakeLists), Graph.cpp (dangling-pointer design, unused), Heritage (superseded by Kinship), CommunicationBasis (1 line), SDL rendering path, test.cpp (0 bytes), legacy chooseAction scorer, OpenMP (linked, zero pragmas) |
+| ❌ Dead | validation/ scalability/ observability/ modules/ (3,000+ lines compiled, never referenced), SpatialMesh.cpp + movement.cpp (not in CMakeLists), Graph.cpp (dangling-pointer design, unused), Heritage (superseded by Kinship), CommunicationBasis (1 line), test.cpp (0 bytes), legacy chooseAction scorer, OpenMP (linked, zero pragmas) |
 
 ---
 
@@ -440,7 +440,7 @@ src/
 │                   command queue back
 └── tests/          unit (decision, memory, norms, clock, saveload roundtrip),
                     sim tests (determinism, validation assertions), bench/
-third_party/        imgui, implot, glfw, sdl2
+third_party/        imgui, implot, glfw
 config/             default.yaml, scenarios/*.yaml
 ```
 

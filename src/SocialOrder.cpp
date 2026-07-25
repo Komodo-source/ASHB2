@@ -1,6 +1,7 @@
 #include "header/SocialOrder.h"
 #include "header/Entity.h"
 #include "header/WorldSeed.h"
+#include "header/LiveConfig.h"   // III-P4 classMul kill switch
 #include "header/CivilizationEngine.h"   // for globalCivEngine->logEvent (rare, important events)
 #include <algorithm>
 #include <unordered_map>
@@ -125,7 +126,15 @@ void SocialOrderSystem::updateClasses(std::vector<Entity>& entities) {
 
         if (e.socialClass == CLASS_SLAVE) continue; // bondage isn't escaped by wealth
 
-        float standing = wpct * 0.6f + (e.auctoritas / 100.0f) * 0.4f;
+        // III-P4: class rests on three legs, not two (Bourdieu). Money and
+        // earned standing are the first two; cultural capital is the third —
+        // and it is the one that carries a family through a bad generation of
+        // finances, because manners and letters are not confiscated with an
+        // estate. It also means new money alone does not buy entry.
+        float standing = (g_liveConfig.classMul != 0.0f)
+            ? wpct * 0.50f + (e.auctoritas / 100.0f) * 0.32f
+                           + (e.culturalCapital / 100.0f) * 0.18f * g_liveConfig.classMul
+            : wpct * 0.6f + (e.auctoritas / 100.0f) * 0.4f;
         if (e.socialClass == CLASS_PATRICIAN) {
             // Fall from grace only on real collapse of fortune and standing.
             if (standing < 0.45f && e.auctoritas < 45.0f) {
@@ -293,7 +302,48 @@ void SocialOrderSystem::updateDebtConsequences(std::vector<Entity>& entities, in
 
 // ── Inheritance hook ──────────────────────────────────────────────────────────
 void SocialOrderSystem::onDeath(std::vector<Entity>& entities, int deadId, int heirId, int year) {
-    (void)entities; (void)year;
+    (void)year;
+
+    // ── III-P4: the estate ───────────────────────────────────────────────────
+    // This hook already passed on debts and clients — the *obligations* of a
+    // life — but not its property, so every fortune ever accumulated simply
+    // evaporated at the grave and inequality was silently redealt each
+    // generation. Real advantage compounds precisely because it does not:
+    // wealth and the bearing that goes with it pass to the children.
+    if (g_liveConfig.classMul != 0.0f) {
+        Entity* dead = nullptr;
+        for (Entity& e : entities) if (e.entityId == deadId) { dead = &e; break; }
+        if (dead && dead->salary.token > 0.0f) {
+            std::vector<Entity*> heirs;
+            for (int cid : dead->childrenIds)
+                for (Entity& c : entities)
+                    if (c.entityId == cid && c.entityHealth > 0.0f) { heirs.push_back(&c); break; }
+            // With no children of their own, the named heir (if any) takes it.
+            if (heirs.empty() && heirId >= 0)
+                for (Entity& c : entities)
+                    if (c.entityId == heirId && c.entityHealth > 0.0f) { heirs.push_back(&c); break; }
+
+            if (!heirs.empty()) {
+                // Most of the estate passes; the rest is spent on the funeral
+                // and the claims of others. Split evenly among the children —
+                // partible inheritance, which dilutes a fortune across a large
+                // brood and concentrates it in a small one.
+                float estate = dead->salary.token * 0.80f * g_liveConfig.classMul;
+                float each   = estate / (float)heirs.size();
+                for (Entity* h : heirs) {
+                    h->salary.earnMoney(each);
+                    // Standing rubs off too: an heir is treated as their parent
+                    // was, before they have done anything to deserve it.
+                    h->culturalCapital = std::min(100.0f,
+                        h->culturalCapital + dead->culturalCapital * 0.15f * g_liveConfig.classMul);
+                    h->auctoritas = std::min(100.0f,
+                        h->auctoritas + dead->auctoritas * 0.10f * g_liveConfig.classMul);
+                }
+                dead->salary.spendMoney(estate);
+            }
+        }
+    }
+
     if (heirId < 0 || heirId == deadId) {
         // No heir: the dead agent's obligations simply dissolve.
         bonds.erase(std::remove_if(bonds.begin(), bonds.end(),

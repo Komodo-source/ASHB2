@@ -28,13 +28,10 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-make
-            mingw-w64-x86_64-SDL2
-            mingw-w64-x86_64-SDL2_image
             mingw-w64-x86_64-glfw
 
       # The repo vendors headers but not binaries (.a/.dll are gitignored).
-      # SDL2 libs resolve from /mingw64/lib via the toolchain's default search
-      # path, but CMakeLists links glfw by absolute vendored path — stage it.
+      # CMakeLists links glfw by absolute vendored path — stage it.
       - name: Stage glfw static lib into the vendored path
         run: |
           mkdir -p libs/glfw/lib-mingw-w64
