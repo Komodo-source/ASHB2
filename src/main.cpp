@@ -1,8 +1,16 @@
+// HEADLESS: a build with no window at all — no GLFW, no OpenGL, no Dear ImGui,
+// nothing that needs a display or a GPU driver present. That is what a Linux
+// server, a CI runner and a GitHub Codespace actually are, and the simulation
+// itself has never needed any of it: --headless runs the whole world and prints
+// the realism report. Building the render path there meant installing a GUI
+// toolchain to run a text-mode simulation, so it is compiled out instead.
+#ifndef HEADLESS
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include "./header/UI.h"
+#endif
 #include "./header/Entity.h"
 #include <vector>
 #include <algorithm>
@@ -15,8 +23,10 @@
 #include <thread>
 #include "./header/Disease.h"
 #include "util/Debbug.h"
+#ifndef HEADLESS
 #include "./header/implot.h"
 #include "./header/implot_internal.h"
+#endif
 #include "./util/clear.h"
 #include "./header/SaveLoad.h"
 #include "./header/Logging.h"
@@ -25,7 +35,9 @@
 #include "./header/Kinship.h"
 #include "./header/WorldSeed.h"
 #include "world/Planet.h"
+#ifndef HEADLESS
 #include "world/PlanetView.h"
+#endif
 #include "world/Lexicon.h"
 #include <unordered_map>
 #include <array>
@@ -3636,6 +3648,16 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+#ifdef HEADLESS
+    // No render path was compiled in. Reaching here means the person asked for
+    // a window from a binary that has none — say so plainly and tell them the
+    // one flag that gets them a run, rather than exiting silently.
+    std::cout << "\nThis is a headless build — it has no window.\n"
+                 "Run the simulation in the terminal instead, e.g.\n"
+                 "  ./app --headless 1000 --seed mars --entities 60\n"
+                 "(or rebuild with ./build_linux.sh --gui for the graphical version)\n";
+    return 0;
+#else
     // Interactive mode: GLFW + OpenGL + Dear ImGui is the only render path.
     {
         if (!glfwInit()) return -1;
@@ -3747,4 +3769,5 @@ int main(int argc, char* argv[]) {
         glfwTerminate();
     }
     return 0;
+#endif   // HEADLESS
 }

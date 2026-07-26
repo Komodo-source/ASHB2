@@ -45,3 +45,7 @@ __pycache__/
 *.swo
 .DS_Store
 Thumbs.db
+
+# Build outputs (Linux headless/GUI builds from build_linux.sh)
+app
+app.exe
