@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>          // atof
 
 ItemManager g_itemManager;
 

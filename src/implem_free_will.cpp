@@ -16,6 +16,8 @@
 #include "world/Lexicon.h"
 #include "./header/LiveConfig.h"
 
+#include <cstdlib>          // std::getenv
+
 
 #include <algorithm>
 #include <cerrno>

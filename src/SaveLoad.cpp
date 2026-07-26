@@ -23,7 +23,13 @@ const char* SAVE_FORMAT_V3 = "ASHB2_SAVE_V3";
 #include <string>
 #include <algorithm>
 #include <sys/stat.h>
-#include <direct.h>
+#include <cstring>          // strcpy — came in via <direct.h> on Windows
+#include <cstdlib>          // atof
+#ifdef _WIN32
+  #include <direct.h>       // _mkdir
+#else
+  #include <sys/types.h>    // mkdir(2)
+#endif
 
 // ── Global state we save/restore ─────────────────────────────────────────────
 // Declared extern elsewhere; we simply include the headers that declare them.
@@ -116,7 +122,11 @@ std::string autobackupFilename() {
 bool ensureSavesDir() {
     struct stat st;
     if (stat(SAVES_DIR, &st) == 0 && (st.st_mode & S_IFDIR)) return true;
+#ifdef _WIN32
     int ret = _mkdir(SAVES_DIR);
+#else
+    int ret = mkdir(SAVES_DIR, 0755);
+#endif
     if (ret == 0) {
         std::cout << "Created saves directory: " << SAVES_DIR << std::endl;
         return true;

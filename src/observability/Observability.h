@@ -9,6 +9,7 @@
 #include <sstream>
 #include <chrono>
 #include <mutex>
+#include <cstdint>          // uint64_t / int64_t
 #include <atomic>
 #include <math.h>
 #include <functional>

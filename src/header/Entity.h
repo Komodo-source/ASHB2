@@ -363,7 +363,10 @@ public:
     SemanticMemorySystem semanticMemory;
     PlanningSystem planner;
     std::vector<GriefState> griefStates;
-    ValueSystem ValueSystem;
+    // Member deliberately shares its type's name; the elaborated specifier keeps
+    // that legal (GCC rejects the bare form under -Wchanges-meaning). Renaming
+    // would touch ~120 access sites.
+    struct ValueSystem ValueSystem;
     SocialNorm socialNorm;
     std::vector<LifeGoal> m_goals; //une entité peut avoir entre 1 - 5 but de vie
     std::map<std::string, HierarchicalNeed> needs;
@@ -409,7 +412,7 @@ public:
     std::vector<LifeMemory> lifeMemories;
     EmotionalState emotionalState;
     std::vector<MentalModelOfOther*> list_MentalModelOfOther;
-    SelfConcept SelfConcept;
+    struct SelfConcept SelfConcept;   // see note on ValueSystem above
     std::map<int, PerceivedReputation> reputationMap;
     // NOTE: these were uninitialized for years. meetingCount gates stranger
     // bonding (freewill:~2170), so entities built on recycled heap memory got

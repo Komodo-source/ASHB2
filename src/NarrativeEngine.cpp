@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <cstdlib>
+#include <cstdio>           // snprintf
 
 // ── Global definitions ───────────────────────────────────────────────────────
 std::deque<std::string> globalNarrativeLog;

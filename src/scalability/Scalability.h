@@ -9,6 +9,7 @@
 #include <future>
 #include <queue>
 #include <condition_variable>
+#include <stdexcept>        // std::runtime_error
 #include <memory>
 #include <unordered_map>
 #include <random>
