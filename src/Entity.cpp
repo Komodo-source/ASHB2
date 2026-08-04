@@ -21,6 +21,18 @@
 #include "./header/LiveConfig.h"
 #include "./header/SocialNormSystem.h"
 #include "./header/ExternalData.h"
+#include "./header/WorldSeed.h"
+
+// ── QI: a private random stream ──────────────────────────────────────────────
+// Every QI draw comes from here rather than from BetterRand or any generator
+// the world already turns. That is deliberate: one extra draw on a shared
+// stream shifts every number after it, so a build with QI compiled in could
+// never be proved identical to the build without it. With its own stream,
+// `--set qiMul=0` reproduces the pre-QI world exactly.
+static std::mt19937_64& qiRng() {
+    static std::mt19937_64 s = makeStream(g_worldSeed.master, 0xB1A5C0DE51CE9A7Dull);
+    return s;
+}
 
 // Constructor with only ID
 Entity::Entity(int id)
@@ -230,6 +242,67 @@ void Entity::IncrementBDay(){
             }
         }
     }
+
+    // A year of a life is also a year of a mind being made — or not.
+    if (entityHealth > 0.0f) developQI();
+}
+
+float Entity::rollQIPotential(const Entity* pa, const Entity* pb) {
+    // A founder has no parents to inherit from: draw straight from the
+    // population distribution.
+    if (!pa && !pb) {
+        std::normal_distribution<float> founder(100.0f, 15.0f);
+        return std::clamp(founder(qiRng()), 55.0f, 145.0f);
+    }
+    float midparent = (pa && pb) ? 0.5f * (pa->qiPotential + pb->qiPotential)
+                                 : (pa ? pa->qiPotential : pb->qiPotential);
+    // Heritability ~0.6 with regression to the population mean. This is the
+    // term that stops one lucky pairing founding a dynasty of geniuses that
+    // never comes back down: half of what makes a clever child is the parents,
+    // the rest is the same draw everybody else is making.
+    std::normal_distribution<float> noise(0.0f, 8.0f);
+    return std::clamp(0.6f * midparent + 0.4f * 100.0f + noise(qiRng()), 55.0f, 145.0f);
+}
+
+void Entity::developQI() {
+    if (g_liveConfig.qiMul == 0.0f) return;   // kill switch: nothing happens
+
+    // Nobody accumulates an unbounded education. Without this an entity that
+    // sat in a school from six to twenty-six banked twenty school-years, and
+    // every downstream term that reads schoolYears (fertility above all) was
+    // being fed a number no human ever reaches.
+    constexpr float kMaxSchoolYears = 16.0f;
+
+    // What this year of the life is actually giving them.
+    float nutrition = std::clamp(1.0f - entityHunger / 100.0f, 0.0f, 1.0f);
+    float school    = std::clamp(schoolAccess, 0.0f, 1.0f);
+    float trauma    = std::clamp(dv.childhoodTraumaScore / 100.0f, 0.0f, 1.0f);
+
+    if (entityAge < 16.0f) {
+        // A child closes on its ceiling only as fast as its circumstances
+        // allow. The 0.70 floor is what an unschooled but adequately fed
+        // childhood reaches by itself — the headroom above it is precisely
+        // what a University is selling.
+        float envFactor = 0.70f + 0.15f * nutrition + 0.15f * school - 0.10f * trauma;
+        float target    = qiPotential * std::clamp(envFactor, 0.55f, 1.05f);
+        qi += (target - qi) * 0.16f;
+        schoolYears = std::min(kMaxSchoolYears, schoolYears + school);
+    } else if (entityAge < 26.0f) {
+        // Higher study still moves a young adult mind, with diminishing returns.
+        if (school > 0.0f) {
+            qi += 1.2f * school / (1.0f + schoolYears * 0.08f);
+            schoolYears = std::min(kMaxSchoolYears, schoolYears + school);
+        }
+        qi = std::min(qi, qiPotential * 1.05f);
+    } else if (entityAge >= 60.0f) {
+        // Decline, steeper for a body already failing.
+        qi -= (entityHealth < 40.0f) ? 0.6f : 0.3f;
+    } else if (isSpecialist && (specialization == "scholar" || specialization == "craftsman")) {
+        // Practising a thinking trade keeps an adult sharp.
+        qi = std::min(qi + 0.15f, qiPotential * 1.05f);
+    }
+
+    qi = std::clamp(qi, 40.0f, 160.0f);
 }
 
 Entity* Entity::mostAngryConn(){
@@ -538,6 +611,12 @@ void Entity::saveTo(std::ofstream& file) const {
     file << "CHAPTERS:" << lifeChapters.size() << "\n";
     for (const LifeChapter& c : lifeChapters)
         file << "CHAPTER:" << c.day << ',' << c.otherId << ',' << c.title << ',' << c.note << "\n";
+
+    // QI: the ceiling, what was made of it, and the schooling that did it.
+    // A reloaded world that lost these would restart every lineage's mind from
+    // scratch — and `qiPotential` in particular is unrecoverable, since nothing
+    // else in the save records what a person could have been.
+    file << "QI:" << qi << ',' << qiPotential << ',' << schoolYears << "\n";
 
     // Web bridge: MySQL characters.id this entity embodies (-1 = pure AI).
     // MUST stay the LAST key — older loaders rewind on the unknown line and
@@ -879,6 +958,12 @@ bool Entity::loadFrom(std::ifstream& file) {
                 ch.note  = body.substr(c3 + 1);
                 lifeChapters.push_back(ch);
             }
+        }
+        else if (line.rfind("QI:", 0) == 0) {
+            auto f = splitFloats(line.substr(3));
+            // Presence-guarded: a save written before QI existed simply never
+            // carries this key and the defaults (100/100/0) stand.
+            if (f.size() >= 3) { qi = f[0]; qiPotential = f[1]; schoolYears = f[2]; }
         }
         else if (line.rfind("WEBCHARID:", 0) == 0)      webCharId     = std::stoi(line.substr(10));
         else if (line.rfind("--- END ENTITY", 0) == 0)  break;
@@ -1242,6 +1327,45 @@ bool Entity::pruneLifeMemories(int simDay) {
         return m.emotionalIntensity * decay;
     };
 
+    // ── M14-P2: what a forgotten decade leaves behind ────────────────────────
+    // This is the exact line where trauma used to vanish. A memory drops below
+    // the retrieval floor, gets erased here, and every behavioural effect it had
+    // disappears with it — the agent is measurably "over it" the moment it stops
+    // being able to remember. People do not work that way. The episode goes; the
+    // disposition it built stays, which is why someone can be wary without being
+    // able to tell you what taught them to be.
+    //
+    // So before erasing, take the emotional weight of what is being lost and pay
+    // a fraction of it into permanent personality. Capped over a lifetime (see
+    // Entity::kMaxLifetimeDrift) so a long unlucky life bends a character rather
+    // than pinning it at the clamp — the failure mode documented for
+    // applyBuildingEffects in plans/qi-university.md.
+    if (g_liveConfig.appraisalMul != 0.0f) {
+        float lostDark = 0.0f, lostWarm = 0.0f;
+        for (const LifeMemory& m : lifeMemories) {
+            if (m.isFormative) continue;
+            if (simDay - m.simulationDay < GRACE_DAYS) continue;
+            if (salience(m) >= MIN_SALIENCE) continue;
+            if (m.eventType == "trauma" || m.eventType == "loss_death" ||
+                m.eventType == "conflict" || m.eventType == "betrayal")
+                lostDark += m.emotionalIntensity;
+            else if (m.eventType == "positive_bond" || m.eventType == "romantic_success")
+                lostWarm += m.emotionalIntensity;
+        }
+        const float net = (lostDark - lostWarm) * 0.25f;
+        if (net != 0.0f) {
+            auto driftBy = [](float& accum, float& trait, float delta, float lo, float hi) {
+                const float room = Entity::kMaxLifetimeDrift;
+                const float want = std::clamp(accum + delta, -room, room);
+                const float applied = want - accum;
+                accum  = want;
+                trait  = std::clamp(trait + applied, lo, hi);
+            };
+            driftBy(driftNeuroticism, personality.neuroticism,     net,        0.0f, 100.0f);
+            driftBy(driftAgreeable,   personality.agreeableness,  -net * 0.5f, 0.0f, 100.0f);
+        }
+    }
+
     lifeMemories.erase(
         std::remove_if(lifeMemories.begin(), lifeMemories.end(),
             [&](const LifeMemory& m) {
@@ -1389,6 +1513,11 @@ void Entity::applyEpigeneticEffects() {
     personality.conscientiousness = std::clamp(personality.conscientiousness, 0.0f, 100.0f);
     personality.neuroticism = std::clamp(personality.neuroticism, 0.0f, 100.0f);
     personality.openness = std::clamp(personality.openness, 0.0f, 100.0f);
+
+    // QI lives on its own scale (100 = the population mean), so it clamps to
+    // its own bounds rather than 0-100.
+    qi          = std::clamp(qi, 40.0f, 160.0f);
+    qiPotential = std::clamp(qiPotential, 55.0f, 145.0f);
 }
 
 void Entity::inheritEpigeneticMarkers(Entity* parent1, Entity* parent2) {
@@ -1519,3 +1648,10 @@ void Entity::tickPathogens(int today) {
         ++it;
     }
 }
+
+
+// for Postgre Database server we update every 30 ticks
+// for local SQlite server we update every 50 ticks
+// try to not update at both time and make backup update update just before
+// online database update
+

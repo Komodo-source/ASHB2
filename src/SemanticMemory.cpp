@@ -2,6 +2,7 @@
 #include "./header/Entity.h"
 #include "./header/FreeWillSystem.h"
 #include "./header/WorldSeed.h"
+#include "./header/LiveConfig.h"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
@@ -332,8 +333,28 @@ MemorySearchResult SemanticMemorySystem::searchRelevantMemories(const MemoryQuer
                                               query.actionType);
     }
     
+    // ── M16-P1: bound the scan ───────────────────────────────────────────────
+    // `memoryDatabase` is never pruned, so it grows for the whole of a life,
+    // and this function is called once per candidate action per decision — up
+    // to fourteen full 64-dimensional passes over every memory an agent has
+    // ever formed, every time it decides anything. That is the largest hidden
+    // cost in the pipeline and it gets worse the longer someone lives.
+    //
+    // Human recall is not a linear scan either: what is available to be
+    // remembered is a small working set of the recent and the formative. So the
+    // scan starts at a recency window and always includes formative memories,
+    // which are the ones the rest of the system treats as permanent anyway.
+    // Neutral (full scan) when memoryLodMul == 0.
+    const size_t kWorkingSet = 64;
+    size_t scanFrom = 0;
+    const bool bounded = (g_liveConfig.memoryLodMul != 0.0f) &&
+                         (memoryDatabase.size() > kWorkingSet);
+    if (bounded) scanFrom = memoryDatabase.size() - kWorkingSet;
+
     std::vector<std::pair<float, int>> scoredMemories;
     for (size_t i = 0; i < memoryDatabase.size(); ++i) {
+        // Outside the recency window only formative memories still surface.
+        if (bounded && i < scanFrom && !memoryDatabase[i].isFormative) continue;
         float sim = cosineSimilarity(queryEmbed, memoryDatabase[i].embedding);
         
         float entityBoost = 1.0f;

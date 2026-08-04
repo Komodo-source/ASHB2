@@ -11,6 +11,117 @@ runtime artifact and is gitignored (`bridge/*.txt`, `bridge/*.json`,
 | `inject.txt` | PHP → engine | new web characters + feedback nudges, applied via `--inject` |
 | `report.json` | engine → PHP | per-web-character daily report (Phase 3) |
 | `scheduler.log` | scheduler | stdout of scheduled engine runs (Phase 4) |
+| `spool/` | engine → PostgreSQL | NDJSON chunks for `scripts/db_spool_loader.py` |
+
+## spool/ — the PostgreSQL channel
+
+One command, when you just want a run to end up in the database:
+
+```
+python scripts/run_sim_to_db.py --days 500 --seed mars --label "first world"
+```
+
+It checks the database is reachable and `sim.*` applied **before** starting the
+engine, runs producer and consumer together, and — the part that is easy to get
+wrong by hand — drains the spool once more *after* the engine exits, because
+`dbexport::shutdown()` publishes the tail chunk on the way out. It then prints
+what actually landed and fails if anything is still unread. Credentials come
+from `PG_DSN` in `website/.env`, same as the web app; `--dsn` overrides.
+
+The two halves separately, which is what the scheduler uses:
+
+```
+./app --headless 250 --db-export bridge/spool --world-id 1     # producer
+python scripts/db_spool_loader.py                               # consumer
+```
+
+First-time setup:
+
+```
+# 1. put PG_DSN=postgresql://... in website/.env
+php website/bin/pg_check.php --import      # create sim.*
+php website/bin/pg_check.php               # verify, then run the sim
+```
+
+The engine appends rows to `<epoch>_<pid>_<counter>.ndjson.tmp` and every 5 000
+rows closes it and renames it to `.ndjson`. **That rename is the whole protocol.**
+While the name ends in `.tmp` the loader's glob ignores it; the moment it is
+renamed the chunk is complete and on disk. Rename inside one directory is atomic
+on NTFS and ext4, so a half-written chunk is never visible.
+
+The loader ingests chunks oldest-first (the names sort chronologically), COPYs
+each into `sim.*` in a single transaction, then deletes it. Disk stays bounded at
+about one chunk no matter how long the world runs — unlike `tick_history.jsonl`,
+which nothing consumes and which reached 188 MB.
+
+Neither side can block or crash the other. The loader can be down for hours and
+catch up; the engine can be between scheduled runs and the loader just sleeps.
+A chunk that fails to load three times is renamed `.failed` rather than retried
+forever or deleted, so it can be inspected without wedging the queue.
+
+Schema: `website/sql/schema_pg.sql` (an entity's own attributes, plus one table
+per pointed association — desire, anger, social, couple, mental model).
+Deaths arrive as absence: the tick's batch erase removes entities with
+health <= 0 before the export runs, so someone who stops being pushed has died
+and the loader flips them to `alive = false` without deleting the row.
+
+Everything under `spool/` is runtime data and is gitignored.
+
+## src/backup/ — the crash-recovery channel
+
+Not under `bridge/`, but the same producer/consumer shape as `spool/`, so it is
+documented next to it. There the artifact is a row and the consumer is
+PostgreSQL; here the artifact is a whole world save and the consumer is a SQLite
+index that can put the run back on its feet.
+
+```
+./app --headless 20000 --seed mars --backup-every 300     # producer (seconds!)
+python src/backup/auto_file_index_database.py             # consumer
+```
+
+Three kinds of file land in `src/backup/backup_log/`:
+
+| File | What it is |
+|---|---|
+| `<sig>_bk_<run>_<nnnnnn>_d<day>.txt` | a full `ASHB2_SAVE_V3` world |
+| `<sig>_bk_<run>_<nnnnnn>_d<day>.meta.json` | what it is and how to resume it (day, ticks done/target, seed, cwd, argv) |
+| `run_<run>.alive` | the heartbeat, rewritten about once a second |
+
+**Cadence is wall-clock, not ticks.** A tick costs more as the population grows,
+so "every 500 ticks" is minutes early in a run and an hour late once the world
+is crowded. Seconds bound the thing you actually care about: how much history a
+crash can cost you.
+
+**Publication is the same atomic rename as the spool.** `saveGame` writes under
+`.part`; only once the file is closed is it renamed to `.txt`. The indexer's
+glob only matches the published form, so a save being written — or one torn by
+the very crash we are recovering from — is never picked as a restore point. Each
+indexed file is checked anyway: format marker on the first line, `CS_END` on the
+last.
+
+**The heartbeat is the crash signal.** While the engine lives it says
+`"running"`; a clean exit rewrites it as `"finished"`, and a world that dies out
+as `"extinct"`, through an `atexit` hook. A segfault, an OOM kill or a power cut
+runs no `atexit` handler — so the file is left saying `"running"` with a pid that
+no longer exists. Stale heartbeat **and** dead pid means a crash; the supervisor
+then relaunches the recorded argv with `--load <newest checkpoint>` and the
+tick count that is *left*, not the one originally asked for. Stale but pid still
+alive is reported and left alone: a second engine on the same world would
+corrupt exactly what is being protected. `--extinct` and `--finished` runs are
+never resumed.
+
+```
+python src/backup/auto_file_index_database.py --list        # what is indexed
+python src/backup/auto_file_index_database.py --index-only  # never relaunch
+python src/backup/auto_file_index_database.py --dry-run     # print the command only
+python src/backup/auto_file_index_database.py --restore-now # resume by hand, one pass
+```
+
+Restarts are budgeted (`--max-restarts 3` per `--restart-window 3600`s): a world
+that crashes deterministically is a bug to look at, not something to relaunch all
+night. Old checkpoints are pruned to `--keep 20` per run — never the newest, and
+never a save that did not come from this channel. Everything in `backup_log/`
+plus the SQLite index is runtime data and gitignored.
 
 ## TICKS_PER_CIV_DAY = 1
 

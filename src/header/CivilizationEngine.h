@@ -10,8 +10,10 @@
 #include "Economics.h"
 #include "WorldSeed.h"
 #include "../environment/EnvironmentModel.h"   // II-P2: InstitutionalSystem
+#include "Building.h"
 
 class Entity;
+
 
 // ── Innovation ────────────────────────────────────────────────────────────────
 struct Innovation {
@@ -30,6 +32,8 @@ struct Innovation {
 // ── Religion ──────────────────────────────────────────────────────────────────
 enum MoralCode   { MC_STRICT, MC_PEACEFUL, MC_WARRIOR, MC_FLEXIBLE };
 enum RitualType  { RT_DAILY_PRAYER, RT_WEEKLY_GATHERING, RT_MEDITATION, RT_CEREMONY, RT_SACRIFICE };
+
+extern int last_entity_id;
 
 struct Religion {
     int         id;
@@ -134,6 +138,8 @@ struct Tribe {
     int            lastCoupDay     = -100000;  // cooldown so revolts don't chain
     int            totalCoups      = 0;        // how many times this tribe has revolted
 
+    std::vector<buildingStructure> buildings_owned;
+
     // ── Elections & council ──────────────────────────────────────────────────
     // Democracies choose their leader by real ballot every term; every regime
     // seats a small council of notables whose mood steadies or shakes the ruler
@@ -190,6 +196,19 @@ struct Tribe {
     float metalStock     = 0.0f;   // smelted ore
     float luxuryStock    = 0.0f;   // fine crafts & trade goods
     float knowledgeStock = 0.0f;   // accumulated learning (does not spoil)
+
+    // ── QI: what this people can think with ──────────────────────────────────
+    // All four are RECOMPUTED from the living members every civ-day by
+    // updateEducation — never accumulated. That distinction matters: a field
+    // that is added to each pass can only ever rise and will saturate at its
+    // clamp, so a people could never grow stupider. These can fall, and do,
+    // when the schools close or the educated generation dies in a war.
+    float meanQI        = 100.0f;  // mean QI of living adults
+    float eliteQI       = 100.0f;  // mean of the top decile — its generals and scholars
+    float schoolQuality = 0.0f;    // 0-1: what a University here is actually worth
+    int   schooledCount = 0;       // members with schoolYears >= 4
+    bool  hadUniversity = false;   // latch: so "founded its first university" logs once
+    bool  wasLettered   = false;   // latch: so "a lettered generation" logs once
 
     // ── Culture & arts (Improvement Plan 7) ──────────────────────────────────
     // Artists turn leisure and inspiration into culture. A tribe's cultural score
@@ -610,6 +629,8 @@ public:
     int  totalWarDeaths    = 0;   // deaths directly caused by battle/war attrition
     int  totalBattles      = 0;
     int  totalWarsDeclared = 0;
+    int  totalWarsAverted  = 0;   // QI: wars a people saw it would lose, and bought its way out of
+    int  totalBrainDrain   = 0;   // QI: schooled people absorbed from a conquered neighbour
     int  totalEthnicWars   = 0;   // wars rooted in tribal/religious hatred
     int  totalConquests    = 0;
     int  totalCouplesBroken= 0;   // couples torn apart by war between their tribes
@@ -795,6 +816,16 @@ private:
     void updateTribeValues(Tribe& tribe, std::vector<Entity>& entities);
     void updateTribeTech(Tribe& tribe, std::vector<Entity>& entities);
     void updateTribeReligion(Tribe& tribe, std::vector<Entity>& entities);
+    void applyBuildingEffects(Tribe& tribe);
+    // Decide whether this people raises something this month. Until this
+    // existed nothing ever called Building::build, so buildings_owned was
+    // always empty and every building effect in the game was unreachable.
+    void considerConstruction(Tribe& tribe, int day);
+    // QI: recompute this people's collective mind, then run its universities —
+    // who gets a seat, what it costs the treasury and the granary, and how much
+    // schooling actually reaches them. Every civ-day, because schooling is
+    // continuous; the buildings themselves are still charged monthly.
+    void updateEducation(Tribe& tribe, std::vector<Entity>& entities, int day);
     void absorbEntityIntoTribe(Tribe& tribe, Entity* ent);
     void removeDeadFromTribes(std::vector<Entity>& entities);
     void dissolveSmallTribes(std::vector<Entity>& entities, int day);

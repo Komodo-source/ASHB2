@@ -1,8 +1,10 @@
 #include "TechTree.h"
 #include "Entity.h"
 #include "CivilizationEngine.h"
+#include "QISystem.h"
 
 #include <algorithm>
+#include <cmath>
 #include <sstream>
 #include <iomanip>
 
@@ -96,23 +98,31 @@ void tick(CivilizationEngine& eng, std::vector<Entity>& entities, int day) {
         }
 
         // Research accrues from raw population + (heavily) scholars + cultural
-        // inventiveness, amplified by techs like Writing and Mathematics.
+        // inventiveness, amplified by techs like Writing and Mathematics — and
+        // by how clever the people doing the thinking actually are.
+        const float qiMul = QISystem::researchMul(tribe);
         float gain = (pop * 0.5f + scholars * 2.5f + tribe.innovation * 0.04f)
-                   * researchMultiplier(tribe);
+                   * researchMultiplier(tribe) * qiMul;
         tribe.researchPoints += gain;
 
         // Unlock the single cheapest affordable, prerequisite-met node this tick
         // (pacing the climb). A node costs both research points and granary food.
+        // A clever people not only earns points faster, it needs fewer of them
+        // to see the point — under a square root, so earning and understanding
+        // do not compound into an absurdity.
+        const float costRelief = std::sqrt(qiMul);
         const TechNode* best = nullptr;
+        float bestCost = 0.0f;
         for (const TechNode& n : kTree) {
             if (tribe.techTreeUnlocked.count(n.id)) continue;
             if (!prereqsMet(tribe, n)) continue;
-            if (tribe.researchPoints < n.knowledgeCost) continue;
-            if (tribe.granary       < n.resourceCost)  continue;
-            if (!best || n.knowledgeCost < best->knowledgeCost) best = &n;
+            float cost = n.knowledgeCost / costRelief;
+            if (tribe.researchPoints < cost)          continue;
+            if (tribe.granary        < n.resourceCost) continue;
+            if (!best || cost < bestCost) { best = &n; bestCost = cost; }
         }
         if (best) {
-            tribe.researchPoints -= best->knowledgeCost;
+            tribe.researchPoints -= bestCost;
             tribe.granary        -= best->resourceCost;
             tribe.techTreeUnlocked.insert(best->id);
             eng.logEvent(day, tribe.name + " mastered " + best->name

@@ -136,10 +136,13 @@ add_executable(app
     src/Drive.cpp
     src/JungianType.cpp
     src/Disease.cpp
+    src/Building.cpp
     src/Logging.cpp
     ${IMGUI_SOURCES}
     src/implem_free_will.cpp
     src/SaveLoad.cpp
+    src/DbExport.cpp
+    src/BackupExport.cpp
     src/Kinship.cpp
     src/SocialOrder.cpp
     ${GUI_SOURCES}
@@ -149,6 +152,8 @@ add_executable(app
     src/NarrativeEngine.cpp
     src/CivilizationEngine.cpp
     src/TechTree.cpp
+    src/QISystem.cpp
+    src/VectorUtility.cpp
     src/Diplomacy.cpp
     src/Economics.cpp
 

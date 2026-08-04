@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include "FreeWillSystem.h"
+#include "VectorUtility.h"  // M13 continuous vector utility learner (vu::Learner)
 #include "SocialNormSystem.h"
 #include "SemanticMemory.h"
 #include "PlanningSystem.h"
@@ -540,6 +541,14 @@ public:
     void upgradeSocial(Entity* pointed, float value);
 
     void IncrementBDay();
+    // Move `qi` one year toward what this life has actually made possible.
+    // Called once a year from IncrementBDay; reads `schoolAccess`, which the
+    // University pass refreshes each civ-day (0 when nobody is teaching them).
+    void developQI();
+    // Draw a newborn's genetic ceiling from its parents (either may be null for
+    // a founder). Uses a private RNG stream, so adding QI to the world shifts
+    // no existing random sequence.
+    static float rollQIPotential(const Entity* pa, const Entity* pb);
     void saveEntityStats(Action* act);
     // M4 perf: saveEntityStats accumulates rows here; this writes them out.
     void flushEntityStats();
@@ -718,6 +727,46 @@ public:
     int   webCharId    = -1;         // web bridge: MySQL characters.id this entity embodies (-1 = pure AI)
     std::vector<int> knownTechIds;   // IDs of discovered/learned innovations
 
+    // ── QI (quotient intellectuel) ──────────────────────────────────────────
+    // `qiPotential` is what this person could have become — fixed at conception
+    // from the two parents and never touched again. `qi` is what they actually
+    // became: it starts far below that ceiling and only closes the gap if
+    // childhood feeds, shelters and teaches them. Schooling is the largest
+    // single lever on that gap, which is what makes a University worth 7000
+    // tokens. Nothing outside QISystem reads these to change the world; that
+    // is what keeps `--set qiMul=0` an exact reproduction of the old build.
+    float qiPotential  = 100.0f;  // genetic ceiling, ~N(100,15), clamped 55-145
+    float qi           = 100.0f;  // realized ability, clamped 40-160
+    float schoolYears  = 0.0f;    // years of formal education actually received
+    bool  isStudent    = false;   // currently holding a seat at a University
+    float schoolAccess = 0.0f;    // 0-1 quality of the schooling reaching them now
+
+    // ── M13: this agent's own learning state ─────────────────────────────────
+    // `prevRlState` / `prevRlAction` used to be plain members of FreeWillSystem.
+    // Every entity in the world decides through the ONE global FreeWillSystem
+    // (`sys` in main.cpp), so those two fields were shared by everybody: the
+    // eligibility replay credited whichever entity happened to act immediately
+    // before this one in iteration order. One agent's successful hunt was
+    // reinforcing another agent's decision to sleep. They live here now.
+    // (The Q-tables themselves were always fine — LearningAdaptationSystem keys
+    // them by entity id.)
+    std::string prevRlState;
+    std::string prevRlAction;
+    vu::Learner rlLearner;        // M13 continuous vector utility; runtime-only
+
+    // ── M14: how far a life has moved this mind from the one it was born with.
+    // Sleep-time consolidation writes here when traumatic episodes are pruned,
+    // so the disposition an event created outlives the memory of the event. The
+    // running total is kept separately from `personality` so the lifetime cap is
+    // enforceable and the drift is auditable in the inspector.
+    // Trust is not a field on Entity — `trustLevel` is per-relationship and
+    // `trustworthiness` is a reputation others hold. Agreeableness is the Big
+    // Five home of trust as a disposition, so the drift lands there rather than
+    // on a new field nothing else would read.
+    float driftNeuroticism = 0.0f;
+    float driftAgreeable   = 0.0f;
+    static constexpr float kMaxLifetimeDrift = 15.0f;
+
     // Temporary storage for IDs during loading (before pointer resolution)
     std::vector<std::pair<int, float>> tempDesireIds;
     std::vector<std::pair<int, float>> tempAngerIds;
@@ -742,7 +791,7 @@ public:
     // Phase 2: push a new significant event into working memory
     void addToWorkingMemory(const std::string& eventType,
                             const std::string& desc, float weight);
-
+ 
     // ── Phase 6: Epigenetics & generational trauma ──────────────────────────
     // Record a new trauma-induced methylation mark (war/famine/loss/abuse/...).
     void addEpigeneticMarker(std::string traumaSource, float methylationLevel,
@@ -775,6 +824,8 @@ public:
     // immunityLevel raised (naive vaccination-equivalent) or the entity stays
     // chronically contagious past a long timeout. Cheap, O(activePathogens).
     void tickPathogens(int today);
+
+    void DB_get_pointed_attribute();
 };
 
 // Removed duplicate extern globals for pointed relationships

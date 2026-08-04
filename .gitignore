@@ -23,9 +23,19 @@ imgui.ini
 bridge/*.txt
 bridge/*.json
 bridge/*.log
+# DB bridge spool: NDJSON chunks the engine writes and db_spool_loader.py eats.
+# Purely in-flight data — anything still here is work the loader hasn't done yet.
+bridge/spool/
 
 # Save files (simulation state backups)
 saves/
+# Crash-recovery channel: world checkpoints, their sidecars, heartbeats and the
+# SQLite index auto_file_index_database.py builds from them. All runtime data —
+# the scripts and the reference schema beside them ARE committed.
+src/backup/backup_log/
+src/backup/schema_local_backup.db
+src/backup/schema_local_backup.db-wal
+src/backup/schema_local_backup.db-shm
 
 *.log
 *.tmp

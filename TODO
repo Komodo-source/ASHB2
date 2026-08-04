@@ -20,3 +20,27 @@ make breeding a bit less easier also try to log in Recent events part everything
 Upgrade the report system showing everything that is important and have a big summary about the simulation
 add wars between tribes (ethnic wars, or hate wars something like that) that affects the society (economy, couples, breeding, death...)
 all babies born at the same time they dont appear normally
+
+
+
+make id for entity unique auto incremental over time - Done
+
+inclure une meilleur map et système minier
+  -Colonisation ?
+  - ressources à partir des mines => or
+  - Territory conquest
+  - Building type
+continue Building
+
+implement inflation price goes up sometimes because why not
+implement unemployement
+implement global tribes decision, decision that get hold for a month -> change how tribes act globally how leader acts for their tribes
+  - decision like = diplomacy, wars, social upgrade, technological upgrade...
+
+maybe implement spiritual achievement-> check what it could bring to the simulation
+implement people stealing money to other people, or tribes directly -> lower trust in tribes families can immigrate to other tribes, or change tribes, revolt ...
+
+implement QI goes along with universitites
+  - Help win wars
+  - faster technologies
+  - growth on every types of points

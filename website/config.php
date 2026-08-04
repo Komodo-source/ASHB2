@@ -36,13 +36,48 @@ ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.cookie_secure', '0'); // Set to '1' if using HTTPS
 ini_set('session.gc_maxlifetime', '86400'); // 24 hours
 
-// ── Database ────────────────────────────────────────────────────
+// ── Application database: MySQL ─────────────────────────────────
+// Accounts, characters, password resets, feedback — sql/schema.sql.
+// Read through Database:: (db.php).
 define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
 define('DB_PORT', getenv('DB_PORT') ?: '3306');
 define('DB_NAME', getenv('DB_NAME') ?: 'ashb2');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_CHARSET', 'utf8mb4');
+
+// ── Simulation database: PostgreSQL ─────────────────────────────
+// The world itself — sim.* in sql/schema_pg.sql, written by
+// scripts/db_spool_loader.py from what the C++ engine spools.
+// Read through SimDb:: (sim_db.php). A separate server, so separate
+// settings: sharing DB_* would point one of the two at the wrong host.
+//
+// PG_DSN is the whole connection as a URL and wins when set — it is what
+// hosted providers give you, sslmode and all:
+//   PG_DSN=postgresql://user:password@host.neon.tech/ashb2?sslmode=require
+// Otherwise the discrete settings below are used.
+//
+// PG_POOLER_URL is the fallback, and on Supabase it is the one that works from
+// here. A direct connection (db.<ref>.supabase.co) publishes an AAAA record and
+// no A record, so a machine without IPv6 cannot even resolve the name — the
+// failure is "could not translate host name", not a refused connection, which
+// sends people looking for a firewall that isn't the problem. The session
+// pooler (aws-0-<region>.pooler.supabase.com) answers over IPv4. Its username
+// carries the project ref: postgres.<ref>, not postgres.
+define('PG_DSN',     getenv('PG_DSN') ?: (getenv('PG_POOLER_URL') ?: ''));
+define('PG_HOST',    getenv('PG_HOST') ?: '127.0.0.1');
+define('PG_PORT',    getenv('PG_PORT') ?: '5432');
+define('PG_NAME',    getenv('PG_NAME') ?: 'ashb2');
+define('PG_USER',    getenv('PG_USER') ?: 'postgres');
+define('PG_PASS',    getenv('PG_PASS') ?: '');
+// Hosted PostgreSQL almost always requires TLS; a local one usually has none.
+// Empty leaves the choice to libpq's own default ('prefer').
+define('PG_SSLMODE', getenv('PG_SSLMODE') ?: '');
+// Seconds to wait for the simulation database before giving up. Short on
+// purpose: a page must not hang because the world's server is down.
+define('PG_TIMEOUT', (int)(getenv('PG_TIMEOUT') ?: 5));
+// Which world the site displays. The engine writes one row per --world-id.
+define('SIM_WORLD_ID', (int)(getenv('SIM_WORLD_ID') ?: 1));
 
 // ── Application ─────────────────────────────────────────────────
 define('APP_NAME', 'ASHB2');

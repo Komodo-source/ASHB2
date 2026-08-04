@@ -21,12 +21,12 @@ void Planet::generate(const WorldSeed& seed, int width, int height,
     // Random continental layout per seed: scale & offsets shift the whole map.
     std::mt19937_64 cfg = makeStream(seed.master, STREAM_TERRAIN, 99);
     std::uniform_real_distribution<float> offD(0.0f, 1000.0f);
-    std::uniform_real_distribution<float> scaleD(2.6f, 4.4f);
+    std::uniform_real_distribution<float> scaleD(4.0f, 6.0f);
     float ox = offD(cfg), oy = offD(cfg);
     float continentScale = scaleD(cfg);          // higher = more, smaller continents
     // Negative sea level pushes more terrain above water (Earth ~29% land);
     // small per-seed variance keeps ocean/land ratio interesting but always playable.
-    float seaLevel = -0.10f + (offD(cfg) / 1000.0f - 0.5f) * 0.14f;
+    float seaLevel = -0.20f + (offD(cfg) / 1000.0f - 0.5f) * 0.14f;
 
     for (int y = 0; y < H; ++y) {
         float ny = (float)y / (H - 1);            // 0..1 north->south
@@ -213,7 +213,7 @@ void Planet::summariseRegions() {
             r.avgFertility /= r.tileCount;
             r.avgOre /= r.tileCount;
             // habitable = a basin big enough to host a starting band with farmable land
-            r.habitable = (r.tileCount >= std::max(15, (W * H) / 700)) && r.avgFertility > 0.13f;
+            r.habitable = (r.tileCount >= std::max(15, (W * H) / 2800)) && r.avgFertility > 0.13f;
         }
     }
 }

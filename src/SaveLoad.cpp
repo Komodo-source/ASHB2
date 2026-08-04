@@ -15,7 +15,7 @@
 #include "environment/EnvironmentModel.h"
 
 // Define the constants that were moved to extern in the header
-const char* SAVES_DIR = "saves";
+const char* SAVES_DIR = "src/backup/backup_log/";
 const char* SAVE_FORMAT_V3 = "ASHB2_SAVE_V3";
 #include <fstream>
 #include <iostream>
@@ -786,9 +786,14 @@ void saveGame(const std::string& filepath, const std::vector<Entity>& entities,
               int day, int frameCounter, const CivilizationEngine* civ) {
     // Ensure the saves directory exists
     ensureSavesDir();
-
-    std::string fullPath = savePath(filepath);
+    // The signature prefix keeps two worlds from overwriting each other's saves.
+    // `civ` is optional (the default is null, and the tail of this function
+    // already handles that case) so it cannot be dereferenced unconditionally —
+    // an entities-only save used to crash here rather than write a file.
+    const std::string prefix = civ ? std::to_string(civ->historySignature()) + "_" : "";
+    std::string fullPath = savePath(prefix + filepath);
     std::ofstream file(fullPath);
+
     if (!file.is_open()) {
         std::cerr << "Failed to open save file: " << fullPath << std::endl;
         return;
@@ -1076,6 +1081,10 @@ void exportTickHistory(const std::string& filepath, const std::vector<Entity>& e
         file << "\"n\":" << entity.personality.neuroticism << ",";
         file << "\"o\":" << entity.personality.openness;
         file << "},";
+
+        file << "\"qi\":" << entity.qi << ",";
+        file << "\"qiPotential\":" << entity.qiPotential << ",";
+        file << "\"schoolYears\":" << entity.schoolYears << ",";
 
         file << "\"valueSystem\":{";
         file << "\"family\":" << entity.ValueSystem.familyOrientation << ",";

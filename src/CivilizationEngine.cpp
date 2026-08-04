@@ -7,16 +7,28 @@
 #include "world/ResourceSystem.h"   // per-region resource pools feed craftsmen
 #include "EnvironmentModel.h"   // previously-unused seasonal model, now driving famine cycles
 #include "header/TechTree.h"    // structured, prerequisite-gated technology tree
+#include "header/QISystem.h"    // QI payoff: research, war and growth multipliers
 #include "header/Kinship.h"     // family/dynasty registry (Plan 4.1)
 #include "header/LiveConfig.h"  // corruptionMul: live graft-odds tunable (Society Plan 5)
 #include "header/Logging.h"     // persist civilization events to civilization_log.txt
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <sstream>
 #include <numeric>
 #include <vector>
 
 CivilizationEngine* globalCivEngine = nullptr;
+
+// The one id sequence every entity born during a run draws from — living
+// babies, children lost to infant mortality, and web-injected spawns alike.
+// Declared extern in CivilizationEngine.h; it lives here because that header
+// is what every birth site already includes.
+//
+// 1000 is the historical base: founders are numbered from 0 upward, so the gap
+// leaves room for the starting population without a birth ever landing on a
+// founder's id.
+int last_entity_id = 1000;
 
 // ── Innovation catalog (the complete pool of discoverable technologies) ────────
 struct InnovTemplate {
@@ -182,6 +194,12 @@ float CivilizationEngine::researchClimate(const Entity& ent, const Tribe* tribe)
     // in the catalogue that are *about* discovering techniques.
     if (tribe->knownTechName.count("Printing"))          m += 0.5f;
     if (tribe->knownTechName.count("Scientific Method")) m += 1.2f;
+    // And the mind doing the thinking. This is the one place QI is read per
+    // PERSON rather than per people, because this is where a single unusual
+    // head is supposed to matter: the asymmetric clamp lets a genius carry a
+    // backward tribe further than a dullard can drag a clever one down.
+    m += std::clamp((ent.qi - QISystem::kUnschooledMean) / 100.0f, -0.4f, 0.8f)
+       * g_liveConfig.qiMul;
     return 1.0f + (m - 1.0f) * g_liveConfig.knowledgeMul;
 }
 
@@ -380,6 +398,7 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
         updateTribeValues(tribe, entities);
         updateTribeReligion(tribe, entities);
         updateTribeTech(tribe, entities);
+        updateEducation(tribe, entities, day);
         electLeader(tribe, entities, day);
 
         // Absorb tribeless entities with very compatible values — strict threshold so
@@ -398,6 +417,25 @@ void CivilizationEngine::updateTribes(std::vector<Entity>& entities, int day) {
                 absorbEntityIntoTribe(tribe, &ent);
                 logEvent(day, ent.name + " joined " + tribe.name, "tribe");
             }
+        }
+    }
+
+    // 1.5. Buildings — upkeep, then upgrades, on a monthly beat.
+    // Monthly rather than per-tick because these are treasury movements at the
+    // scale of thousands of tokens: charged every day they would bankrupt a
+    // tribe faster than its economy could ever refill.
+    if (day % 30 == 0) {
+        for (auto& tribe : tribes) {
+            // Upkeep first, so a tribe cannot upgrade with money it owes on
+            // what it already has.
+            Building::maintenance_costs(tribe);
+            // Then raise something new, if this people wants and can afford one.
+            considerConstruction(tribe, day);
+            for (const auto& blueprint : Building::getBuildings()) {
+                Building::upgrade(blueprint.name, tribe);
+            }
+            // Apply building effects to tribe attributes
+            applyBuildingEffects(tribe);
         }
     }
 
@@ -773,6 +811,335 @@ void CivilizationEngine::updateTribeReligion(Tribe& tribe, std::vector<Entity>& 
     tribe.dominantReligionId = bestRel;
 }
 
+void CivilizationEngine::considerConstruction(Tribe& tribe, int day) {
+    if (g_liveConfig.buildMul == 0.0f) return;   // the old world: nothing is ever built
+    // A camp does not raise a hospital. Wait until there is a people to serve.
+    if (tribe.population() < 6) return;
+
+    // Keep a reserve of two months' upkeep on what already stands, so a new
+    // roof does not bankrupt the ones the tribe is already paying for.
+    float upkeep = 0.0f;
+    for (const auto& b : tribe.buildings_owned) upkeep += b.getMaintenance();
+    const float reserve = upkeep * 2.0f;
+
+    // Recent fighting is the proxy for "at war" that needs no new API:
+    // warExhaustion climbs while a people is at war and decays in peace.
+    const bool fighting = tribe.warExhaustion > 10.0f;
+    const float pop = static_cast<float>(tribe.population());
+
+    const buildingStructure* best = nullptr;
+    float bestScore = 0.0f;
+    for (const buildingStructure& bp : Building::getBuildings()) {
+        bool owned = false;
+        for (const auto& b : tribe.buildings_owned)
+            if (b.name == bp.name) { owned = true; break; }
+        if (owned) continue;                                  // one of each; upgrades do the rest
+        if (tribe.economy.token < bp.getPrice() + reserve) continue;
+
+        // What this people feels the lack of. Deliberately plain: each building
+        // is wanted by the pressure it relieves.
+        float need = 0.0f;
+        if      (bp.name == "Hospital")    need = 45.0f + (1.0f - tribe.childSurvival) * 60.0f;
+        else if (bp.name == "Market")      need = 40.0f + pop * 0.8f;
+        else if (bp.name == "Houses")      need = 35.0f + pop * 1.2f;
+        else if (bp.name == "Military training center")
+                                           need = 20.0f + tribe.militarism * 0.5f + (fighting ? 45.0f : 0.0f);
+        else if (bp.name == "Senate")      need = 15.0f + (100.0f - tribe.govSatisfaction) * 0.4f;
+        else if (bp.name == "Churches")    need = 20.0f + tribe.spiritualism * 0.5f;
+        else if (bp.name == "Bank")        need = 15.0f + tribe.tradeWealth * 0.002f;
+        else if (bp.name == "Theater")     need = 15.0f + tribe.festivity * 0.4f;
+        else if (bp.name == "Weapon manufactures")
+                                           need = 10.0f + tribe.militarism * 0.4f + (fighting ? 35.0f : 0.0f);
+        else if (bp.name == "Court")       need = 15.0f + tribe.corruption * 0.6f;
+        else if (bp.name == "University")  need = 25.0f + tribe.innovation * 0.6f
+                                                + (tribeIsLiterate(tribe) ? 30.0f : 0.0f)
+                                                + pop * 0.5f;
+
+        if (need > bestScore) { bestScore = need; best = &bp; }
+    }
+
+    if (!best) return;
+    Building::build(best->name, tribe);
+    logEvent(day, tribe.name + " raised a " + best->name, "building",
+             "kind=building_built tribe=\"" + tribe.name + "\" tribeId=" + std::to_string(tribe.id)
+             + " building=\"" + best->name + "\"");
+}
+
+void CivilizationEngine::updateEducation(Tribe& tribe, std::vector<Entity>& entities, int day) {
+    // ── 1. Recompute the collective mind from the people who are actually alive.
+    // Recomputed, never accumulated: this is what lets a people grow stupider
+    // when its schooled generation dies and nobody replaces them.
+    std::vector<Entity*> members;
+    std::vector<float>   adultQI;
+    int schooled = 0;
+    for (int mid : tribe.memberIds) {
+        Entity* e = entityById(entities, mid);
+        if (!e || e->entityHealth <= 0.0f) continue;
+        members.push_back(e);
+        if (e->entityAge >= 16.0f)   adultQI.push_back(e->qi);
+        if (e->schoolYears >= 4.0f)  schooled++;
+    }
+    tribe.schooledCount = schooled;
+
+    if (adultQI.empty()) {
+        tribe.meanQI = 100.0f; tribe.eliteQI = 100.0f; tribe.schoolQuality = 0.0f;
+        return;
+    }
+    float sum = 0.0f;
+    for (float q : adultQI) sum += q;
+    tribe.meanQI = sum / static_cast<float>(adultQI.size());
+
+    // The top decile: the people who actually command, teach and invent here.
+    std::vector<float> ranked = adultQI;
+    std::sort(ranked.begin(), ranked.end(), std::greater<float>());
+    size_t top = std::max<size_t>(1, ranked.size() / 10);
+    float esum = 0.0f;
+    for (size_t i = 0; i < top; ++i) esum += ranked[i];
+    tribe.eliteQI = esum / static_cast<float>(top);
+
+    if (std::getenv("ASHB_QI_BASELINE") && day % 60 == 0)
+        std::cerr << "QIBASE day=" << day << " pop=" << members.size()
+                  << " meanQI=" << tribe.meanQI << " eliteQI=" << tribe.eliteQI << "\n";
+
+    // ── 2. How much university this people has.
+    int uniLevels = 0;
+    for (const auto& b : tribe.buildings_owned)
+        if (b.name == "University") uniLevels += b.level;
+
+    // ── Dark age: knowledge that is not institutionally maintained is LOST.
+    // A people that cannot feed itself, has torn itself apart, or has been bled
+    // white by a war stops paying its masters, and the university falls a level
+    // — or falls down. Without this the whole QI loop is a ratchet and meanQI
+    // could only ever rise, which is not a simulation of anything that has ever
+    // happened. This is what lets a dark age actually cost a people its mind.
+    if (g_liveConfig.qiMul != 0.0f && uniLevels > 0) {
+        const float pop0    = std::max(1.0f, static_cast<float>(members.size()));
+        const bool starving  = tribe.granary      < pop0 * 0.5f;
+        const bool tornApart = tribe.instability  > 75.0f;
+        const bool bledWhite = tribe.warExhaustion > 85.0f;
+        if (starving || tornApart || bledWhite) {
+            std::uniform_real_distribution<float> ruinRoll(0.0f, 1.0f);
+            if (ruinRoll(rng) < 0.02f) {
+                for (auto it = tribe.buildings_owned.begin(); it != tribe.buildings_owned.end(); ++it) {
+                    if (it->name != "University") continue;
+                    if (it->level > 1) --it->level;
+                    else               tribe.buildings_owned.erase(it);
+                    logEvent(day, "The university of the " + tribe.name + " falls into ruin",
+                             "knowledge", "kind=university_ruined tribe=\"" + tribe.name
+                             + "\" tribeId=" + std::to_string(tribe.id)
+                             + " cause=" + (starving ? "famine" : (tornApart ? "strife" : "war")));
+                    break;
+                }
+                uniLevels = 0;
+                for (const auto& b : tribe.buildings_owned)
+                    if (b.name == "University") uniLevels += b.level;
+            }
+        }
+    }
+
+    if (uniLevels > 0 && !tribe.hadUniversity) {
+        tribe.hadUniversity = true;
+        logEvent(day, tribe.name + " founded its first university", "knowledge",
+                 "kind=university_founded tribe=\"" + tribe.name
+                 + "\" tribeId=" + std::to_string(tribe.id));
+    }
+
+    // Yesterday's enrolment lapses: a seat has to be paid for again today.
+    for (Entity* e : members) { e->isStudent = false; e->schoolAccess = 0.0f; }
+
+    if (g_liveConfig.qiMul == 0.0f || uniLevels <= 0) { tribe.schoolQuality = 0.0f; return; }
+
+    // ── 3. What a University here is actually worth. A building is not a
+    // school: it needs a granary that can feed students who are not farming,
+    // writing to teach from, and a treasury that can pay the masters.
+    const int   seats = 10 * uniLevels;
+    const float pop   = std::max(1.0f, static_cast<float>(members.size()));
+    float built    = std::min(1.0f, static_cast<float>(uniLevels) / 5.0f);
+    float fed      = std::min(1.0f, tribe.granary / (pop * 8.0f));
+    float literacy = tribeIsLiterate(tribe) ? 1.0f : 0.0f;
+    float funded   = std::min(1.0f, tribe.economy.token / std::max(1.0f, seats * 400.0f));
+    tribe.schoolQuality = std::clamp(0.20f * built + 0.30f * fed
+                                   + 0.25f * literacy + 0.25f * funded, 0.0f, 1.0f);
+
+    // ── 4. Who gets a seat. Ranked by what a household can carry: its wealth,
+    // whether the parents were themselves schooled, and the cultural capital
+    // the lineage already holds. That bias is the point — education becomes
+    // hereditary in practice, which is both what happened and something a
+    // later reformer can be given a reason to break.
+    std::vector<Entity*> candidates;
+    for (Entity* e : members)
+        if (e->entityAge >= 6.0f && e->entityAge <= 22.0f) candidates.push_back(e);
+
+    auto standing = [](const Entity* e) {
+        float parentSchooling = 0.0f;
+        if (e->parent1) parentSchooling += e->parent1->schoolYears;
+        if (e->parent2) parentSchooling += e->parent2->schoolYears;
+        return e->salary.token * 0.01f + parentSchooling * 2.0f + e->culturalCapital * 0.5f;
+    };
+    std::sort(candidates.begin(), candidates.end(), [&](const Entity* a, const Entity* b) {
+        float sa = standing(a), sb = standing(b);
+        if (sa != sb) return sa > sb;
+        return a->entityId < b->entityId;   // deterministic tie-break
+    });
+
+    // ── 5. Pay for it. A student eats from the granary instead of filling it,
+    // and the masters draw on the treasury. A people that cannot pay teaches
+    // fewer children — poverty closing the schools is the brake that stops QI
+    // running away.
+    const float kTokenPerSeat = 4.0f;    // per civ-day
+    const float kFoodPerSeat  = 0.15f;   // a student is a child, mostly fed at home
+    int enrolled = std::min<int>(seats, static_cast<int>(candidates.size()));
+    // At most a quarter of the treasury a day goes on schooling, and schooling
+    // is only ever paid for out of SURPLUS: a people at the edge of hunger
+    // sends its children back to the fields. Charging this against the bare
+    // granary drained it every single day and starved three worlds to death.
+    const float spare = tribe.granary - pop * 2.0f;
+    int byCoin = static_cast<int>((tribe.economy.token * 0.25f) / kTokenPerSeat);
+    int byFood = (spare > 0.0f) ? static_cast<int>(spare / kFoodPerSeat) : 0;
+    enrolled = std::max(0, std::min({enrolled, byCoin, byFood}));
+
+    tribe.economy.spendMoney(enrolled * kTokenPerSeat);
+    tribe.granary = std::max(0.0f, tribe.granary - enrolled * kFoodPerSeat);
+
+    for (int i = 0; i < enrolled; ++i) {
+        candidates[i]->isStudent    = true;
+        candidates[i]->schoolAccess = tribe.schoolQuality;
+    }
+
+#ifndef NDEBUG
+    // The compounding guard. Every QI payoff is individually clamped, but the
+    // thing that would actually break the world is their PRODUCT — a people
+    // that researches, fights and grows at four times everyone else has left
+    // the simulation behind. If this ever trips, the clamps in QISystem are
+    // wrong, not this line.
+    assert(QISystem::researchMul(tribe) * QISystem::growthMul(tribe)
+         * QISystem::warMul(tribe) <= 4.0f && "QI multipliers compound past the cap");
+#endif
+
+    if (std::getenv("ASHB_QI_DEBUG") && day % 30 == 0)
+        std::cerr << "QIDBG day=" << day << " tribe=" << tribe.name
+                  << " pop=" << members.size() << " meanQI=" << tribe.meanQI
+                  << " eliteQI=" << tribe.eliteQI << " uni=" << uniLevels
+                  << " quality=" << tribe.schoolQuality << " enrolled=" << enrolled
+                  << " schooled=" << schooled << "\n";
+
+    // ── 6. The chronicle. Latched both ways, so a people that loses its
+    // schools is reported losing them.
+    bool lettered = (schooled * 4 >= static_cast<int>(members.size())) && schooled >= 3;
+    if (lettered && !tribe.wasLettered) {
+        tribe.wasLettered = true;
+        logEvent(day, "A lettered generation has come of age among the " + tribe.name,
+                 "knowledge", "kind=lettered_generation tribe=\"" + tribe.name
+                 + "\" tribeId=" + std::to_string(tribe.id)
+                 + " schooled=" + std::to_string(schooled)
+                 + " meanQI=" + std::to_string((int)tribe.meanQI));
+    } else if (!lettered && tribe.wasLettered) {
+        tribe.wasLettered = false;
+        logEvent(day, "The schools of the " + tribe.name + " stand empty", "knowledge",
+                 "kind=schools_emptied tribe=\"" + tribe.name
+                 + "\" tribeId=" + std::to_string(tribe.id));
+    }
+}
+
+void CivilizationEngine::applyBuildingEffects(Tribe& tribe) {
+    // Initialize effect counters
+    float hospitalEffect = 0.0f;
+    float marketEffect = 0.0f;
+    float housesEffect = 0.0f;
+    float militaryEffect = 0.0f;
+    float senateEffect = 0.0f;
+    float churchEffect = 0.0f;
+    float bankEffect = 0.0f;
+    float theaterEffect = 0.0f;
+    float weaponEffect = 0.0f;
+    float courtEffect = 0.0f;
+    float universityEffect = 0.0f;
+
+    // Calculate effects based on buildings owned and their levels
+    for (const auto& building : tribe.buildings_owned) {
+        float levelFactor = static_cast<float>(building.level) / building.maxLevel;
+
+        if (building.name == "Hospital") {
+            // tribes live longer over time + less infant death
+            hospitalEffect += levelFactor * 0.2f; // 20% boost to health/lifespan per level
+        } else if (building.name == "Market") {
+            // price goes lower, economy of tribe higher + social goes up
+            marketEffect += levelFactor * 0.15f; // 15% economic boost per level
+        } else if (building.name == "Houses") {
+            // in a family, people live longer, more familial links, more centered about families and nation
+            housesEffect += levelFactor * 0.1f; // 10% family/health boost per level
+        } else if (building.name == "Military training center") {
+            // better defenses, better attack, less death of wars
+            militaryEffect += levelFactor * 0.25f; // 25% military boost per level
+        } else if (building.name == "Senate") {
+            // unlock tribes decision (=> see todo)
+            senateEffect += levelFactor * 0.1f; // 10% governance boost per level
+        } else if (building.name == "Churches") {
+            // hospital but cheaper, less efficient but bring spiritual
+            churchEffect += levelFactor * 0.15f; // 15% spiritual boost per level
+        } else if (building.name == "Bank") {
+            // reduce number of stealing, bring stability in economy
+            bankEffect += levelFactor * 0.2f; // 20% economic stability per level
+        } else if (building.name == "Theater") {
+            // reduces boredomiting
+            // reduces boredom, can higher dates/desire, openness and tribes openness over other tribes,
+            // also catharsis => less violent actions (suicide, murder, death)
+            theaterEffect += levelFactor * 0.18f; // 18% social/cultural boost per level
+        } else if (building.name == "Weapon manufactures") {
+            // no more weapon costs
+            weaponEffect += levelFactor * 0.3f; // 30% military cost reduction per level
+        } else if (building.name == "Court") {
+            // less robbery, more punished drastic actions, more trust in government unless corrosion
+            courtEffect += levelFactor * 0.15f; // 15% justice/trust boost per level
+        } else if (building.name == "University") {
+            // The University's real work is schooling — see updateEducation,
+            // which fills its seats and raises the QI of who sits in them. What
+            // is left here is only the standing inventive climate of a place
+            // that keeps scholars: applied below as a pull toward a target
+            // rather than a monthly increment, because an increment can only
+            // ever rise and would peg innovation at 100 forever.
+            universityEffect += levelFactor * 0.2f;
+        }
+    }
+
+    // Apply effects to tribe attributes
+    // Health/lifespan related (affects child survival, general health)
+    // QI/growth 4 of 6 — HEALTH. Medicine is knowledge applied to a body, so
+    // the same hospital saves more children in a people that can read it.
+    tribe.childSurvival = std::min(1.0f, tribe.childSurvival
+                                       + hospitalEffect * 0.3f * QISystem::growthMul(tribe)
+                                       + housesEffect * 0.2f);
+
+    // Economic effects
+    // We'll modify trade wealth generation and economic stability through other mechanisms
+    // For now, we'll affect general economic indicators
+    tribe.economy.token = static_cast<int>(tribe.economy.token * (1.0f + marketEffect * 0.1f + bankEffect * 0.05f));
+
+    // Military strength
+    // This would affect combat calculations elsewhere, but we can modify a base value
+    // For now, we'll store it in a way that affects military calculations
+
+    // Social/cultural effects
+    tribe.festivity = std::min(100.0f, tribe.festivity + theaterEffect * 10.0f);
+    tribe.collectivism = std::min(100.0f, tribe.collectivism + housesEffect * 5.0f + theaterEffect * 3.0f);
+    // Universities pull inventiveness toward a ceiling set by how much
+    // university there is, instead of adding to it every month — so a people
+    // that lets its schools fall drifts back down instead of staying clever
+    // for ever on the strength of a building it no longer maintains.
+    if (universityEffect > 0.0f) {
+        float target = 50.0f + std::min(1.0f, universityEffect) * 50.0f;
+        if (target > tribe.innovation)
+            tribe.innovation += (target - tribe.innovation) * 0.15f;
+    }
+    tribe.spiritualism = std::min(100.0f, tribe.spiritualism + churchEffect * 5.0f);
+
+    // Governance/trust effects
+    tribe.govSatisfaction = std::min(100.0f, tribe.govSatisfaction + senateEffect * 5.0f + courtEffect * 5.0f);
+
+    // Stability/security effects
+    tribe.warExhaustion = std::max(0.0f, tribe.warExhaustion - militaryEffect * 2.0f);
+}
+
 void CivilizationEngine::updateTribeTech(Tribe& tribe, std::vector<Entity>& entities) {
     for (int mid : tribe.memberIds) {
         Entity* e = entityById(entities, mid);
@@ -786,6 +1153,9 @@ void CivilizationEngine::absorbEntityIntoTribe(Tribe& tribe, Entity* ent) {
     ent->tribeId = tribe.id;
     tribe.memberIds.push_back(ent->entityId);
     if (ent->specialization.empty()) ent->specialization = "farmer";
+    // QI: the spoils of taking a university town are the people who studied in
+    // it. A schooled incomer carries their learning across the border with them.
+    if (g_liveConfig.qiMul != 0.0f && ent->schoolYears >= 4.0f) ++totalBrainDrain;
     // Give entity access to tribe's known technologies
     for (int tid : tribe.knownTechIds)
         if (std::find(ent->knownTechIds.begin(), ent->knownTechIds.end(), tid) == ent->knownTechIds.end())
@@ -1798,6 +2168,10 @@ void CivilizationEngine::spreadInnovations(std::vector<Entity>& entities, int da
             // a ratchet from the supply side.
             if (g_liveConfig.knowledgeMul != 0.0f && tribe && tribeIsLiterate(*tribe))
                 spreadProb *= (1.0f + 2.5f * g_liveConfig.knowledgeMul);
+            // Learning is half of intelligence: a quick head picks a technique
+            // up off a weaker showing than a slow one needs.
+            if (g_liveConfig.qiMul != 0.0f)
+                spreadProb *= std::clamp(ent.qi / QISystem::kUnschooledMean, 0.7f, 1.3f);
             if (roll(rng) < spreadProb) {
                 ent.knownTechIds.push_back(inv.id);
                 if (tribe) tribe->knownTechIds.insert(inv.id);
@@ -1998,6 +2372,48 @@ void CivilizationEngine::updateTribeRelations(std::vector<Entity>& entities, int
                     stance = TS_RIVAL;                 // simmering, not yet blood
                 if (wasWar && stance != TS_AT_WAR && rel < warLine + 14.0f)
                     stance = TS_AT_WAR;                // the fighting outlasts the mood
+            }
+            // ── QI: can this people see what it is walking into? ─────────────
+            // Nobody in this world is handed the strength comparison as a fact
+            // — it is an estimate, and how wrong the estimate is falls as the
+            // council that makes it gets cleverer. So the term is noise on the
+            // ENEMY's strength, not a flat penalty. A people that can count and
+            // finds itself badly outmatched buys its way out: it concedes, pays,
+            // appeases, and the war does not happen. A dull one marches, and
+            // that is the single most legible thing intelligence does here.
+            if (g_liveConfig.qiMul != 0.0f && stance == TS_AT_WAR && prev != TS_AT_WAR) {
+                float ownA = calculateTribeMilitaryStrength(A, entities);
+                float ownB = calculateTribeMilitaryStrength(B, entities);
+                std::normal_distribution<float> err(0.0f, 1.0f);
+                float seenByA = ownB * std::max(0.1f, 1.0f + err(rng) * QISystem::misjudgement(A));
+                float seenByB = ownA * std::max(0.1f, 1.0f + err(rng) * QISystem::misjudgement(B));
+                Tribe* yields = nullptr;
+                if      (seenByA > ownA * 2.0f) yields = &A;
+                else if (seenByB > ownB * 2.0f) yields = &B;
+                if (yields) {
+                    // Backing down is not free, and that is what stops this
+                    // becoming a permanent veto on war. The first version simply
+                    // set the stance back and left relations where they were, so
+                    // the SAME pair re-averted the same war every civ-day for the
+                    // rest of the run — 164 "averted wars" that were really one
+                    // war refused a hundred and sixty-four times, and warfare
+                    // stopped happening in the world at all. Appeasement now buys
+                    // real goodwill and is paid for out of the treasury, so the
+                    // pair drifts back above the war line and the concession has
+                    // a price the tribe can only afford so often.
+                    Tribe& other = (yields == &A) ? B : A;
+                    A.relations[B.id] = std::min(100.0f, A.relations[B.id] + 12.0f);
+                    B.relations[A.id] = std::min(100.0f, B.relations[A.id] + 12.0f);
+                    yields->economy.spendMoney(yields->economy.token * 0.10f);
+                    other.economy.earnMoney(yields->economy.token * 0.05f);
+                    stance = TS_RIVAL;   // bitter, but not stupid
+                    ++totalWarsAverted;
+                    logEvent(day, yields->name + " bought peace from " + other.name
+                             + " rather than fight a war it could not win", "war",
+                             "kind=war_averted tribe=\"" + yields->name
+                             + "\" tribeId=" + std::to_string(yields->id)
+                             + " against=\"" + other.name + "\"");
+                }
             }
             if (stance != prev) {
                 A.stances[B.id] = stance;
@@ -2458,6 +2874,9 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
         // Agricultural & storage techs (Agriculture, Irrigation, Pottery…)
         // multiply the surplus a tribe banks each tick.
         deposited *= TechTreeSystem::foodMultiplier(tribe);
+        // QI/growth 1 of 6 — FOOD. Better tools, rotation, drainage, storage:
+        // knowledge applied to the ground it is standing on.
+        deposited *= QISystem::growthMul(tribe);
         tribe.granary += deposited;
         tribe.granary *= 0.985f;   // antiquity has no refrigeration — stores spoil
 
@@ -2515,7 +2934,12 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
             float s = e->skills.get(kRoleSkill[role]) / 100.0f;
             switch (role) {
                 case 0: s += e->personality.conscientiousness / 260.0f; break;
-                case 1: s += e->personality.openness          / 260.0f; break;
+                case 1: s += e->personality.openness          / 260.0f;
+                        // A quick, schooled mind is what actually makes a
+                        // scholar — more than a taste for novelty does.
+                        s += g_liveConfig.qiMul * ((e->qi - 100.0f) / 400.0f
+                                                 + e->schoolYears / 120.0f);
+                        break;
                 case 2: s += e->personality.extraversion      / 260.0f; break;
                 case 3: s += (100.0f - e->personality.agreeableness) / 260.0f; break;
                 case 4: s += e->personality.agreeableness     / 260.0f; break;
@@ -2568,6 +2992,11 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
             for (Entity* e : members) {
                 if (current >= target) break;
                 if (e->isSpecialist) continue;
+                // A student under sixteen is a child and would not be promoted
+                // anyway; an older one can hold a trade and study beside it.
+                // Excluding every student outright withheld a small tribe's
+                // whole young generation from the specialist rolls at once.
+                if (e->isStudent && e->entityAge < 16.0f) continue;
                 if (e->roleSinceDay >= 0 && day - e->roleSinceDay < 3) continue;
                 if (favoredFamily >= 0 && e->familyId == favoredFamily && globalKinship) {
                     tribe.corruption = std::min(100.0f, tribe.corruption + 0.5f);
@@ -2611,14 +3040,25 @@ void CivilizationEngine::updateDivisionOfLabour(std::vector<Entity>& entities, i
                 }
                 // Careers are chosen at promotion, from the dominant trait.
                 if (e->specialization.empty() || e->specialization == "farmer") {
+                    // A university town should produce scholars, not merely
+                    // clever farmers: schooling and QI weigh on the same scale
+                    // as the trait that used to decide this alone.
+                    // Scaled against the population's OWN mean, not 100 (which
+                    // no unschooled world reaches), and deliberately modest: at
+                    // schoolYears * 2.0 this term reached +32 on a 0-100 scale
+                    // and turned every schooled person into a scholar, which
+                    // emptied the other five trades a tribe needs to eat.
+                    float bookish = e->personality.openness
+                                  + g_liveConfig.qiMul * ((e->qi - QISystem::kUnschooledMean) * 0.25f
+                                                        + e->schoolYears * 0.8f);
                     float maxTrait = std::max({ e->personality.extraversion,
                                                 e->personality.agreeableness,
                                                 e->personality.conscientiousness,
-                                                e->personality.openness,
+                                                bookish,
                                                 100.0f - e->personality.agreeableness,
                                                 e->ValueSystem.spiritualNeed });
                     if (maxTrait == e->ValueSystem.spiritualNeed           ) e->specialization = "priest";
-                    else if (maxTrait == e->personality.openness           ) e->specialization = "scholar";
+                    else if (maxTrait == bookish                           ) e->specialization = "scholar";
                     else if (maxTrait == e->personality.conscientiousness  ) e->specialization = "craftsman";
                     else if (maxTrait == e->personality.extraversion       ) e->specialization = "trader";
                     else if (maxTrait == e->personality.agreeableness      ) e->specialization = "healer";
@@ -2890,6 +3330,22 @@ float CivilizationEngine::fertilityModifier(const Entity& a, const Entity& b) co
     const float foodPerHead = home->granary / (float)mouths;
     const float scarcity    = clamp(1.0f - foodPerHead / 3.0f, 0.0f, 1.0f);
     modifier *= (1.0f - 0.55f * scarcity * g_liveConfig.laborMul);
+
+    // QI BRAKE: the schooling half of the demographic transition. Years spent
+    // at a desk are years not spent raising a household, and an educated woman
+    // in particular has somewhere else for her twenties to go. This is the term
+    // that stops the QI loop being a ratchet: schooling buys capability and
+    // charges for it in children, so no people can simply educate its way into
+    // permanent dominance without shrinking.
+    if (g_liveConfig.qiMul != 0.0f) {
+        const float schooling = 0.5f * (a.schoolYears + b.schoolYears);
+        // Shallow on purpose. At 0.04/year this stacked on top of the wealth,
+        // status and urbanisation terms already here and drove a schooled world
+        // to extinction inside three centuries — the transition has to bend the
+        // curve, not cut it. A fully schooled couple now has ~20% fewer
+        // children, which is the real effect's order of magnitude.
+        modifier *= clamp(1.0f - 0.013f * schooling * g_liveConfig.qiMul, 0.80f, 1.0f);
+    }
     return modifier;
 }
 
@@ -3054,7 +3510,11 @@ void CivilizationEngine::updateCulture(std::vector<Entity>& entities, int day) {
         // Inspiration flows from artists, luxury (patronage) and a living faith.
         float inspiration = artists * 0.5f + t.luxuryStock * 0.02f
                             + (t.dominantReligionId >= 0 ? 0.3f : 0.0f);
-        t.cultureScore = clamp(t.cultureScore + inspiration * 0.1f - 0.05f, 0.0f, 100.0f);
+        // QI/growth 3 of 6 — CULTURE. Literacy and patronage: more of what is
+        // made gets written down, and so survives being made.
+        t.cultureScore = clamp(t.cultureScore
+                               + inspiration * 0.1f * QISystem::growthMul(t)
+                               - 0.05f, 0.0f, 100.0f);
 
         // A great work: rare, needs a vibrant culture and at least one artist.
         // IV-P4: the old bar was cultureScore > 40, but culture accrues at
@@ -3508,8 +3968,12 @@ void CivilizationEngine::updateSettlements(std::vector<Entity>& entities, int da
         // Surplus per head is what lets people stop farming and pile up in one
         // spot; worked stone and timber per head is the built fabric that keeps
         // them there through a winter.
-        const float surplus = t.granary  / (float)pop;
-        const float fabric  = t.matStock / (float)pop;
+        // QI/growth 6 of 6 — SETTLEMENT. A city is an engineering problem
+        // before it is a population: sanitation, water, streets that survive a
+        // winter. A cleverer people gets more town out of the same surplus.
+        const float qiGrowth = QISystem::growthMul(t);
+        const float surplus = t.granary  / (float)pop * qiGrowth;
+        const float fabric  = t.matStock / (float)pop * qiGrowth;
 
         int want = 0;
         if (pop >=  6 && surplus >= 0.6f)                                        want = 1;
@@ -4451,7 +4915,9 @@ void CivilizationEngine::updateTrade(std::vector<Entity>& entities, int day) {
         constexpr float TOKENS_PER_UNIT = 50.0f;
         const float gross = valueMoved * TOKENS_PER_UNIT * tradeMul;
         for (Tribe* t : { A, B }) {
-            t->tradeWealth += gross * 0.25f;
+            // QI/growth 2 of 6 — ECONOMY. Reckoning, contracts, ledgers: a
+            // people that can do arithmetic keeps more of what it moves.
+            t->tradeWealth += gross * 0.25f * QISystem::growthMul(*t);
             t->luxuryStock += margin * 0.05f;
             std::vector<Entity*> traders;
             for (int mid : t->memberIds) {
@@ -5120,7 +5586,11 @@ void CivilizationEngine::updateCorruption(std::vector<Entity>& entities, int day
 
     for (Tribe& t : tribes) {
         if (t.population() == 0) { t.corruption *= 0.9f; continue; }
-        t.corruption = std::max(0.0f, t.corruption - 0.3f);   // clean rule is forgotten
+        // QI/growth 5 of 6 — GOVERNANCE. Records, audits, a bureaucracy that
+        // can check its own books: competent administration, not honest
+        // administration. Graft is found and undone faster where it is written
+        // down — which is why this scales the DECAY and not the integrity.
+        t.corruption = std::max(0.0f, t.corruption - 0.3f * QISystem::growthMul(t));
         if (t.corruption <= 0.5f) continue;
 
         // The people feel the theft long before they can prove it.
@@ -5785,8 +6255,10 @@ void CivilizationEngine::processWarTick(std::vector<Entity>& entities, int day) 
 #endif
                 }
             };
-            attrit(A, aLossRate);
-            attrit(B, bLossRate);
+            // Same effect on the long grind between battles: better camps,
+            // cleaner water, food that arrives.
+            attrit(A, aLossRate / QISystem::defenseMul(A));
+            attrit(B, bLossRate / QISystem::defenseMul(B));
 
             // Peace negotiations. Two roads to peace now (Plan 2.1.B): the armies
             // are spent (little military strength left), OR the people are simply
@@ -5924,6 +6396,10 @@ void CivilizationEngine::executeBattle(Tribe& attacker, Tribe& defender, std::ve
     auto killFrac = [&](Tribe& side, float frac, bool isDefender) {
         if (frac <= 0.0f) return;
         if (isDefender) frac *= (1.0f - std::min(0.5f, fort / 200.0f)); // walls shelter the defenders
+        // A clever army wins the same battles with fewer funerals: it withdraws
+        // in order, it treats its wounded, it does not stand where it will be
+        // enveloped. This is the effect the whole QI idea is really asking for.
+        frac /= QISystem::defenseMul(side);
         std::vector<Entity*> alive;
         for (int mid : side.memberIds) {
             Entity* e = entityById(entities, mid);
@@ -6435,6 +6911,10 @@ float CivilizationEngine::calculateTribeMilitaryStrength(const Tribe& tribe, std
     }
     // … and from the deliberate tech tree (Bronze/Iron Working etc.).
     strength *= TechTreeSystem::militaryMultiplier(tribe);
+    // Generalship, drill and supply: an army is not only how many men it has
+    // but how well the people commanding them can think. Weighted toward the
+    // elite, because battles are lost by councils more often than by soldiers.
+    strength *= QISystem::warMul(tribe);
     // Arms in the storehouse: a stockpile of swords and bows turns willing bodies
     // into a real army. Each held weapon adds its attack value to the tribe's might.
     strength += weaponAttackStrength(tribe);
@@ -6450,6 +6930,8 @@ float CivilizationEngine::calculateTribeDefenseStrength(const Tribe& tribe, std:
     }
     // Masonry / Fortification on the tech tree harden the tribe's defences.
     defense *= TechTreeSystem::defenseMultiplier(tribe);
+    // Siegecraft, ground chosen well, stores laid in before the siege.
+    defense *= QISystem::defenseMul(tribe);
     // Shields, armour and battlements stockpiled in the armoury bolster defence.
     defense += weaponDefenseStrength(tribe);
     return defense;

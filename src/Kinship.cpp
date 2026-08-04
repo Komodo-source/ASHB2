@@ -13,6 +13,7 @@ KinshipSystem* globalKinship = nullptr;
 Family* KinshipSystem::findFamily(int id) {
     for (auto& f : families) if (f.id == id) return &f;
     return nullptr;
+
 }
 const Family* KinshipSystem::findFamily(int id) const {
     for (auto& f : families) if (f.id == id) return &f;

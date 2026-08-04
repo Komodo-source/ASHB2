@@ -1,9 +1,19 @@
 <?php
 /**
- * ASHB2: Database Connection
- * 
- * Singleton PDO instance. All database access goes through this.
- * Prepared statements are used everywhere — no raw query concatenation.
+ * ASHB2: Application Database Connection (MySQL)
+ *
+ * Singleton PDO instance for the ACCOUNT side of the app — users, characters,
+ * password resets, feedback: everything in sql/schema.sql. Prepared statements
+ * everywhere, no raw query concatenation.
+ *
+ * The simulation lives in a different database on a different engine. Rows in
+ * `sim.*` are written by the C++ engine through scripts/db_spool_loader.py into
+ * PostgreSQL, and are read here through SimDb (sim_db.php) — a separate
+ * connection with the same API. Two stores, two classes, on purpose: they have
+ * different owners, different lifetimes and different credentials.
+ *
+ *   Database::  -> MySQL, sql/schema.sql        (auth.php, dashboard.php, ...)
+ *   SimDb::     -> PostgreSQL, sql/schema_pg.sql (entity.php, world.php, ...)
  */
 
 require_once __DIR__ . '/config.php';
@@ -39,11 +49,11 @@ class Database
             } catch (PDOException $e) {
                 // Log the error but don't expose details in production
                 error_log('Database connection failed: ' . $e->getMessage());
-                
-                if (APP_ENV === 'development') {
+
+                if (defined('APP_ENV') && APP_ENV === 'development') {
                     die('Database connection failed: ' . $e->getMessage());
                 }
-                
+
                 http_response_code(500);
                 die('An internal error occurred. Please try again later.');
             }

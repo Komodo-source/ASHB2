@@ -43,10 +43,12 @@ SRC=(
   src/main.cpp src/WorldSeed.cpp src/world/Noise.cpp src/world/Planet.cpp
   src/world/Lexicon.cpp src/world/ResourceSystem.cpp src/world/Ecosystem.cpp
   src/Entity.cpp src/Drive.cpp src/JungianType.cpp src/Disease.cpp
-  src/Logging.cpp src/implem_free_will.cpp src/SaveLoad.cpp src/Kinship.cpp
+  src/Logging.cpp src/implem_free_will.cpp src/SaveLoad.cpp src/DbExport.cpp
+  src/BackupExport.cpp
+  src/Kinship.cpp
   src/SocialOrder.cpp src/SemanticMemory.cpp src/PlanningSystem.cpp
   src/PersonaSystem.cpp src/NarrativeEngine.cpp src/CivilizationEngine.cpp
-  src/TechTree.cpp src/Diplomacy.cpp src/Economics.cpp
+  src/TechTree.cpp src/QISystem.cpp src/VectorUtility.cpp src/Diplomacy.cpp src/Economics.cpp
   src/items/ItemSystem.cpp src/ai/GoapPlanner.cpp src/ai/neat/Neat.cpp
   src/ai/MindUpgrade.cpp
   src/world/PheromoneField.cpp src/Action.cpp src/CognitiveArchitecture.cpp

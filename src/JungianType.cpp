@@ -16,6 +16,7 @@
 //    • arms  (2,3): the other category, opposite function, opposite attitude.
 //    • attitudes alternate I/E down the conscious stack; shadow (5-8) flips each.
 // ─────────────────────────────────────────────────────────────────────────────
+
 void JungianStack::buildStack() {
     const bool isE                 = (ei == 'E');
     const bool extravertedIsJudging = (jp == 'J');

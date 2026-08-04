@@ -29,6 +29,8 @@
 #endif
 #include "./util/clear.h"
 #include "./header/SaveLoad.h"
+#include "./header/DbExport.h"     // bridge/spool → PostgreSQL (--db-export)
+#include "./header/BackupExport.h" // backup_log → SQLite index + crash restore (--backup-every)
 #include "./header/Logging.h"
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
@@ -95,6 +97,11 @@ bool setLiveConfigKnob(const std::string& n, float v) {
         { "laborMul",         &LiveConfig::laborMul },
         { "demographyMul",    &LiveConfig::demographyMul },
         { "networkMul",       &LiveConfig::networkMul },
+        { "qiMul",            &LiveConfig::qiMul },
+        { "buildMul",         &LiveConfig::buildMul },
+        { "utilityMul",       &LiveConfig::utilityMul },
+        { "appraisalMul",     &LiveConfig::appraisalMul },
+        { "memoryLodMul",     &LiveConfig::memoryLodMul },
         { "epigeneticsMul",   &LiveConfig::epigeneticsMul },
         { "pathogenMul",      &LiveConfig::pathogenMul },
         { "bioHomeostasisMul",&LiveConfig::bioHomeostasisMul },
@@ -262,6 +269,8 @@ Personality generateRandomPersonality() {
             bool isChild    = (dead == ent->parent1  || dead == ent->parent2);
             bool hasSocial  = ent->searchConnSocial(dead) > 10.0f;
             bool hasDesire  = ent->searchConnDesire(dead) > 15.0f;
+
+            //handle money inh
 
             float griefIntensity = 0.0f;
             std::string narrative;
@@ -1982,8 +1991,27 @@ void updateSimulationStep(std::vector<Entity>& entities, std::vector<Entity*>& e
             // Export state to JSON lines for the HTML viewer. Sampled every
             // 5th tick: per-tick export of the whole population produced
             // ~27 MB per 500 ticks and dominated I/O.
+            //
+            // The path is .jsonl and must stay that way: startup truncates
+            // "./src/data/tick_history.jsonl", so writing ".json" here meant
+            // the truncation cleared a file nobody wrote while the real one
+            // grew across every run (observed at 188 MB).
             if (g_clock.isCivTick())
-                exportTickHistory("./src/data/tick_history.json", entities, day);
+                exportTickHistory("./src/data/tick_history.jsonl", entities, day);
+
+            // Same cadence, different consumer: NDJSON chunks for the
+            // PostgreSQL loader. No-op unless --db-export was passed.
+            //
+            // g_clock.day(), not the local `day`: this one counts render
+            // frames (it advances 60 per tick), which is exactly the ambiguity
+            // SimClock was introduced to end. The database wants the in-world
+            // day the civ log and the web bridge already speak in, so a row
+            // here lines up with a `day=` in civilization_log.txt.
+            if (g_clock.isCivTick() && dbexport::enabled()) {
+                const int civDay = static_cast<int>(g_clock.day());
+                dbexport::pushWorld(civDay);
+                dbexport::pushEntities(entities, civDay);
+            }
         }
         day++;
     }
@@ -2786,6 +2814,41 @@ static void printRealismReport(const std::vector<Entity>& entities,
                           << " darkAges=" << civ->darkAgeCount
                           << "  [" << softVerdict(ok, ticksRun >= 2000) << "]\n";
             }
+
+            // 27. QI: does schooling actually happen, and does it move a mind?
+            // The claim being tested is not "QI is high" — an unschooled world
+            // SHOULD sit near QISystem::kUnschooled. It is that universities get
+            // built, fill, and pull the people who sit in them above the people
+            // who do not. `gap` is that pull, and it is the whole feature in one
+            // number. Informational: a world that never gets rich enough to
+            // build a university has not failed, it has just stayed poor.
+            {
+                float schooledSum = 0.0f, unschooledSum = 0.0f;
+                int   nS = 0, nU = 0, universities = 0, students = 0;
+                for (const Entity& e : entities) {
+                    if (e.entityHealth <= 0.0f || e.entityAge < 18.0f) continue;
+                    if (e.schoolYears >= 4.0f) { schooledSum += e.qi; ++nS; }
+                    else                       { unschooledSum += e.qi; ++nU; }
+                    if (e.isStudent) ++students;
+                }
+                for (const Tribe& t : civ->tribes)
+                    for (const auto& b : t.buildings_owned)
+                        if (b.name == "University") universities += b.level;
+                const float mS = nS ? schooledSum / nS : 0.0f;
+                const float mU = nU ? unschooledSum / nU : 0.0f;
+                const float gap = (nS && nU) ? mS - mU : 0.0f;
+                bool ok = (universities == 0) || (nS > 0 && gap > 2.0f);
+                std::cout << "27. Schooling makes minds (schooled QI > unschooled): gap="
+                          << (nS && nU ? std::to_string((int)gap) : std::string("n/a"))
+                          << " schooledQI=" << (nS ? std::to_string((int)mS) : std::string("n/a"))
+                          << " unschooledQI=" << (nU ? std::to_string((int)mU) : std::string("n/a"))
+                          << " schooled=" << nS << "/" << (nS + nU)
+                          << " uniLevels=" << universities
+                          << " enrolled=" << students
+                          << " warsAverted=" << civ->totalWarsAverted
+                          << " brainDrain=" << civ->totalBrainDrain
+                          << "  [" << softVerdict(ok, ticksRun >= 1000 && universities > 0) << "]\n";
+            }
     }
     std::cout << "==========================================\n\n";
 }
@@ -2799,7 +2862,6 @@ static void printRealismReport(const std::vector<Entity>& entities,
 // per web character, terminated by END. Unknown lines are ignored.
 //
 //   CHAR:42               MySQL characters.id
-//   NAME:Naelle
 //   OPENNESS:62           NUDGE:0 → absolute Big Five trait, 0-100
 //   CONSCIENTIOUSNESS:55  NUDGE:1 → signed delta, clamped to [-10,+10]
 //   EXTRAVERSION:71
@@ -2947,6 +3009,7 @@ static void applyWebInjectFile(const std::string& path,
         // ValueSystem/integrity derived from personality — same formulas and
         // seeding scheme as the founder loop.
         std::mt19937 rng_spawn((unsigned)splitmix64(g_worldSeed.master ^ (0x51ED2C17ull * (newId + 1))));
+        last_entity_id ++;
         std::normal_distribution<float> vd(50.0f, 18.0f);
         entity.ValueSystem.familyOrientation = vc(vd(rng_spawn) + (entity.personality.agreeableness - 50.0f) * 0.3f);
         entity.ValueSystem.achievementDrive  = vc(vd(rng_spawn) + (entity.personality.conscientiousness - 50.0f) * 0.4f);
@@ -2956,6 +3019,11 @@ static void applyWebInjectFile(const std::string& path,
         entity.integrity = vc(0.4f * entity.personality.conscientiousness
                             + 0.4f * entity.personality.agreeableness
                             + static_cast<float>(BetterRand::genNrInInterval(-15.0f, 15.0f)));
+
+        // QI: a ceiling drawn from the population, and a mind that has only
+        // reached three-quarters of it — nobody has taught this world anything yet.
+        entity.qiPotential = Entity::rollQIPotential(nullptr, nullptr);
+        entity.qi          = entity.qiPotential * 0.75f;
 
         // Developmental history (attachment/trauma), founder-style — minus the
         // personality shift (see above).
@@ -3094,6 +3162,14 @@ struct CliOptions {
     // Web bridge: spawn/nudge web-controlled characters from a block file
     // before the tick loop starts (see applyWebInjectFile).
     std::string injectFile;
+    // DB bridge: spool NDJSON chunks for scripts/db_spool_loader.py to COPY
+    // into PostgreSQL. Empty = no export (the default; zero cost).
+    std::string dbExportDir;
+    int         worldId = 1;          // which sim.world row this run writes to
+    // Crash recovery: checkpoint the world every N seconds into the backup log
+    // for src/backup/auto_file_index_database.py to index and resume from.
+    // Seconds rather than ticks because tick cost swings with population.
+    int         backupEverySec = -1;  // >0 = enable the backup channel
 };
 
 static CliOptions parseCli(int argc, char* argv[]) {
@@ -3110,6 +3186,9 @@ static CliOptions parseCli(int argc, char* argv[]) {
         else if (a == "--chaos")    { o.chaos = (float)std::atof(next(i)); }
         else if (a == "--load")     { o.loadFile = next(i); }
         else if (a == "--inject")   { o.injectFile = next(i); }
+        else if (a == "--db-export"){ o.dbExportDir = next(i); }
+        else if (a == "--world-id") { o.worldId = std::atoi(next(i)); }
+        else if (a == "--backup-every") { o.backupEverySec = std::atoi(next(i)); }
         else if (a == "--save-at")  { o.saveAtTick = std::atoi(next(i)); }
         else if (a == "--save-file"){ o.saveFile = next(i); }
         else if (a == "--save-every"){ o.saveEvery = std::atoi(next(i)); }
@@ -3156,6 +3235,11 @@ static CliOptions parseCli(int argc, char* argv[]) {
                           "  --save-every <n>     rolling autosave every N ticks (overwrites --save-file)\n"
                           "  --save-on-exit       write the world once the run finishes\n"
                           "  --set <knob>=<val>   set a live-config multiplier (repeatable), e.g. --set cityMul=0\n"
+                         "  --db-export <dir>    spool NDJSON chunks for the PostgreSQL loader, e.g. bridge/spool\n"
+                         "  --world-id <n>       sim.world row this run writes to (default 1)\n"
+                         "  --backup-every <s>   checkpoint into src/backup/backup_log every N SECONDS, with a\n"
+                         "                       heartbeat, so a crash is detected and resumed by\n"
+                         "                       src/backup/auto_file_index_database.py\n"
                          "  --scenario <name>    preset bundle: eden (gentle, 150 souls), crucible (harsh, 60),\n"
                          "                       babel (crowded, 400), dish (petri dish, 12). Later flags override.\n";
             std::exit(0);
@@ -3182,8 +3266,8 @@ int main(int argc, char* argv[]) {
     // or --load), because a scripted run must never block on stdin.
     if (cli.headlessTicks <= 0 && !std::getenv("ASHB_HEADLESS")) {
         std::cout << "\nHow do you want to run this world?\n"
-                     "  1  With a window   — watch it live (graphs, inspector, save/load buttons)\n"
-                     "  2  In the terminal — no window: run N ticks, print the realism report\n"
+                     "  1  With a window   - watch it live (graphs, inspector, save/load buttons)\n"
+                     "  2  In the terminal - no window: run N ticks, print the realism report\n"
                      ">";
         std::string modeInput;
         std::getline(std::cin, modeInput);
@@ -3316,12 +3400,47 @@ int main(int argc, char* argv[]) {
         BetterRand::reseed(splitmix64(g_worldSeed.master ^ STREAM_SPAWN));
     }
 
+    // ── DB bridge ────────────────────────────────────────────────────────────
+    // Started here rather than at the top of main() because the spooled world
+    // row carries the seed, and the seed isn't known until the block above has
+    // run. Absent --db-export this is never called and every dbexport:: entry
+    // point stays a no-op, so a normal run pays nothing for it.
+    if (!cli.dbExportDir.empty()) {
+        dbexport::configure(cli.dbExportDir, cli.worldId,
+                            cli.loadFile.empty() ? "fresh world" : cli.loadFile,
+                            std::to_string(g_worldSeed.master));
+        // The tail of a run sits in a .tmp chunk the loader's glob ignores, so
+        // it has to be published before the process goes away. Registered at
+        // exit rather than written at each of the several return paths (GUI
+        // close, headless completion, empty population) so none can miss it.
+        std::atexit(dbexport::shutdown);
+    }
+
+    // ── Crash-recovery backup channel ────────────────────────────────────────
+    // Here for the same reason as the block above: the heartbeat and every
+    // checkpoint sidecar carry the seed, which the world-setup block has only
+    // just settled. ASHB_BACKUP_EVERY is the scheduler-friendly spelling of
+    // --backup-every, matching ASHB_HEADLESS.
+    if (cli.backupEverySec <= 0) {
+        if (const char* be = std::getenv("ASHB_BACKUP_EVERY"))
+            cli.backupEverySec = std::atoi(be);
+    }
+    if (cli.backupEverySec > 0) {
+        bkexport::configure(cli.worldId, std::to_string(g_worldSeed.master),
+                            cli.loadFile.empty() ? "fresh world" : cli.loadFile,
+                            cli.backupEverySec, argc, argv);
+        // Marks the heartbeat "finished" on every ordinary exit path. A crash
+        // runs no atexit handler, which is precisely what leaves the heartbeat
+        // saying "running" and tells the supervisor to resume the world.
+        std::atexit(bkexport::atExit);
+    }
+
     const int height = 1050;
     const int width = 1400;
 
     // ── Procedural planet ────────────────────────────────────────────────────
     g_planet = new Planet();
-    g_planet->generate(g_worldSeed, 200, 150, (float)width, (float)height);
+    g_planet->generate(g_worldSeed, 400, 300, (float)width, (float)height);
     {
         std::stringstream ps;
         ps << "planet generated: hash=" << g_planet->hash()
@@ -3416,6 +3535,12 @@ int main(int argc, char* argv[]) {
                 entity.integrity = vc(0.4f * entity.personality.conscientiousness
                                     + 0.4f * entity.personality.agreeableness
                                     + static_cast<float>(BetterRand::genNrInInterval(-15.0f, 15.0f)));
+
+                // QI: a ceiling drawn from the population, and a mind that has
+                // only reached three-quarters of it — nobody has taught this
+                // world anything yet. That gap is what universities later buy.
+                entity.qiPotential = Entity::rollQIPotential(nullptr, nullptr);
+                entity.qi          = entity.qiPotential * 0.75f;
 
                 // --- Developmental History: childhood shapes the adult ---
                 float traumaRoll   = vc(static_cast<float>(BetterRand::genNrInInterval(0, 50)));
@@ -3631,6 +3756,13 @@ int main(int argc, char* argv[]) {
                     std::cout << "AUTOSAVE: tick " << ticksDone
                               << " -> saves/" << cli.saveFile << "\n";
                 }
+                // Crash recovery: refreshes the heartbeat every tick and writes
+                // a checkpoint once the wall clock says it is due. No-op unless
+                // --backup-every was passed. Distinct from --save-every above,
+                // which keeps one file for a human to resume by hand; this one
+                // keeps generations an indexer can pick the newest good one from.
+                bkexport::tick(entities, day, frameCounter, globalCivEngine,
+                               ticksDone, targetTicks);
             }
         }
         if (cli.saveOnExit) {
@@ -3642,6 +3774,11 @@ int main(int argc, char* argv[]) {
             std::cout << "PROFILE: sim=" << (msSim / ticksDone) << " ms/tick, movement="
                       << (msMove / ticksDone) << " ms/tick (x" << UPDATE_FREQUENCY << " frames)\n";
         for (Entity& e : entities) e.flushEntityStats();  // drain buffered CSVs
+        dbexport::shutdown();          // publish the tail chunk (atexit would too)
+        // An empty world ended the loop early — say so, so the supervisor does
+        // not resume a run whose population is gone and which would exit again
+        // on the first tick.
+        bkexport::shutdown(entities.empty() ? "extinct" : "finished");
         std::cout << "HEADLESS: done. ticks=" << ticksDone
                   << " population=" << entities.size() << "\n";
         printRealismReport(entities, globalCivEngine, ticksDone);   // M9
@@ -3695,6 +3832,12 @@ int main(int argc, char* argv[]) {
             // never called, so all proximity mechanics ran on frozen positions).
             if (!instanceUI.isSimulationPaused())
                 updateMovement(ent_quad, (float)width, (float)height, day);
+
+            // Crash recovery, windowed edition. No tick target here — the run
+            // ends when the window closes — so a resumed run keeps whatever
+            // --headless the supervisor's reconstructed command line implies.
+            if (!instanceUI.isSimulationPaused())
+                bkexport::tick(entities, day, frameCounter, globalCivEngine, -1, -1);
 
             std::string saveFilename;
             int saveLoadAction = instanceUI.showSaveLoadButtons(saveFilename, day / 60 , entities.size(), UPDATE_FREQUENCY, {});

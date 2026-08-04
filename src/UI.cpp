@@ -11,6 +11,7 @@
 #include "./header/NarrativeEngine.h"
 #include "./header/CivilizationEngine.h"
 #include "./header/TechTree.h"
+#include "./header/QISystem.h"
 #include "./header/Kinship.h"
 #include "world/ResourceSystem.h"
 #include "world/Ecosystem.h"
@@ -59,7 +60,7 @@ int UI::showSaveLoadButtons(std::string& filename, int day, int num_entity, int 
                        g_seasonalFoodModifier, g_harvestLuck);
     ImGui::Separator();
 
-    if (ImGui::Button(simulationPaused ? "Resume Simulation" : "Stop Simulation")) {
+    if (ImGui::Button(simulationPaused ? "Resume Simulation" : "Stop Simulation") ) {
         simulationPaused = !simulationPaused;
     }
     if (simulationPaused) {
@@ -226,6 +227,11 @@ void UI::showSystemInformation(){
         ImGui::Text("conscientiousness: %.2f", entity->personality.conscientiousness);
         ImGui::Text("neuroticism: %.2f", entity->personality.neuroticism);
         ImGui::Text("openness: %.2f", entity->personality.openness);
+        ImGui::Spacing();
+        ImGui::Text(" === Mind ===");
+        ImGui::Text("QI: %.0f / potential %.0f", entity->qi, entity->qiPotential);
+        ImGui::Text("school-years: %.1f%s", entity->schoolYears,
+                    entity->isStudent ? "  (enrolled)" : "");
         ImGui::Spacing();
         ImGui::Text(" === AI Entity Information ===");
 
@@ -859,6 +865,27 @@ void UI::ShowCivilizationPanel(int simDay, std::vector<Entity*>& entities) {
                 ImGui::ProgressBar(tribe.corruption/100.0f, ImVec2(60,8), idC);
                 ImGui::PopStyleColor();
             }
+            if(!tribe.buildings_owned.empty()){
+                std::string buildings_list = "Buildings: ";
+                for(buildingStructure b: tribe.buildings_owned){
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 0.55f, 1.0f, 1.0f));
+                    buildings_list += b.name + " | ";
+                    ImGui::PopStyleColor();
+                }
+                ImGui::Text(buildings_list.c_str());
+            }else{
+                ImGui::Text("No buildings");
+            }
+
+            // QI: what this people can think with, and what it buys them.
+            ImGui::TextColored(ImVec4(0.85f, 0.75f, 0.45f, 1.0f), "    %s",
+                               QISystem::summary(tribe).c_str());
+            if (tribe.schoolQuality > 0.0f)
+                ImGui::TextDisabled("    school quality %.0f%% | research x%.2f  war x%.2f  growth x%.2f",
+                                    tribe.schoolQuality * 100.0f,
+                                    QISystem::researchMul(tribe),
+                                    QISystem::warMul(tribe),
+                                    QISystem::growthMul(tribe));
 
             // Known tech count (emergent innovations)
             if (!tribe.knownTechIds.empty())

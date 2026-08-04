@@ -217,8 +217,11 @@ private:
 
     // ── Reinforcement learning ────────────────────────────────────────────────
     // Per-entity Q-learning: agents learn which actions pay off in a given
-    // situation. This FreeWillSystem instance is owned by a single Entity
-    // (see Entity::getFreeWill), so rlSystem holds just that agent's Q-table.
+    // situation. NOTE: despite `Entity` owning a FreeWillSystem by value, every
+    // decision in the simulation is actually taken through the single global
+    // `sys` in main.cpp — `Entity::fws` is never called. rlSystem is still
+    // correctly per-agent because LearningAdaptationSystem keys every table by
+    // entity id; the two fields below were the ones that were not.
     LearningAdaptationSystem rlSystem;
 
     // Compact, discretised description of the agent's current situation used as
@@ -228,6 +231,13 @@ private:
     // C1 eligibility-lite: the previous (state, action) pair shares a fraction
     // of each new reward, so multi-step payoffs (hunt → eat) credit the chain.
     // Runtime-only; not serialized.
+    //
+    // M13: these are WORLD-shared, not per-agent (see the note above — one
+    // global FreeWillSystem serves every entity), so the replay below credits
+    // whatever entity acted immediately before this one. That is a bug, and the
+    // fix lives on Entity as `prevRlState` / `prevRlAction`. These two survive
+    // only to reproduce the old behaviour under `--set utilityMul=0`, which is
+    // what the kill-switch contract means by "the pre-feature world".
     std::string prevRlState;
     std::string prevRlAction;
 

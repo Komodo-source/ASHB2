@@ -1,177 +1,181 @@
 <?php
 /**
- * ASHB2: Password Reset
- * 
- * Two-mode page:
- *   GET without token: Show email form to request reset.
- *   GET with token:    Show new password form.
- *   POST (request):    Generate reset token and display it (dev) / send email.
- *   POST (complete):   Validate token and update password.
+ * ASHB2: Password Reset — unavailable on this schema
+ *
+ * This page used to run the usual two-mode token flow: request a reset by
+ * email, receive a link, set a new password. Both halves of that depend on
+ * things sql/schema_pg.sql does not have.
+ *
+ *   - No `password_resets` table, so a token has nowhere to live. It has to be
+ *     stored server-side with an expiry and a used flag, or it is not a reset
+ *     token, it is a password.
+ *   - No email column on sim.users. There is `login` and nothing else
+ *     identifying, so there is no address to send a link to.
+ *
+ * The honest thing is to say so. The tempting alternative — keep the form,
+ * accept the address, and always answer "if the email exists, a link has been
+ * sent" — is worse than useless here: that message is deliberately
+ * indistinguishable from success, so a visitor would wait for mail that no part
+ * of this system is able to send.
+ *
+ * Restoring it needs a schema change (a resets table and an email column) plus
+ * a mailer. Until then an administrator sets passwords directly; see the
+ * snippet at the bottom of this page.
  */
 
 require_once __DIR__ . '/auth.php';
 session_init();
 
-$mode = 'request';   // 'request' | 'complete'
-$token = $_GET['token'] ?? '';
-$message = '';
-$error = '';
-
-// If token is provided, switch to complete mode
-if (!empty($token)) {
-    $mode = 'complete';
+// Anyone already signed in has no business here.
+if (session_user()) {
+    header('Location: dashboard.php');
+    exit;
 }
 
-// ── Handle form submissions ─────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['request_reset'])) {
-        // ── Request mode ───────────────────────────────────
-        $email = trim($_POST['email'] ?? '');
-        if (empty($email)) {
-            $error = 'Email address is required.';
-        } else {
-            $result = create_password_reset($email);
-            if ($result['success']) {
-                // In dev mode, show the token
-                $tokenLink = 'reset-password.php?token=' . urlencode($result['token']);
-                $message = 'Password reset link generated. In production, this would be emailed.';
-                // Display the link for development convenience
-                $message .= ' <a href="' . htmlspecialchars($tokenLink) . '" class="amber">Click here to reset</a>';
-                // Store in session so we don't regenerate on refresh
-                $_SESSION['reset_message'] = $message;
-            } else {
-                $error = $result['error'] ?? 'An error occurred.';
-            }
-        }
-    } elseif (isset($_POST['complete_reset'])) {
-        // ── Complete mode ──────────────────────────────────
-        $token = $_POST['token'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $confirm = $_POST['password_confirm'] ?? '';
-
-        if (empty($token) || empty($password)) {
-            $error = 'All fields are required.';
-        } elseif ($password !== $confirm) {
-            $error = 'Passwords do not match.';
-        } else {
-            $result = complete_password_reset($token, $password);
-            if ($result['success']) {
-                $message = 'Password has been reset successfully. <a href="login.php">Sign in with your new password.</a>';
-                $mode = 'done';
-            } else {
-                $error = $result['error'];
-            }
-        }
-    }
-}
-
-// Check for stored message (after redirect/post)
-if (empty($message) && isset($_SESSION['reset_message'])) {
-    $message = $_SESSION['reset_message'];
-    unset($_SESSION['reset_message']);
-}
+function h($v): string { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
 
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASHB2 — Reset Password</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ASHB2 — Passphrase Recovery</title>
+<style>
+/* Same plate as login.php — the two pages are one system. */
+:root{
+  --void:#000000;
+  --bone:#e8e6e1;
+  --bone-dim:#8f8d88;
+  --bone-faint:#54524e;
+  --rule:rgba(232,230,225,.14);
+  --rule-strong:rgba(232,230,225,.30);
+  --magenta:#c98ba8;
+  --violet:#9b7bc4;
+  --mono:ui-monospace,"IBM Plex Mono","SFMono-Regular","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--void)}
+body{
+  background:var(--void);color:var(--bone);font-family:var(--mono);
+  font-size:11px;line-height:1.5;letter-spacing:.02em;
+  -webkit-font-smoothing:antialiased;
+  padding:clamp(10px,2.2vw,34px);min-height:100vh;
+  display:flex;flex-direction:column;
+}
+body::before,body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0}
+body::before{
+  background-image:radial-gradient(circle at 50% 50%,rgba(255,255,255,.028) 0 1px,transparent 1px);
+  background-size:3px 3px;mix-blend-mode:screen;
+}
+body::after{background:radial-gradient(ellipse at 50% 42%,transparent 55%,rgba(0,0,0,.85) 100%)}
+
+.plate{position:relative;z-index:1;width:100%;max-width:460px;margin:auto;min-width:0}
+.institute{font-size:9px;letter-spacing:.42em;text-transform:uppercase;color:var(--bone-dim)}
+.plate-title{font-size:clamp(15px,2.1vw,22px);letter-spacing:.30em;text-transform:uppercase;margin-top:8px}
+.plate-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--bone-faint);margin-top:6px}
+
+.card{border:1px solid var(--rule);margin-top:12px;position:relative;background:var(--void)}
+.card::before,.card::after{
+  content:"";position:absolute;width:9px;height:9px;border:1px solid var(--rule-strong);pointer-events:none;
+}
+.card::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.card::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+
+.panel{padding:14px 15px 16px}
+.panel + .panel{border-top:1px solid var(--rule)}
+.panel-head{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.panel-no{font-size:8.5px;letter-spacing:.1em;color:var(--void);background:var(--bone-faint);padding:1px 4px;flex:none}
+.panel-title{font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--bone-dim)}
+.panel-note{margin-left:auto;font-size:8px;letter-spacing:.12em;color:var(--bone-faint)}
+
+.alert{
+  border:1px solid rgba(201,139,168,.5);color:var(--magenta);
+  padding:8px 10px;margin-bottom:12px;font-size:9.5px;letter-spacing:.1em;
+  display:flex;gap:8px;align-items:baseline;
+}
+.alert .tag{font-size:8px;letter-spacing:.2em;text-transform:uppercase;flex:none;opacity:.8}
+
+p{font-size:10px;color:var(--bone-dim);letter-spacing:.03em}
+p + p{margin-top:8px}
+code{
+  display:block;background:#070707;border:1px solid var(--rule);
+  padding:8px 10px;margin-top:10px;font-size:9.5px;color:var(--bone);
+  white-space:pre;overflow-x:auto;
+}
+a{color:var(--violet);text-decoration:none;border-bottom:1px solid rgba(155,123,196,.35)}
+a:hover{color:var(--bone);border-bottom-color:var(--bone)}
+.links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:9px;letter-spacing:.1em}
+.colophon{
+  margin-top:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--bone-faint);
+}
+@media (max-width:420px){.plate-title{letter-spacing:.2em}.links{flex-direction:column;gap:6px}}
+</style>
 </head>
 <body>
 
-  <nav>
-    <div class="logo">ASHB2<span>.exe</span></div>
-    <ul>
-      <li><a href="index.php">Home</a></li>
-      <li><a href="login.php">Login</a></li>
-      <li><a href="register.php">Register</a></li>
-      <li><a href="reset-password.php" class="active">Reset</a></li>
-    </ul>
-  </nav>
+  <main class="plate">
 
-  <main>
+    <header>
+      <div class="institute">ASHB2 &middot; Human-in-the-Loop Simulation</div>
+      <h1 class="plate-title">Recovery</h1>
+      <div class="plate-sub">Passphrase reset &mdash; unavailable</div>
+    </header>
 
-    <div class="auth-container">
-      <h1>Reset Password.</h1>
+    <div class="card">
 
-      <?php if ($error): ?>
-        <div class="alert error"><?= htmlspecialchars($error) ?></div>
-      <?php endif; ?>
-
-      <?php if ($message): ?>
-        <div class="alert success"><?= $message ?></div>
-      <?php endif; ?>
-
-      <?php if ($mode === 'request'): ?>
-        <!-- ── Request form ──────────────────────────────── -->
-        <p class="mono muted text-center" style="margin-bottom:2rem;">
-          Enter your email to receive a reset token.
-        </p>
-
-        <form method="POST" action="reset-password.php">
-          <input type="hidden" name="request_reset" value="1">
-
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email"
-                   placeholder="your@email.com" required autocomplete="email" autofocus>
-          </div>
-
-          <button type="submit" class="btn amber" style="width:100%;">Send Reset Token</button>
-        </form>
-
-        <div class="auth-links">
-          <a href="login.php">Back to sign in.</a>
+      <section class="panel">
+        <div class="panel-head">
+          <span class="panel-no">01</span>
+          <span class="panel-title">Not Configured</span>
+          <span class="panel-note">Read only</span>
         </div>
 
-      <?php elseif ($mode === 'complete'): ?>
-        <!-- ── Complete reset form ───────────────────────── -->
-        <p class="mono muted text-center" style="margin-bottom:2rem;">
-          Enter your new password.
-        </p>
-
-        <form method="POST" action="reset-password.php">
-          <input type="hidden" name="complete_reset" value="1">
-          <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-
-          <div class="form-group">
-            <label for="password">New Password</label>
-            <input type="password" id="password" name="password"
-                   placeholder="Min. 8 characters" required minlength="8"
-                   autocomplete="new-password">
-          </div>
-
-          <div class="form-group">
-            <label for="password_confirm">Confirm Password</label>
-            <input type="password" id="password_confirm" name="password_confirm"
-                   placeholder="Repeat password" required minlength="8"
-                   autocomplete="new-password">
-          </div>
-
-          <button type="submit" class="btn amber" style="width:100%;">Reset Password</button>
-        </form>
-
-      <?php elseif ($mode === 'done'): ?>
-        <!-- ── Success (message already shown) ───────────── -->
-        <div class="auth-links">
-          <a href="login.php">Sign in with your new password.</a>
+        <div class="alert" role="alert">
+          <span class="tag">Unavailable</span>
+          <span>Self-service passphrase recovery is not enabled on this deployment.</span>
         </div>
-      <?php endif; ?>
 
-      <div class="terminal-panel mt-2" style="font-size:0.75rem;">
-        <span class="prompt">$</span> <span class="timestamp">[SECURITY]</span> Reset tokens expire after 1 hour.<br>
-        <span class="prompt">$</span> <span class="timestamp">[SECURITY]</span> Tokens are single-use only.<br>
-        <span class="prompt">$</span> <span class="timestamp">[SECURITY]</span> <span class="highlight">Your security is our priority.</span>
-      </div>
+        <p>
+          Accounts here are identified by login alone. No email address is
+          recorded, so there is nowhere to send a reset link &mdash; and no
+          token store to validate one against.
+        </p>
+        <p>
+          If you have lost your passphrase, an administrator can set a new one
+          directly against the database.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <span class="panel-no">02</span>
+          <span class="panel-title">Administrator Procedure</span>
+        </div>
+        <p>Generate a hash, then store it &mdash; never write a plaintext passphrase into the table:</p>
+        <code>php -r 'echo password_hash("NEW-PASSPHRASE", PASSWORD_BCRYPT, ["cost"=&gt;12]), PHP_EOL;'
+
+psql "$PG_POOLER_URL" -c \
+  "UPDATE sim.users SET password = '&lt;hash&gt;'
+    WHERE world_id = <?= (int)SIM_WORLD_ID ?> AND login = '&lt;login&gt;';"</code>
+      </section>
+
+      <section class="panel">
+        <div class="links">
+          <a href="login.php">Back to sign in</a>
+          <a href="register.php">Request access</a>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="colophon">
+      <span><a href="index.php">&larr; Index</a></span>
+      <span>Session &middot; <?= h(date('Y-m-d H:i T')) ?></span>
     </div>
 
   </main>
-
-  <footer>
-    ASHB2 <span class="dot">◆</span> Human-in-the-Loop Simulation &nbsp;|&nbsp; Scientific Terminal
-  </footer>
 
 </body>
 </html>

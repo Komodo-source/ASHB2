@@ -9,44 +9,24 @@
 require_once __DIR__ . '/auth.php';
 $user = require_auth();
 
-// Get all characters for this user
-$characters = get_user_characters($user['id']);
+// The user's character — their assigned entity. Always one row on this schema
+// (sim.users binds one account to one entity), but the page's roster loop is
+// left intact; see get_user_characters().
+$characters = get_user_characters($user['id'], $user['world_id']);
 
-// Handle feedback submission
+// The world's own numbers, for the banner. Nothing here depends on it, so a
+// null just means the world row has gone.
+$world = get_world_summary($user['world_id']);
+
+// Feedback capture is not wired up on this schema.
+//
+// It needs a `user_feedback` table, and sql/schema_pg.sql defines none — the
+// only table here the web app may write is sim.users, because every other one
+// is replaced wholesale by the loader on the next push (see SimDb::execute).
+// The form has been removed rather than left accepting input it would drop:
+// a page that thanks you for feedback it discarded is worse than one that says
+// it cannot take any.
 $feedbackMessage = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_feedback'])) {
-    $characterId = (int)($_POST['character_id'] ?? 0);
-    $simDay = (int)($_POST['simulation_day'] ?? 0);
-    $alignment = (int)($_POST['alignment_score'] ?? 3);
-
-    // Validate alignment score
-    $alignment = max(1, min(5, $alignment));
-
-    try {
-        Database::insert(
-            'INSERT INTO user_feedback (user_id, character_id, simulation_day, alignment_score,
-                                        narrative_feedback, would_change_action, would_change_personality)
-             VALUES (?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE alignment_score = VALUES(alignment_score),
-                                      narrative_feedback = VALUES(narrative_feedback),
-                                      would_change_action = VALUES(would_change_action),
-                                      would_change_personality = VALUES(would_change_personality)',
-            [
-                $user['id'],
-                $characterId,
-                $simDay,
-                $alignment,
-                $_POST['narrative_feedback'] ?? '',
-                $_POST['would_change_action'] ?? '',
-                $_POST['would_change_personality'] ?? '',
-            ]
-        );
-        $feedbackMessage = 'Feedback recorded. Thank you.';
-    } catch (Exception $e) {
-        $feedbackMessage = 'Error saving feedback.';
-        error_log('Feedback error: ' . $e->getMessage());
-    }
-}
 
 // Get latest state for the active character (first alive one)
 $activeChar = null;
@@ -56,8 +36,8 @@ $recentActions = [];
 foreach ($characters as $char) {
     if ($char['is_alive'] && $char['is_active']) {
         $activeChar = $char;
-        $latestState = get_latest_character_state($char['id']);
-        $recentActions = get_recent_actions($char['id'], 15);
+        $latestState = get_latest_character_state($char['id'], $user['world_id']);
+        $recentActions = get_recent_actions($char['id'], 15, $user['world_id']);
         break;
     }
 }
@@ -65,8 +45,8 @@ foreach ($characters as $char) {
 // If no active character, pick the most recent
 if (!$activeChar && !empty($characters)) {
     $activeChar = $characters[0];
-    $latestState = get_latest_character_state($activeChar['id']);
-    $recentActions = get_recent_actions($activeChar['id'], 10);
+    $latestState = get_latest_character_state($activeChar['id'], $user['world_id']);
+    $recentActions = get_recent_actions($activeChar['id'], 10, $user['world_id']);
 }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -105,11 +85,20 @@ if (!$activeChar && !empty($characters)) {
 
     <?php if (empty($characters)): ?>
       <!-- ── No characters ───────────────────────────────── -->
+      <?php /* Reached only when the account's entity is gone from sim.entity.
+               The FK is ON DELETE CASCADE, so this means the world itself was
+               retired — not that the visitor has yet to make a character. There
+               is nothing for them to do about it, and register.php would only
+               refuse them for already holding a login. */ ?>
       <div class="card text-center" style="padding:3rem;">
-        <p class="section-label">No Digital Twins Found</p>
-        <h3>You haven't created a character yet.</h3>
-        <p class="lede" style="margin:1rem auto;">The simulation is waiting for a seed. Complete the intake questionnaire to create your first digital twin.</p>
-        <a href="register.php" class="btn amber">Create Your First Character</a>
+        <p class="section-label">Subject Not Found</p>
+        <h3>Your subject is no longer in the world.</h3>
+        <p class="lede" style="margin:1rem auto;">
+          World <?= (int)$user['world_id'] ?> no longer holds the entity this account was
+          assigned to &mdash; the world has been retired or reloaded. An
+          administrator will need to reassign you.
+        </p>
+        <a href="index.php" class="btn amber">Return to index</a>
       </div>
 
     <?php elseif ($activeChar): ?>
@@ -129,9 +118,15 @@ if (!$activeChar && !empty($characters)) {
           <div class="stat-value"><?= number_format($activeChar['current_day']) ?></div>
           <div class="stat-label">Simulation Days Lived</div>
         </div>
+        <?php /* Offspring was a `characters` column; sim.entity has no
+                 equivalent and there is no lineage table here to count from.
+                 Age is real data on this schema, so the tile shows that
+                 instead of formatting a NULL into a confident "0". */ ?>
         <div class="stat-box">
-          <div class="stat-value"><?= number_format($activeChar['total_offspring']) ?></div>
-          <div class="stat-label">Offspring</div>
+          <div class="stat-value"><?= number_format((float)$activeChar['age'], 1) ?></div>
+          <div class="stat-label">Age &middot; <?= htmlspecialchars(life_stage_label(
+            $activeChar['life_stage'] === null ? null : (int)$activeChar['life_stage']
+          )) ?></div>
         </div>
       </div>
 
@@ -192,60 +187,71 @@ if (!$activeChar && !empty($characters)) {
             <span class="key">neuroticism</span>
             <span class="val crimson"><?= number_format($activeChar['personality_neuroticism'], 3) ?></span>
           </div>
+          <?php /* QI is nullable: a world exported before the QI columns
+                   existed has no value to show, and a dash is honest where a
+                   zero would read as "this person is an idiot". */ ?>
+          <?php if (($activeChar['qi'] ?? null) !== null): ?>
+          <div class="data-row">
+            <span class="key">QI</span>
+            <span class="val amber"><?= number_format((float)$activeChar['qi'], 0) ?>
+              <span style="opacity:.6">/ <?= number_format((float)($activeChar['qi_potential'] ?? 0), 0) ?></span></span>
+          </div>
+          <div class="data-row">
+            <span class="key">school-years</span>
+            <span class="val"><?= number_format((float)($activeChar['school_years'] ?? 0), 1) ?></span>
+          </div>
+          <?php endif; ?>
           <div class="data-row">
             <span class="key">attachment</span>
-            <span class="val"><?= htmlspecialchars($activeChar['attachment_style'] ?? 'secure') ?></span>
+            <?php /* A smallint enum ordinal, not a word — see
+                     attachment_style_label(). Printing the column directly
+                     would show "0". */ ?>
+            <span class="val"><?= htmlspecialchars(attachment_style_label(
+              $activeChar['attachment_style'] === null ? null : (int)$activeChar['attachment_style']
+            )) ?></span>
           </div>
         </div>
       </div>
       <?php endif; ?>
 
-      <!-- ── Personality correction ──────────────────────── -->
+      <!-- ── Inner state ─────────────────────────────────── -->
+      <?php /* The behavioural-alignment form stood here. It wrote to
+               `user_feedback`, which sql/schema_pg.sql does not define, and the
+               loader owns every table it does define — so there is nowhere to
+               put an answer. Restoring it needs a schema change, not a code
+               change. What the engine DOES export is the entity's own account
+               of itself, which is worth more than a 1–5 slider anyway. */ ?>
+      <?php if (!empty($activeChar['inner_monologue']) || !empty($activeChar['current_goal'])): ?>
       <div class="card" style="margin-bottom:1.5rem;">
-        <div class="card-label">Behavioral Alignment</div>
-        <h3>How is your character doing?</h3>
-        <p>Each day, you can give feedback. This trains the simulation to better match your expectations.</p>
-
-        <form method="POST" action="dashboard.php" style="margin-top:1rem;">
-          <input type="hidden" name="character_id" value="<?= $activeChar['id'] ?>">
-          <input type="hidden" name="simulation_day" value="<?= $activeChar['current_day'] ?>">
-          <input type="hidden" name="submit_feedback" value="1">
-
-          <div class="form-group">
-            <label>How aligned was your character's behavior with your expectations?</label>
-            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;">
-              <?php for ($i = 1; $i <= 5; $i++): ?>
-                <label style="display:flex; align-items:center; gap:0.3rem; font-family:var(--mono); font-size:0.8rem; cursor:pointer;">
-                  <input type="radio" name="alignment_score" value="<?= $i ?>" <?= $i === 3 ? 'checked' : '' ?>>
-                  <?= $i ?>
-                </label>
-              <?php endfor; ?>
-              <span class="hint" style="margin-left:0.5rem;">1=completely wrong &middot; 5=perfect</span>
-            </div>
+        <div class="card-label">Inner State</div>
+        <?php if (!empty($activeChar['current_goal'])): ?>
+          <div class="data-row">
+            <span class="key">current goal</span>
+            <span class="val amber"><?= htmlspecialchars($activeChar['current_goal']) ?></span>
           </div>
-
-          <div class="form-group">
-            <label for="would_change_action">What would you have done differently?</label>
-            <textarea id="would_change_action" name="would_change_action" rows="2"
-                      placeholder="e.g., I would have migrated instead of staying in the depleted area..."></textarea>
+        <?php endif; ?>
+        <?php if (!empty($activeChar['last_action'])): ?>
+          <div class="data-row">
+            <span class="key">last action</span>
+            <span class="val"><?= htmlspecialchars($activeChar['last_action']) ?></span>
           </div>
-
-          <div class="form-group">
-            <label for="narrative_feedback">Notable events / Free response</label>
-            <textarea id="narrative_feedback" name="narrative_feedback" rows="2"
-                      placeholder="What stood out to you this day?"></textarea>
-          </div>
-
-          <button type="submit" class="btn amber small">Submit Feedback</button>
-        </form>
+        <?php endif; ?>
+        <?php if (!empty($activeChar['inner_monologue'])): ?>
+          <p style="margin-top:1rem; font-style:italic;">
+            &ldquo;<?= htmlspecialchars($activeChar['inner_monologue']) ?>&rdquo;
+          </p>
+        <?php endif; ?>
       </div>
+      <?php endif; ?>
 
       <!-- ── Recent Actions ──────────────────────────────── -->
       <?php if (!empty($recentActions)): ?>
       <div class="card">
         <div class="card-label">Recent Actions</div>
         <h3>Decision Log</h3>
-        <p class="hint">The last <?= count($recentActions) ?> actions your character took.</p>
+        <?php /* At most one row: sim.entity keeps only the most recent action
+                 and there is no character_actions history table here. */ ?>
+        <p class="hint">The most recent action on record.</p>
         <div style="margin-top:1rem;">
           <?php foreach ($recentActions as $action): ?>
             <div class="data-row">
@@ -259,9 +265,14 @@ if (!$activeChar && !empty($characters)) {
                     → <?= htmlspecialchars($action['action_target']) ?>
                   <?php endif; ?>
                 </span>
+                <?php /* No utility_score column on sim.entity — the engine
+                         exports the chosen action, not the planner's scoring.
+                         Rendered only when there is something to render. */ ?>
+                <?php if ($action['utility_score'] !== null): ?>
                 <span class="muted mono" style="font-size:0.7rem; white-space:nowrap;">
-                  util: <?= number_format($action['utility_score'], 3) ?>
+                  util: <?= number_format((float)$action['utility_score'], 3) ?>
                 </span>
+                <?php endif; ?>
               </span>
             </div>
           <?php endforeach; ?>
@@ -270,22 +281,38 @@ if (!$activeChar && !empty($characters)) {
       <?php endif; ?>
 
       <!-- ── Death notice ───────────────────────────────── -->
-      <?php if (!$activeChar['is_alive'] && $activeChar['death_cause']): ?>
+      <?php /* Gated on is_alive alone. It used to also require death_cause,
+               which sim.entity does not record — keeping that condition would
+               have meant the notice never appeared at all. Death arrives here
+               as absence: the engine erases the dead before exporting, and the
+               loader flips alive to false for anyone it stops seeing, so the
+               last age it recorded is the age at death. */ ?>
+      <?php if (!$activeChar['is_alive']): ?>
       <div class="card" style="border-color:var(--crimson); margin-top:1.5rem;">
-        <div class="card-label crimson">Character Deceased</div>
-        <h3><?= htmlspecialchars($activeChar['name']) ?> died at Day <?= number_format($activeChar['age_at_death'] ?: $activeChar['current_day']) ?></h3>
-        <p>Cause: <?= htmlspecialchars($activeChar['death_cause']) ?></p>
-        <p class="hint">A full chronicle of their life will be available soon.</p>
+        <div class="card-label crimson">Subject Deceased</div>
+        <h3>
+          <?= htmlspecialchars($activeChar['name']) ?>
+          <?php if ($activeChar['age_at_death'] !== null): ?>
+            died at age <?= number_format((float)$activeChar['age_at_death'], 1) ?>
+          <?php else: ?>
+            is no longer living
+          <?php endif; ?>
+        </h3>
+        <p>Last seen on civ day <?= number_format((int)$activeChar['current_day']) ?>.</p>
+        <p class="hint">The engine exports no cause of death; their record remains, and their relationships outlive them.</p>
       </div>
       <?php endif; ?>
 
     <?php else: ?>
       <!-- ── All characters deceased ─────────────────────── -->
       <div class="card text-center" style="padding:3rem;">
-        <p class="section-label">All Characters Deceased</p>
-        <h3>Your lineage has ended.</h3>
-        <p class="lede" style="margin:1rem auto;">Every simulation ends. But you can always create a new character with a different profile and see how the outcome changes.</p>
-        <a href="register.php" class="btn amber">Create New Character</a>
+        <p class="section-label">No Subject</p>
+        <h3>This account holds no assignment.</h3>
+        <p class="lede" style="margin:1rem auto;">
+          Subjects are assigned from the living population when an account is
+          created; this one has none on record.
+        </p>
+        <a href="world.php" class="btn amber">View the world</a>
       </div>
     <?php endif; ?>
 

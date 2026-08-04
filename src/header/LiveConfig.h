@@ -43,7 +43,24 @@ struct LiveConfig {
     float traitMul = 1.0f;     // IV-P1 cultural traits: transmission, 25% tipping point, cultural distance (CivilizationEngine.cpp/Kinship.cpp); 0 = bit-exact off
     float laborMul = 1.0f;     // III-P3 labour market (skills, demand, weak ties, guilds) + demographic transition (CivilizationEngine.cpp/implem_free_will.cpp); 0 = bit-exact off
     float demographyMul = 1.0f;// §8 infant & child mortality — the hump at the bottom of the lifespan curve (Entity.cpp); 0 = bit-exact off
+    float buildMul = 1.0f;     // tribes actually constructing buildings (CivilizationEngine.cpp considerConstruction); 0 = bit-exact off, i.e. the old world where Building::build was never called
+    float qiMul = 1.0f;        // QI: schooling, research/war/growth payoff of a clever people (Entity.cpp/QISystem.cpp/CivilizationEngine.cpp); 0 = bit-exact off
     float networkMul = 1.0f;   // §8 personal Dunbar layers — role- and temperament-scaled social capacity (main.cpp); 0 = bit-exact off (flat 5-9 cap)
+
+    // ── Phase 6 cognitive-plausibility knobs (plans/cognitive-plausibility.md).
+    //    Same contract: ×1.0 = new baseline, 0.0 = bit-exact pre-feature. ─────
+    float utilityMul = 1.0f;   // M13 continuous vector utility + per-entity eligibility trace
+                               // (VectorUtility.cpp/implem_free_will.cpp); 0 = bit-exact off,
+                               // i.e. the tabular string Q-table AND the world-shared trace it
+                               // used to run on — the bug is preserved under the switch on
+                               // purpose, because that is what "reproduces the old world" means.
+    float appraisalMul = 1.0f; // M14 appraisal gates (hard utility masking, tunnel vision,
+                               // impulsive discounting) + sleep-time persona drift
+                               // (implem_free_will.cpp/Entity.cpp); 0 = bit-exact off
+    float memoryLodMul = 1.0f; // M16-P1 semantic-memory working set: bounds the cosine scan and
+                               // caches one retrieval per decision (SemanticMemory.cpp/
+                               // implem_free_will.cpp); 0 = bit-exact off, i.e. the full
+                               // unbounded scan once per candidate action
 
     // ── ASHB2 overhaul knobs (epigenetics, disease vectors). Same contract:
     //    ×1.0 = baseline, ×0.0 = feature contributes nothing. ─────────────────

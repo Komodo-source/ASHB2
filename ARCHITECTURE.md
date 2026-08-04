@@ -111,6 +111,20 @@ Above 2,000 living agents deliberation staggers into round-robin cohorts
 - **Demography**: fertility desire and conception, ID-based kinship
   (`src/Kinship.cpp`), childhood development, and Gompertz old-age mortality
   anchored on modal adult death age.
+- **QI & universities** (`src/QISystem.cpp`, `updateEducation` in
+  `CivilizationEngine.cpp`): every entity carries an inherited ceiling
+  (`qiPotential`, heritability 0.6 with regression to the mean) and a realized
+  `qi` that only closes on it if childhood feeds and teaches them. Universities
+  are the machine that teaches: they fill seats out of granary **surplus** and
+  raise `schoolYears`, which raises `qi`. A tribe's `meanQI`/`eliteQI` are
+  **recomputed from the living members every civ-day, never accumulated**, and
+  are read by nothing outside `QISystem`'s four clamped multipliers
+  (`researchMul`, `warMul`, `defenseMul`, `growthMul`) — that list is the
+  complete set of places intelligence changes the world. The loop is braked
+  from three sides: schooling costs food and coin, schooled adults have fewer
+  children, and famine/strife/war can knock a university down so `meanQI` falls.
+  Kill switch `--set qiMul=0`; the separate `--set buildMul=0` disables tribal
+  construction (which had no callers at all before this layer).
 
 ## Determinism contract
 

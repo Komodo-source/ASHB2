@@ -40,6 +40,13 @@ static void inheritEmergenceTraits(Entity& baby, Entity* pa, Entity* pb) {
     std::uniform_real_distribution<float> integrityNoise(-10.0f, 10.0f);
     baby.integrity = std::max(0.0f, std::min(100.0f,
         (pa->integrity + pb->integrity) * 0.5f + integrityNoise(s_geneRng)));
+    // QI: the ceiling is fixed here and never moves again. What the child
+    // actually becomes of it is decided over the next sixteen years by what it
+    // is fed and whether anyone teaches it. Drawn from QI's own RNG stream
+    // (inside rollQIPotential) so s_geneRng above stays untouched.
+    baby.qiPotential = Entity::rollQIPotential(pa, pb);
+    baby.qi          = 60.0f;
+    baby.schoolYears = 0.0f;
     std::uniform_real_distribution<float> roll(0.0f, 1.0f);
     if (pa->useNeatBrain && pb->useNeatBrain
         && !pa->neatGenome.empty() && !pb->neatGenome.empty()) {
@@ -385,6 +392,7 @@ void FreeWillSystem::tickChildDevelopment(Entity* child, float deltaTime) {
         return;
     }
 
+
     // Parent presence modelled by social bond strength (no spatial positions)
     float bond1 = child->searchConnSocial(child->parent1);
     float bond2 = child->searchConnSocial(child->parent2);
@@ -602,6 +610,8 @@ float FreeWillSystem::calculateEnvironmentalModifier(Entity* entity, const Actio
     return modifier;
 }
 
+
+
 float FreeWillSystem::applyValueSatisfaction(Entity* entity, const Action& action) {
     ValueSystem v = entity->ValueSystem;
     float modifier = 1.0f;
@@ -638,6 +648,7 @@ float FreeWillSystem::applyValueSatisfaction(Entity* entity, const Action& actio
     }
     return std::max(0.1f, modifier);
 }
+
 
 float FreeWillSystem::calculatePersonalityModifier(Entity* entity, const Action& action) {
     float modifier = 1.0f;
@@ -1634,6 +1645,18 @@ float calculateNormModifier(Entity* entity, const Action& action, const SocialNo
 // short string (e.g. "Ma_p"). Buckets: loneliness L/M/H, anger present, hunger
 // present, social context p(eers)/s(olo). ~24 distinct states keep the per-agent
 // Q-table small while still letting agents learn context-dependent preferences.
+// M13: the year as a phase in [0,1), so the state vector can carry the season as
+// a smooth pair (sin, cos) instead of a letter. `season` is the global in
+// ExternalData.h; an unset season sits at 0 and is simply a fixed point on the
+// circle, which is harmless.
+static float seasonPhase01() {
+    if (season == "spring") return 0.00f;
+    if (season == "summer") return 0.25f;
+    if (season == "autumn") return 0.50f;
+    if (season == "winter") return 0.75f;
+    return 0.0f;
+}
+
 std::string FreeWillSystem::rlStateSignature(Entity* entity, int numNearby) const {
     if (!entity) return "none";
     auto b3 = [](float v) -> const char* {
@@ -2152,11 +2175,11 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
                 return;
             }
             ASHB_TRACE_STREAM << "Reproduction bloque: " << pointed->getName() << " a trop de colere envers " << pointer->getName() << "\n";
-            pointed->list_entityPointedAnger[pointed_anger_index].anger -= BetterRand::genNrInInterval(3, 8);
+            pointed->list_entityPointedAnger[pointed_anger_index].anger -= BetterRand::genNrInInterval(3, 11);
             return;
         }
         if (pointer->entityAge < 15 || pointed->entityAge < 15) {
-          ASHB_TRACE_STREAM << "cannot have children under the age of 18";
+          ASHB_TRACE_STREAM << "cannot have children under the age of 15";
           return ;
         }
         // Fertility wanes with age — elders rarely conceive.
@@ -2166,7 +2189,150 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
         }
 
         if (pointer->checkCouple(pointed)) {
+          // Ids come from the global last_entity_id (CivilizationEngine.cpp),
+          // shared by the living and the lost: a child that dies before it is
+          // constructed still takes an id, so grief can be aimed at a person
+          // rather than at a sentinel (see below).
+          //
+          // This used to be a function-local `static int nextBabyId = 1000`.
+          // It had to become global once the surviving-birth path below started
+          // drawing from last_entity_id: two independent counters both starting
+          // at 1000 would hand the same id to a buried child and a living one,
+          // and addGrief() keys on that id.
 
+          // ── Infant mortality ────────────────────────────────────────────
+          // ONE roll for this birth. The loop that used to be here rolled 10%
+          // for every technology every tribe in the world knew: five tribes
+          // knowing five techs each killed 93% of newborns, and each new
+          // discovery anywhere made childbirth deadlier. Worse, the one tech
+          // that should SAVE infants — Oral Rehydration Therapy — only skipped
+          // a single roll. Medicine now lowers the rate, and only the parents'
+          // OWN tribe counts: a remedy another people has and never shared
+          // does nothing for this child.
+          float deathChance = 24.0f;   // pre-modern baseline, roughly 1 in 4
+          Tribe* home = globalCivEngine ? globalCivEngine->findTribe(pointer->tribeId)
+                                        : nullptr;
+          if (home) {
+              // Each of these was, historically, a step change in how many
+              // babies lived through their first days.
+              if (home->knownTechName.count("Birthing Method"))          deathChance -= 6.0f;
+              if (home->knownTechName.count("Oral Rehydration Therapy")) deathChance -= 8.0f;
+              if (home->knownTechName.count("Vaccine/Medication"))       deathChance -= 5.0f;
+              if (home->knownTechName.count("Quarantine"))               deathChance -= 2.0f;
+          }
+          // A starving or sick mother loses more babies, whatever her people know.
+          if (pointed->entityHealth < 40.0f) deathChance += 8.0f;
+          if (pointed->entityHunger > 70.0f) deathChance += 6.0f;
+          deathChance = std::max(2.0f, std::min(45.0f, deathChance));
+
+          const bool was_born = (BetterRand::genNrInInterval(0, 100) > deathChance);
+
+          if (!was_born) {
+            // The child gets an id of its own. addGrief() keys on the lost
+            // person, so a shared sentinel would fold a second loss into the
+            // first — the parents would mourn "the baby" once instead of each
+            // child they buried.
+            const int lostChildId = last_entity_id++;
+
+            if (engineCivilization)
+                engineCivilization->logEvent(-1, pointed->name + " and " + pointer->name
+                    + " lost their baby (infant death)", "death");
+            if (globalLogger)
+                globalLogger->logEvent("infant_death", pointed->name + " and "
+                    + pointer->name + " lost their baby");
+
+            // handleDeath() in main.cpp is the bereavement path, and it already
+            // knows that losing a child is the heaviest grief there is. It
+            // cannot fire here: it walks the living reading the DEAD entity's
+            // parent pointers, and this child was never constructed. That is
+            // why an infant death used to cost the parents nothing at all.
+            //
+            // Nothing below DECIDES that anyone despairs, separates, or takes
+            // their own life. It moves the state the existing systems already
+            // read and lets them choose: Suicide requires mentalHealth <= 8,
+            // stress >= 95 and happiness <= 3; BreakUp requires anger >= 40
+            // toward the partner. Grief this deep can carry someone there, and
+            // the scorer decides whether it does.
+            Entity* parents[2] = { pointer, pointed };
+            for (Entity* p : parents) {
+                // Attachment shapes mourning the way it already does in the
+                // BreakUp branch: the anxious cannot put it down, the avoidant
+                // will not pick it up.
+                float grief = 0.85f + BetterRand::genNrInInterval(0, 15) / 100.0f;
+                if (p->dv.attachmentStyle == ANXIOUS)  grief = std::min(1.0f, grief + 0.10f);
+                if (p->dv.attachmentStyle == AVOIDANT) grief = std::max(0.0f, grief - 0.25f);
+                // Someone who built their life around family loses more of it.
+                grief = std::min(1.0f, grief + p->ValueSystem.familyOrientation / 500.0f);
+                p->addGrief(lostChildId, grief, true);
+
+                LifeMemory mem;
+                mem.eventType = "loss_death";
+                mem.entityInvolvedId = lostChildId;
+                mem.emotionalIntensity = grief;
+                mem.isFormative = true;          // nobody is unchanged by this one
+                mem.internalNarrative = "lost a child before it drew breath";
+                p->lifeMemories.push_back(mem);
+                p->rebuildSemanticMemory();      // after the push, or it consolidates stale state
+
+                p->entityHapiness     = std::max(0.0f, p->entityHapiness     - 25.0f * grief);
+                p->entityMentalHealth = std::max(0.0f, p->entityMentalHealth - 20.0f * grief);
+                p->entityStress       = std::min(100.0f, p->entityStress     + 22.0f * grief);
+                p->entityLoneliness   = std::min(100.0f, p->entityLoneliness + 10.0f * grief);
+                p->senseOfPurpose     = std::max(0.0f, p->senseOfPurpose     - 12.0f * grief);
+                p->personality.neuroticism =
+                    std::min(100.0f, p->personality.neuroticism + 8.0f);
+                // Anger with nowhere to aim. Left unexpressed it becomes the
+                // suppression debt the emotional model already charges for.
+                p->emotionalState.rawAnger =
+                    std::min(100.0f, p->emotionalState.rawAnger + 15.0f * grief);
+
+                p->onMajorEventAddOrBoostGoal("loss_death");
+            }
+
+            // ── What it does to the two of them ─────────────────────────────
+            // A shared loss either welds a couple together or tears it apart,
+            // and which one is not decided here either. The bond takes damage
+            // both ways; whether that becomes a separation depends on the
+            // blame below clearing BreakUp's anger threshold.
+            for (int i = 0; i < 2; ++i) {
+                Entity* self  = parents[i];
+                Entity* other = parents[1 - i];
+
+                int ci = self->contains(self->list_entityPointedCouple, other, 3);
+                if (ci != -1) {
+                    entityPointedCouple& bond = self->list_entityPointedCouple[ci];
+                    bond.satisfaction = std::max(0.0f,
+                        bond.satisfaction - BetterRand::genNrInInterval(10, 25));
+                    bond.trust = std::max(0.0f,
+                        bond.trust - BetterRand::genNrInInterval(0, 8));
+                    // Commitment genuinely goes both ways: some hold on harder
+                    // precisely because of what they lost together.
+                    bond.commitment += (self->ValueSystem.familyOrientation > 60.0f)
+                                       ?  BetterRand::genNrInInterval(0, 6)
+                                       : -BetterRand::genNrInInterval(5, 15);
+                    bond.commitment = std::max(0.0f, std::min(100.0f, bond.commitment));
+                }
+
+                // Blame. Not always, and not evenly — someone highly neurotic
+                // goes looking for a person to hold responsible.
+                if (BetterRand::genNrInInterval(0, 100)
+                        < 20.0f + self->personality.neuroticism / 4.0f) {
+                    int ai = self->contains(self->list_entityPointedAnger, other, 2);
+                    float blame = static_cast<float>(BetterRand::genNrInInterval(8, 20));
+                    if (ai == -1) {
+                        self->addAnger({ other->entityId, other, blame });
+                    } else {
+                        self->list_entityPointedAnger[ai].anger =
+                            std::min(100.0f, self->list_entityPointedAnger[ai].anger + blame);
+                    }
+                }
+            }
+
+            ASHB_TRACE_STREAM << "Infant death: " << pointer->getName() << " and "
+                              << pointed->getName() << " lost a child (risk was "
+                              << deathChance << "%)\n";
+            return ;
+          }
             LifeMemory mem;
             mem.eventType = "breeding";
             mem.entityInvolvedId = pointed->entityId;
@@ -2192,8 +2358,13 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             if (globalLogger) globalLogger->logEvent("breeding", "Reproduction between " + pointer->name + " and " + pointed->name);
 
 
-            static int nextBabyId = 1000;
-            Entity baby = Entity(nextBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1, "happiness");
+            // nextBabyId is declared at the top of this block — the lost
+            // children draw from the same sequence, so no id is ever reused
+            // between a baby that lived and one that did not.
+            Entity baby = Entity(last_entity_id++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1, "happiness");
+
+
+
 
             if (engineCivilization) {
                 engineCivilization->logEvent(-1, baby.getName() + " was born to "
@@ -2283,8 +2454,10 @@ void FreeWillSystem::pointedAssimilation(Entity* pointer, Entity* pointed, Actio
             if (dHere >= desireGate && dThere >= desireGate &&
                 pointer->entityAge >= 18 && pointed->entityAge >= 18 &&
                 pointer->entityAge <= 55 && pointed->entityAge <= 55) {
-                static int nextBabyId2 = 5000;
-                Entity baby = Entity(nextBabyId2++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1, "happiness");
+                // Same sequence as every other birth — a second counter based
+                // at 5000 would collide with this one as soon as the run was
+                // long enough to allocate 4000 ids.
+                Entity baby = Entity(last_entity_id++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75, 'A', 0, 75, -1, "happiness");
                 baby.posX = pointer->posX + BetterRand::genNrInInterval(-15, 15);
                 baby.posY = pointer->posY + BetterRand::genNrInInterval(-15, 15);
                 baby.parent1 = pointed;
@@ -2853,6 +3026,11 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
     // RL: capture the situation *before* the action so the outcome below can be
     // attributed to the right (state, action) pair.
     const std::string rlPreState = rlStateSignature(entity, context.numPeopleNearby);
+    // M13: the same situation as a continuous vector, captured at the same
+    // instant so the two learners are fed identical evidence.
+    const vu::Vec rlPreVec = (g_liveConfig.utilityMul != 0.0f)
+        ? vu::stateVector(*entity, context.numPeopleNearby, context.isNightTime, seasonPhase01())
+        : vu::Vec{};
     std::map<std::string, float> statsBefore = captureEntityStats(entity);
     //ASHB_TRACE_STREAM << "Stats Before:\n";
     //for (auto& [k, v] : statsBefore) ASHB_TRACE_STREAM << "  " << k << ": " << v << "\n";
@@ -3023,11 +3201,40 @@ void FreeWillSystem::executeAction(Entity* entity, Action*& action, const Action
         rlSystem.processExperience(entity, rlPreState, action->name, reward, rlNextState);
         // C1 eligibility-lite: yesterday's choice shares credit/blame for
         // today's result, so multi-step payoffs (hunt → eat) credit the chain.
-        if (!prevRlState.empty())
-            rlSystem.processExperience(entity, prevRlState, prevRlAction,
-                                       reward * 0.3f, rlPreState);
-        prevRlState  = rlPreState;
-        prevRlAction = action->name;
+        if (g_liveConfig.utilityMul == 0.0f) {
+            // Pre-M13 behaviour, preserved bit-exactly: the trace is world-shared,
+            // so "yesterday's choice" is whatever entity acted before this one.
+            if (!prevRlState.empty())
+                rlSystem.processExperience(entity, prevRlState, prevRlAction,
+                                           reward * 0.3f, rlPreState);
+            prevRlState  = rlPreState;
+            prevRlAction = action->name;
+        } else {
+            // M13-P0: the trace belongs to the agent whose life it is.
+            if (!entity->prevRlState.empty())
+                rlSystem.processExperience(entity, entity->prevRlState, entity->prevRlAction,
+                                           reward * 0.3f, rlPreState);
+            entity->prevRlState  = rlPreState;
+            entity->prevRlAction = action->name;
+
+            // M13-P1: the continuous learner. It sees the same reward, but over
+            // a state it can actually resolve, and it pays it back down a
+            // depth-8 trace instead of one flat step.
+            const vu::Vec rlPostVec =
+                vu::stateVector(*entity, context.numPeopleNearby, context.isNightTime,
+                                seasonPhase01());
+            float bestNext = 0.0f;
+            for (const Action& cand : availableActions) {
+                float u = entity->rlLearner.utility(rlPostVec, cand.name, cand.needCategory);
+                if (u > bestNext) bestNext = u;
+            }
+            // M14: an enraged mind stops discounting the future correctly — it
+            // stops having one. Neutral 0.9 whenever the appraisal gates are off.
+            const float discount = (g_liveConfig.appraisalMul != 0.0f &&
+                                    entity->entityGeneralAnger > 70.0f) ? 0.5f : 0.9f;
+            entity->rlLearner.learn(rlPreVec, action->name, action->needCategory,
+                                    reward / 100.0f, bestNext, discount);
+        }
     }
 
     // Phase 3: sentiment-modulated emotional impact on pointed target
@@ -3588,6 +3795,75 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
     perception.events.clear();
     perception.nearbyEntities.clear();
 
+    // ── M14-P1: appraisal-driven utility masking ─────────────────────────────
+    // The twelve scorers below are a weighted sum, and a sum is a democracy: a
+    // starving agent's "Socialize" collects a dozen small positive terms and can
+    // still out-vote the one enormous negative one. Real minds do not work that
+    // way. Under pressure they do not re-weight, they REFUSE — whole categories
+    // of action stop being considered at all, and the field of view narrows to
+    // the few options that speak to the emergency.
+    //
+    // So these are hard zeros, not penalties, and they are applied by dropping
+    // the action from the candidate list entirely rather than by scoring it low.
+    // Neutral when appraisalMul == 0: nothing is dropped, nothing is narrowed,
+    // and the RNG is consumed in exactly the old order.
+    struct AppraisalGates {
+        bool starving   = false;   // eat or find food; the rest can wait
+        bool terrified  = false;   // tunnel vision toward safety
+        bool enraged    = false;   // impulsive: the future stops counting
+        bool exhausted  = false;   // no capacity for sustained work
+        bool any() const { return starving || terrified || enraged || exhausted; }
+
+        // True when this action is not admissible in the current state.
+        bool masks(const std::string& name, const std::string& cat) const {
+            if (starving  && (cat == "social" || cat == "entertainment" ||
+                              cat == "spiritual" || cat == "leadership" || cat == "hygiene"))
+                return true;
+            if (exhausted && (cat == "achievement" || cat == "entertainment"))
+                return true;
+            if (terrified && (cat == "entertainment" || name == "Explore"))
+                return true;
+            return false;
+        }
+        // Fear makes a mind risk-averse rather than incapable: violent and
+        // otherwise costly options survive, but they have to be worth much more.
+        float riskScale(const std::string& name, const std::string& cat) const {
+            if (!terrified) return 1.0f;
+            if (cat == "safety" || name == "Betray" || name == "Insult" ||
+                name == "Manipulate" || name == "Discrimination")
+                return 1.0f / 3.0f;
+            return 1.0f;
+        }
+    } gates;
+    if (g_liveConfig.appraisalMul != 0.0f) {
+        gates.starving  = entity->entityHunger        > 80.0f;
+        gates.terrified = entity->emotions.fear       > 60.0f;
+        gates.enraged   = entity->entityGeneralAnger  > 70.0f;
+        gates.exhausted = entity->sleepPressure       > 85.0f;
+    }
+    // How often does each gate actually fire? A gate meant for an emergency that
+    // turns out to be the normal state is not a gate, it is a permanent ban —
+    // and the difference is not guessable from the threshold, only measurable.
+    // ASHB_GATE_DEBUG=1.
+    {
+        static const bool s_gateDbg = std::getenv("ASHB_GATE_DEBUG") != nullptr;
+        if (s_gateDbg) {
+            static long nDecide = 0, nStarve = 0, nFear = 0, nRage = 0, nTired = 0;
+            ++nDecide;
+            if (gates.starving)  ++nStarve;
+            if (gates.terrified) ++nFear;
+            if (gates.enraged)   ++nRage;
+            if (gates.exhausted) ++nTired;
+            if (nDecide % 200000 == 0)
+                std::cerr << "GATEDBG decisions=" << nDecide
+                          << " starving=" << (100.0 * nStarve / nDecide) << "%"
+                          << " terrified=" << (100.0 * nFear / nDecide) << "%"
+                          << " enraged=" << (100.0 * nRage / nDecide) << "%"
+                          << " exhausted=" << (100.0 * nTired / nDecide) << "%\n";
+        }
+    }
+
+
     // M4: percept budget — attention is a finite resource that stress narrows.
     // A calm agent registers everyone nearby; a panicked one registers only the
     // most salient few (threats first, then strong bonds). Everything after
@@ -3759,6 +4035,11 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
     // RL: snapshot the situation once; each candidate is scored against it below.
     const std::string rlState = rlStateSignature(entity, (int)attended.size());
+    // M13: and the same situation as a continuous vector, for the learner that
+    // can actually tell hunger 51 from hunger 99.
+    const vu::Vec sVec = (g_liveConfig.utilityMul != 0.0f)
+        ? vu::stateVector(*entity, (int)attended.size(), context.isNightTime, seasonPhase01())
+        : vu::Vec{};
 
     // ── B5: metacognition — decide how hard this decision is worth thinking
     // about. Stakes = bodily peril, felt fear, or an anticipated attack. Calm
@@ -3825,6 +4106,12 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         // different RNG, so the off-state would no longer reproduce the
         // pre-feature world bit-for-bit.
         if (act.name == "GiveGift" && g_liveConfig.giftMul == 0.0f) continue;
+        // M14-P1: an option the current state refuses to entertain is dropped
+        // here, before it is scored — a masked action must not reach the softmax
+        // at all, or "hard zero" would just be "very small" and the twelve
+        // scorers could still vote it back in. All gates are false when
+        // appraisalMul == 0, so this is bit-exactly the old loop then.
+        if (gates.masks(an0, act.needCategory)) continue;
         bool isSocialCat = (act.needCategory == "social" ||
                             act.name == "Murder" || act.name == "Betray");
         if (isSocialCat && attended.empty()) {
@@ -3894,7 +4181,7 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         if      (an0 == "Gather" || an0 == "Hunt") score *= neatForage;
         else if (an0 == "EatMeal")                 score *= neatEat;
 
-        
+
         // Planned action bias: boost if this matches the planned action
         if (!plannedActionName.empty() && act.name == plannedActionName) {
             score *= 1.5f;
@@ -3959,9 +4246,23 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
         // RL: bias toward actions that have historically paid off in this state.
         // Neutral at the default Q (50); ±40% at the extremes.
         {
-            float q = rlSystem.getActionValue(entity->getId(), rlState, an);
-            score *= (0.6f + 0.8f * (q / 100.0f));
+            if (g_liveConfig.utilityMul != 0.0f) {
+                // M13: same ±40% authority as the tabular bias it replaces, so
+                // this swaps the learner without re-tuning every other weight in
+                // the pipeline. The learner starts at w=0, bias=0 → U=0 → ×1.0,
+                // i.e. a newborn world behaves exactly as if unbiased and only
+                // diverges as agents actually learn something.
+                float u = entity->rlLearner.utility(sVec, an, act.needCategory);
+                score *= 1.0f + std::clamp(u, -0.5f, 0.5f) * 0.8f;
+            } else {
+                float q = rlSystem.getActionValue(entity->getId(), rlState, an);
+                score *= (0.6f + 0.8f * (q / 100.0f));
+            }
         }
+
+        // M14-P1: fear does not forbid a knife fight, it makes one look like a
+        // much worse idea. Neutral 1.0 whenever the gates are off.
+        score *= gates.riskScale(an, act.needCategory);
 
         std::uniform_real_distribution<float> jitter(0.93f, 1.07f);
         score *= jitter(rng);
@@ -4007,7 +4308,15 @@ Action* FreeWillSystem::cognitiveChooseAction(Entity* entity,
 
     std::sort(candidates.begin(), candidates.end(),
         [](const ActionCandidate& a, const ActionCandidate& b) { return a.score > b.score; });
-    if ((int)candidates.size() > finalCut) candidates.resize(finalCut);
+    // M14-P1: tunnel vision. B5's metacognition already widens the slate when
+    // the stakes are high — but "high stakes" and "in crisis" are not the same
+    // state. A frightened or starving mind does not deliberate MORE carefully
+    // over more options; it stops seeing most of them. Narrowing to three after
+    // the sort keeps the best options and drops the long tail the agent would
+    // not, realistically, still be weighing.
+    const int effectiveCut = (g_liveConfig.appraisalMul != 0.0f && gates.any())
+                             ? std::min(finalCut, 3) : finalCut;
+    if ((int)candidates.size() > effectiveCut) candidates.resize(effectiveCut);
     seg(s_msMemPass);
 
     Deliberation delib;
@@ -4885,8 +5194,10 @@ void FreeWillSystem::processSocialConsequences(Entity* e, const std::vector<Enti
             if (youngerAge <= 30.0f)      fertility *= 1.6f;
             else if (youngerAge <= 40.0f) fertility *= 1.25f;
             if (BetterRand::genNrInInterval(0, 100) < fertility) {
-                static int nextLineageBabyId = 20000;
-                Entity baby = Entity(nextLineageBabyId++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75,
+                // Same global sequence as every other birth site. Its own base
+                // of 20000 kept it clear of the others only by being far away;
+                // one counter makes that guarantee structural instead.
+                Entity baby = Entity(last_entity_id++, 0, 75, 85, 0, 100, "", 10, 0, 0, 75,
                                      'A', 0, 75, -1, "happiness");
                 baby.posX = e->posX + BetterRand::genNrInInterval(-15, 15);
                 baby.posY = e->posY + BetterRand::genNrInInterval(-15, 15);
